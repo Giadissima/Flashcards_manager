@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flashcard Generator</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+</head>
+<body>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
+  <div class="container text-center" style="margin-top: 1rem;">
+    <div class="row">
+      <div class="col">
+        <a type="button" class="btn btn-warning" href="/new-card" style="color: white"><b><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/></svg> Create a new Card</b></a>
+      </div>
+      <div class="col">
+        <a type="button" class="btn btn-info" href="/new-group" style="color: white"><b><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M480-120 200-272v-240L40-600l440-240 440 240v320h-80v-276l-80 44v240L480-120Zm0-332 274-148-274-148-274 148 274 148Zm0 241 200-108v-151L480-360 280-470v151l200 108Zm0-241Zm0 90Zm0 0Z"/></svg> Create a new Group</b></a>
+      </div>
+    </div>
+  </div>
+  <div class="container mt-4">
+    <div id="cards" class="row g-3"></div>
+  </div>
+  <script> 
+    let cards_arr = [];
+    async function seeAnswer(card_title) {
+      const cards = document.getElementById('cards').children;
+      Array.from(cards).forEach(card=>{
+        if (card.querySelector('.card-title').textContent === card_title) {
+          const cardData = cards_arr.find(c => c.title === card_title);
+      
+          // Cambia il contenuto del card-description con la risposta
+          if (cardData) {
+            const card_text_selector=card.querySelector('.card-text')
+            if(card_text_selector.textContent == cardData.answer){
+              card.querySelector('.card-text').textContent = cardData.question;
+              card.querySelector('.card-button').textContent = "Vedi risposta";
+
+            }else{
+              card.querySelector('.card-text').textContent = cardData.answer;
+              card.querySelector('.card-button').textContent = "Vedi domanda";
+            }
+          }
+        }
+      })
+
+    }
+    async function deleteCard(card_title) {
+      const cards = document.getElementById('cards').children;
+      let res = await fetch('/delete-card', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: card_title })
+      });
+      const result = await res.json();
+      if (res.ok) {
+        alert('Card successfully deleted!');
+        // Ricarica la pagina
+        location.reload();
+
+      } else {
+        alert('Error removing card: ' + result.message);
+      }
+
+    }
+    async function loadFlashcard() {
+      try {
+        const response = await fetch('/flashcards.json');
+        const flashcardsData = await response.json();
+
+        const container = document.getElementById('cards');
+        flashcardsData.forEach(card => {
+          const div = document.createElement('div');
+        div.className = 'col-md-4'; // 3 colonne per riga su dispositivi >= md
+
+        const htmlstr = `
+          <div class="card h-100" style="width: 18rem; border: 2px solid ${card.borderColor};">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">${card.title}</h5>
+              <p class="card-text">${card.question}</p>
+              <div class="mt-auto">
+                <button class="btn btn-primary card-button me-2" onclick="seeAnswer('${card.title}')">Vedi risposta</button>
+                <button type="button" class="btn btn-danger card-button" onclick="deleteCard('${card.title}')">
+                  <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF">
+                    <path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>`;
+        div.innerHTML = htmlstr;
+        container.appendChild(div);
+          cards_arr.push(card);
+        });
+      } catch (error) {
+        console.error('Errore nella lettura del file:', error);
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", loadFlashcard);
+  </script>
+  
+</body>
+</html>

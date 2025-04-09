@@ -1,0 +1,47 @@
+[
+  {
+    "title": "Deadlock",
+    "question": "Cos'è un deadlock?",
+    "answer": "È una situazione in cui due o più processi rimangono in attesa permanente l’uno dell’altro, impedendo l’avanzamento."
+  },
+  {
+    "title": "Starvation",
+    "question": "Qual è la differenza tra deadlock e starvation?",
+    "answer": "La starvation è quando un processo non riceve mai le risorse necessarie, mentre nel deadlock c'è un blocco circolare tra processi."
+  },
+  {
+    "title": "Schedulazione",
+    "question": "Quali sono le principali politiche di scheduling?",
+    "answer": "FCFS, SJF, Round Robin, Priorità statica e dinamica, Multilevel Queue."
+  },
+  {
+    "title": "FCFS",
+    "question": "Come funziona la politica FCFS?",
+    "answer": "First Come First Served: i processi vengono eseguiti nell'ordine in cui arrivano, senza preemption."
+  },
+  {
+    "title": "Round Robin",
+    "question": "In cosa consiste il Round Robin?",
+    "answer": "Ogni processo riceve un time slice fisso e viene messo in fondo alla coda se non finisce entro il suo turno."
+  },
+  {
+    "title": "Mutua esclusione",
+    "question": "Come si garantisce la mutua esclusione?",
+    "answer": "Utilizzando meccanismi come lock, mutex o semafori binari per evitare accessi simultanei."
+  },
+  {
+    "title": "Kernel",
+    "question": "Cos'è il kernel?",
+    "answer": "È il cuore del sistema operativo, gestisce le risorse e la comunicazione tra hardware e software."
+  },
+  {
+    "title": "Interrupt",
+    "question": "Cosa fa un interrupt?",
+    "answer": "Segnala al processore un evento asincrono, interrompendo il flusso di esecuzione per gestire l’evento."
+  },
+  {
+    "title": "Context switch",
+    "question": "Cosa accade durante un context switch?",
+    "answer": "Il sistema salva lo stato del processo corrente e carica lo stato di un altro processo per eseguirlo."
+  }
+]
