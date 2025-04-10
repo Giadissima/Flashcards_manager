@@ -1,3 +1,4 @@
+// TODO il gruppo può avere un immagine
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
@@ -49,7 +50,18 @@ const server = http.createServer((req, res) => {
         res.end(data);
       }
     });
-  }else if (req.url === '/add-card' && req.method === 'POST') {
+  }else if (req.url === '/groups.json') {
+    fs.readFile('./data/groups.json', 'utf-8', (err, data) => {
+      if (err) {
+        res.writeHead(500, { 'Content-Type': 'text/plain' });
+        res.end('Errore nel caricamento del JSON');
+      } else {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(data);
+      }
+    });
+  }
+  else if (req.url === '/add-card' && req.method === 'POST') {
     let body = '';
     
     // Riceve i dati del corpo della richiesta
@@ -65,7 +77,7 @@ const server = http.createServer((req, res) => {
         fs.readFile('./data/flashcards.json', 'utf-8', (err, data) => {
           if (err) {
             res.writeHead(500, { 'Content-Type': 'text/plain' });
-            res.end('Errore nel caricamento del file JSON');
+            res.end('Error occoured loading JSON file');
             return;
           }
 
@@ -74,7 +86,7 @@ const server = http.createServer((req, res) => {
             flashcards = JSON.parse(data); // Converte il contenuto in un array di oggetti
           } catch (error) {
             res.writeHead(500, { 'Content-Type': 'text/plain' });
-            res.end('Errore nel parsing del JSON');
+            res.end('Error occoured parsing JSON file');
             return;
           }
 
@@ -96,10 +108,61 @@ const server = http.createServer((req, res) => {
         });
       } catch (error) {
         res.writeHead(400, { 'Content-Type': 'text/plain' });
-        res.end('Dati JSON non validi');
+        res.end('error: invalid JSON data');
       }
     });
-  }else if (req.url === '/delete-card' && req.method === 'POST') {
+  }else if (req.url === '/add-group' && req.method === 'POST') {
+    let body = '';
+    
+    // Riceve i dati del corpo della richiesta
+    req.on('data', chunk => {
+      body += chunk;
+    });
+    
+    // Quando i dati sono stati ricevuti
+    req.on('end', () => {
+      try {
+        console.log("ciao");
+        const newGroup = JSON.parse(body); // Parsea il JSON ricevuto
+        fs.readFile('./data/groups.json', 'utf-8', (err, data) => {
+          if (err) {
+            res.writeHead(500, { 'Content-Type': 'text/plain' });
+            res.end('Error occoured loading JSON file');
+            return;
+          }
+
+          let groups = [];
+          try {
+            groups = JSON.parse(data); // Converte il contenuto in un array di oggetti
+          } catch (error) {
+            res.writeHead(500, { 'Content-Type': 'text/plain' });
+            res.end('Error occoured parsing JSON file');
+            return;
+          }
+
+          // Write group into "groups" array
+          groups.push(newGroup);
+
+          // Write array into JSON file
+          fs.writeFile('./data/groups.json', JSON.stringify(groups, null, 2), 'utf-8', (err) => {
+            if (err) {
+              res.writeHead(500, { 'Content-Type': 'text/plain' });
+              res.end('Error occourred writing JSON file');
+              return;
+            }
+
+            // success
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ message: 'Added group successfully' }));
+          });
+        });
+      } catch (error) {
+        res.writeHead(400, { 'Content-Type': 'text/plain' });
+        res.end('error: invalid JSON data');
+      }
+    });
+  }
+  else if (req.url === '/delete-card' && req.method === 'POST') {
     let body = '';
   
     // Riceve i dati del corpo della richiesta
@@ -121,7 +184,7 @@ const server = http.createServer((req, res) => {
         fs.readFile('./data/flashcards.json', 'utf-8', (err, data) => {
           if (err) {
             res.writeHead(500, { 'Content-Type': 'text/plain' });
-            res.end('Errore nel caricamento del file JSON');
+            res.end('Error occoured loading JSON file');
             return;
           }
   
@@ -130,7 +193,7 @@ const server = http.createServer((req, res) => {
             flashcards = JSON.parse(data);
           } catch (parseError) {
             res.writeHead(500, { 'Content-Type': 'text/plain' });
-            res.end('Errore nel parsing del JSON');
+            res.end('Error occoured parsing JSON file');
             return;
           }
   
@@ -156,14 +219,30 @@ const server = http.createServer((req, res) => {
         });
       } catch (error) {
         res.writeHead(400, { 'Content-Type': 'text/plain' });
-        res.end('Dati JSON non validi');
+        res.end('error: invalid JSON data');
       }
     });
   }
   // Gestisci richieste non riconosciute
   else {
-    res.writeHead(404, { 'Content-Type': 'text/plain' });
-    res.end('Pagina non trovata');
+    const filePath = path.join(__dirname, req.url);
+    fs.readFile(filePath, (err, data) => {
+      if (err) {
+        res.writeHead(404, { 'Content-Type': 'text/plain' });
+        res.end('File non trovato');
+      } else {
+        const ext = path.extname(filePath);
+        let contentType = 'text/plain';
+        if (ext === '.css') contentType = 'text/css';
+        if (ext === '.js') contentType = 'application/javascript';
+        if (ext === '.png') contentType = 'image/png';
+        if (ext === '.jpg' || ext === '.jpeg') contentType = 'image/jpeg';
+        // Aggiungi altri tipi se ti servono
+
+        res.writeHead(200, { 'Content-Type': contentType });
+        res.end(data);
+      }
+    });
   } 
 });
 

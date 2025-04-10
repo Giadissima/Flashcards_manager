@@ -3,30 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Flashcard Generator</title>
+  <title>FlashGroup Generator</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
 </head>
 <body>
+  <!-- TODO mettere gli input required -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
   <script>
-    async function addCard(){
-      const title = document.getElementById("title").value;
-      const answer = document.getElementById("answer").value;
-      const question = document.getElementById("question").value;
-      const newCard =  {title, question, answer}
-      console.log(answer, question, title);
+    async function addGroup(){
+      const name = document.getElementById("name").value;
+      const color = document.getElementById("color").value;
+      const newGroup =  {name, color}
       try {
-        const response = await fetch('/add-card', {
+        const response = await fetch('/add-group', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(newCard) // Converte l'oggetto in JSON
+          body: JSON.stringify(newGroup) // Converte l'oggetto in JSON
         });
   
         const result = await response.json();
         if (response.ok) {
-          alert('Card added successfully!');
+          alert('Group added successfully!');
         } else {
-          alert('Error adding card: ' + result.message);
+          alert('Error adding Group: ' + result.message);
         }
       } catch (error) {
         console.error('Error:', error);
@@ -36,7 +35,7 @@
 
     }
   </script>
-  <div class="card">
+  <div class="Group">
     <div class="input-group mb-3">
       <span class="input-group-text" >Group name</span>
       <input type="text" id="name" class="form-control">
@@ -53,7 +52,7 @@
       </select>
     </div>
 
-    <button type="button" class="btn btn-success" onclick="addCard()">Add new group</button>
+    <button type="button" class="btn btn-success" onclick="addGroup()">Add new group</button>
   </div>
 </body>
 </html>
