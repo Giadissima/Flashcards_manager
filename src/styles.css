@@ -14,5 +14,16 @@
 }
 
 .select{
-  background-color: !important orange;
+  background-color: orange !important;
+  border: 1px solid black !important;
+  color:white;
+}
+
+.input{
+  border: 1px solid black !important;
+}
+
+.div-centered{
+  margin-left:auto;
+  margin-right:auto;
 }

@@ -51,30 +51,36 @@
 
     document.addEventListener("DOMContentLoaded", loadGroups);
   </script>
+  <h1 class="text-centered">
+    Create a new card
+  </h1>
+  <!-- mettere una width statica per i label -->
   <div class="form-container">
     <div class="input-group mb-3">
       <span class="input-group-text select"  >Title</span>
-      <input type="text" id="title" class="form-control">
+      <input type="text" id="title" class="form-control input">
     </div>
 
     <div class="input-group mb-3">
       <span class="input-group-text select" >Question</span>
-      <input type="text" id="question" class="form-control">
+      <input type="text" id="question" class="form-control input">
     </div>
 
     <div class="input-group mb-3">
       <span class="input-group-text select" >Answer</span>
-      <input type="text" id="answer" class="form-control">
+      <input type="text" id="answer" class="form-control input">
     </div>
 
     <div class="input-group mb-3">
       <span class="input-group-text select" >Group</span>
-      <select class="form-select" id="group">
+      <select class="form-select input" id="group">
         <option selected value="">Choose the group</option> 
         
       </select>
     </div>
-    <button type="button" class="btn btn-success" onclick="addCard()">Add new card</button>
+    <div class="div-centered">
+      <button type="button" class="btn btn-success" onclick="addCard()">Add new card</button>
+    </div>
   </div>
 
   </div>

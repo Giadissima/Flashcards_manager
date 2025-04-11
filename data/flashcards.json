@@ -43,5 +43,10 @@
     "title": "Context switch",
     "question": "Cosa accade durante un context switch?",
     "answer": "Il sistema salva lo stato del processo corrente e carica lo stato di un altro processo per eseguirlo."
+  },
+  {
+    "title": "",
+    "question": "",
+    "answer": ""
   }
 ]
