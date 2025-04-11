@@ -10,7 +10,20 @@
 <body class="d-flex align-items-center justify-content-center">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
   <script>
-    async function addCard(event) {
+    let title,answer,question,group 
+    
+    // Funzione per ottenere i query parameters dalla URL
+    function getQueryParams() {
+      const urlParams = new URLSearchParams(window.location.search);
+      title = urlParams.get('title');  // Ottieni il parametro 'group'
+      answer = urlParams.get('answer');      // Ottieni il parametro 'num'
+      question = urlParams.get('question');      // Ottieni il parametro 'num'
+      group = urlParams.get('group');      // Ottieni il parametro 'num'
+      console.log('Params:', { title, answer, question, group });   
+      return {title,answer,question,group}
+    }
+
+    async function updateCard(event) {
       event.preventDefault();
       const form = event.target;
     
@@ -26,7 +39,7 @@
       const newCard = { title, question, answer, group };
     
       try {
-        const response = await fetch('/add-card', {
+        const response = await fetch('/update-card', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(newCard)
@@ -34,9 +47,9 @@
     
         const result = await response.json();
         if (response.ok) {
-          alert('Card added successfully!');
+          alert('Card updated successfully!');
         } else {
-          alert('Error adding card: ' + result.message);
+          alert('Error updating card: ' + result.message);
         }
       } catch (error) {
         console.error('Error:', error);
@@ -59,12 +72,33 @@
       })
     }
 
-    document.addEventListener("DOMContentLoaded", loadGroups);
+    async function updatePageContent() {
+      let card = getQueryParams();
+      document.getElementById("title").value = card.title;
+      document.getElementById("answer").value = card.answer;
+      document.getElementById("question").value = card.question;
+      document.getElementById("group").value = card.group; 
+      await loadGroups();
+    }
+
+    async function loadGroups(){
+      let select = document.getElementById("group");
+      let res = await fetch('/groups.json', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const groupsData = await res.json();
+      groupsData.forEach(group=>{
+        select.innerHTML+= `<option value="${group.name}">${group.name}</option>`
+      })
+    }
+
+    document.addEventListener("DOMContentLoaded", updatePageContent);
   </script>
   <div class="container-md align-middle">
-    <h1 class="text-center">Create a new card</h1>
+    <h1 class="text-center">Modify card</h1>
 
-    <form class="form-container needs-validation" novalidate onsubmit="addCard(event)">
+    <form class="form-container needs-validation" novalidate onsubmit="updateCard(event)">
       <div class="input-group mb-3">
         <span class="input-group-text select" >Title</span>
         <input type="text" id="title" class="form-control input" required>
@@ -83,7 +117,7 @@
 
       <div class="input-group mb-3">
         <span class="input-group-text select" >Answer</span>
-        <input type="text" id="answer" class="form-control input" required>
+        <input type="text" id="answer" class="form-control input" required value="ciao">
         <div class="invalid-feedback">
           Please insert the answer.
         </div>
@@ -96,7 +130,7 @@
         </select>
       </div>
       <div class="d-flex justify-content-center mt-3">
-        <button type="submit" class="btn btn-success">Add new card</button>
+        <button type="submit" class="btn btn-warning">Update card</button>
       </div>
     </form>
 

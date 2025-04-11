@@ -37,6 +37,37 @@ const server = http.createServer((req, res) => {
         res.end(data);
       }
     });
+  }else if (req.url === '/start-test') {
+    fs.readFile("./src/new-test.html", 'utf-8', (err, data) => {
+      if (err) {
+        res.writeHead(500, { 'Content-Type': 'text/plain' });
+        res.end('Errore nel server');
+      } else {
+        res.writeHead(200, { 'Content-Type': 'text/html' });
+        res.end(data);
+      }
+    });
+  }else if (req.url.startsWith('/test')) {
+    fs.readFile("./src/view-test.html", 'utf-8', (err, data) => {
+      if (err) {
+        res.writeHead(500, { 'Content-Type': 'text/plain' });
+        res.end('Errore nel server');
+      } else {
+        res.writeHead(200, { 'Content-Type': 'text/html' });
+        res.end(data);
+      }
+    });
+  }
+  else if (req.url.startsWith('/card')) {
+    fs.readFile("./src/modify-card.html", 'utf-8', (err, data) => {
+      if (err) {
+        res.writeHead(500, { 'Content-Type': 'text/plain' });
+        res.end('Errore nel server');
+      } else {
+        res.writeHead(200, { 'Content-Type': 'text/html' });
+        res.end(data);
+      }
+    });
   }
 
   // Servire il file JSON se richiesto
@@ -73,7 +104,6 @@ const server = http.createServer((req, res) => {
     req.on('end', () => {
       try {
         const newCard = JSON.parse(body); // Parsea il JSON ricevuto
-        console.log(newCard);
         fs.readFile('./data/flashcards.json', 'utf-8', (err, data) => {
           if (err) {
             res.writeHead(500, { 'Content-Type': 'text/plain' });
@@ -92,7 +122,7 @@ const server = http.createServer((req, res) => {
 
           // Aggiungi la nuova card all'array
           flashcards.push(newCard);
-
+          flashcards.sort((a, b) => a.title.localeCompare(b.title));
           // Scrivi di nuovo l'array nel file JSON
           fs.writeFile('./data/flashcards.json', JSON.stringify(flashcards, null, 2), 'utf-8', (err) => {
             if (err) {
@@ -111,7 +141,64 @@ const server = http.createServer((req, res) => {
         res.end('error: invalid JSON data');
       }
     });
-  }else if (req.url === '/add-group' && req.method === 'POST') {
+  }else if (req.url === '/update-card' && req.method === 'POST') {
+    let body = '';
+  
+    req.on('data', chunk => {
+      body += chunk;
+    });
+  
+    req.on('end', () => {
+      try {
+        const updatedCard = JSON.parse(body); // { title, question, answer, group }
+  
+        fs.readFile('./data/flashcards.json', 'utf-8', (err, data) => {
+          if (err) {
+            res.writeHead(500, { 'Content-Type': 'text/plain' });
+            res.end('Errore nel caricamento del file JSON');
+            return;
+          }
+  
+          let flashcards;
+          try {
+            flashcards = JSON.parse(data);
+          } catch (error) {
+            res.writeHead(500, { 'Content-Type': 'text/plain' });
+            res.end('Errore nel parsing del file JSON');
+            return;
+          }
+  
+          // Trova e aggiorna la card esistente
+          const index = flashcards.findIndex(c => c.title === updatedCard.title);
+          if (index === -1) {
+            res.writeHead(404, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ message: 'Card non trovata' }));
+            return;
+          }
+  
+          // Aggiorna la card
+          flashcards[index] = updatedCard;
+  
+          // Salva le modifiche
+          fs.writeFile('./data/flashcards.json', JSON.stringify(flashcards, null, 2), 'utf-8', (err) => {
+            if (err) {
+              res.writeHead(500, { 'Content-Type': 'text/plain' });
+              res.end('Errore nella scrittura del file JSON');
+              return;
+            }
+  
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ message: 'Card aggiornata con successo' }));
+          });
+        });
+      } catch (error) {
+        res.writeHead(400, { 'Content-Type': 'text/plain' });
+        res.end('Errore: dati JSON non validi');
+      }
+    });
+  }
+  
+  else if (req.url === '/add-group' && req.method === 'POST') {
     let body = '';
     
     // Riceve i dati del corpo della richiesta
@@ -142,6 +229,7 @@ const server = http.createServer((req, res) => {
 
           // Write group into "groups" array
           groups.push(newGroup);
+          groups.sort((a, b) => a.name.localeCompare(b.name));
 
           // Write array into JSON file
           fs.writeFile('./data/groups.json', JSON.stringify(groups, null, 2), 'utf-8', (err) => {
