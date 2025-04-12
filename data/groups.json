@@ -1,11 +1,19 @@
 [
   {
+    "name": "adsadas",
+    "color": "#007bff"
+  },
+  {
     "name": "Assembly",
     "color": "blue"
   },
   {
     "name": "Assembly to byte",
     "color": "gray"
+  },
+  {
+    "name": "culo",
+    "color": "#ff00dd"
   },
   {
     "name": "Gerarchie di memoria",
