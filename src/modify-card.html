@@ -9,8 +9,9 @@
 </head>
 <body class="d-flex align-items-center justify-content-center">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
+  <script src="utility.js"></script>
   <script>
-    let title,answer,question,group 
+    let title,answer,question,group;
     
     // Funzione per ottenere i query parameters dalla URL
     function getQueryParams() {
@@ -59,19 +60,6 @@
       window.location.href = '/';
     }
 
-
-    async function loadGroups(){
-      let select = document.getElementById("group");
-      let res = await fetch('/groups.json', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      });
-      const groupsData = await res.json();
-      groupsData.forEach(group=>{
-        select.innerHTML+= `<option value="${group.name}">${group.name}</option>`
-      })
-    }
-
     async function updatePageContent() {
       let card = getQueryParams();
       document.getElementById("title").value = card.title;
@@ -79,18 +67,6 @@
       document.getElementById("question").value = card.question;
       document.getElementById("group").value = card.group; 
       await loadGroups();
-    }
-
-    async function loadGroups(){
-      let select = document.getElementById("group");
-      let res = await fetch('/groups.json', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      });
-      const groupsData = await res.json();
-      groupsData.forEach(group=>{
-        select.innerHTML+= `<option value="${group.name}">${group.name}</option>`
-      })
     }
 
     document.addEventListener("DOMContentLoaded", updatePageContent);
@@ -116,8 +92,8 @@
       </div>
 
       <div class="input-group mb-3">
-        <span class="input-group-text select" >Answer</span>
-        <input type="text" id="answer" class="form-control input" required value="ciao">
+        <span class="input-group-text orange-text-area" >Answer</span>
+        <textarea id="answer" class="form-control input" rows="1" required oninput="textAreaAutoResize(this)"></textarea>
         <div class="invalid-feedback">
           Please insert the answer.
         </div>

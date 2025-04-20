@@ -1,46 +1,10 @@
 [
   {
-    "name": "adsadas",
-    "color": "#007bff"
-  },
-  {
-    "name": "Assembly",
-    "color": "blue"
-  },
-  {
-    "name": "Assembly to byte",
-    "color": "gray"
-  },
-  {
-    "name": "culo",
-    "color": "#ff00dd"
-  },
-  {
-    "name": "Gerarchie di memoria",
-    "color": "green"
-  },
-  {
-    "name": "Kernel",
-    "color": "black"
-  },
-  {
-    "name": "Microarchitetture",
-    "color": "orange"
-  },
-  {
-    "name": "Politiche di scheduling",
-    "color": "white"
-  },
-  {
-    "name": "Politiche di sincronizzazione",
-    "color": "purple"
-  },
-  {
     "name": "Processi",
-    "color": "red"
+    "color": "#349400"
   },
   {
     "name": "Thread",
-    "color": "pink"
+    "color": "#ff85fb"
   }
 ]
