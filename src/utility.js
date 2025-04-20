@@ -3,6 +3,7 @@ let group_arr = [];
 let i=0;
 
 async function seeAnswer(card_title, card_container_id = "cards_container") {
+  card_title = decodeURIComponent(card_title);
   const cards = document.getElementById(card_container_id).children;
   Array.from(cards).forEach(card=>{
     if (card.querySelector('.card-title').textContent === card_title) {
@@ -35,13 +36,17 @@ function fixedEncodeURIComponent(str) {
  * @param {CallableFunction} card_str_call callback to get card str
  * @param {string} card_container_id name of the id of cards' container
  */
-async function loadFlashcard(card_str_call, card_container_id = "cards_container", filter_group = "", max_num = "") {
+async function loadFlashcard(card_str_call, card_container_id = "cards_container", filter_group = "", max_num = "", sort=false) {
   try {
     const response = await fetch('/flashcards.json');
     let flashcardsData = await response.json();
 
     const response2 = await fetch('/groups.json');
     const groupsData = await response2.json();
+
+    // se è stato richiesto il sorting lo esegue prima della filter
+    if(sort)
+      flashcardsData.sort(() => Math.random() - 0.5);
 
     // Filtro per gruppo
     if (filter_group !== "") {
@@ -76,6 +81,32 @@ async function loadFlashcard(card_str_call, card_container_id = "cards_container
   }
 }
 
+async function getFlashcard(card_title) {
+  console.log("card title", card_title)
+  try {
+    const response = await fetch('/flashcards.json');
+    let flashcardsData = await response.json();
+
+    return flashcardsData.filter(card => card.title === card_title)[0]; // TODO cambiarlo in un id
+  } catch (error) {
+    console.error('Errore nella lettura del file:', error);
+  }
+}
+
+async function copyCard(card_title){
+  card_title = decodeURIComponent(card_title);
+  const flashcard = await getFlashcard(card_title);
+  console.log("flashcard filtered", flashcard)
+  const string_to_copy = `Question: ${flashcard.question}\nAnswer: ${flashcard.answer}`;
+  try {
+    await navigator.clipboard.writeText(string_to_copy);
+    alert('Content copied to clipboard'); // TODO aggiungere un toast invece che un alert
+  } catch (err) {
+    alert('Failed to copy');
+    console.error(err);
+  }
+}
+
 async function loadGroups(group_id='group'){
   let select = document.getElementById(group_id);
   let res = await fetch('/groups.json', {
@@ -95,7 +126,7 @@ const createIndexCard = ((card, color)=>`
         <h5 class="card-title">${card.title}</h5>
       </div>
       <div class="card-body-custom">
-        <p class="card-text">${card.question}</p>
+        <p class="card-text text-wrap-custom">${card.question}</p>
         <div class="mt-auto">
           <button class="btn btn-primary card-button me-2" onclick="seeAnswer('${fixedEncodeURIComponent(card.title)}')">Vedi risposta</button>
           <button type="button" class="btn btn-danger card-button" onclick="deleteCard('${fixedEncodeURIComponent(card.title)}')">

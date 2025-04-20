@@ -62,12 +62,12 @@
     }
 
     async function updatePageContent() {
+      await loadGroups();
       let card = getQueryParams();
       document.getElementById("title").value = card.title;
       document.getElementById("answer").value = card.answer;
       document.getElementById("question").value = card.question;
       document.getElementById("group").value = card.group; 
-      await loadGroups();
     }
 
     document.addEventListener("DOMContentLoaded", updatePageContent);

@@ -30,10 +30,11 @@
   <script> 
     
     async function deleteCard(card_title) {
+
       let res = await fetch('/delete-card', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: card_title })
+        body: JSON.stringify({ "title": decodeURIComponent(card_title) })
       });
       try {
         result = await res.json();

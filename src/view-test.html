@@ -71,7 +71,7 @@
     function createTest() {
       getQueryParams();
       cards_arr = []; // Reset globale se ti serve
-      loadFlashcard(createTestCard, "cards_container", group, num);
+      loadFlashcard(createTestCard, "cards_container", group, num, sort=true);
     }
 
     function toggleSelection(index, type) {
@@ -118,7 +118,7 @@
     }
 
 
-    const getElapsedTime = () => (((Date.now() - timeCounter) / 1000).toFixed(2));
+    const getElapsedTime = () => ((((Date.now() - timeCounter) / 1000)/60)).toFixed(2);
 
 
      // Funzione per finire il test e mostrare i risultati
@@ -132,7 +132,7 @@
       
       document.getElementById('correct_answers').textContent = `Correct answers: ${correctAnswers}`;
       document.getElementById('incorrect_answers').textContent = `Incorrect answers: ${incorrectAnswers}`;
-      document.getElementById('elapsed_time').textContent = `Elapsed time: ${getElapsedTime()}sec`;
+      document.getElementById('elapsed_time').textContent = `Elapsed time: ${getElapsedTime()}min`;
     }
 
     // Esegui la funzione quando la pagina è completamente caricata
