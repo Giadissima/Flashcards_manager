@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 // TODo deve avere un id la card
 const server = http.createServer((req, res) => {
+  console.log('Richiesta:', req.method, req.url);
   // Definisci il percorso del file HTML da servire
   if (req.url === '/') {
     fs.readFile("index.html", 'utf-8', (err, data) => {
@@ -313,7 +314,7 @@ const server = http.createServer((req, res) => {
   }
   // Gestisci richieste non riconosciute
   else {
-    const filePath = path.join(__dirname, req.url);
+    const filePath = path.join(__dirname, '..', req.url);
     fs.readFile(filePath, (err, data) => {
       if (err) {
         res.writeHead(404, { 'Content-Type': 'text/plain' });
