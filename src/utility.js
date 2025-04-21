@@ -84,7 +84,7 @@ async function loadFlashcard(card_str_call, card_container_id = "cards_container
 async function getFlashcard(card_title) {
   console.log("card title", card_title)
   try {
-    const response = await fetch('/flashcards.json');
+    const response = await fetch('/data/flashcards.json');
     let flashcardsData = await response.json();
 
     return flashcardsData.filter(card => card.title === card_title)[0]; // TODO cambiarlo in un id
@@ -109,10 +109,12 @@ async function copyCard(card_title){
 
 async function loadGroups(group_id='group'){
   let select = document.getElementById(group_id);
-  let res = await fetch('/groups.json', {
+  
+  let res = await fetch('/data/groups.json', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
   });
+  
   const groupsData = await res.json();
   groupsData.forEach(group=>{
     select.innerHTML+= `<option value="${group.name}">${group.name}</option>`

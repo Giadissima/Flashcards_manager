@@ -15,3 +15,5 @@ aggiungere minuti e secondi
 aggiungere a gitignore quando aggiungo la vpn i json delle mie flashcards
 
 aggiungi le materie
+
+mettere una variabile di ambiente development per gestire i log delle richieste
