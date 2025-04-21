@@ -9,6 +9,30 @@
   <title>Flashcard Manager</title>
 </head>
 <body class="d-flex justify-content-center align-items-center">
+  <div class="container-md align-middle">
+    <h1 class="text-center">Insert data and start a new Test</h1>
+    <form class="form-container needs-validation" novalidate onsubmit="startTest(event)">
+      <div class="input-group mb-3">
+        <span class="input-group-text select text-center" >Group</span>
+        <select class="form-select input" id="group">
+          <option selected value="">Choose the group</option> 
+        </select>
+      </div>
+      
+      <div class="input-group mb-3">
+        <span class="input-group-text select text-center"  >Number of questions</span>
+        <input type="number" id="num" class="form-control input">
+      </div>
+  
+      <!-- TODO aggiungere la materia -->
+      <div class="d-flex justify-content-center mt-3">
+        <button type="submit" class="btn btn-success">Start new test</button>
+      </div>
+    </form>
+  </div>
+
+
+  <!-- parte js  -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
   <script src="/src/utility.js"></script>
   <script>
@@ -45,26 +69,5 @@
       window.location.href = url;
     }
   </script>
-  <div class="container-md align-middle">
-    <h1 class="text-center">Insert data and start a new Test</h1>
-    <form class="form-container needs-validation" novalidate onsubmit="startTest(event)">
-      <div class="input-group mb-3">
-        <span class="input-group-text select text-center" >Group</span>
-        <select class="form-select input" id="group">
-          <option selected value="">Choose the group</option> 
-        </select>
-      </div>
-      
-      <div class="input-group mb-3">
-        <span class="input-group-text select text-center"  >Number of questions</span>
-        <input type="number" id="num" class="form-control input">
-      </div>
-  
-      <!-- TODO aggiungere la materia -->
-      <div class="d-flex justify-content-center mt-3">
-        <button type="submit" class="btn btn-success">Start new test</button>
-      </div>
-    </form>
-  </div>
 </body>
 </html>
