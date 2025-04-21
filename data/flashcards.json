@@ -74,7 +74,7 @@
   {
     "title": "Passaggi di una fork",
     "question": "Quali sono i passaggi che fa una fork?",
-    "answer": "1 - crea un PCB \n2- crea lo spazio di indirizzamento\n3- viene condiviso il codice del programma anche al nuovo processo\n4 - il processo eredita il contesto del padre (variabili di ambiente, shell, args, priorità...)\n5 - informa lo scheduler che il nuovo processo è nato  ",
+    "answer": "1 - crea un PCB   2- crea lo spazio di indirizzamento   3- viene condiviso il codice del programma anche al nuovo processo   4 - il processo eredita il contesto del padre (variabili di ambiente, shell, args, priorità...)   5 - informa lo scheduler che il nuovo processo è nato  ",
     "group": "Processi"
   },
   {

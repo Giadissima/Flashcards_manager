@@ -96,11 +96,11 @@ async function getFlashcard(card_title) {
 async function copyCard(card_title){
   card_title = decodeURIComponent(card_title);
   const flashcard = await getFlashcard(card_title);
-  console.log("flashcard filtered", flashcard)
   const string_to_copy = `Question: ${flashcard.question}\nAnswer: ${flashcard.answer}`;
   try {
     await navigator.clipboard.writeText(string_to_copy);
-    alert('Content copied to clipboard'); // TODO aggiungere un toast invece che un alert
+    const toast = new bootstrap.Toast(document.getElementById('toastSuccess'));
+    toast.show();
   } catch (err) {
     alert('Failed to copy');
     console.error(err);

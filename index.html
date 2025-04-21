@@ -27,8 +27,34 @@
   <div class="container mt-4">
     <div id="cards_container" class="row g-3"></div>
   </div>
+
+  <!-- Bootstrap Toast (visibile solo quando viene copiato il contenuto) -->
+  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div id="toastSuccess" class="toast align-items-center text-bg-success border-0 custom-toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body">
+          Content copied to clipboard. Use ctrl+v for using it.
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap Toast (visibile solo quando viene cancellata correttamente una card) -->
+  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div id="toastSuccessDelete" class="toast align-items-center text-bg-success border-0 custom-toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body">
+          Card cancellation successfully completed.
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- parte js  -->
   <script> 
-    
     async function deleteCard(card_title) {
 
       let res = await fetch('/delete-card', {
@@ -45,27 +71,34 @@
         return;
       }
       if (res.ok) {
-        alert('Card successfully deleted!');
+        localStorage.setItem('showDeleteToast', 'true');
         // Ricarica la pagina
         location.reload();
 
       } else {
-        alert('Error removing card: ' + result.message);
+        alert('Error removing card');
+        console.error(result.message)
       }
 
     }
 
     async function modifyCard(title="", answer="", question="", group=""){
-
       // Crea l'URL con i parametri
       const url = `/card?title=${title}&answer=${answer}&question=${question}&group=${group}`;
-      
       // Reindirizza alla pagina con i parametri
       window.location.href = url;
     }
 
     function loadPageContent(){
       loadFlashcard(createIndexCard);
+      if (localStorage.getItem('showDeleteToast') === 'true') {
+        localStorage.removeItem('showDeleteToast');
+        const toastElement = document.getElementById('toastSuccessDelete');
+        if (toastElement) {
+          const toast = new bootstrap.Toast(toastElement);
+          toast.show();
+        }
+      }
     }
 
     document.addEventListener("DOMContentLoaded", loadPageContent);

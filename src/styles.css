@@ -46,6 +46,10 @@
   height: 40px;
 }
 
+.custom-toast{
+  border: 1px solid black !important;
+}
+
 textarea.form-control {
   overflow-y: hidden !important;
 }
