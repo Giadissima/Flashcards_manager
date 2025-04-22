@@ -122,31 +122,35 @@ async function loadGroups(group_id='group'){
 }
 
 const createIndexCard = ((card, color)=>`
-  <div class="card h-100 col-md-4">
-    <div class="card-body custom-card">
-      <div class="colorful-card-title" style="background-color: ${color} !important">
-        <h5 class="card-title">${card.title}</h5>
-      </div>
-      <div class="card-body-custom">
-        <p class="card-text text-wrap-custom">${card.question}</p>
-        <div class="mt-auto">
-          <button class="btn btn-primary card-button me-2" onclick="seeAnswer('${fixedEncodeURIComponent(card.title)}')">Vedi risposta</button>
-          <button type="button" class="btn btn-danger card-button" onclick="deleteCard('${fixedEncodeURIComponent(card.title)}')">
-            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF">
-              <path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/>
-            </svg>
-          </button>
-          <button type="button" class="btn btn-warning card-button" onclick="modifyCard(
-              '${fixedEncodeURIComponent(card.title)}',
-              '${fixedEncodeURIComponent(card.answer)}',
-              '${fixedEncodeURIComponent(card.question)}',
-              '${fixedEncodeURIComponent(card.group || '')}'
-          )">
-            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-527q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z"/></svg>  
-          </button>
-          <button type="button" class="btn btn-success card-button" onclick="copyCard('${fixedEncodeURIComponent(card.title)}')">
-            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M360-240q-33 0-56.5-23.5T280-320v-480q0-33 23.5-56.5T360-880h360q33 0 56.5 23.5T800-800v480q0 33-23.5 56.5T720-240H360Zm0-80h360v-480H360v480ZM200-80q-33 0-56.5-23.5T120-160v-560h80v560h440v80H200Zm160-240v-480 480Z"/></svg>
-          </button>
+  <!-- col-md-4 appariranno 3 cards per riga, perché Bootstrap lavora con griglie di 12 colonne e io voglio che ne prenda 12/4 = 3 -->
+  <!-- card h-100 da un altezza uguale a tutte le card, dicendo che devono prendere altezza 100% del contenitore padre-->
+  <div class="col-md-4  mb-4 px-2">
+    <div class="card h-100"> 
+      <div class="card-body custom-card d-flex flex-column">
+        <div class="colorful-card-title" style="background-color: ${color} !important">
+          <h5 class="card-title">${card.title}</h5>
+        </div>
+        <div class="card-body-custom">
+          <p class="card-text text-wrap-custom">${card.question}</p>
+          <div class="mt-auto">
+            <button class="btn btn-primary card-button me-2" onclick="seeAnswer('${fixedEncodeURIComponent(card.title)}')">Vedi risposta</button>
+            <button type="button" class="btn btn-danger card-button" onclick="deleteCard('${fixedEncodeURIComponent(card.title)}')">
+              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF">
+                <path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/>
+              </svg>
+            </button>
+            <button type="button" class="btn btn-warning card-button" onclick="modifyCard(
+                '${fixedEncodeURIComponent(card.title)}',
+                '${fixedEncodeURIComponent(card.answer)}',
+                '${fixedEncodeURIComponent(card.question)}',
+                '${fixedEncodeURIComponent(card.group || '')}'
+            )">
+              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-527q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z"/></svg>  
+            </button>
+            <button type="button" class="btn btn-success card-button" onclick="copyCard('${fixedEncodeURIComponent(card.title)}')">
+              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M360-240q-33 0-56.5-23.5T280-320v-480q0-33 23.5-56.5T360-880h360q33 0 56.5 23.5T800-800v480q0 33-23.5 56.5T720-240H360Zm0-80h360v-480H360v480ZM200-80q-33 0-56.5-23.5T120-160v-560h80v560h440v80H200Zm160-240v-480 480Z"/></svg>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -154,7 +158,7 @@ const createIndexCard = ((card, color)=>`
 
 const createTestCard = ((card, color)=>`
   <div class="card mb-4 mt-4">
-    <div class="card-body custom-card d-flex flex-column" style="padding-top:0px;">
+    <div class="card-body custom-card d-flex flex-column">
       <div class="colorful-card-title" style="background-color: ${color} !important">
         <h5 class="card-title">${card.title}</h5>
       </div>
