@@ -1,5 +1,11 @@
 [
   {
+    "title": "Context switch tra thread",
+    "question": "Come può essere il context switch? Con quali funzioni può essere in un modo e con quali nell'altro? ",
+    "answer": "Un context switch può essere volontario o involontario, il context switch volontario si può fare con t_yield e t_join() se il thread che dobbiamo aspettare non ha ancora finito. Il context switch involontario invece, accade al seguito di un interrupt o di un exception, oppure più specificatamente con un timerout, o sono entrati thread con maggiore priorità nella coda (questo anche in base alle politiche di scheduling)",
+    "group": "Thread"
+  },
+  {
     "title": "cosa significa astrarre un thread?",
     "question": "cosa significa astrarre un thread?",
     "answer": "E' un concetto fondamentale alla base dei thread, in cui fingiamo che ci sia un numero illimitato di processori (uno per ogni thread). Questo comporta che ogni thread crede di avere sempre il processore, e il context switch è trasparente al thread, portandolo a pensare che la sua sia un esecuzione lineare senza interruzioni. Questo però ci ricorda anche il perché non possiamo fare supposizioni sul quale pezzo di codice tra più thread concorrenti verrà eseguito prima, dato che la cpu riordina le op a proprio piacimento",
@@ -14,7 +20,7 @@
   {
     "title": "Design pattern unix I/O",
     "question": "Mi sapresti dire i concetti che stanno alla base di come viene strutturato l'I/O in unix?",
-    "answer": "1) uniformità. E' il concetto che permette l'astrazione del file system, ovvero tutte le operazioni che vengono fatte ad alto livello vengono viste come operazioni su file, attraverso le funzioni base (system call) come open, close, read, write. 2) Tutti i dispositivi I/O vengono orientati al byte 3) Prima di poter usare un file, va aperto, in maniera tale da ottenere il file descriptor sul quale potremo lavorarci. 4) Le read e le write vengono bufferate 5) bisogna sempre chiudere un file dopo l'uso, per poter permettere al garbage collector di raccogliere i file descriptor usati in precedenza dal processo",
+    "answer": "1) uniformità. E' il concetto che permette l'astrazione del file system, ovvero tutte le operazioni che vengono fatte ad alto livello vengono viste come operazioni su file, attraverso le funzioni base (system call) come open, close, read, write. \n2) Tutti i dispositivi I/O vengono orientati al byte \n3) Prima di poter usare un file, va aperto, in maniera tale da ottenere il file descriptor sul quale potremo lavorarci. \n4) Le read e le write vengono bufferate \n5) bisogna sempre chiudere un file dopo l'uso, per poter permettere al garbage collector di raccogliere i file descriptor usati in precedenza dal processo",
     "group": "Processi"
   },
   {
@@ -24,10 +30,22 @@
     "group": "Thread"
   },
   {
+    "title": "Funzionamento scheduling activation",
+    "question": "Come funziona lo scheduler activation?",
+    "answer": "Gli scheduler activation funzionano attraverso la cooperazione tra kernel e lo scheduling user-lv. Il kernel delega delle decisioni da eseguire allo scheduler, tramite delle upcall speciali, con un timeout di risposta molto più ampio del solito. Tra queste decisioni importanti potrebbero esserci per es la scelta di fare eseguire un thread schedulato in user lv, e allora lo scheduler deciderà quale fare partire (se ci sono thread da eseguire) e poi invierà risposta al kernel con quella che si chiama fare un activation. \n\nCome possiamo notare quindi in questa soluzione il kernel non è più ignaro dei thread in user-lv",
+    "group": "Thread"
+  },
+  {
     "title": "Funzioni legate ai processi",
     "question": "Quali funzioni dei processi ci sono? quali sono con maggior probabilità usati dai padri e quali dai figli?",
     "answer": "Il padre e il figlio usano la exit, il padre usa inoltre la wait, la waitpid, e la fork, mentre il figlio usa la exit, la getpid, la getppid, e la exec",
     "group": "Processi"
+  },
+  {
+    "title": "I/O asincrono + threads",
+    "question": "Cosa succede se implementiamo il cosiddetto \"I/O asincrono + threads\"?",
+    "answer": "E' un organizzazione in cui decidiamo di mettere un thread per ogni dispositivo di I/O lento. E' un'idea fallimentare in quanto l'attesa di questi thread non è passiva e facendo polling generano overhead inutile, inoltre, anche in termini di risorse, per quanto i thread condividono più risorse rispetto ai processi, è molto dispendiosa",
+    "group": "Thread"
   },
   {
     "title": "implementazione di thread",
@@ -126,6 +144,18 @@
     "group": "Processi"
   },
   {
+    "title": "Scheduler activation",
+    "question": "Che cosa è lo scheduler activation?",
+    "answer": "Lo scheduler activation è un meccanismo di scheduling che cerca di migliorare la soluzione di usare lo scheduler user-lv che ha un overhead più basso rispetto al meccanismo kernel-lv, ma senza la criticità del modello ovvero quella che se un thread user-lv esegue una system call bloccante, allora tutti i thread che aveva quel processo vengono bloccati, dato che il kernel non li vede",
+    "group": "Thread"
+  },
+  {
+    "title": "Scheduler activation ad oggi",
+    "question": "Lo scheduler activation perché è una soluzione non utilizzata nei sistemi moderni?",
+    "answer": "E' un meccanismo complesso da implementare. Inoltre, dipende troppo dagli scheduler user-lv, che potrebbero abusare della cooperazione del kernel generando troppo overhead",
+    "group": "Thread"
+  },
+  {
     "title": "Shell",
     "question": "Cosa è una shell?",
     "answer": "Una shell è un controllore di jobs, ai quali assegna a ciascuno una task. La shell si occupa di creare questi jobs attraverso la fork e la exec",
@@ -177,6 +207,12 @@
     "title": "Tipi di modelli di threads e processi",
     "question": "Che tipi di modelli abbiamo che lavorano con i thread e processi applicati ai kernel e non?",
     "answer": "Il kernel multiprocesso, che riesce a gestire più processi all'interno di un singolo programma, e kernel multithread, che supporta i thread all'interno di un singolo programma. I programmi a lv utente possono essere multithread, creati attraverso delle lib solitamente già implementate nei sistemi. Sta a noi quando si fa un thread, sempre se il kernel sia multithread, decidere se vogliamo sfruttare il kernel come intermediario o usare una libreria che li crea per noi. L'altro modello a lv utente è il singlethread, che supporta un thread alla volta. Semplice da realizzare, ma non sfruttta il parallelismo",
+    "group": "Thread"
+  },
+  {
+    "title": "Un nipote thread",
+    "question": "Può un figlio thread generare un altro figlio thread?",
+    "answer": "un thread può generare un altro thread, unica cosa non ha senso parlare di gerarchie e quindi di \"nipoti\" dato che i threads convidivono lo stesso codice e quindi sono più \"colleghi\"",
     "group": "Thread"
   }
 ]

@@ -125,7 +125,7 @@ const createIndexCard = ((card, color)=>`
   <!-- col-md-4 appariranno 3 cards per riga, perché Bootstrap lavora con griglie di 12 colonne e io voglio che ne prenda 12/4 = 3 -->
   <!-- card h-100 da un altezza uguale a tutte le card, dicendo che devono prendere altezza 100% del contenitore padre-->
   <div class="col-md-4  mb-4 px-2">
-    <div class="card h-100"> 
+    <div class="card"> 
       <div class="card-body custom-card d-flex flex-column">
         <div class="colorful-card-title" style="background-color: ${color} !important">
           <h5 class="card-title">${card.title}</h5>

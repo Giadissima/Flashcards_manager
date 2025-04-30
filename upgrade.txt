@@ -19,3 +19,10 @@ aggiungi le materie
 mettere una variabile di ambiente development per gestire i log delle richieste
 
 cambiare gli alert in toast dove possibile
+
+mettere un titolo alla view test
+aggiungere il testo in grassetto e la modifica della text area
+nel test, non vengono visualizzati gli /n
+
+aggingere nel test un contatore di domande lasciate in bianco
+se fac
