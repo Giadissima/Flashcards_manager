@@ -1,5 +1,41 @@
 [
   {
+    "title": "Algoritmo di Lamport's",
+    "question": "Cosa è l'algoritmo di Lamport's?",
+    "answer": "E' un vecchio algoritmo che funzionava per i vecchi sistemi, che diceva che l'unico modo per essere sicuro che le operazioni venissero eseguite in ordine nel caso di un produttore e un consumatore era fare delle load e delle store",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "Bounded buffer",
+    "question": "Che cosa è il bounded buffer?",
+    "answer": "Il bounded buffer, ovvero buffer a capacità limitata, è un metodo di comunicazione in cui si sfrutta un canale (ovvero il buffer) in cui un thread produce il messaggio da mettere nel buffer (thread produttore), e un thread lo legge (chiamato thread consumatore). ",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "Come funzionano le spinlocks in user lv?",
+    "question": "Come funzionano le spinlocks in user lv ?",
+    "answer": "Abbiamo il caso fast path, in cui viene fatta una test and set per fare polling, nel caso slow path invece, viene richiesta una sc bloccante al kernel chiamata Kernel locks",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "Come riordina la cpu le operazioni?",
+    "question": "Come riordina la cpu le operazioni?",
+    "answer": "Per esempio con un write buffer, ovvero quando viene fatta una write, invece di farla subito viene bufferata per permettere che venga eseguita un'altra operazione nel mentre",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "Concetti base della lock",
+    "question": "Quali sono i concetti base di una lock?",
+    "answer": "concetto safety= al massimo un lock holder\nconcetto liveness = se non ci sono thread che hanno quella lock, la acquisisco",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "context switch causato da un interrupt handler",
+    "question": "cosa succede in un context switch involontario?",
+    "answer": "simple version:\n1) l'interrupt handler salva i registri sul kernel stack del thread da cambiare\n2) l'interrupt handler chiama la switch thread che sceglie il nuovo thread da eseguire\n3) la switch thread prende dal kernel stack il contesto(registri) del vecchio thread e lo salva sul tcb, poi prende il contesto del nuovo thread da eseguire dal tcb e lo mette nei registri attuali\n4) il nuovo thread viene eseguito\n\nfaster version:\n1) l'interrupt handler salva il contesto del vecchio thread sul tcb\n2) l'interrupt handler chiama la switch thread che sceglie il nuovo thread da eseguire\n3) la switch thread ripristina il contesto di esecuzione del nuovo thread da eseguire dal tcb (ripristino dei registri)\n4) il nuovo thread viene eseguito",
+    "group": "Thread"
+  },
+  {
     "title": "Context switch tra thread",
     "question": "Come può essere il context switch? Con quali funzioni può essere in un modo e con quali nell'altro? ",
     "answer": "Un context switch può essere volontario o involontario, il context switch volontario si può fare con t_yield e t_join() se il thread che dobbiamo aspettare non ha ancora finito. Il context switch involontario invece, accade al seguito di un interrupt o di un exception, oppure più specificatamente con un timerout, o sono entrati thread con maggiore priorità nella coda (questo anche in base alle politiche di scheduling)",
@@ -12,10 +48,22 @@
     "group": "Thread"
   },
   {
+    "title": "Cosa sono le risorse?",
+    "question": "Cosa sono le risorse? Come si differenziano?",
+    "answer": "Qualsiasi oggetto passivo di cui il thread/proc potrebbe aver bisogno per terminare il job assegnato (es monitor, cpu, spazio in mem, lock. Si differenziano in prerilasciabili, ovvero il S.O. può riprendersele, e non prerilasciabili, che deve per forza rilasciarla il thread/proc.",
+    "group": "Sincronizzazione"
+  },
+  {
     "title": "Creazione di uno zombie",
     "question": "Quando è che si crea un processo zombie?",
     "answer": "Quando il processo figlio termina prima che il padre abbia fatto la wait",
     "group": "Processi"
+  },
+  {
+    "title": "Deadlock",
+    "question": "Che cosa è il deadlock?",
+    "answer": "Il deadlock è una situazione irreversibile di quando c'è un attesa circolare tra threads o processi, in cui ognuno di loro richiede una risorse che a sua volta è trattenuta da un'altro thread per terminare, anch'esso in attesa ",
+    "group": "Sincronizzazione"
   },
   {
     "title": "Design pattern unix I/O",
@@ -36,10 +84,22 @@
     "group": "Thread"
   },
   {
+    "title": "Funzioni delle variabili di condizioni",
+    "question": "che funzioni hanno le variabili di condizioni?",
+    "answer": "cond.wait() aspetta finché un evento non accade sospendendo il thread. Usarlo sempre in un while per evitare gli spurius wakeup\n\ncond.signal() se ci sono thread in attesa dell'evento \"cond\", ne sveglia uno e lo fa mettere in coda pronti\n\ncond.broadcast() se ci sono thread in attesa dell'evento \"cond\", li sveglia tutti e li fa mettere in coda pronti. Soluzione da usare in casi specifici perché svegliarli tutti non significa eseguirli tutti, quindi potrebbe generare overhead inutilmente, dato che la sezione critica è in mutua esclusione",
+    "group": "Sincronizzazione"
+  },
+  {
     "title": "Funzioni legate ai processi",
     "question": "Quali funzioni dei processi ci sono? quali sono con maggior probabilità usati dai padri e quali dai figli?",
     "answer": "Il padre e il figlio usano la exit, il padre usa inoltre la wait, la waitpid, e la fork, mentre il figlio usa la exit, la getpid, la getppid, e la exec",
     "group": "Processi"
+  },
+  {
+    "title": "Global env e virtual env",
+    "question": "Cosa cambia tra il global env e il virtual env?",
+    "answer": "Il global environment è il modello usato per la gestione dei thread, in cui c'è uno spazio di memoria condivisa in cui viene fatta la comunicazione. Il local environment invece, è il modello usato per la gestione dei processi, in cui ogni processo è isolato dagli altri e la comunicazione viene fatta esplicitandolo correttamente tra tutte le parti che dovranno comunicare",
+    "group": "Sincronizzazione"
   },
   {
     "title": "I/O asincrono + threads",
@@ -60,16 +120,46 @@
     "group": "Processi"
   },
   {
+    "title": "Locks",
+    "question": "Cosa sono le locks? come si usano?",
+    "answer": "Le locks sono un meccanismo di sync.\n\nSi utilizza iniziando con la funzione lock.acquire() che ti permette di creare una sezione critica in mutua esclusione, infatti, la lock.acquire() controlla che non ci sia nessun thread già in una sezione critica, e che quindi la \"risorsa\" lock sia libera, se non lo è aspetta, altrimenti si dice che acquisisco la lock.\n\n\nQuando voglio uscire dalla sezione critica utilizzo la lock.release() che sveglia eventuali thread in attesa che avevano richiesto l'acquire()",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "Mapped file o mapped segment",
+    "question": "cosa sono i mapped file o mapped segment?",
+    "answer": "Porzione di memoria condivisa",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "Mesa e Hoare",
+    "question": "Cosa sono le sintassi Mesa e Hoare? Come si differenziano tra loro?",
+    "answer": "Sono entrambe sintassi usate quando si usano le locks, la prima, Mesa, una volta che il thread che ha la lock fa la signal risveglia il thread che aspettava (sempre che ci fosse) e lo mette in coda pronti, continuando con la propria esecuzione. \n\nLa sintassi Hoare invece, richiede maggiore attenzione nel suo utilizzo ma ha più potenziale, infatti, una volta che viene fatta la signal, passa anche la lock al thread risvegliato, e il thread che era in esecuzione si rimette nella coda pronti. La sintassi hoare può essere utile quando vogliamo dare un ordine ai thread risvegliati, per esempio creare code fifo o filo. \n\nCreare queste file è possibile anche con Mesa ma è meno intuitivo. Nonostante si possa passare una lock o risvegliare un thread specifico non è comunque dato l'ordine di esecuzione preciso, perché l'ordine di risveglio non è l'ordine di esecuzione. Per esempio, in bounded buffer non possiamo fare assunzioni perché non sappiamo se verrà eseguito prima un produttore o un consumatore",
+    "group": "Sincronizzazione"
+  },
+  {
     "title": "Modelli di scheduling",
     "question": "Che tipo di modelli di scheduling per la gestione dei thread ci sono? ",
     "answer": "Ci sono i modelli cooperativi, e i modelli a prerilascio. I modelli cooperativi sono quelli più vecchi e ogni thread in questo modello rilascia autonomamente il processore attraverso il thread_yield(), garantendo un enorme cooperazione tra di loro e se gestito bene di efficienza, perché il context switch è più leggero. Il problema di questo modello è che è rischioso, perché un thread può monopolizzare un processore se programmato male o malevolo. Il modello a prerilascio è quello che usiamo in cui per gestire i thread si usano le sistem call e un timeout, rendendo il context switch più pesante ma più sicuro",
     "group": "Thread"
   },
   {
+    "title": "Monitor",
+    "question": "Cosa è un monitor?",
+    "answer": "Un monitor è un meccanismo di sync un po' particolare, perché è più ad alto lv rispetto agli altri meccanismi visti, e quindi più semplice da usare, che usa a sua volta meccanismi interni più a basso lv come locks+ cond. variabl3 oppure mutex. Se usiamo un monitor è più semplice evitare race cond. Ha diverse caratteristiche: 1) esegue incapsulamento delle variabili condivise al suo interno, permettendo di visualizzarle o modificarle solo tramite funzionj esposte all'esterno del monitor 2) tutto il codice jnterno al monitor viene eseguito in mutua esclusione ",
+    "group": "Sincronizzazione"
+  },
+  {
     "title": "MTAO x processo",
     "question": "Cosa sono i programmi che devono gestire MTAO? come la gestiscono?",
     "answer": "I programmi che devono gestire multiple things at once sono i programmi che hanno diverse funzionalità da eseguire, e quindi la soluzione ideale sarebbe creare un processo per ogni task, sfruttando gli IPC. Questa però si rivela una situazione lenta, e quindi per la maggior parte dei casi è preferibile al posto di creare tanti processi, creare tanti thread",
     "group": "Processi"
+  },
+  {
+    "title": "Mutua esclusione",
+    "question": "cosa è la mutua esclusione?",
+    "answer": "La mutua esclusione è il concetto in cui si può accedere o a una risorsa o a una sezione critica uno alla volta",
+    "group": "Sincronizzazione"
   },
   {
     "title": "Ogni thread...",
@@ -88,6 +178,12 @@
     "question": "Come fa il padre a ottenere il valore di uscita del figlio?",
     "answer": "Attraverso la wait, che restituisce lo status da convertire (a me sembra in byte) che corrisponde al valore della exit",
     "group": "Processi"
+  },
+  {
+    "title": "Overhead della thread switch",
+    "question": "Da dove deriva l'overhead della thread switch?",
+    "answer": "L'overhead viene dalla gestione delle liste e dalle copie necessarie per il cambio del thread da eseguire. Inoltre, se viene eseguito un thread che non fa parte dello stesso processo, la cache potrebbe essere ricaricata da zero.\n\nContribuiscono all'overhead anche le exception, page fault(codice non caricato precedentemente in memoria), MMU/TLB invalidation (operazioni per invalidare vecchi dati)",
+    "group": "Thread"
   },
   {
     "title": "Passaggi di una fork",
@@ -126,6 +222,12 @@
     "group": "Thread"
   },
   {
+    "title": "Prevenire riordinamento operazioni",
+    "question": "Come si può prevenire il riordinamento delle operazioni fatto dalla cpu?",
+    "answer": "Attraverso i meccanismi di sincronizzazione, in particolare, più a basso livello possibile troviamo per prevenirlo le memory barrier instructions. I meccanismi di sync più ad alto livello sfruttano le memory barrier instructions",
+    "group": "Sincronizzazione"
+  },
+  {
     "title": "Processi leggeri",
     "question": "Perché i thread vengono anche chiamati \"processi leggeri\"?",
     "answer": "Perché condividono molte risorse, tra cui variabili globali, e l'heap. Il codice di base è condiviso ma a diversi thread possiamo fargli fare differenti task. Con codice e variabili condivise abbiam inoltre un modo per implementare una comunicazione più rapida degli IPC senza dover usare il kernel come intermediario",
@@ -138,10 +240,28 @@
     "group": "Processi"
   },
   {
+    "title": "Race conditions",
+    "question": "Cosa sono le race conditions?",
+    "answer": "La race condition è una situazione che si verifica quando più thread si concorrono una risorsa senza usare meccanismi di sync, rendendo la variabile di valore imprevedibile perché dipendente dal riordinamento delle operazioni della cpu",
+    "group": "Sincronizzazione"
+  },
+  {
     "title": "Return processo terminato",
     "question": "Cosa ritorna un processo terminato?",
     "answer": "Ritorna al chiamante, ovvero alla funzione padre, un valore, che può essere gestito dal programmatore attraverso la exit o mandato dal kernel a seguito di un eccezione o upcall (sarà un valore negativo). Nel caso sia proprio la funzione \"main\" a terminare, il suo chiamante si chiama init",
     "group": "Processi"
+  },
+  {
+    "title": "Riordimento op CPU",
+    "question": "Perché la CPU riordina le operazioni?",
+    "answer": "La CPU riordina le operazioni per gestire meglio l'overhead, a patto che il risultato rimanga lo stesso (considerando un solo thread, ma abbiamo detto che se una risorsa è contesa dobbiamo usare dei meccanismi speciali per mantenere una congruenza)",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "RMW",
+    "question": "Cosa sono gli RMW?",
+    "answer": "Gli rmw sono op speciali fornite dal l'architettura che permettono di fare un set di operazioni in modo atomico. Stanno alla base delle lock nei sistemi multiproc, dato che usare perle lock multiproc il metodo di disabilitare gli interrupt in tutti i cores genererebbe troppo overhead. Es di rmw sono test-and-set, compare and swap, ldrex e strex in arm (load link e store conditional). qLa scelta del RMW da utilizzare non cambia nel risultato, ma aolo nelle performance",
+    "group": "Sincronizzazione"
   },
   {
     "title": "Scheduler activation",
@@ -156,15 +276,51 @@
     "group": "Thread"
   },
   {
+    "title": "Semafori",
+    "question": "Cosa sono i semafori?",
+    "answer": "I semafori o mutex, sono un meccanismo di sync con un intero >=0 e una coda di attesa al suo interno. Si crea un mutex per tutti i thread. Un mutex ha due funzioni principali: 1) V() anche chiamata Sempost(), in cui se c'è un thread in coda lo sveglia,  altrimenti, aumenta il contatore interno. 2) P() o Semwait, in cui viene decrementato il contatorr interno se >0, altrimenti si aggiunge il thread corrente in coda",
+    "group": "Sincronizzazione"
+  },
+  {
     "title": "Shell",
     "question": "Cosa è una shell?",
     "answer": "Una shell è un controllore di jobs, ai quali assegna a ciascuno una task. La shell si occupa di creare questi jobs attraverso la fork e la exec",
     "group": "Processi"
   },
   {
+    "title": "Spinlocks",
+    "question": "Cosa sono le spinlocks?",
+    "answer": "Le spinlocks hanno la stessa utilità delle locks, solo che fanno attesa attiva. Infatti, sono utili per quando pensiamo che la lock verrà acquisita in un breve lasso di tempo. Quando viene eseguita una spinlocks, fa polling per un certo lasso di tempo, e se in questo tempo acquisisce la lock siamo nel caeo di FAST PATH, altrimenti, siamo nel caso di SLOW PATH,in cui dopo il polling si mette in attesa passiva dell'evento. È importante che la spinlocks riesca a ottenere la lock nel caso fast path ovviamente, per avere un overhead migliore",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "Spurius wakeup",
+    "question": "cosa sono gli spurius wakeup? ",
+    "answer": "Gli spurius wakeup sono degli eventi molto rari ma possibili in cui una wait di una variabile di condizione potrebbe risvegliarsi per altri motivi, quindi per evitarlo mettere sempre la wait in un while, così da ricontrollare due volte se si è svegliata per caso o meno",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "starvation",
+    "question": "Cosa è la starvation?",
+    "answer": "Lo starvation è quando i thread/proc aspettano teoricamenre all'infinito,  perché succede sempre qualche evento che ha più priorità di lui",
+    "group": "Sincronizzazione"
+  },
+  {
     "title": "Stub",
     "question": "cosa fa la funzione stub?",
     "answer": "La funzione stub si occupa di chiamare la funzione e quindi il task che dovrà eseguire il thread, e in seguito alla sua terminazione si occuperà anche della sua deallocazione (infatti, chiama la funzione thread_exit)",
+    "group": "Thread"
+  },
+  {
+    "title": "Switch volontario",
+    "question": "Come funziona lo switch volontario di un thread?",
+    "answer": "1) salvo i registri sul tcb del thread da sostituire\n2) switcho gli stacks, ovvero cambio il puntatore dello stack mettendoci l'indirizzo di partenza dello stack del thread che verrà eseguito\n3) vengono ripristinati i registri dal tcb del nuovo thread\n4) viene fatto un return (se i thread sono in user-lv) altrimenti un iret (se i thread sono in kernel level)",
+    "group": "Thread"
+  },
+  {
+    "title": "switch_threads()",
+    "question": "Come funziona la switch threads?",
+    "answer": "1) Salva i reg del vecchio thread dal kernel stack al tcb (processo evitato se usiamo la faster version)\n2) attraverso le politiche di scheduling sceglie il nuovo thread da eseguire\n3) il vecchio thread viene messo o nella waiting list o nella ready list\n4) viene ripreso il contesto di esecuzione (i registri) del nuovo thread dal tcb\n5) viene spostato il nuovo thread nella running list e viene eseguito",
     "group": "Thread"
   },
   {
@@ -214,5 +370,17 @@
     "question": "Può un figlio thread generare un altro figlio thread?",
     "answer": "un thread può generare un altro thread, unica cosa non ha senso parlare di gerarchie e quindi di \"nipoti\" dato che i threads convidivono lo stesso codice e quindi sono più \"colleghi\"",
     "group": "Thread"
+  },
+  {
+    "title": "Utilità sincronizzazione",
+    "question": "Perché serve la sincronizzazione?",
+    "answer": "Perché i processori riordinano le operazioni a proprio piacimento, inoltre, un thread potrebbe essere fermato in qualsiasi momento, e le variabili condivise possono essere imprevedibilli",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "Variabili di condizione",
+    "question": " A cosa servono le condition variables?",
+    "answer": "Servono per aspettare in maniera passiva (quindi sospendere il thread) finché non accade l'evento per il quale il thread stava aspettando. Es. un thread consumatore nota che non ci sono messaggi nel buffer, e quindi va in wait finché il produttore non ne producerà uno.",
+    "group": "Sincronizzazione"
   }
 ]
