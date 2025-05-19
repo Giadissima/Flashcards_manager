@@ -1,5 +1,23 @@
 [
   {
+    "title": "Affinity scheduling",
+    "question": "Cosa è l'affinity scheduling?",
+    "answer": "E' un algoritmo di scheduling per sistemi multicores in cui viene fatto un mfq per ogni core, però ci crea un problema: delle CPU a volte potrebbero essere senza lavoro e altre averne troppo, quindi quando una cpu ha bisogno di lavorare ruba alle altre CPU il lavoro. Ma qui si creano dei dubbi a cui non è facile rispondere: quanti processi alla volta dovrebbe rubare? Da chi dovrebbe rubarli? Quando ci conviene ribilanciare il lavoro? Questo algoritmo non è semplice da ottimizzare.\n\nSi chiama affinity perché i processi man mano che passa il tempo fanno affinità con la cpu perché una volta finita l'esecuzione ritornano nella lista pronti della stessa.",
+    "group": "Scheduling"
+  },
+  {
+    "title": "Algoritmi monoprocessori",
+    "question": "Quali sono gli algoritmi che abbiamo studiato per i sistemi monoprocessori?",
+    "answer": "MFQ, RR, MMF, SJF, FIFO, scheduling basato su priorità",
+    "group": "Scheduling"
+  },
+  {
+    "title": "Algoritmo del banchiere in multiple resources",
+    "question": "Come cambia l'algoritmo del banchiere con la molteplicità delle risorse?",
+    "answer": "Abbiamo un vettore di disponibilità D, un vettore di assegnamento A per ogni processo Pj, e un vettore di esigente E per ogni processo Pj (anche visti come matrici se prendiamo tutte le assegnazioni e esigente per ogni processo)",
+    "group": "Sincronizzazione"
+  },
+  {
     "title": "Algoritmo di Lamport's",
     "question": "Cosa è l'algoritmo di Lamport's?",
     "answer": "E' un vecchio algoritmo che funzionava per i vecchi sistemi, che diceva che l'unico modo per essere sicuro che le operazioni venissero eseguite in ordine nel caso di un produttore e un consumatore era fare delle load e delle store",
@@ -12,6 +30,36 @@
     "group": "Sincronizzazione"
   },
   {
+    "title": "Buffer",
+    "question": "Che cosa è un buffer?",
+    "answer": "Un buffer è una porta logica che riproduce lo stesso valore di ingresso e ne può amplificare la corrente o propagare a più porte l'uscita",
+    "group": "Basi di microarchitetture"
+  },
+  {
+    "title": "Byte, nibble, word",
+    "question": "Cosa è un byte, un nibble, un word?",
+    "answer": "Un byte è 8 bit, un nibble è 4 bit, e un word è una parola, ovvero un gruppo di bit di dimensioni variabili (variano in base al microprocessore in uso)",
+    "group": "Basi di microarchitetture"
+  },
+  {
+    "title": "cache su più core",
+    "question": "Dimmi tutto ciò che sai sul problema di coerenza di cache su un sistema di più core",
+    "answer": "-",
+    "group": "Domande orale"
+  },
+  {
+    "title": "Come funziona l'invalidazione dei bit nelle cache",
+    "question": "Come funziona l'invalidazione dei bit nelle cache",
+    "answer": "-",
+    "group": "Domande orale"
+  },
+  {
+    "title": "Come funziona sjf",
+    "question": "Come funziona sjf",
+    "answer": "-",
+    "group": "Domande orale"
+  },
+  {
     "title": "Come funzionano le spinlocks in user lv?",
     "question": "Come funzionano le spinlocks in user lv ?",
     "answer": "Abbiamo il caso fast path, in cui viene fatta una test and set per fare polling, nel caso slow path invece, viene richiesta una sc bloccante al kernel chiamata Kernel locks",
@@ -22,6 +70,18 @@
     "question": "Come riordina la cpu le operazioni?",
     "answer": "Per esempio con un write buffer, ovvero quando viene fatta una write, invece di farla subito viene bufferata per permettere che venga eseguita un'altra operazione nel mentre",
     "group": "Sincronizzazione"
+  },
+  {
+    "title": "Come varia il tp?",
+    "question": "Come varia il tp?",
+    "answer": "Il tp varia o in base al numero di porte, dopo un certo numero diventa esponenziale o in base al numero di elementi inseriti in una singola porta logica",
+    "group": "Logica combinatoria"
+  },
+  {
+    "title": "Complemento a 2",
+    "question": "Come funziona la rappresentazione a complemento a 2?",
+    "answer": "E' la rappresentazione binaria maggiormente usata che consiste nel prendere una cifra positiva, ribaltarla, sommarci 1 per ottenere il numero binario negativo corrispondente. ha un unica rappresentazione dello zero ed è possibile farci le operazioni algebriche sopra senza problemi",
+    "group": "Basi di microarchitetture"
   },
   {
     "title": "Concetti base della lock",
@@ -42,6 +102,12 @@
     "group": "Thread"
   },
   {
+    "title": "Copy and write e kernel",
+    "question": "Cosa è la copy and write? 2) Come fa il kernel a ricordarsi dei bit che aveva settato per la copy and write?",
+    "answer": "Sono memorizzati nel TCB e PCB",
+    "group": "Domande orale"
+  },
+  {
     "title": "cosa significa astrarre un thread?",
     "question": "cosa significa astrarre un thread?",
     "answer": "E' un concetto fondamentale alla base dei thread, in cui fingiamo che ci sia un numero illimitato di processori (uno per ogni thread). Questo comporta che ogni thread crede di avere sempre il processore, e il context switch è trasparente al thread, portandolo a pensare che la sua sia un esecuzione lineare senza interruzioni. Questo però ci ricorda anche il perché non possiamo fare supposizioni sul quale pezzo di codice tra più thread concorrenti verrà eseguito prima, dato che la cpu riordina le op a proprio piacimento",
@@ -54,15 +120,39 @@
     "group": "Sincronizzazione"
   },
   {
+    "title": "CPU bound job, I/O bound job e workload misti",
+    "question": "Cosa sono?",
+    "answer": "CPU burst = tempo totale in cui il processo usa la CPU in maniera attiva\n I/O burst = tempo totale in cui il processo aspetta per operazioni  I/O\nCPU bound job = hanno un cpu burst notevole e un I/O burst molto ridotto, ovvero il processo utilizza molto di più la cpu rispetto che le operazioni di I/O\nI/O bound job = hanno un I/O burst notevole e un CPU burst molto ridotto, ovvero il processo utilizza molto di più le operazioni I/O rispetto che le operazioni della CPU.\nworkload misti= sono dei processi che hanno bisogno più o meno in egual misura di operazioni di  I/O e di CPU",
+    "group": "Scheduling"
+  },
+  {
     "title": "Creazione di uno zombie",
     "question": "Quando è che si crea un processo zombie?",
     "answer": "Quando il processo figlio termina prima che il padre abbia fatto la wait",
     "group": "Processi"
   },
   {
+    "title": "Criteri di scheduling in sistemi multiprocessore",
+    "question": "Di cosa dobbiamo tenere conto quando facciamo uno scheduling multiprocessore?",
+    "answer": "Uno scheduling per sistemi multiprocessore deve essere capace di lavorare con job sequenziali e con job paralleli, ovvero job che rendono meglio se messi in parallelo su core diversi e eseguiti in simultanea",
+    "group": "Scheduling"
+  },
+  {
     "title": "Deadlock",
     "question": "Che cosa è il deadlock?",
     "answer": "Il deadlock è una situazione irreversibile di quando c'è un attesa circolare tra threads o processi, in cui ognuno di loro richiede una risorse che a sua volta è trattenuta da un'altro thread per terminare, anch'esso in attesa ",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "Definizioni criteri di scheduling",
+    "question": "Cosa significa overhead, equità, predicibilità, workload e scheduling di tipo work conserving?",
+    "answer": "ovrehead = il lavoro extra che deve fare lo scheduling per garantirne il funzionamento\nequità = lo scheduling deve garantire assenza di starvation\npredicibilità = quanto sono affidabili le metriche usate dallo scheduling? si discostano tanto da un esecuzione e l'altra?\nworkload = l'insieme di tasks che devono essere eseguire\nwork conserving = lo scheduler cerca di fare usare il più possibile la CPU al processo",
+    "group": "Scheduling"
+  },
+  {
+    "title": "Definizioni di stato per algoritmo del banchiere",
+    "question": "Quali sono le definizioni di stato per l'algoritmo del banchiere?",
+    "answer": "Safe state = c'è almeno una sequenza di richieste che portano alla terminazione dei processi senza provocare deadlock\nunsafe state = c'è almeno una sequenza di richieste che portano a deadlock\ndoomed state = il deadlock è inevitabile",
     "group": "Sincronizzazione"
   },
   {
@@ -72,10 +162,52 @@
     "group": "Processi"
   },
   {
+    "title": "Detect and fix",
+    "question": "Come funziona il metodo detect and fix?",
+    "answer": "E' un metodo di risoluzione dei deadlock grafico, che consiste nell'analizzare il grafico delle risorse allocate ai vari processi o thread e trovarne i cicli, e a quel punto rimuoverli. Dal punto di vista pratico, rimuovere un ciclo significa o uccidere un thread o fare un rollback delle azioni. Se uccidiamo un thread abbiamo bisogno di un exception handler molto robusto e di un criterio per uccidere i thread, mentre un rollback delle azioni viene usato soprattutto nei database ed è una soluzione costosa in quanto dobbiamo salvarci più di uno stato alla volta",
+    "group": "Sincronizzazione"
+  },
+  {
     "title": "differenza di astrazione",
     "question": "che vantaggi comporta l'astrazione ai thread user-level e quali invece ai thread kernel-level?",
     "answer": "Il context switch nell'user level è molto veloce, ma come svantaggio ha che non sfrutta il parallelismo dei cores e lo scheduling non è pienamente efficiente dato che è interno della libreria e gestisce equamente solo i threads all'interno di essa, non conoscendo gli altri. Inoltre offrono un modo per averli in sistemi che non li hanno nativamente (su kernel multiprocesso). I threads a kernel lv invece, al contrario hanno un overhead molto più lento dato che ci sono le sc per gestirli, ma sfruttano i multicores",
     "group": "Thread"
+  },
+  {
+    "title": "Dimmi vero o falso su rc",
+    "question": "E' vero che in una rc ci sono sempre due livelli di logica dal punto di vista teorico? 2) Quanti lv di logica ha la struttura somma e prodotto? 3) qual'è il problema di avere un and a 50 ingressi?",
+    "answer": "-",
+    "group": "Domande orale"
+  },
+  {
+    "title": "Elenco soluzioni deadlock",
+    "question": "Elencami i metodi di risoluzione del deadlock",
+    "answer": "1) detect and fix\n2) prevenzione statica\n3) prevenzione dinamica",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "esercizi lock",
+    "question": "Fammi il problema dei produttori e consumatori: 1) con una sola condition variables 2) con le lock 3) con i semafori",
+    "answer": "-",
+    "group": "Domande orale"
+  },
+  {
+    "title": "fattoriale ricorsivo in assembly",
+    "question": "Spiegami il fattoriale ricorsivo in assembly",
+    "answer": "-",
+    "group": "Domande orale"
+  },
+  {
+    "title": "FIFO o FCFS",
+    "question": "Come funziona il FIFO? Quali sono i suoi vantaggi? Quali sono i suoi svantaggi?",
+    "answer": "Il FIFO è un algoritmo di scheduling non preemptive implementabile tramite una coda, in cui viene mandato in esecuzione il primo che arriva nella coda pronti. E' un algoritmo molto semplice, quindi poco costoso, e può essere vantaggioso quando abbiamo molti jobs di dimensioni molto simili. I suoi svantaggi sono invece che non ottimizza per niente il tempo di turnaround e di attesa, finendo molto spesso ad essere particolarmente inefficiente",
+    "group": "Scheduling"
+  },
+  {
+    "title": "Funzionamento algoritmo del banchiere",
+    "question": "Come funziona l'algoritmo del banchiere?",
+    "answer": "- i processi dichiarano all'inizio il massimo delle risorse che dovranno usare per terminare la propria esecuzione\n- il banchiere accetta una richiesta solo se rimarrebbe in safe state. Per verificarlo fa una simulazione. Se una richiesta viene rifiutata, il banchiere mette  in wait il processo finché non può soddisfarla\n- il banchiere gestisce le richieste dinamicamente, ovvero man mano che arrivano decide se rifiutarle o accettarle",
+    "group": "Sincronizzazione"
   },
   {
     "title": "Funzionamento scheduling activation",
@@ -94,6 +226,12 @@
     "question": "Quali funzioni dei processi ci sono? quali sono con maggior probabilità usati dai padri e quali dai figli?",
     "answer": "Il padre e il figlio usano la exit, il padre usa inoltre la wait, la waitpid, e la fork, mentre il figlio usa la exit, la getpid, la getppid, e la exec",
     "group": "Processi"
+  },
+  {
+    "title": "Gang Scheduling",
+    "question": "Cosa è il gang scheduling?",
+    "answer": "E' un algoritmo di scheduling multicore che gestisce i processi paralleli eseguendo sempre i processi dello stesso programma insieme. Purtroppo non è un algoritmo molto efficiente perché il numero dei processi generati da un programma potrebbero essere di più dei cores sulla macchina",
+    "group": "Scheduling"
   },
   {
     "title": "Global env e virtual env",
@@ -120,10 +258,22 @@
     "group": "Processi"
   },
   {
+    "title": "Jump in byte armv7",
+    "question": "Come è fatta l'istruzione di salto in linguaggio macchina? (aiuti:)2) i primi 4 bit sono con segno o senza segno? 3) se fossero senza segno che problema avrebbe? 4) si può creare una struttura in cui l'offset è senza segno? 5) come si compila un for in assembler? controlla la condizione e se è falsa esco",
+    "answer": "-",
+    "group": "Domande orale"
+  },
+  {
     "title": "Locks",
     "question": "Cosa sono le locks? come si usano?",
     "answer": "Le locks sono un meccanismo di sync.\n\nSi utilizza iniziando con la funzione lock.acquire() che ti permette di creare una sezione critica in mutua esclusione, infatti, la lock.acquire() controlla che non ci sia nessun thread già in una sezione critica, e che quindi la \"risorsa\" lock sia libera, se non lo è aspetta, altrimenti si dice che acquisisco la lock.\n\n\nQuando voglio uscire dalla sezione critica utilizzo la lock.release() che sveglia eventuali thread in attesa che avevano richiesto l'acquire()",
     "group": "Sincronizzazione"
+  },
+  {
+    "title": "Mappe di karnaugh orale",
+    "question": "Cosa sono le mappe di karnaugh e come funzionano 2) a che servono? 3) disegnare un esempio 4) qual'è la regola?",
+    "answer": "-",
+    "group": "Domande orale"
   },
   {
     "title": "Mapped file o mapped segment",
@@ -132,10 +282,28 @@
     "group": "Sincronizzazione"
   },
   {
+    "title": "Max Min Fairness",
+    "question": "Cosa è l'algoritmo max min fairness? Quali sono i suoi svantaggi? Ci sono delle varianti?",
+    "answer": "è un algoritmo utilizzato principalmente nelle reti, e che cerca di risolvere il problema dell'equità di RR cercando di massimizzare l'allocazione minima da dare a un processo rimanendo equo (dare il più possibile senza sbilanciarsi). Per esempio se io ho un budget di 100 quanti di tempo, e io ho p1 che per terminare ha bisogno di 20 quanti, p2=50 e p3=50, faccio 100/3=33, quindi vedo che 20 < 33 e assegno 20 a p1, così ci rimane 80 di budget- 80/2=40 che vengono assegnati equamente a p2 e p3.\n\nLo svantaggio di questo algoritmo è che è troppo costoso, infatti in realtà viene usato come benchmark.\n\nEsiste anche un'altra variante, che dà priorità ai processi che terminano prima, dando ancora più equità ai workload misti, ma questa variante è ancora più pesante della versione base",
+    "group": "Scheduling"
+  },
+  {
     "title": "Mesa e Hoare",
     "question": "Cosa sono le sintassi Mesa e Hoare? Come si differenziano tra loro?",
     "answer": "Sono entrambe sintassi usate quando si usano le locks, la prima, Mesa, una volta che il thread che ha la lock fa la signal risveglia il thread che aspettava (sempre che ci fosse) e lo mette in coda pronti, continuando con la propria esecuzione. \n\nLa sintassi Hoare invece, richiede maggiore attenzione nel suo utilizzo ma ha più potenziale, infatti, una volta che viene fatta la signal, passa anche la lock al thread risvegliato, e il thread che era in esecuzione si rimette nella coda pronti. La sintassi hoare può essere utile quando vogliamo dare un ordine ai thread risvegliati, per esempio creare code fifo o filo. \n\nCreare queste file è possibile anche con Mesa ma è meno intuitivo. Nonostante si possa passare una lock o risvegliare un thread specifico non è comunque dato l'ordine di esecuzione preciso, perché l'ordine di risveglio non è l'ordine di esecuzione. Per esempio, in bounded buffer non possiamo fare assunzioni perché non sappiamo se verrà eseguito prima un produttore o un consumatore",
     "group": "Sincronizzazione"
+  },
+  {
+    "title": "mfq",
+    "question": "Cosa è l'mfq e come funziona? Ci sono degli accorgimenti da farci? Come previene lo starvation?",
+    "answer": "L'MFQ, o Multi-Level Feedback Queue è un algoritmo di scheduling che cerca di trovare un compromesso tra tutti gli obbiettivi proposti dai criteri dello scheduling, tra cui un overhead, response time, turnaround time \n e throughput buono, rimanendo il più equo possibile e non generare lo starvation.\n\nL'MFQ pone diverse code di RR, una per ogni livello di priorità, e associa un quanto di tempo diverso a seconda della priorità in cui si trova. La priorità più alta è quella con un time slice minore, mentre la coda con la priorità più bassa ha il time slice maggiore. Quando un processo viene creato, viene messo nella coda con priorità più alta. Ogni volta che un processo viene eseguito e non termina, viene scalato di priorità, di un livello inferiore (meno urgente).\n\nL'MFQ è un algoritmo molto buono per i sistemi monoprocessori, veniva usato addirittura da Windows. Però, vanno comunque fatti degli accorgimenti per farlo funzionare a dovere, per esempio, un processo che richiede l'uso della tastiera dovrebbe scalare più rapidamente di priorità rispetto a uno che legge solo la memoria, per garantire un response time buono.\n\nPreviene lo starvation facendo si che dopo un po' che un processo aspetta senza essere eseguito viene scalato di priorità",
+    "group": "Scheduling"
+  },
+  {
+    "title": "MFQ in multiprocessore",
+    "question": "Come funziona MFQ nei sistemi multiprocessore?",
+    "answer": "Abbiamo le nostre code di MFQ condivise a tutte le CPU, ogni CPU quando ha bisogno di un processo da eseguire chiede alla spinlock dello scheduler. Lo scheduler non può mai sospendersi, per questo viene usata l'attesa attiva",
+    "group": "Scheduling"
   },
   {
     "title": "Modelli di scheduling",
@@ -144,9 +312,21 @@
     "group": "Thread"
   },
   {
+    "title": "Modulo e segno",
+    "question": "Cosa è la rappresentazione modulo e segno? ",
+    "answer": "E' un modo per rappresentare i numeri binari, in cui il bit più significativo è riservato al segno. Purtroppo ha due svantaggi nell'usarlo:\n1) abbiamo doppia rappresentazione dello zero\n2) le somme non danno sempre risultati corretti",
+    "group": "Basi di microarchitetture"
+  },
+  {
     "title": "Monitor",
     "question": "Cosa è un monitor?",
-    "answer": "Un monitor è un meccanismo di sync un po' particolare, perché è più ad alto lv rispetto agli altri meccanismi visti, e quindi più semplice da usare, che usa a sua volta meccanismi interni più a basso lv come locks+ cond. variabl3 oppure mutex. Se usiamo un monitor è più semplice evitare race cond. Ha diverse caratteristiche: 1) esegue incapsulamento delle variabili condivise al suo interno, permettendo di visualizzarle o modificarle solo tramite funzionj esposte all'esterno del monitor 2) tutto il codice jnterno al monitor viene eseguito in mutua esclusione ",
+    "answer": "Un monitor è un meccanismo di sync un po' particolare, perché è più ad alto lv rispetto agli altri meccanismi visti, e quindi più semplice da usare, che usa a sua volta meccanismi interni più a basso lv come locks+ cond. variabl3 oppure mutex. Se usiamo un monitor è più semplice evitare race cond. Ha diverse caratteristiche: 1) esegue incapsulamento delle variabili condivise al suo interno, permettendo di visualizzarle o modificarle solo tramite funzioni esposte all'esterno del monitor 2) tutto il codice interno al monitor viene eseguito in mutua esclusione ",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "Motivi deadlock",
+    "question": "Quali possono essere le cause che portano al deadlock?",
+    "answer": "Le cause possono essere le seguenti:\n1) risorse limitate e non prerilasciabili\n2) wait while holding, ovvero un thread o un processo detiene una risorsa mentre ne aspetta un altra\n3) le due cause precedenti possono generare attesa circolare, e quindi il deadlock.\n\nRisolvendo una di queste cause risolviamo il deadlock ma non per forza lo starvation",
     "group": "Sincronizzazione"
   },
   {
@@ -156,10 +336,28 @@
     "group": "Processi"
   },
   {
+    "title": "Multiplexer a più ingressi",
+    "question": "Multiplexer a n ingressi a 1 bit o multiplexer a 2 ingressi a 1 bit. Quali delle due strutture potrebbe crearci più problemi?",
+    "answer": "tp",
+    "group": "Domande orale"
+  },
+  {
+    "title": "Mutex o semafori?",
+    "question": "I semafori sono la stessa cosa dei mutex?",
+    "answer": "No, i semafori hanno un contatore che può essere >= 0, mentre le mutex hanno un contatore per un unica risorsa binario",
+    "group": "Domande orale"
+  },
+  {
     "title": "Mutua esclusione",
     "question": "cosa è la mutua esclusione?",
     "answer": "La mutua esclusione è il concetto in cui si può accedere o a una risorsa o a una sezione critica uno alla volta",
     "group": "Sincronizzazione"
+  },
+  {
+    "title": "Oblivious scheduling",
+    "question": "Cosa è l'oblivious scheduling?",
+    "answer": "L'oblivious scheduling, o scheduling ignaro, è quando uno scheduler in un ambiente multicore non prende in considerazione dei possibili processi paralleli",
+    "group": "Scheduling"
   },
   {
     "title": "Ogni thread...",
@@ -188,7 +386,7 @@
   {
     "title": "Passaggi di una fork",
     "question": "Quali sono i passaggi che fa una fork?",
-    "answer": "1 - crea un PCB   2- crea lo spazio di indirizzamento   3- viene condiviso il codice del programma anche al nuovo processo   4 - il processo eredita il contesto del padre (variabili di ambiente, shell, args, priorità...)   5 - informa lo scheduler che il nuovo processo è nato  ",
+    "answer": "1 - crea un PCB   \n2- crea lo spazio di indirizzamento   \n3- viene condiviso il codice del programma anche al nuovo processo   \n4 - il processo eredita il contesto del padre (variabili di ambiente, shell, args, priorità...)   \n5 - informa lo scheduler che il nuovo processo è nato  ",
     "group": "Processi"
   },
   {
@@ -222,10 +420,58 @@
     "group": "Thread"
   },
   {
+    "title": "Preemptive scheduler",
+    "question": "Perché il preemptive scheduler prende spesso una decisione rispetto allo scheduler non preemptive?",
+    "answer": "Perché lo scheduler preemptive se trova un processo che ha maggiore priorità di esecuzione ferma il processo in esecuzione e ci mette il nuovo processo, mentre nel modello non preemptive la decisione viene fatta solo dopo che il processo di esecuzione termina o va in timer out e non viene fermato \"nel mezzo\"",
+    "group": "Scheduling"
+  },
+  {
     "title": "Prevenire riordinamento operazioni",
     "question": "Come si può prevenire il riordinamento delle operazioni fatto dalla cpu?",
     "answer": "Attraverso i meccanismi di sincronizzazione, in particolare, più a basso livello possibile troviamo per prevenirlo le memory barrier instructions. I meccanismi di sync più ad alto livello sfruttano le memory barrier instructions",
     "group": "Sincronizzazione"
+  },
+  {
+    "title": "Prevenzione statica",
+    "question": "Come funziona il metodo di prevenzione statica per la risoluzione dei deadlock?",
+    "answer": "Si tratta di un metodo in cui si usano dei criteri per rendere impossibile il verificarsi delle cause che portano a deadlock. Tra questi:\n- ordinamento delle lock. Diamo sempre le lock in un ordine preciso, per esempio in ordine alfabetico, molto usato dai kernel\n- rimuovere il wait while holding. Se un thread o processo ha una risorsa e sta aspettando per un'altra, rilascia la risorsa che già aveva prima di fare la wait.\n- virtualizzazione delle risorse. Non sempre possibile, ma consiste nel fare credere che le risorse siano illimitate e poi lasciare un gestore a occuparsi di decidere a chi devono andare le vere risorse fisiche, metodo usato per esempio con le stampanti.\n- Metodo \"o tutte o nessuna\". Si tratta di chiedere anticipatamente tutte le risorse che serviranno a quel thread/proc, e se sono tutte libere le prende, altrimenti aspetta e non ne prende nessuna",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "Principio di astrazione",
+    "question": "Cosa è il principio di astrazione? Quali sono i vantaggi?",
+    "answer": "E' il riuscire a spiegare il funzionamento di un dispositivo complesso come il computer attraverso diversi livelli che collaborano tra di loro creando livelli superiori sempre più astratti. La comunicazione è possibile attraverso le funzionalità e le politiche. Il livello Li ha n funzionalità, perché queste funzionalità funzionino, hanno bisogno di interfacciarsi con i meccanismi, dei componenti che fanno da intermediari con il livello Li-1, e chiedono i dati richiesti dalle funzionalità alle politiche. Il vantaggio di astrarre i livelli è che li rendi indipendenti tra di loro e se viene cambiato un livello inferiore con un altro il livello superiore non se ne accorge dato che chiede i dati ai meccanismi",
+    "group": "Basi di microarchitetture"
+  },
+  {
+    "title": "Principio di disciplina",
+    "question": "Cosa è il principio di disciplina?",
+    "answer": "La disciplina è il concentrarsi quando si crea un componente a crearne uno generico senza troppe funzionalità, per poter prediligere la riusabilità del componente rispetto alla personalizzazione",
+    "group": "Basi di microarchitetture"
+  },
+  {
+    "title": "Principio di gerarchia",
+    "question": "Cosa è il principio di gerarchia?",
+    "answer": "E' il riuscire a progettare una componente complessa attraverso moduli più piccoli collegate tra di loro",
+    "group": "Basi di microarchitetture"
+  },
+  {
+    "title": "Principio di modularità",
+    "question": "Cosa è il principio di modularità?",
+    "answer": "i moduli devono avere interfacce e funzioni ben definite, ovvero di cui è ben nota la funzionalità",
+    "group": "Basi di microarchitetture"
+  },
+  {
+    "title": "Principio di regolarità",
+    "question": "Cosa è il principio di regolarità?",
+    "answer": "Il principio di regolarità è una delle tre y, in cui nella progettazione si utilizzano dei moduli standardizzati e comuni tipo bus e anello",
+    "group": "Basi di microarchitetture"
+  },
+  {
+    "title": "Priority inversion problem",
+    "question": "Che cosa è il priority inversion problem?",
+    "answer": "E' un problema che si verifica nell'algoritmo di scheduling MFQ in cui un processo con più alta priorità richiede una risorsa che è allocata a un processo che è in una lista con più a bassa priorità",
+    "group": "Scheduling"
   },
   {
     "title": "Processi leggeri",
@@ -240,16 +486,64 @@
     "group": "Processi"
   },
   {
+    "title": "Qual'è l'idea dell'algoritmo del banchiere?",
+    "question": "Qual'è l'idea dell'algoritmo del banchiere?",
+    "answer": "Il banchiere presta i soldi solo se è sicuro che verranno restituiti e se ce ne sono abbastanza. Il sistema analogamente dà una risorsa solo se siamo sicuri che accettando la richiesta rimaniamo in un safe state",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "Quando viene fatto lo scheduling dei processi da eseguire?",
+    "question": "Quando viene fatto lo scheduling dei processi da eseguire?",
+    "answer": "La decisione di quale processo deve essere eseguito varia in base alla scelta del tipo di scheduling. Per il modello Preemptive, la decisione viene presa quando un processo:\n1) switcha da running a waiting\n2) switcha da running a ready\n3) switcha da waiting a ready\n4) termina\nNel modello non preemptive invece, la decisione viene presa solo nei punti 1 e 4",
+    "group": "Scheduling"
+  },
+  {
     "title": "Race conditions",
     "question": "Cosa sono le race conditions?",
     "answer": "La race condition è una situazione che si verifica quando più thread si concorrono una risorsa senza usare meccanismi di sync, rendendo la variabile di valore imprevedibile perché dipendente dal riordinamento delle operazioni della cpu",
     "group": "Sincronizzazione"
   },
   {
+    "title": "Range complemento a 2",
+    "question": "Mi dici il range di numeri con l'utilizzo della rappresentazione complemento a 2?",
+    "answer": "[-2^(n-1),2^(n-1)-1]",
+    "group": "Basi di microarchitetture"
+  },
+  {
+    "title": "Range modulo e segno",
+    "question": "Mi sapresti dire il range dei numeri con la rappresentazione modulo e segno?",
+    "answer": "[-2^(n-1)-1,2^(n-1)-1], uno in meno della rappresentazione complemento a 2 perché abbiamo 2 rappresentazioni per lo zero",
+    "group": "Basi di microarchitetture"
+  },
+  {
+    "title": "rete combinatoria",
+    "question": "Da cosa dipende l'output di una rete combinatoria?",
+    "answer": "Dipende  unicamente dai valori di input e dal calcolo che la rete fa su quegli input per determinarne l'output",
+    "group": "Logica combinatoria"
+  },
+  {
+    "title": "Rete sequenziale",
+    "question": "Da cosa dipende l'output di una rete sequenziale?",
+    "answer": "L'output di una rete sequenziale dipende dal calcolo che viene fatto sugli input attuali, ma anche sui valori precedenti degli input",
+    "group": "Logica sequenziale"
+  },
+  {
+    "title": "Reti logiche",
+    "question": "Come si differenziano le reti logiche?",
+    "answer": "Le reti logiche si differenziano in reti sequenziali e reti combinatorie",
+    "group": "Domande orale"
+  },
+  {
     "title": "Return processo terminato",
     "question": "Cosa ritorna un processo terminato?",
     "answer": "Ritorna al chiamante, ovvero alla funzione padre, un valore, che può essere gestito dal programmatore attraverso la exit o mandato dal kernel a seguito di un eccezione o upcall (sarà un valore negativo). Nel caso sia proprio la funzione \"main\" a terminare, il suo chiamante si chiama init",
     "group": "Processi"
+  },
+  {
+    "title": "Riflessioni su mfq in multicore",
+    "question": "Ha senso usare mfq in multicore?",
+    "answer": "mfq in multicore è troppo costoso, una miglioria potrebbe essere usare un vettore di spinlocks tante quante sono le code per diminuire la sezione critica, ma rimane comunque il problema.\n\na quel punto si potrebbe pensare di implementare l'affinity scheduling",
+    "group": "Scheduling"
   },
   {
     "title": "Riordimento op CPU",
@@ -264,6 +558,30 @@
     "group": "Sincronizzazione"
   },
   {
+    "title": "RR",
+    "question": "cos è l'RR?",
+    "answer": "Il round robin è un modello di scheduling in cui abbiamo una coda di processi come in FIFO e ogni processo viene eseguito per un quanto di tempo prefissato. Il problema di questo modello è calcolare il quanto di tempo giusto, perché un quanto troppo grande significherebbe ricadere nel modello FIFO, e un quanto troppo piccolo genererebbe troppo overhead e sarebbe inefficiente. Solitamente il quanto ideale nei sistemi moderni è 20-100ms. RR inizia prendendo il primo processo dalla coda pronti, setta un timer per il timeout del quanto di tempo e lo esegue, se il processo non è terminato in quel quanto di tempo lo mette alla fine della coda",
+    "group": "Scheduling"
+  },
+  {
+    "title": "RR 2",
+    "question": "RR dal punto di vista del turnaround time è ottimo? MFQ è ottimo per? Qual'è il priority inversion problem?",
+    "answer": "-",
+    "group": "Domande orale"
+  },
+  {
+    "title": "RR vs FIFO",
+    "question": "Confrontami i due modelli",
+    "answer": "RR è generalmente meglio di FIFO, ma ci sono delle situazioni in cui non è equo o comunque FIFO riesce ad essere più efficiente. Per esempio, se tutti i processi durano più o meno lo stesso tempo non ha senso dividerli, oppure RR non è efficiente nel caso di workload misti, perché i processi I/O bound beneficerebbero di un quanto di tempo piccolo perché hanno da aspettare le risposte dei dispositivi, mentre i processi CPU bound beneficerebbero di un quanto più grande perché hanno bisogno di sfruttare al massimo la CPU. Quindi l'algoritmo non è equo perché dà più chance di terminazione ai processi di tipo CPU bound rispetto a quelli I/O bound",
+    "group": "Scheduling"
+  },
+  {
+    "title": "RR vs SJF",
+    "question": "Cosa puoi dire degli algoritmi RR e SJF a confronto?",
+    "answer": "Le performance di RR non sono molto scostanti da quelle di SJF, per quanto RR introduce un maggior overhead e non è equo per workload misti (dà più chance di terminazione a processi CPU bound)",
+    "group": "Scheduling"
+  },
+  {
     "title": "Scheduler activation",
     "question": "Che cosa è lo scheduler activation?",
     "answer": "Lo scheduler activation è un meccanismo di scheduling che cerca di migliorare la soluzione di usare lo scheduler user-lv che ha un overhead più basso rispetto al meccanismo kernel-lv, ma senza la criticità del modello ovvero quella che se un thread user-lv esegue una system call bloccante, allora tutti i thread che aveva quel processo vengono bloccati, dato che il kernel non li vede",
@@ -276,6 +594,24 @@
     "group": "Thread"
   },
   {
+    "title": "Scheduling basato su priorità",
+    "question": "Cosa è lo scheduling basato su priorità?",
+    "answer": "Viene eseguito sempre il processo con priorità più alta (ovvero con il valore più basso). L'algoritmo può essere preemptive o non preemptive, e può causare starvation. Un'alternativa sicura dallo starvation è la versione aging in cui man mano che passa il tempo i processi aumentano di priorità. ",
+    "group": "Scheduling"
+  },
+  {
+    "title": "Scheduling criteria",
+    "question": "Quali sono gli scheduling criteria?",
+    "answer": "- massimizzare l'uso della CPU\n- massimizzare il throughput, ovvero il numero di task che si riescono a fare in un unità di tempo\n- minimizzare il waiting time, ovvero il tempo in cui un processo deve aspettare nella ready list prima di essere eseguito\n- minimizzare il tempo di risposta, una metrica per i sistemi interattivi in cui ci sono molti più input dell'utente e serve un tempo di risposta breve\n- minimizzare il turnaround, ovvero il tempo totale in cui il processo rimane in vita",
+    "group": "Scheduling"
+  },
+  {
+    "title": "Scheduling RR",
+    "question": "Parliamo dello scheduling di RR, quali sono i pro e i contro?",
+    "answer": "-",
+    "group": "Domande orale"
+  },
+  {
     "title": "Semafori",
     "question": "Cosa sono i semafori?",
     "answer": "I semafori o mutex, sono un meccanismo di sync con un intero >=0 e una coda di attesa al suo interno. Si crea un mutex per tutti i thread. Un mutex ha due funzioni principali: 1) V() anche chiamata Sempost(), in cui se c'è un thread in coda lo sveglia,  altrimenti, aumenta il contatore interno. 2) P() o Semwait, in cui viene decrementato il contatorr interno se >0, altrimenti si aggiunge il thread corrente in coda",
@@ -286,6 +622,24 @@
     "question": "Cosa è una shell?",
     "answer": "Una shell è un controllore di jobs, ai quali assegna a ciascuno una task. La shell si occupa di creare questi jobs attraverso la fork e la exec",
     "group": "Processi"
+  },
+  {
+    "title": "Sintassi Mesa",
+    "question": "Come funziona la sintassi Mesa?",
+    "answer": "-",
+    "group": "Domande orale"
+  },
+  {
+    "title": "SJF",
+    "question": "Come funziona SJF? Quali sono i suoi vantaggi? Quali sono i suoi svantaggi?",
+    "answer": "SJF, o shortest job first, è un algoritmo che può essere sia preemptive sia non preemptive, in cui viene eseguito sempre il processo che ci metterà meno a terminare. L'implementazione preemptive è una variante in cui quando arriva un processo che dura meno di quello attualmente in esecuzione viene fatto il context switch, infatti questa variante si chiama Shortest Remaining Time First (SRTF).\n\nIl suo vantaggio è quello di avere un tempo di risposta ottimale ma al tempo stesso molto variabile, e nei sistemi interattivi può essere ottimo o un po' peggiore in base alla situazione, ma il suo principale svantaggio è che può provocare starvation, e anche che ordinare i processi per durata ha un costo, e se si trova processi che durano tutti più o meno lo stesso tempo diventa costoso e poco efficiente.",
+    "group": "Scheduling"
+  },
+  {
+    "title": "Space sharing",
+    "question": "Cosa è lo space sharing?",
+    "answer": "Lo space sharing è un algoritmo di scheduling che raggruppa i processi con i propri threads e li manda in esecuzione a gruppi e alloca i processori a task differenti",
+    "group": "Scheduling"
   },
   {
     "title": "Spinlocks",
@@ -364,6 +718,24 @@
     "question": "Che tipi di modelli abbiamo che lavorano con i thread e processi applicati ai kernel e non?",
     "answer": "Il kernel multiprocesso, che riesce a gestire più processi all'interno di un singolo programma, e kernel multithread, che supporta i thread all'interno di un singolo programma. I programmi a lv utente possono essere multithread, creati attraverso delle lib solitamente già implementate nei sistemi. Sta a noi quando si fa un thread, sempre se il kernel sia multithread, decidere se vogliamo sfruttare il kernel come intermediario o usare una libreria che li crea per noi. L'altro modello a lv utente è il singlethread, che supporta un thread alla volta. Semplice da realizzare, ma non sfruttta il parallelismo",
     "group": "Thread"
+  },
+  {
+    "title": "Tipi di processi",
+    "question": "Che tipi di processi ci sono?",
+    "answer": "Ci sono processi sequenziali, e processi paralleli, ovvero processi che fanno parte dello stesso programma e hanno bisogno di molto scambio di dati. Quando si crea un algoritmo muticores bisogna stare attenti ai processi paralleli, noi ne abbiamo visti principalmente di due tipi:\n1) producer-consumer pipeline\nin cui tutti i processi coinvolti fanno una catena di montaggio in cui un processo ha bisogno dei dati del processo precedente per generare un nuovo dato che a sua volta verrà usato dal processo successivo. Se uno dei processi non è in esecuzione tutta la catena viene quindi bloccata\n2) bulk synchronous parallel (BSP)\nk processi lavorano a fasi chiamate superstep. Ogni superstep consiste nel comunicare nuovi dati con la barriera di sincronizzazione. Questa barriera si occupa di aggiornare tutti i processi con i nuovi dati appena c'è un cambiamento, e se non riesce, mette tutti in attesa. Quindi, anche per questo modello è fondamentale avere tutti questi processi in esecuzione in contemporanea",
+    "group": "Scheduling"
+  },
+  {
+    "title": "Tipologie di load che conosce",
+    "question": "Mi dice le tipologie di load che conosce?",
+    "answer": "-",
+    "group": "Domande orale"
+  },
+  {
+    "title": "tp",
+    "question": "Cosa è il tp?",
+    "answer": "E' il tempo di propagazione, ovvero il ritardo di propagazione del circuito",
+    "group": "Logica combinatoria"
   },
   {
     "title": "Un nipote thread",

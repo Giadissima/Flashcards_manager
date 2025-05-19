@@ -25,4 +25,8 @@ aggiungere il testo in grassetto e la modifica della text area
 nel test, non vengono visualizzati gli /n
 
 aggingere nel test un contatore di domande lasciate in bianco
-se fac
+non posso cambiare il titolo
+
+salvarsi le risposte sbagliate e tra le opzioni selezionare un test di sole risposte sbagliate
+
+non si vedono i paragrafi nella view test

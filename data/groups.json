@@ -1,7 +1,39 @@
 [
   {
+    "name": "ARM",
+    "color": "#ff007b"
+  },
+  {
+    "name": "Basi di microarchitetture",
+    "color": "#ff0000"
+  },
+  {
+    "name": "Componenti digitali",
+    "color": "#51e66a"
+  },
+  {
+    "name": "Domande orale",
+    "color": "#fd77f8"
+  },
+  {
+    "name": "Logica combinatoria",
+    "color": "#7300ff"
+  },
+  {
+    "name": "Logica sequenziale",
+    "color": "#ffe357"
+  },
+  {
+    "name": "Microarchitettura",
+    "color": "#aeff00"
+  },
+  {
     "name": "Processi",
     "color": "#349400"
+  },
+  {
+    "name": "Scheduling",
+    "color": "#00d5ff"
   },
   {
     "name": "Sincronizzazione",
