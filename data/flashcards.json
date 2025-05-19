@@ -48,6 +48,12 @@
     "group": "Domande orale"
   },
   {
+    "title": "Calcolo tp di full adder",
+    "question": "Calcolami il tp di un full adder a 32 bit",
+    "answer": "-",
+    "group": "Domande orale"
+  },
+  {
     "title": "Come funziona l'invalidazione dei bit nelle cache",
     "question": "Come funziona l'invalidazione dei bit nelle cache",
     "answer": "-",
@@ -64,6 +70,12 @@
     "question": "Come funzionano le spinlocks in user lv ?",
     "answer": "Abbiamo il caso fast path, in cui viene fatta una test and set per fare polling, nel caso slow path invece, viene richiesta una sc bloccante al kernel chiamata Kernel locks",
     "group": "Sincronizzazione"
+  },
+  {
+    "title": "Come possono essere le reti logiche?",
+    "question": "Come possono essere le reti logiche?",
+    "answer": "Le reti logiche possono essere sequenziali o combinatorie",
+    "group": "Basi di microarchitetture"
   },
   {
     "title": "Come riordina la cpu le operazioni?",
@@ -106,6 +118,12 @@
     "question": "Cosa è la copy and write? 2) Come fa il kernel a ricordarsi dei bit che aveva settato per la copy and write?",
     "answer": "Sono memorizzati nel TCB e PCB",
     "group": "Domande orale"
+  },
+  {
+    "title": "Cosa è un full adder?",
+    "question": "Cosa è un full adder?",
+    "answer": "Un full adder è un componente che effettua un addizione su n bit (full adder a n bit) e in cui ha in ingresso il riporto del full adder precedente collegato a lui, e Rout il riporto per l'eventuale full adder successivo a lui. Inoltre ha la z che serve per l'output del risultato dell'addizione. E' fatto in modo tale da poterlo connettere a componenti uguali a lui, per il primo della serie si può usare un half adder, un componente che non ha Rin",
+    "group": "Logica combinatoria"
   },
   {
     "title": "cosa significa astrarre un thread?",
@@ -174,6 +192,12 @@
     "group": "Thread"
   },
   {
+    "title": "Differenza di tp tra and a 8 ingressi e gerarchia di and a 2 ingressi per fare un and a 8 ingressi",
+    "question": "Differenza di tp tra and a 8 ingressi e gerarchia di and a 2 ingressi per fare un and a 8 ingressi",
+    "answer": "per la gerarchia possiamo calcolare il tp come log in base 2 di 8 = 3, infatti l'albero saranno 3 livelli e quindi 3tp, mentre l'and di base a 8 ingressi non è calcolabile direttamente, perché varia in base alla tecnologia usata, ma sappiamo che usare gli alberi è più rapido di usare una porta molto grande, perché richiede un ordine di grandezza lineare o più",
+    "group": "Logica combinatoria"
+  },
+  {
     "title": "Dimmi vero o falso su rc",
     "question": "E' vero che in una rc ci sono sempre due livelli di logica dal punto di vista teorico? 2) Quanti lv di logica ha la struttura somma e prodotto? 3) qual'è il problema di avere un and a 50 ingressi?",
     "answer": "-",
@@ -208,6 +232,12 @@
     "question": "Come funziona l'algoritmo del banchiere?",
     "answer": "- i processi dichiarano all'inizio il massimo delle risorse che dovranno usare per terminare la propria esecuzione\n- il banchiere accetta una richiesta solo se rimarrebbe in safe state. Per verificarlo fa una simulazione. Se una richiesta viene rifiutata, il banchiere mette  in wait il processo finché non può soddisfarla\n- il banchiere gestisce le richieste dinamicamente, ovvero man mano che arrivano decide se rifiutarle o accettarle",
     "group": "Sincronizzazione"
+  },
+  {
+    "title": "Funzionamento di mappek",
+    "question": "Come funzionano le mappek?",
+    "answer": "Supponiamo di studiare un uscita z. Bisogna fare una mappa per ogni output. In questo caso, disegniamo una matrice fatta con codice gray in cui scriviamo gli ingressi e i valori dell'uscita che risulta al variare di essi. Una volta finito, cerchiamo di fare i quadrati o rettangoli più grandi formati dagli \"1\" che possiamo, tenendo a mente che i rettangoli possono andare fuori dai bordi e rientrare dall'altra parte e che devono essere grandi come una potenza di 2. Per la semplificazione scriviamo questi uni come le costanti di ingresso che non cambiano in ogni rettangolone",
+    "group": "Logica combinatoria"
   },
   {
     "title": "Funzionamento scheduling activation",
@@ -282,6 +312,18 @@
     "group": "Sincronizzazione"
   },
   {
+    "title": "Mappek",
+    "question": "Cosa sono le mappe di karnaugh?",
+    "answer": "Le mappe di karnaugh o mappek sono delle mappe usate per semplificare le espressioni logiche per reti combinatorie a n ingressi con n <=4",
+    "group": "Logica combinatoria"
+  },
+  {
+    "title": "Mappek a 5 ingressi",
+    "question": "Possiamo fare una mappak a 5 ingressi?",
+    "answer": "Sì, ma dato che dobbiamo fare delle matrici, già a 5 ingressi inizia a diventare inefficiente il metodo di semplificazione. Infatti, dovremmo fare due matrici che ne creano una singola bidimensionale, in cui in una abbiamo il quinto ingresso = 0 e nell'altra il quinto ingresso=1",
+    "group": "Logica combinatoria"
+  },
+  {
     "title": "Max Min Fairness",
     "question": "Cosa è l'algoritmo max min fairness? Quali sono i suoi svantaggi? Ci sono delle varianti?",
     "answer": "è un algoritmo utilizzato principalmente nelle reti, e che cerca di risolvere il problema dell'equità di RR cercando di massimizzare l'allocazione minima da dare a un processo rimanendo equo (dare il più possibile senza sbilanciarsi). Per esempio se io ho un budget di 100 quanti di tempo, e io ho p1 che per terminare ha bisogno di 20 quanti, p2=50 e p3=50, faccio 100/3=33, quindi vedo che 20 < 33 e assegno 20 a p1, così ci rimane 80 di budget- 80/2=40 che vengono assegnati equamente a p2 e p3.\n\nLo svantaggio di questo algoritmo è che è troppo costoso, infatti in realtà viene usato come benchmark.\n\nEsiste anche un'altra variante, che dà priorità ai processi che terminano prima, dando ancora più equità ai workload misti, ma questa variante è ancora più pesante della versione base",
@@ -337,7 +379,7 @@
   },
   {
     "title": "Multiplexer a più ingressi",
-    "question": "Multiplexer a n ingressi a 1 bit o multiplexer a 2 ingressi a 1 bit. Quali delle due strutture potrebbe crearci più problemi?",
+    "question": "Multiplexer a n ingressi a 1 bit o multiplexer a 2 ingressi a 1 bit. Quali delle due strutture potrebbe crearci più problemi? al variare di n qual'è il ritardo?",
     "answer": "tp",
     "group": "Domande orale"
   },
@@ -420,6 +462,12 @@
     "group": "Thread"
   },
   {
+    "title": "Postulati algebra booleana",
+    "question": "Quali sono i postulati dell'algebra booleana?",
+    "answer": "not A + A = 1\nnot A * A = 0\nA * 0 = 0\nA * 1 = A\nA + 1 = 1",
+    "group": "Logica combinatoria"
+  },
+  {
     "title": "Preemptive scheduler",
     "question": "Perché il preemptive scheduler prende spesso una decisione rispetto allo scheduler non preemptive?",
     "answer": "Perché lo scheduler preemptive se trova un processo che ha maggiore priorità di esecuzione ferma il processo in esecuzione e ci mette il nuovo processo, mentre nel modello non preemptive la decisione viene fatta solo dopo che il processo di esecuzione termina o va in timer out e non viene fermato \"nel mezzo\"",
@@ -486,6 +534,12 @@
     "group": "Processi"
   },
   {
+    "title": "Proprietà logica booleana",
+    "question": "Dimmi le proprietà della logica booleana con più di una variabile",
+    "answer": "commutativa:\nA*B = B*A\nA+B = B+A\n\nassociativa\nA*(B*C)=(A*B)*C\nA+(B+C)=(A+B)+C\n\ndistributiva\n(B+C)(B+D) = B+(C*D)\n(B*C)+(B*D)=B*(C+D)\n\nde morgan\nnot a * not b = not (A+B)\nnot a + not b = not(A*B)",
+    "group": "Logica combinatoria"
+  },
+  {
     "title": "Qual'è l'idea dell'algoritmo del banchiere?",
     "question": "Qual'è l'idea dell'algoritmo del banchiere?",
     "answer": "Il banchiere presta i soldi solo se è sicuro che verranno restituiti e se ce ne sono abbastanza. Il sistema analogamente dà una risorsa solo se siamo sicuri che accettando la richiesta rimaniamo in un safe state",
@@ -522,6 +576,12 @@
     "group": "Logica combinatoria"
   },
   {
+    "title": "Rete combinatoria",
+    "question": "Cosa è una rete combinatoria?",
+    "answer": "Una rete combinatoria è un circuito formato da porte logiche che prende n ingressi e m uscite, con gli indici sia di uscite sia di ingressi che partono da 0 e finiscono a n-1 o m-1. Una rete combinatoria è un insieme di funzioni applicate ognuna a un'uscita che potenzialmente vengono applicate a tutti gli ingressi",
+    "group": "Logica combinatoria"
+  },
+  {
     "title": "Rete sequenziale",
     "question": "Da cosa dipende l'output di una rete sequenziale?",
     "answer": "L'output di una rete sequenziale dipende dal calcolo che viene fatto sugli input attuali, ma anche sui valori precedenti degli input",
@@ -550,6 +610,18 @@
     "question": "Perché la CPU riordina le operazioni?",
     "answer": "La CPU riordina le operazioni per gestire meglio l'overhead, a patto che il risultato rimanga lo stesso (considerando un solo thread, ma abbiamo detto che se una risorsa è contesa dobbiamo usare dei meccanismi speciali per mantenere una congruenza)",
     "group": "Sincronizzazione"
+  },
+  {
+    "title": "ritardo di propagazione",
+    "question": "Cos'è il ritardo di propagazione?",
+    "answer": "Il ritardo di propagazione è il tempo che intercorre tra un cambiamento all'ingresso di una porta logica e il risultato visibile all'uscita",
+    "group": "Logica combinatoria"
+  },
+  {
+    "title": "Ritardo di propagazione di un and fatto come una gerarchia di and",
+    "question": "qual'è?",
+    "answer": "E' log in base 2 di n (n = numero di ingressi)",
+    "group": "Logica combinatoria"
   },
   {
     "title": "RMW",
@@ -618,6 +690,12 @@
     "group": "Sincronizzazione"
   },
   {
+    "title": "Semplificare le espressioni logiche",
+    "question": "Che vantaggi porta semplificare le espressioni logiche?",
+    "answer": "Talvolta ci porta il vantaggio di risparmiare sul tempo di propagazione, ma sicuramente il vantaggio che porta sempre è una diminuzione di costi per realizzare il circuito",
+    "group": "Logica combinatoria"
+  },
+  {
     "title": "Shell",
     "question": "Cosa è una shell?",
     "answer": "Una shell è un controllore di jobs, ai quali assegna a ciascuno una task. La shell si occupa di creare questi jobs attraverso la fork e la exec",
@@ -634,6 +712,12 @@
     "question": "Come funziona SJF? Quali sono i suoi vantaggi? Quali sono i suoi svantaggi?",
     "answer": "SJF, o shortest job first, è un algoritmo che può essere sia preemptive sia non preemptive, in cui viene eseguito sempre il processo che ci metterà meno a terminare. L'implementazione preemptive è una variante in cui quando arriva un processo che dura meno di quello attualmente in esecuzione viene fatto il context switch, infatti questa variante si chiama Shortest Remaining Time First (SRTF).\n\nIl suo vantaggio è quello di avere un tempo di risposta ottimale ma al tempo stesso molto variabile, e nei sistemi interattivi può essere ottimo o un po' peggiore in base alla situazione, ma il suo principale svantaggio è che può provocare starvation, e anche che ordinare i processi per durata ha un costo, e se si trova processi che durano tutti più o meno lo stesso tempo diventa costoso e poco efficiente.",
     "group": "Scheduling"
+  },
+  {
+    "title": "Somma di prodotti",
+    "question": "Cosa è la somma di prodotti?",
+    "answer": "La somma di prodotti è il modo per scrivere sotto forma di espressione logica una rete combinatoria partendo da una tabella di verità. Scriviamo nell'espressione * per fare un and e il + per fare un or",
+    "group": "Logica combinatoria"
   },
   {
     "title": "Space sharing",
