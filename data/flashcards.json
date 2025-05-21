@@ -6,6 +6,12 @@
     "group": "Scheduling"
   },
   {
+    "title": "ALEE",
+    "question": "Cosa sono le alee?",
+    "answer": "Le ALEE sono fenomeni in cui l'output diventa instabile per un istante a causa del ritardo di un not. Si può evitare aggiungendo più componenti, ovvero anche nella mappak per esempio di aggiungere un rettangolo extra tra i quadrati che hanno il not, quindi aggiungere un and extra",
+    "group": "Logica combinatoria"
+  },
+  {
     "title": "Algoritmi monoprocessori",
     "question": "Quali sono gli algoritmi che abbiamo studiato per i sistemi monoprocessori?",
     "answer": "MFQ, RR, MMF, SJF, FIFO, scheduling basato su priorità",
@@ -54,6 +60,12 @@
     "group": "Domande orale"
   },
   {
+    "title": "Ciclo di vita di un processo",
+    "question": "Dimmi gli stati di lifecycle di un processo",
+    "answer": "new, ready, running, waiting, terminated",
+    "group": "Processi"
+  },
+  {
     "title": "Come funziona l'invalidazione dei bit nelle cache",
     "question": "Come funziona l'invalidazione dei bit nelle cache",
     "answer": "-",
@@ -78,6 +90,12 @@
     "group": "Basi di microarchitetture"
   },
   {
+    "title": "come riconoscere una rete sequenziale",
+    "question": "Come si differenzia una rete sequenziale da una combinatoria graficamente?",
+    "answer": "Perché a rete sequenziale è ciclica",
+    "group": "Logica sequenziale"
+  },
+  {
     "title": "Come riordina la cpu le operazioni?",
     "question": "Come riordina la cpu le operazioni?",
     "answer": "Per esempio con un write buffer, ovvero quando viene fatta una write, invece di farla subito viene bufferata per permettere che venga eseguita un'altra operazione nel mentre",
@@ -100,6 +118,18 @@
     "question": "Quali sono i concetti base di una lock?",
     "answer": "concetto safety= al massimo un lock holder\nconcetto liveness = se non ci sono thread che hanno quella lock, la acquisisco",
     "group": "Sincronizzazione"
+  },
+  {
+    "title": "Config proibita latch sr",
+    "question": "Che succede se faccio la configurazione proibita del latch sr?",
+    "answer": "Succede che Q=0 ma anche not q=0, e quindi non ha più senso dato che not q deve essere il contrario di q!",
+    "group": "Logica sequenziale"
+  },
+  {
+    "title": "confrontatore",
+    "question": "Cosa è un confrontatore? ",
+    "answer": "Un confrontatore è una rc che confronta gli ingressi e restituisce 1 se son uguali",
+    "group": "Logica combinatoria"
   },
   {
     "title": "context switch causato da un interrupt handler",
@@ -162,6 +192,12 @@
     "group": "Sincronizzazione"
   },
   {
+    "title": "Decoder, mux, demux",
+    "question": "Cosa è un decoder? cosa è un mux? cosa è un demux?",
+    "answer": "Un decoder è una rete combinatoria che fa uscire 1 all'uscita scelta dagli ingressi, un mux prende degli ingressi e secondo il bit di controllo che è segnato in quel momento selezione l'ingresso da mandare in uscita, mentre un demux al contrario ha un ingresso e con il bit di controllo decide dove riprodurre l'uscita",
+    "group": "Logica combinatoria"
+  },
+  {
     "title": "Definizioni criteri di scheduling",
     "question": "Cosa significa overhead, equità, predicibilità, workload e scheduling di tipo work conserving?",
     "answer": "ovrehead = il lavoro extra che deve fare lo scheduling per garantirne il funzionamento\nequità = lo scheduling deve garantire assenza di starvation\npredicibilità = quanto sono affidabili le metriche usate dallo scheduling? si discostano tanto da un esecuzione e l'altra?\nworkload = l'insieme di tasks che devono essere eseguire\nwork conserving = lo scheduler cerca di fare usare il più possibile la CPU al processo",
@@ -210,6 +246,30 @@
     "group": "Sincronizzazione"
   },
   {
+    "title": "Encoder",
+    "question": "Cosa è un encoder?",
+    "answer": "E' una rete combinatoria che, presa una serie di bit in ingresso dove solo uno tra loro sarà 1, uscirà qual'è l'ingresso a 1",
+    "group": "Logica combinatoria"
+  },
+  {
+    "title": "Es multiplexer",
+    "question": "Mi fai la tabella di verità e la mappak di un multiplexer a 2 ingressi e successivamente di un multiplexer a 2 ingressi con n>1 bit e successivamente di un multiplexer a 4 ingressi?",
+    "answer": "-",
+    "group": "Domande orale"
+  },
+  {
+    "title": "Es sui demux",
+    "question": "Mi dici l'espressione logica di un demux?",
+    "answer": "Lezione 5",
+    "group": "Domande orale"
+  },
+  {
+    "title": "es sui multiplexer 2",
+    "question": "Se io ho un multiplexer con Xn ingressi, quanti bit mi servono per il bit di controllo? Inoltre, mi scrivi l'espressione logica di z? Mi puoi disegnare il multiplexer? Quale sarà il ritardo?",
+    "answer": "log in base 2 di n",
+    "group": "Domande orale"
+  },
+  {
     "title": "esercizi lock",
     "question": "Fammi il problema dei produttori e consumatori: 1) con una sola condition variables 2) con le lock 3) con i semafori",
     "answer": "-",
@@ -222,10 +282,28 @@
     "group": "Domande orale"
   },
   {
+    "title": "FFD con WE",
+    "question": "Cosa è il flip flop d con il write enable?",
+    "answer": "E' una variante del flip flop d in cui, invece di ricevere in ingresso il clock e basta, riceve un and con il clock e un ingresso nuovo chiamato enable, in cui si protegge il flip flop d dalla scrittura finché non vogliamo noi e quindi finché enable=1, a quel punto, verrà scritto l'ingresso al prossimo fronte di salita del clock",
+    "group": "Logica sequenziale"
+  },
+  {
     "title": "FIFO o FCFS",
     "question": "Come funziona il FIFO? Quali sono i suoi vantaggi? Quali sono i suoi svantaggi?",
     "answer": "Il FIFO è un algoritmo di scheduling non preemptive implementabile tramite una coda, in cui viene mandato in esecuzione il primo che arriva nella coda pronti. E' un algoritmo molto semplice, quindi poco costoso, e può essere vantaggioso quando abbiamo molti jobs di dimensioni molto simili. I suoi svantaggi sono invece che non ottimizza per niente il tempo di turnaround e di attesa, finendo molto spesso ad essere particolarmente inefficiente",
     "group": "Scheduling"
+  },
+  {
+    "title": "Flip Flop D",
+    "question": "Come funziona il Flip Flop D?",
+    "answer": "E' un evoluzione del latch D che serve per prevenire di scrivere sempre quando il clock è alto, ma di scrivere solo al fronte di salita del clock. Questo si può fare attraverso due latch d connessi tra di loro, uno chiamato master, che ha come ingresso il clock negato, e il nostro ingresso D, e uno chiamato slave, che ha come ingresso il Q del master, e il clock. Si dice che quando lo slave può leggere l'input (ovvero quando il clock è alto) lo slave è trasparente perché può ricevere i nuovi input e calcolarli, mentre il master è opaco, quando il clock è basso, viceversa il master è trasparente e lo slave opaco",
+    "group": "Logica sequenziale"
+  },
+  {
+    "title": "Flip Flop resettabile",
+    "question": "Che cosa è?",
+    "answer": "E' un FFD in cui viene aggiunto un ulteriore ingresso chiamato reset, e quando è a 1 resettiamo l'uscita Q a 0, quando è a 0 lasciamo che il flip flop si comporti normalmente al variare di D. Questa variante di FFD può essere fatta sincrona, in cui Q viene resettato solo al fronte di salita del clock, o asincrona, in cui viene ignorata la componente del clock quando RESET=1",
+    "group": "Logica sequenziale"
   },
   {
     "title": "Funzionamento algoritmo del banchiere",
@@ -294,6 +372,24 @@
     "group": "Domande orale"
   },
   {
+    "title": "Latch D",
+    "question": "Come funziona il latch d?",
+    "answer": "Il latch d è un'evoluzione del latch sr in cui viene passato un solo ingresso D e abbiamo due and, di cui due negati, connessi al clock, in modo tale da scrivere i nostri S(ovvero d) e R (ovvero not D) del latch  sr quando il clock è alto. Questo circuito serve per evitare a configurazione proibita, ovvero S=1 e R=1",
+    "group": "Logica sequenziale"
+  },
+  {
+    "title": "Latch e Flip Flop combinati a automi",
+    "question": "Come mai i latch e Flip Flop non possono essere automi di mealy o di moore?",
+    "answer": "Perché hanno due soli stati e la logica in cui vengono implementati è troppo semplice per essere considerati automi",
+    "group": "Logica sequenziale"
+  },
+  {
+    "title": "latch sr",
+    "question": "Cosa è un latch sr? Spiegami la tabella di verità",
+    "answer": "un latch sr è una rs in cui abbiamo due ingressi, R (reset) e S(set), e due uscite, q e not q, se R=0&&S=1, vogliamo settare q=1 e quindi not q = 0. Se R=1&&S=0, vogliamo settare q=0 e quindi not q =1. Se R=0&&S=0 allora Q=valore che aveva precedentemente (memoria della rete sequenziale) e not q = valore che aveva precedentemente. La combinazione R=1&S=1 è proibita",
+    "group": "Logica sequenziale"
+  },
+  {
     "title": "Locks",
     "question": "Cosa sono le locks? come si usano?",
     "answer": "Le locks sono un meccanismo di sync.\n\nSi utilizza iniziando con la funzione lock.acquire() che ti permette di creare una sezione critica in mutua esclusione, infatti, la lock.acquire() controlla che non ci sia nessun thread già in una sezione critica, e che quindi la \"risorsa\" lock sia libera, se non lo è aspetta, altrimenti si dice che acquisisco la lock.\n\n\nQuando voglio uscire dalla sezione critica utilizzo la lock.release() che sveglia eventuali thread in attesa che avevano richiesto l'acquire()",
@@ -346,6 +442,12 @@
     "question": "Come funziona MFQ nei sistemi multiprocessore?",
     "answer": "Abbiamo le nostre code di MFQ condivise a tutte le CPU, ogni CPU quando ha bisogno di un processo da eseguire chiede alla spinlock dello scheduler. Lo scheduler non può mai sospendersi, per questo viene usata l'attesa attiva",
     "group": "Scheduling"
+  },
+  {
+    "title": "Mi disegni un latch sr?",
+    "question": "Mi disegni un latch sr?",
+    "answer": "Un latch sr è formato da due or con un not sul fondo in cui il secondo ingresso dell'or è l'uscita dell'altro or negato e viceversa. Questo perché si tratta di una rete sequenziale e si basa sulle retroazioni, ovvero ingressi stabili ma che derivano da un ciclo interno della rete",
+    "group": "Logica sequenziale"
   },
   {
     "title": "Modelli di scheduling",
@@ -582,6 +684,18 @@
     "group": "Logica combinatoria"
   },
   {
+    "title": "Rete di Mealy",
+    "question": "Cosa è una rete di Mealy?",
+    "answer": "Una rete di Mealy è una rete sequenziale in cui abbiamo la funzione omega che viene determinata dagli ingressi e dagli stati, e produce le uscite, e la funzione sigma, che viene determinata dagli ingressi e dallo stato attuale e genera un nuovo stato",
+    "group": "Logica sequenziale"
+  },
+  {
+    "title": "Rete di Moore",
+    "question": "Cosa è una rete di Moore?",
+    "answer": "Una rete di Moore è una rete sequenziale in cui abbiamo la funzione omega i cui valori delle uscite dipendono esclusivamente da quelli dello stato attuale, e la funzione sigma in cui i valori degli ingressi e lo stato attuale generano un nuovo stato",
+    "group": "Logica sequenziale"
+  },
+  {
     "title": "Rete sequenziale",
     "question": "Da cosa dipende l'output di una rete sequenziale?",
     "answer": "L'output di una rete sequenziale dipende dal calcolo che viene fatto sugli input attuali, ma anche sui valori precedenti degli input",
@@ -592,6 +706,18 @@
     "question": "Come si differenziano le reti logiche?",
     "answer": "Le reti logiche si differenziano in reti sequenziali e reti combinatorie",
     "group": "Domande orale"
+  },
+  {
+    "title": "Reti sequenziali",
+    "question": "Cosa li caratterizza le reti sequenziali? Parlami degli ingressi e delle uscite",
+    "answer": "Le reti sequenziali hanno il concetto di stato, ovvero salvarsi i valori di input che sono stati precedentemente inviati e grazie ad essi generare nuovi output sempre deterministici. La rete sequenziale è composta da 3 fattori: \nomega: è la funzione che calcola le uscite\nsigma: è la funzione che calcola gli stati\nstato: lo stato attuale della rs",
+    "group": "Logica sequenziale"
+  },
+  {
+    "title": "Reti sincrone",
+    "question": "Cosa sono le reti sincrone? chi ne fa parte?",
+    "answer": "Le reti sincrone sono delle reti che operano per cicli di clock. Ne fanno parte le reti di Mealy e di Moore, e quando si fanno degli automi con questi due modelli dobbiamo considerare che la lunghezza del ciclo di clock debba essere sufficientemente lunga per non creare incongruenze nella rete",
+    "group": "Logica sequenziale"
   },
   {
     "title": "Return processo terminato",
@@ -612,9 +738,15 @@
     "group": "Sincronizzazione"
   },
   {
+    "title": "Ritardo di contaminazione",
+    "question": "Cosa è il ritardo di contaminazione?",
+    "answer": "E' il ritardo da quando gli ingressi sono stabili a quando l'uscita inizia a cambiare. Tc <= Tp (=il tempo di percorso del cammino minimo)",
+    "group": "Logica combinatoria"
+  },
+  {
     "title": "ritardo di propagazione",
     "question": "Cos'è il ritardo di propagazione?",
-    "answer": "Il ritardo di propagazione è il tempo che intercorre tra un cambiamento all'ingresso di una porta logica e il risultato visibile all'uscita",
+    "answer": "Il ritardo di propagazione è il tempo che intercorre tra un cambiamento all'ingresso di una porta logica e il risultato visibile all'uscita.\n(=il tempo max di percorso della rete, chiamato anche percorso critico)",
     "group": "Logica combinatoria"
   },
   {
@@ -788,7 +920,7 @@
   {
     "title": "thread lifecycle",
     "question": "Dimmi il ciclo di vita di un thread",
-    "answer": "Da init passa a ready, da ready a running, da running passa o a waiting, o a finished o a ready, da waiting passa a ready",
+    "answer": "init, ready, running, waiting, finished",
     "group": "Thread"
   },
   {
@@ -814,6 +946,12 @@
     "question": "Mi dice le tipologie di load che conosce?",
     "answer": "-",
     "group": "Domande orale"
+  },
+  {
+    "title": "Tipologie di reti sequenziali",
+    "question": "Parlami delle due tipologie di reti sequenziali",
+    "answer": "Le reti sequenziali possono essere di Mealy e di Moore",
+    "group": "Logica sequenziale"
   },
   {
     "title": "tp",
