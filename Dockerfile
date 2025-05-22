@@ -1,13 +1,31 @@
-# parto da un immagine di nodejs  versione 22
+# Usa immagine Node base leggera
 FROM node:22
-# setto la workdir del container in /app
-WORKDIR /app
-# copio tutti file e sottocartelle da locale a /app del container
-COPY . .
-# scarico le dipendenze. RUN serve per preparare l'immagine (ancora in fase di elaborazione)
-RUN npm i
 
+# Cartella di lavoro dentro il container
+WORKDIR /app
+
+# Copia i package.json e package-lock.json per server (per installare dipendenze)
+COPY server/package*.json ./server/
+
+# Installa dipendenze di server
+WORKDIR /app/server
+RUN npm install
+
+# Torna a /app per copiare il resto
+WORKDIR /app
+
+# Copia tutta la cartella client
+COPY client ./client
+
+# Copia tutta la cartella server
+COPY server ./server
+
+# Costruisci il progetto NestJS
+WORKDIR /app/server
+RUN npm run build
+
+# Esponi la porta su cui gira NestJS
 EXPOSE 3000
 
-# CMD è il comando che viene eseguito in automatico una volta che l'immagine è pronta
-CMD ["npm", "run", "build"]
+# Comando di avvio server NestJS 
+CMD ["node", "dist/main.js"]
