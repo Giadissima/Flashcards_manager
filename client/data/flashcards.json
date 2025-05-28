@@ -978,12 +978,6 @@
     "group": "Logica sequenziale"
   },
   {
-    "title": "reti astabili",
-    "question": "Cosa sono le reti astabili?",
-    "answer": "Sono delle reti sequenziali i cui valori interni delle porte oscillano periodicamente senza mai stabilizzarsi, come nel caso di un circuito chiuso formato da 3 negatori, che si chiama anche oscillatore ad anello",
-    "group": "Logica sequenziale"
-  },
-  {
     "title": "Reti logiche",
     "question": "Come si differenziano le reti logiche?",
     "answer": "Le reti logiche si differenziano in reti sequenziali e reti combinatorie",
@@ -1126,12 +1120,6 @@
     "question": "Cosa è una shell?",
     "answer": "Una shell è un controllore di jobs, ai quali assegna a ciascuno una task. La shell si occupa di creare questi jobs attraverso la fork e la exec",
     "group": "Processi"
-  },
-  {
-    "title": "Sincronizzatore",
-    "question": "Cosa è?",
-    "answer": "Un sincronizzatore è un dispositivo che prende un ingresso D in input e restituisce un risultato Q dopo un certo periodo di tempo. Il suo scopo è di evitare gli errori, ovvero, se l'ingresso  cambia troppo a ridosso della fine del clock, potrebbe Q diventare un valore imprevedibile, o alto, o basso, o anche a metà, mentre il sincronizzatore evita questa cosa, e si assicura che Q sia sempre o alto o basso, anche se questo comporta metterci più cicli di clock per assicurarsene",
-    "group": "Logica sequenziale"
   },
   {
     "title": "Sintassi Mesa",
