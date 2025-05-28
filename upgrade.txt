@@ -10,7 +10,7 @@ mettere una grafica a fine test
 aggiungere un toast per la copy clipboard
 
 aggiungere un pulsante in alto a sinistra con il tema scuro
-
+algoritmo di lamports non mostra la risposta
 aggiungere minuti e secondi
 aggiungere a gitignore quando aggiungo la vpn i json delle mie flashcards
 

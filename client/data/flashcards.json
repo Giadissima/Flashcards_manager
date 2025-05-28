@@ -30,6 +30,24 @@
     "group": "Sincronizzazione"
   },
   {
+    "title": "ALU",
+    "question": "Disegnami la ALU + flags",
+    "answer": "-",
+    "group": "Componenti digitali"
+  },
+  {
+    "title": "Architettura CISC vs RISC",
+    "question": "Cosa sono e come si differenziano?",
+    "answer": "Stanno per Complex Instruction Set Computer e Reduced Instruction Set Computer. La CISC fa delle operazioni più complesse tutte in una volta, mentre la RISC fa piccole operazioni una dietro l'altra. La CISC, aggiunge al circuito maggiore complessità perché abbiamo bisogno di circuiti ad hoc per fare più operazioni in una, e non per forza è più efficiente di RISC. Inoltre, CISC è un architettura più costosa di RISC",
+    "group": "ARM"
+  },
+  {
+    "title": "Bit di istruzione",
+    "question": "Quanti bit ci vogliono per fare un istruzione in ARM? Cos'altro corrisponde a  quel numero di bit?",
+    "answer": "32, corrisponde anche al numero di celle della memoria virtuale, al numero di bit per parola e il numero dei bit che contengono i registri",
+    "group": "ARM"
+  },
+  {
     "title": "Bounded buffer",
     "question": "Che cosa è il bounded buffer?",
     "answer": "Il bounded buffer, ovvero buffer a capacità limitata, è un metodo di comunicazione in cui si sfrutta un canale (ovvero il buffer) in cui un thread produce il messaggio da mettere nel buffer (thread produttore), e un thread lo legge (chiamato thread consumatore). ",
@@ -60,10 +78,34 @@
     "group": "Domande orale"
   },
   {
+    "title": "Ciclo della CPU",
+    "question": "Mi dici il ciclo della CPU?",
+    "answer": "Il ciclo della CPU ha diverse fasi, tutte racchiude in un while(true):\n1) fetch in cui viene presa dalla memoria l'operazione grazie al PC\n2) decode, in cui viene decodificata l'istruzione in una serie di bit più comprensibili per il processore\n3) execute, in cui viene eseguita l'operazione\n4) memory, è opzionale, serve per accedere allo stack\n5) writeback, molto comune ma non obbligatoria, per memorizzare i risultati delle operazioni in dei registri",
+    "group": "ARM"
+  },
+  {
+    "title": "ciclo di clock graficamente",
+    "question": "Come si determina graficamente un ciclo di clock?",
+    "answer": "Graficamente, un ciclo di clock inizia al fronte di salita  e finisce al prossimo fronte di salita",
+    "group": "Logica sequenziale"
+  },
+  {
+    "title": "Ciclo di clock nelle reti sequenziali",
+    "question": "Come si fa a calcolare un ciclo di clock nelle reti sequenziali?",
+    "answer": "t>=Tpr(tempo di propagazione del registro) + max{tpomega, tpsigma +  tsetup}",
+    "group": "Logica sequenziale"
+  },
+  {
     "title": "Ciclo di vita di un processo",
     "question": "Dimmi gli stati di lifecycle di un processo",
     "answer": "new, ready, running, waiting, terminated",
     "group": "Processi"
+  },
+  {
+    "title": "Codifica binaria e codifica a singolo 1",
+    "question": "Cosa cambia tra queste?",
+    "answer": "Quando facciamo una macchina a stati finiti, dobbiamo occuparci di dare una codifica degli stati e delle uscite in numeri binari, e si può utilizzare o la codifica binaria, ovvero mettere a uno stato o un ingresso un numero binario scelto, oppure la codifica a singolo 1, che è funzionale quando abbiamo pochi stati o uscite da codificare. Per esempio, se abbiamo tre stati blu, giallo e rosso, avremmo bisogno di 3 bit, in cui ognuno di essi avrà solamente 1 bit a 1, per esempio, Giallo=100, rosso=010, blu=001",
+    "group": "Logica sequenziale"
   },
   {
     "title": "Come funziona l'invalidazione dei bit nelle cache",
@@ -108,10 +150,22 @@
     "group": "Logica combinatoria"
   },
   {
+    "title": "comparatore",
+    "question": "Cosa è?",
+    "answer": "Ci sono due tipi di comparatori, quello per uguaglianza, che restituisce una sola uscita se a == b, e il comparatore per valore, che fa a-b e restituisce un numero positivo se a>b, 0 se a=b e negativo se b>a. Il comparatore per valore purtroppo dà risultati incongruenti quando c'è un overflow",
+    "group": "Componenti digitali"
+  },
+  {
     "title": "Complemento a 2",
     "question": "Come funziona la rappresentazione a complemento a 2?",
     "answer": "E' la rappresentazione binaria maggiormente usata che consiste nel prendere una cifra positiva, ribaltarla, sommarci 1 per ottenere il numero binario negativo corrispondente. ha un unica rappresentazione dello zero ed è possibile farci le operazioni algebriche sopra senza problemi",
     "group": "Basi di microarchitetture"
+  },
+  {
+    "title": "Complemento a 2 in arm",
+    "question": "Come si fa?",
+    "answer": "# complemento a due di 4\nMOV r0, #4\nMVN r1, r0\nADD R1, R1, #1",
+    "group": "ARM"
   },
   {
     "title": "Concetti base della lock",
@@ -166,6 +220,18 @@
     "question": "Cosa sono le risorse? Come si differenziano?",
     "answer": "Qualsiasi oggetto passivo di cui il thread/proc potrebbe aver bisogno per terminare il job assegnato (es monitor, cpu, spazio in mem, lock. Si differenziano in prerilasciabili, ovvero il S.O. può riprendersele, e non prerilasciabili, che deve per forza rilasciarla il thread/proc.",
     "group": "Sincronizzazione"
+  },
+  {
+    "title": "Costruire una memoria",
+    "question": "Come abbiamo visto che si costruisce una memoria? Questa soluzione va bene da usare?",
+    "answer": "Una memoria si costruisce con un demux che prende come ingresso  Il WE e i k bit di indirizzamento come bit di controllo. La memoria è un insieme di cella una sotto l'altra che vengono attivate dal WE e abbiamo un bus di WD connesso a ogni cella.  Per leggere il dato, avremo sulla destra un mux che prende come bit di cntrollo sempre i k bit, come ingressi le linee di parola e restituisce m bit di parola del dato letto. La memoria così disegnata però non è fattibile perché il ritardo cresce in maniera logaritmica ma richiede troppi transistor",
+    "group": "Componenti digitali"
+  },
+  {
+    "title": "CPSR",
+    "question": "Che cosa è?",
+    "answer": "E' il Computer Program Status Register, un registro a 32 bit che contiene i bit nzvc",
+    "group": "ARM"
   },
   {
     "title": "CPU bound job, I/O bound job e workload misti",
@@ -240,6 +306,24 @@
     "group": "Domande orale"
   },
   {
+    "title": "Disciplina dinamica e statica",
+    "question": "Cosa sono?",
+    "answer": "La disciplina statica si basa sull'evitare che gli ingressi delle rs possano trovarsi nella combinazione di stati proibiti\n\nla disciplina dinamica si basa sull'evitare che gli ingressi cambino durante il fronte di salita del clock (thold) e che si stabilizzino prima del fronte di salita (tsetup)",
+    "group": "Logica sequenziale"
+  },
+  {
+    "title": "dove vengono usati maggiormente gli rmw?",
+    "question": "dove vengono usati maggiormente gli rmw?",
+    "answer": "Nelle lock in sistemi multiprocessore",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "DRAM",
+    "question": "Cosa sono? Vantaggi e svantaggi",
+    "answer": "Le DRAM sono memorie volatili in cui abbiamo un meccanismo interno a ogni  cella fatto da un transistor nmos, un condensatore e una messa a terra, messi per memorizzare il dato. Il vantaggio di questa rappresentazione è che per ogni cella siamo in grado di memorizzare 1 bit con un solo transistor, al contrario dei flip flop che ne servono circa 20, mentre lo svantaggio principale è a livello di prestazioni, perché i condensatori sono dispositivi fisici che dopo un po' perdono la carica, quindi abbiamo bisogno di un meccanismo di refresh, in cui ogni tot per tenere i dati bisogna riscriverli da capo",
+    "group": "Componenti digitali"
+  },
+  {
     "title": "Elenco soluzioni deadlock",
     "question": "Elencami i metodi di risoluzione del deadlock",
     "answer": "1) detect and fix\n2) prevenzione statica\n3) prevenzione dinamica",
@@ -256,6 +340,24 @@
     "question": "Mi fai la tabella di verità e la mappak di un multiplexer a 2 ingressi e successivamente di un multiplexer a 2 ingressi con n>1 bit e successivamente di un multiplexer a 4 ingressi?",
     "answer": "-",
     "group": "Domande orale"
+  },
+  {
+    "title": "Es register file",
+    "question": "Mi fai il disegno di un register file che deve fare R2 + R1 = R0?",
+    "answer": "-",
+    "group": "ARM"
+  },
+  {
+    "title": "Es register file 2",
+    "question": "Mi disegni il register file se dobbiamo fare LOAD R0, R1, R2, che significano M[R1 +  R2]=R0?",
+    "answer": "-",
+    "group": "ARM"
+  },
+  {
+    "title": "Es register file 3",
+    "question": "Mi disegni un register file con un operazione di STORE (r0, r1, #4)? (=r0 viene scritto in M[r1 + 4])",
+    "answer": "-",
+    "group": "ARM"
   },
   {
     "title": "Es sui demux",
@@ -304,6 +406,12 @@
     "question": "Che cosa è?",
     "answer": "E' un FFD in cui viene aggiunto un ulteriore ingresso chiamato reset, e quando è a 1 resettiamo l'uscita Q a 0, quando è a 0 lasciamo che il flip flop si comporti normalmente al variare di D. Questa variante di FFD può essere fatta sincrona, in cui Q viene resettato solo al fronte di salita del clock, o asincrona, in cui viene ignorata la componente del clock quando RESET=1",
     "group": "Logica sequenziale"
+  },
+  {
+    "title": "Full adder propagazione di riporto a onda",
+    "question": "Cosa è?",
+    "answer": "E' il modo per scrivere un full adder a n bit tramite n full adder a 1 bit tutti in serie, si dice propagazione di riporto ad onda perché il full adder ha bisogno che il suo predecessore gli dia il riporto della somma precedente per poter fare il calcolo. Quindi quando n diventa troppo grande, il ritardo inizia a diventare importante",
+    "group": "Componenti digitali"
   },
   {
     "title": "Funzionamento algoritmo del banchiere",
@@ -366,6 +474,42 @@
     "group": "Processi"
   },
   {
+    "title": "Istruzioni condizionate",
+    "question": "Cosa sono?",
+    "answer": "Le istruzioni condizionate sono qualsiasi istruzione assembly compatibile a cui è stata aggiunto il suffisso di condizione, per esempio, \"ADD\" possiamo farlo diventare \"ADDEQ\". Si utilizzano dopo una compare per fare piccoli if else immediati, da non usare per interi rami if else grossi perché la complessità del codice diventa troppo alta",
+    "group": "ARM"
+  },
+  {
+    "title": "Istruzioni di accesso alla memoria",
+    "question": "Quali modi ci sono per accedere alla memoria in assembly?",
+    "answer": "Indirizzamento di base.\nLDR R0, [R1]\n\nindirizzamento di base + indice (offset)\nLDR R0, [R1, R2] -> R0 = R1+R2\n\npost-index.\nLDR R0, [R1], R2 -> fa la load R0 = [R1] e successivamente fa R1+=R2 (i++ del for)\n\npre-index.\nLDR R0, [R1, R2]! -> ADD R1 += R2, LDR R0, [R1] (++i del for). Si differenzia dall'indirizzamento base perché l'indirizzamento base non incrementa i valori in automatico, ma fa solo la load",
+    "group": "ARM"
+  },
+  {
+    "title": "Istruzioni di memoria multiple",
+    "question": "Quali sono?",
+    "answer": "Sono la LDMXX <src> {lista di registri} e la STMXX <src> {lista di registri}.\n\nLa LDM serve a caricare dall'indirizzo contenuto in [src] una serie di parole a 32 bit e le inserisce nei registri.\n\nLa STM serve a memorizzare in memoria a partire dall'indirizzo [dst] una serie di parole a 32 bit contenute nella lista dei registri scritti\n\nla \"XX\" stanno per Empty, o Full, e Ascending o Descending. Empty, sono tutte le combinazioni di stack possibili, Empty significa che l'SP punta al primo indirizzo vuoto dello stack, Full significa che punta all'ultimo indirizzo pieno. Ascending, significa che lo stack cresce dal basso verso l'alto, e descendant significa che cresce dall'alto verso il basso. Di default lo stack è in modalità FD",
+    "group": "ARM"
+  },
+  {
+    "title": "Istruzioni di set bit NZVC",
+    "question": "Cosa sono?",
+    "answer": "Sono qualsiasi istruzione con l'aggiunta del suffisso \"S\". Quello che fanno è, quando possibile, settare i bit del registro CPSR, ovvero i bit NZVC. Per esempio, \"MOVS\" setta i bit NZ, VC non hanno senso settarli perché non fa nessuna operazione che può causare riporti o overflow. Invece, \"ADDS\" setta tutti i bit",
+    "group": "ARM"
+  },
+  {
+    "title": "Istruzioni di shift",
+    "question": "Quali sono?",
+    "answer": "LSL, LSR,ROR, ASR <dst> <src1> <src2>",
+    "group": "ARM"
+  },
+  {
+    "title": "Istruzioni operative",
+    "question": "Quali sono le istruzioni operative?",
+    "answer": "Tutte le operazioni logico aritmetiche, quindi shift, somma, sottrazione, rotazione, moltiplicazione, divisione, or, and, xor, and bit a bit ecc",
+    "group": "ARM"
+  },
+  {
     "title": "Jump in byte armv7",
     "question": "Come è fatta l'istruzione di salto in linguaggio macchina? (aiuti:)2) i primi 4 bit sono con segno o senza segno? 3) se fossero senza segno che problema avrebbe? 4) si può creare una struttura in cui l'offset è senza segno? 5) come si compila un for in assembler? controlla la condizione e se è falsa esco",
     "answer": "-",
@@ -388,6 +532,60 @@
     "question": "Cosa è un latch sr? Spiegami la tabella di verità",
     "answer": "un latch sr è una rs in cui abbiamo due ingressi, R (reset) e S(set), e due uscite, q e not q, se R=0&&S=1, vogliamo settare q=1 e quindi not q = 0. Se R=1&&S=0, vogliamo settare q=0 e quindi not q =1. Se R=0&&S=0 allora Q=valore che aveva precedentemente (memoria della rete sequenziale) e not q = valore che aveva precedentemente. La combinazione R=1&S=1 è proibita",
     "group": "Logica sequenziale"
+  },
+  {
+    "title": "Lettura e scrittura DRAM",
+    "question": "Come funzionano?",
+    "answer": "Abbiamo un demux collegato alle linee di parola. Quando dobbiamo leggere un bit, il demux attiva la linea di parola corretta (gli dà corrente) e il transistor nmos chiude la linea di parola, e apre la linea di bit per ciascuna cella della riga, e il condensatore rilascia il dato.\n\nPer la scrittura invece funziona in maniera simile, avremmo un dispositivo che invia i bit della parola, e il demux, farà attivare nuovamente la linea di parola e l'nmos la linea di bit, così che la scrittura possa fare effetto",
+    "group": "Componenti digitali"
+  },
+  {
+    "title": "Lettura e scrittura memoria interallacciata",
+    "question": "Come funziona?",
+    "answer": "la lettura e scrittura su memoria interallacciata funziona nello stesso identico modo della memoria modulare, solo che invece di fare un mux e come bit di controllo metterci i bit più significativi ci mettiamo i bit meno significativi",
+    "group": "Componenti digitali"
+  },
+  {
+    "title": "Lettura memoria modulare",
+    "question": "Come funziona la lettura nella memoria modulare? Es di 2 moduli da 1gb ",
+    "answer": "La lettura si effettua considerando il bit più significativo dell'indirizzo, se è 0, si legge ma M0, altrimenti da M1. Per fare ciò possiamo usare un multiplexer, così da scegliere il dato letto corretto. (lez 9)",
+    "group": "Componenti digitali"
+  },
+  {
+    "title": "Linee di bit",
+    "question": "Cosa sono?",
+    "answer": "Sono fili elettrici messi verticali che rappresentano le colonne della memoria. Una riga completa è un dato, e la grandezza della riga, quindi il numero di colonne, rappresenta quanto è grande un dato",
+    "group": "Componenti digitali"
+  },
+  {
+    "title": "Linee di parola",
+    "question": "Cosa sono?",
+    "answer": "Sono fili elettrici messi orizzontali che rappresentano le righe della memoria, sono tante quanto il numero di celle",
+    "group": "Componenti digitali"
+  },
+  {
+    "title": "Linguaggio ARM",
+    "question": "Cosa è?",
+    "answer": "è una codifica delle istruzioni, più ad alto livello del linguaggio macchina",
+    "group": "ARM"
+  },
+  {
+    "title": "Linguaggio macchina",
+    "question": "Cosa è?",
+    "answer": "Il linguaggio macchina è un set di bit precisi che formano un istruzione che il processore è in grado di capire. Non per forza un istruzione ARM corrisponde a una sola istruzione del linguaggio macchina",
+    "group": "ARM"
+  },
+  {
+    "title": "Little Endian e Big Endian",
+    "question": "Cosa sono? ARM che cosa usa?",
+    "answer": "Nella modalità little endian si accede alla memoria dal basso verso l'alto, quindi i dati più vecchi saranno sul basso, mentre nella modalità big endian si accede alla memoria al contrario. Se cerchiamo di vedere la memoria risultante come un array, se noi vogliamo inserire {\"A\",\"B\",\"C\",\"D\"} nella modalità little endian sarà un array al contrario, che parte da D e finisce con A, mentre nella modalità Big Endian sarà visto come un normale array",
+    "group": "ARM"
+  },
+  {
+    "title": "Load literal",
+    "question": "A cosa servono?",
+    "answer": "Servono per caricare dei puntatori in dei registri. Questi puntatori solitamente puntano a una etichetta oppure a un indirizzo.\n\nLDR R0, =LABEL\nLDR R1, = 0xffaacda9",
+    "group": "ARM"
   },
   {
     "title": "Locks",
@@ -426,6 +624,36 @@
     "group": "Scheduling"
   },
   {
+    "title": "Memoria con porta in lettura",
+    "question": "Mi disegni schematicamente una memoria con una porta in lettura?",
+    "answer": "-",
+    "group": "Componenti digitali"
+  },
+  {
+    "title": "Memoria con porta in lettura e scrittura",
+    "question": "Mi disegni schematicamente una memoria con una porta in lettura e scrittura?",
+    "answer": "-",
+    "group": "Componenti digitali"
+  },
+  {
+    "title": "Memoria con porta in scrittura",
+    "question": "Mi disegni schematicamente una memoria con una porta in scrittura?",
+    "answer": "-",
+    "group": "Componenti digitali"
+  },
+  {
+    "title": "Memoria interallacciata",
+    "question": "Che cosa è?",
+    "answer": "Una memoria interallacciata è un altro modo per memorizzare i dati partendo da una memoria più grande e usando sottobanco più gruppi di memoria. La differenza tra la memoria modulare però, è che non ho un vero e proprio \"stacco\" tra un modulo e l'altro, perché gli indirizzi vengono assegnati ciclicamente a tutti i moduli, però abbiamo un vantaggio cruciale:\nse voglio leggere due indirizzi consecutivi, posso farlo in parallelo",
+    "group": "Componenti digitali"
+  },
+  {
+    "title": "Memoria modulare",
+    "question": "Che cosa è?",
+    "answer": "La memoria modulare è un tipo di memoria in cui dividiamo la memoria totale da realizzare in n moduli (es banchi di RAM). Per esempio, se abbiamo da realizzare una memoria da 2 gb in 2 moduli, ne avrò due da 1 gb",
+    "group": "Componenti digitali"
+  },
+  {
     "title": "Mesa e Hoare",
     "question": "Cosa sono le sintassi Mesa e Hoare? Come si differenziano tra loro?",
     "answer": "Sono entrambe sintassi usate quando si usano le locks, la prima, Mesa, una volta che il thread che ha la lock fa la signal risveglia il thread che aspettava (sempre che ci fosse) e lo mette in coda pronti, continuando con la propria esecuzione. \n\nLa sintassi Hoare invece, richiede maggiore attenzione nel suo utilizzo ma ha più potenziale, infatti, una volta che viene fatta la signal, passa anche la lock al thread risvegliato, e il thread che era in esecuzione si rimette nella coda pronti. La sintassi hoare può essere utile quando vogliamo dare un ordine ai thread risvegliati, per esempio creare code fifo o filo. \n\nCreare queste file è possibile anche con Mesa ma è meno intuitivo. Nonostante si possa passare una lock o risvegliare un thread specifico non è comunque dato l'ordine di esecuzione preciso, perché l'ordine di risveglio non è l'ordine di esecuzione. Per esempio, in bounded buffer non possiamo fare assunzioni perché non sappiamo se verrà eseguito prima un produttore o un consumatore",
@@ -460,6 +688,12 @@
     "question": "Cosa è la rappresentazione modulo e segno? ",
     "answer": "E' un modo per rappresentare i numeri binari, in cui il bit più significativo è riservato al segno. Purtroppo ha due svantaggi nell'usarlo:\n1) abbiamo doppia rappresentazione dello zero\n2) le somme non danno sempre risultati corretti",
     "group": "Basi di microarchitetture"
+  },
+  {
+    "title": "Moltiplicazione",
+    "question": "Con quali istruzioni si fa?",
+    "answer": "MULL <dest> <src1> <src2> per moltiplicazioni con numeri piccoli, altrimenti, UMULL<dest1> <dest2> <src1> <src2> per moltiplicazioni più grandi per numeri senza segno, e smull che è uguale alla umull ma è per numeri con segno",
+    "group": "ARM"
   },
   {
     "title": "Monitor",
@@ -498,6 +732,12 @@
     "group": "Sincronizzazione"
   },
   {
+    "title": "Num registri",
+    "question": "Quanti registri abbiamo in ARMv7?",
+    "answer": "16",
+    "group": "ARM"
+  },
+  {
     "title": "Oblivious scheduling",
     "question": "Cosa è l'oblivious scheduling?",
     "answer": "L'oblivious scheduling, o scheduling ignaro, è quando uno scheduler in un ambiente multicore non prende in considerazione dei possibili processi paralleli",
@@ -526,6 +766,12 @@
     "question": "Da dove deriva l'overhead della thread switch?",
     "answer": "L'overhead viene dalla gestione delle liste e dalle copie necessarie per il cambio del thread da eseguire. Inoltre, se viene eseguito un thread che non fa parte dello stesso processo, la cache potrebbe essere ricaricata da zero.\n\nContribuiscono all'overhead anche le exception, page fault(codice non caricato precedentemente in memoria), MMU/TLB invalidation (operazioni per invalidare vecchi dati)",
     "group": "Thread"
+  },
+  {
+    "title": "Particolarità di LDM e STM",
+    "question": "Qual'è?",
+    "answer": "LDM e STM di base non modificano lo stack pointer, se voglio lo stesso modificarlo posso fare:\nLDM SP!, {r1, r2, r3} ed è la stessa cosa di fare\nPOP {r1,r2,r3}\nuguale per la store",
+    "group": "ARM"
   },
   {
     "title": "Passaggi di una fork",
@@ -642,6 +888,12 @@
     "group": "Logica combinatoria"
   },
   {
+    "title": "Push e Pop",
+    "question": "Quando dobbiamo farla?",
+    "answer": "i registri r0-r3 e r12 sono temporanei, ciò significa che se nel codice dobbiamo fare una BL e quei registri ci servono ancora dobbiamo preservarli facendo una push prima della BL e una pop dopo la BL.\n\nGli altri registri sono chiamati persistenti, e sta al chiamato prima di terminare se li ha usati a riportarli ai valori precedenti con la push e pop",
+    "group": "ARM"
+  },
+  {
     "title": "Qual'è l'idea dell'algoritmo del banchiere?",
     "question": "Qual'è l'idea dell'algoritmo del banchiere?",
     "answer": "Il banchiere presta i soldi solo se è sicuro che verranno restituiti e se ce ne sono abbastanza. Il sistema analogamente dà una risorsa solo se siamo sicuri che accettando la richiesta rimaniamo in un safe state",
@@ -670,6 +922,30 @@
     "question": "Mi sapresti dire il range dei numeri con la rappresentazione modulo e segno?",
     "answer": "[-2^(n-1)-1,2^(n-1)-1], uno in meno della rappresentazione complemento a 2 perché abbiamo 2 rappresentazioni per lo zero",
     "group": "Basi di microarchitetture"
+  },
+  {
+    "title": "Registri e disciplina dinamica",
+    "question": "Quali sono i comportamenti che grazie alla disciplina dinamica riusciamo ad evitare nei registri?",
+    "answer": "Che gli input cambino subito dopo la fronte di salita del clock non permettendo la scrittura corretta del dato",
+    "group": "Logica sequenziale"
+  },
+  {
+    "title": "Registri persistenti",
+    "question": "Quali sono?",
+    "answer": "R4-R11, R13-R15",
+    "group": "ARM"
+  },
+  {
+    "title": "Registri speciali",
+    "question": "Quali sono i registri speciali?",
+    "answer": "R13 -> sp, R14 -> lr, R15 -> PC",
+    "group": "ARM"
+  },
+  {
+    "title": "Registri temporanei",
+    "question": "Quali sono?",
+    "answer": "R0-R3, R12",
+    "group": "ARM"
   },
   {
     "title": "rete combinatoria",
@@ -702,6 +978,12 @@
     "group": "Logica sequenziale"
   },
   {
+    "title": "reti astabili",
+    "question": "Cosa sono le reti astabili?",
+    "answer": "Sono delle reti sequenziali i cui valori interni delle porte oscillano periodicamente senza mai stabilizzarsi, come nel caso di un circuito chiuso formato da 3 negatori, che si chiama anche oscillatore ad anello",
+    "group": "Logica sequenziale"
+  },
+  {
     "title": "Reti logiche",
     "question": "Come si differenziano le reti logiche?",
     "answer": "Le reti logiche si differenziano in reti sequenziali e reti combinatorie",
@@ -716,7 +998,7 @@
   {
     "title": "Reti sincrone",
     "question": "Cosa sono le reti sincrone? chi ne fa parte?",
-    "answer": "Le reti sincrone sono delle reti che operano per cicli di clock. Ne fanno parte le reti di Mealy e di Moore, e quando si fanno degli automi con questi due modelli dobbiamo considerare che la lunghezza del ciclo di clock debba essere sufficientemente lunga per non creare incongruenze nella rete",
+    "answer": "Sono delle reti sequenziali che hanno un registro di stati interno, che cambia solamente ai fronti di salita del clock, motivo per il quale è chiamato sincronizzato. Una rete sequenziale sincrona deve essere formata da almeno un registro, che deve o devono essere connessi per ogni componente ciclica della rete, e tutti i registri devono tenere lo stesso segnale di clock.\n\nNe fanno parte le reti di Mealy e di Moore, e quando si fanno degli automi con questi due modelli dobbiamo considerare che la lunghezza del ciclo di clock debba essere sufficientemente lunga per non creare incongruenze nella rete",
     "group": "Logica sequenziale"
   },
   {
@@ -786,6 +1068,12 @@
     "group": "Scheduling"
   },
   {
+    "title": "Salto",
+    "question": "Mi elenchi i tipi di salto che ci sono in assembly?",
+    "answer": "Salto incondizionato.\nSi esegue con l'istruzione \"B\" (branch)\n\nsalto condizionato.\nA seguito di una compare, è possibile valutare i bit NZVC dal CPSR attraverso le seguenti condizioni aggiungibili sull'istruzione \"B\":\nEQ = uguale\nNE = not equal\n\nnum con segno:\nGT = greater than\nGE = greater or equal\nLT = less than\nLE = less equal\n\nnumeri senza segno:\nHI = higher\nLO = lower\nHS = higher or same\nLS = lower or same ",
+    "group": "ARM"
+  },
+  {
     "title": "Scheduler activation",
     "question": "Che cosa è lo scheduler activation?",
     "answer": "Lo scheduler activation è un meccanismo di scheduling che cerca di migliorare la soluzione di usare lo scheduler user-lv che ha un overhead più basso rispetto al meccanismo kernel-lv, ma senza la criticità del modello ovvero quella che se un thread user-lv esegue una system call bloccante, allora tutti i thread che aveva quel processo vengono bloccati, dato che il kernel non li vede",
@@ -816,6 +1104,12 @@
     "group": "Domande orale"
   },
   {
+    "title": "Scrittura memoria modulare",
+    "question": "Come si può fare?",
+    "answer": "La scrittura possiamo farla facendo un demux dei bit più significativi che dividono la nostra memoria in moduli, e le uscite saranno i WE presenti nei moduli. Avremo anche dal nostro indirizzo i dati inviati per cercare l'indirizzo a tutti i moduli e una linea di wd connessa a tutti i moduli",
+    "group": "Componenti digitali"
+  },
+  {
     "title": "Semafori",
     "question": "Cosa sono i semafori?",
     "answer": "I semafori o mutex, sono un meccanismo di sync con un intero >=0 e una coda di attesa al suo interno. Si crea un mutex per tutti i thread. Un mutex ha due funzioni principali: 1) V() anche chiamata Sempost(), in cui se c'è un thread in coda lo sveglia,  altrimenti, aumenta il contatore interno. 2) P() o Semwait, in cui viene decrementato il contatorr interno se >0, altrimenti si aggiunge il thread corrente in coda",
@@ -832,6 +1126,12 @@
     "question": "Cosa è una shell?",
     "answer": "Una shell è un controllore di jobs, ai quali assegna a ciascuno una task. La shell si occupa di creare questi jobs attraverso la fork e la exec",
     "group": "Processi"
+  },
+  {
+    "title": "Sincronizzatore",
+    "question": "Cosa è?",
+    "answer": "Un sincronizzatore è un dispositivo che prende un ingresso D in input e restituisce un risultato Q dopo un certo periodo di tempo. Il suo scopo è di evitare gli errori, ovvero, se l'ingresso  cambia troppo a ridosso della fine del clock, potrebbe Q diventare un valore imprevedibile, o alto, o basso, o anche a metà, mentre il sincronizzatore evita questa cosa, e si assicura che Q sia sempre o alto o basso, anche se questo comporta metterci più cicli di clock per assicurarsene",
+    "group": "Logica sequenziale"
   },
   {
     "title": "Sintassi Mesa",
@@ -852,6 +1152,18 @@
     "group": "Logica combinatoria"
   },
   {
+    "title": "Sommatore",
+    "question": "Un full adder, come può essere creato?",
+    "answer": "Possiamo crearlo come sommatore completo a propagazione di riporto a onda, oppure come sommatore a anticipazione di riporto, o come sommatore a prefissi",
+    "group": "Componenti digitali"
+  },
+  {
+    "title": "Sottrattore",
+    "question": "Come si fa un sottrattore?",
+    "answer": "Un sottrattore si può realizzare scrivendo il numero in complemento a due e sommandolo normalmente, quindi, a livello di hardware, quello che facciamo è fare passare il numero su un negatore e negare tutti i bit, poi sommarlo con il secondo numero e passare rin a 1 per aggiungere l'1 per fare il complemento a 2",
+    "group": "Componenti digitali"
+  },
+  {
     "title": "Space sharing",
     "question": "Cosa è lo space sharing?",
     "answer": "Lo space sharing è un algoritmo di scheduling che raggruppa i processi con i propri threads e li manda in esecuzione a gruppi e alloca i processori a task differenti",
@@ -868,6 +1180,12 @@
     "question": "cosa sono gli spurius wakeup? ",
     "answer": "Gli spurius wakeup sono degli eventi molto rari ma possibili in cui una wait di una variabile di condizione potrebbe risvegliarsi per altri motivi, quindi per evitarlo mettere sempre la wait in un while, così da ricontrollare due volte se si è svegliata per caso o meno",
     "group": "Sincronizzazione"
+  },
+  {
+    "title": "SRAM",
+    "question": "Che cosa è?",
+    "answer": "E' una memoria volatile più costosa ma più efficiente della dram. \nLa SRAM infatti, ha un meccanismo interno alla cella diverso dalla DRAM, abbiamo due transistor che si connettono a due not in croce (e per fare i not ci vogliono 2 transistor). Risultato: la croce di not rende stabile la cella, senza bisogno di un meccanismo di refresh, però è più costosa perché ci vogliono per ogni cella 6 transistor al posto della DRAM che ne richiedeva solo uno",
+    "group": "Componenti digitali"
   },
   {
     "title": "starvation",
@@ -898,6 +1216,12 @@
     "question": "Come è fatto un TCB?",
     "answer": "Un TCB è formato dai thread metadata (es. lo stato del thread, la priorità ecc), dalle informazioni sullo stack (quindi dove inizia e dove finisce), e dai registri salvati per il context switch",
     "group": "Thread"
+  },
+  {
+    "title": "Teorema automa di Moore",
+    "question": "Qual'è il teorema degli automi di Moore?",
+    "answer": "La versione dell'automa di Moore di una rete ha sempre un numero di stati >= al numero di stati della versione con l'automa di Mealy",
+    "group": "Logica sequenziale"
   },
   {
     "title": "Terminazione di un processo",
@@ -976,5 +1300,17 @@
     "question": " A cosa servono le condition variables?",
     "answer": "Servono per aspettare in maniera passiva (quindi sospendere il thread) finché non accade l'evento per il quale il thread stava aspettando. Es. un thread consumatore nota che non ci sono messaggi nel buffer, e quindi va in wait finché il produttore non ne producerà uno.",
     "group": "Sincronizzazione"
+  },
+  {
+    "title": "Vincolo sul tempo di hold",
+    "question": "qual'è?",
+    "answer": "Thold <= Tcr + Tcsigma",
+    "group": "Logica sequenziale"
+  },
+  {
+    "title": "Visione logica di una memoria",
+    "question": "Qual'è?",
+    "answer": "si tratta di vedere la memoria come un grosso array, in cui ci sono n celle e ogni cella è grande m. Se questo m è un byte, si dice che la memoria è indirizzabile al byte. Ci vogliono k bit per indirizzare una memoria,  k= log_2(n)",
+    "group": "Componenti digitali"
   }
 ]

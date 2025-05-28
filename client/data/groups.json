@@ -4,6 +4,10 @@
     "color": "#ff007b"
   },
   {
+    "name": "arm to byte",
+    "color": "#b38aff"
+  },
+  {
     "name": "Basi di microarchitetture",
     "color": "#ff0000"
   },
@@ -14,6 +18,10 @@
   {
     "name": "Domande orale",
     "color": "#ffc7fd"
+  },
+  {
+    "name": "Gerarchie di memoria",
+    "color": "#ffdd00"
   },
   {
     "name": "Logica combinatoria",
