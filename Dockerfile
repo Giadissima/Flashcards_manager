@@ -21,11 +21,12 @@ COPY client ./client
 COPY server ./server
 
 # Costruisci il progetto NestJS
-WORKDIR /app/server
+#WORKDIR /app/server
+WORKDIR /app/client
 RUN npm run build
 
 # Esponi la porta su cui gira NestJS
 EXPOSE 3000
 
 # Comando di avvio server NestJS 
-CMD ["node", "dist/main.js"]
+#CMD ["node", "dist/main.js"]

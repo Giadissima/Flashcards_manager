@@ -36,6 +36,12 @@
     "group": "Componenti digitali"
   },
   {
+    "title": "AMAT",
+    "question": "Che cosa è? Come si calcola?",
+    "answer": "L'AMAT sta per Average Memory Access Time e serve per dare una metrica per capire quanto ci mette la cpu a reperire un dato in una gerarchia di memoria data.\nIl calcolo per l'amat è Hit time + miss rate * miss penalty",
+    "group": "Gerarchie di memoria"
+  },
+  {
     "title": "Architettura CISC vs RISC",
     "question": "Cosa sono e come si differenziano?",
     "answer": "Stanno per Complex Instruction Set Computer e Reduced Instruction Set Computer. La CISC fa delle operazioni più complesse tutte in una volta, mentre la RISC fa piccole operazioni una dietro l'altra. La CISC, aggiunge al circuito maggiore complessità perché abbiamo bisogno di circuiti ad hoc per fare più operazioni in una, e non per forza è più efficiente di RISC. Inoltre, CISC è un architettura più costosa di RISC",
@@ -66,6 +72,12 @@
     "group": "Basi di microarchitetture"
   },
   {
+    "title": "Cache line o cache block?",
+    "question": "Qual'è la differenza tra i due?",
+    "answer": "Noi li usiamo come sinonimi (per le cache)",
+    "group": "Gerarchie di memoria"
+  },
+  {
     "title": "cache su più core",
     "question": "Dimmi tutto ciò che sai sul problema di coerenza di cache su un sistema di più core",
     "answer": "-",
@@ -76,6 +88,12 @@
     "question": "Calcolami il tp di un full adder a 32 bit",
     "answer": "-",
     "group": "Domande orale"
+  },
+  {
+    "title": "Chi gestisce i livelli della memoria?",
+    "question": "Chi gestisce i livelli della memoria?",
+    "answer": "registri -> cache -> main memory -> secondary storage\n\nil passaggio registri -> cache viene gestito dal compilatore\nil passaggio cache -> main memory viene gestito da microarchitettura (hw)\nil passaggio main memory -> secondary storage viene gestito dall'OS",
+    "group": "Gerarchie di memoria"
   },
   {
     "title": "Ciclo della CPU",
@@ -228,6 +246,18 @@
     "group": "Componenti digitali"
   },
   {
+    "title": "CPI",
+    "question": "Cosa sono i CPI e come si calcolano?",
+    "answer": "I CPI sono i clockcycles per instruction = (clockcycles/IC)\n\noppure CPIperfect + CPIstall",
+    "group": "Gerarchie di memoria"
+  },
+  {
+    "title": "CPIstall, CPImem, CPIperfect",
+    "question": "Cosa sono? Come si calcolano?",
+    "answer": "CPImem =quanti cicli di clock servono in media per eseguire un operazione di memoria. \nCPIperfect = quanti cicli di clock ci mette la CPU per ottenere il dato senza mai fallire.\nCPIstall = quanti cicli di clock ci mette la CPU per ottenere il dato a seguito di un solo caso di miss\n\nCPImem = CPImem-hit + MR*CPImem-miss\nCPIperfect = ((ICcpu)/(IC)*CPIcpu+((ICmem)/IC)*CPImem-hit\nCPIstall = ((ICmem)/(IC)*Mr*Miss penalty",
+    "group": "Gerarchie di memoria"
+  },
+  {
     "title": "CPSR",
     "question": "Che cosa è?",
     "answer": "E' il Computer Program Status Register, un registro a 32 bit che contiene i bit nzvc",
@@ -238,6 +268,12 @@
     "question": "Cosa sono?",
     "answer": "CPU burst = tempo totale in cui il processo usa la CPU in maniera attiva\n I/O burst = tempo totale in cui il processo aspetta per operazioni  I/O\nCPU bound job = hanno un cpu burst notevole e un I/O burst molto ridotto, ovvero il processo utilizza molto di più la cpu rispetto che le operazioni di I/O\nI/O bound job = hanno un I/O burst notevole e un CPU burst molto ridotto, ovvero il processo utilizza molto di più le operazioni I/O rispetto che le operazioni della CPU.\nworkload misti= sono dei processi che hanno bisogno più o meno in egual misura di operazioni di  I/O e di CPU",
     "group": "Scheduling"
+  },
+  {
+    "title": "CPUtime",
+    "question": "Che cosa è? Come si calcola?",
+    "answer": "La CPU time è il tempo totale che la CPU ci mette per eseguire un blocco di operazioni. Si può calcolare come CPUtime= IC * CPI * clockcycletime \nCPUtime = (CPIperfect + CPIstall) * clockcycletime\nCPUtime = clockcycles * clockcycletime",
+    "group": "Gerarchie di memoria"
   },
   {
     "title": "Creazione di uno zombie",
@@ -280,6 +316,12 @@
     "question": "Mi sapresti dire i concetti che stanno alla base di come viene strutturato l'I/O in unix?",
     "answer": "1) uniformità. E' il concetto che permette l'astrazione del file system, ovvero tutte le operazioni che vengono fatte ad alto livello vengono viste come operazioni su file, attraverso le funzioni base (system call) come open, close, read, write. \n2) Tutti i dispositivi I/O vengono orientati al byte \n3) Prima di poter usare un file, va aperto, in maniera tale da ottenere il file descriptor sul quale potremo lavorarci. \n4) Le read e le write vengono bufferate \n5) bisogna sempre chiudere un file dopo l'uso, per poter permettere al garbage collector di raccogliere i file descriptor usati in precedenza dal processo",
     "group": "Processi"
+  },
+  {
+    "title": "Designing a caching system",
+    "question": "Quali sono gli obbiettivi quando si realizza un sistema di cache? Quali sono le domande da porsi?",
+    "answer": "L'obbiettivo principale è minimizzare l'AMAT, e per farlo bisogna minimizzare tutti i fattori coinvolti nella formula, quindi Hit time, miss rate e miss penalty. Il fattore con impatto maggiore è il miss rate. Il miss penalty si abbassa aggiungendo più livelli di cache\n\nLe domande da porsi sono:\nquanto devo fare grande un blocco di cache?\nChe funzione uso per capire se un dato è presente nella cache?\nSe un dato non è presente, come lo ottengo?\nCome affronto i conflitti di blocco? Con quale metodo di rimpiazzo?\nCome mantengo la coerenza di valori nei differenti livelli di memoria?",
+    "group": "Gerarchie di memoria"
   },
   {
     "title": "Detect and fix",
@@ -334,6 +376,30 @@
     "question": "Cosa è un encoder?",
     "answer": "E' una rete combinatoria che, presa una serie di bit in ingresso dove solo uno tra loro sarà 1, uscirà qual'è l'ingresso a 1",
     "group": "Logica combinatoria"
+  },
+  {
+    "title": "Es AMAT",
+    "question": "Se abbiamo un tempo di accesso alla memoria principale di 50 ns, e tL1 è 1 ns, con miss rates del 5% in l1, quanto tempo ci mette senza cache? quanto tempo ci mette con la cache? qual'è il fattore  di miglioramento?",
+    "answer": "AMAT = tL1 + MRL1 * MP(o Tm) = 1 + 0,005*50 = 3,5 ns. Fattore di miglioramento AMAT no cache / AMAT con cache = 50/3,5 = 14,3 quindi un x14",
+    "group": "Gerarchie di memoria"
+  },
+  {
+    "title": "ES indirizzamento 2",
+    "question": "Abbiamo un indirizzo da 32 bit, b=8, e B=128, come è formato l'indirizzo in una direct mapped cache?",
+    "answer": "block offset = log(2)8=3\nbyte offset = 2\nnum di set = log(2)128 = 7 bits\nbit di tag = 32-7-3-2=20",
+    "group": "Gerarchie di memoria"
+  },
+  {
+    "title": "ES indirizzamento 3",
+    "question": "S=B=128, b=8, ind=0xFEAC. Qual'è l'indirizzo della linea di cache e l'offset di blocco? Una volta trovato l'indirizzo, mi controlli che l'indirizzo 0xFEB4 sia nella stessa linea di cache? trovami un altro indirizzo dentro quella linea",
+    "answer": "block offset = log(2)8=3\nbyte offset = 2\nbit di set = log(2) 128 = 7\ntag = 32-12-=20\n\nriscrivo l'indirizzo in binario\n1...1 1110101 011 00 (tag, set, block offset, byte offset)\n\nriga = 1110101 = 117(10) quindi la 118esima riga\ncolonna = 011 = quarta colonna",
+    "group": "Gerarchie di memoria"
+  },
+  {
+    "title": "Es memoria direct mapped",
+    "question": "Se io ho parole da 32 bit e una memoria da 256x64, cosa significa? Come è fatto l'indirizzo?",
+    "answer": "64 indica quanto è grande una linea, quindi b=dim linea/dim parola, 256 dice il numero di linee di cache presenti\nblock offset = log(2)b = 4\nbit di set = log(2)256 = 8 bit\nbyte offset = log(2)4 byte = 2\nbit di tag = 32-8-4-2=18",
+    "group": "Gerarchie di memoria"
   },
   {
     "title": "Es multiplexer",
@@ -450,10 +516,22 @@
     "group": "Scheduling"
   },
   {
+    "title": "Gerarchia di memoria inclusiva e esclusiva",
+    "question": "Cosa sono?",
+    "answer": "Gerarchia inclusiva= quando viene richiesto un dato da un livello superiore, viene fatta una copia\ngerarchia esclusiva = quando viene richiesto un dato da un livello superiore, viene spostato",
+    "group": "Gerarchie di memoria"
+  },
+  {
     "title": "Global env e virtual env",
     "question": "Cosa cambia tra il global env e il virtual env?",
     "answer": "Il global environment è il modello usato per la gestione dei thread, in cui c'è uno spazio di memoria condivisa in cui viene fatta la comunicazione. Il local environment invece, è il modello usato per la gestione dei processi, in cui ogni processo è isolato dagli altri e la comunicazione viene fatta esplicitandolo correttamente tra tutte le parti che dovranno comunicare",
     "group": "Sincronizzazione"
+  },
+  {
+    "title": "Hitrate e Missrate",
+    "question": "Cosa sono? Come si calcolano?",
+    "answer": "hitrate = frequenza di ricerche terminate con successo. Si può calcolare facendo (num di hit)/(num di accessi \n totali della memoria) oppure 1 - MR\nmissrate = frequenza di ricerche terminate con fallimento. Si può calcolare facendo (num di miss)/(num di accessi totali della memoria) oppure 1 - HR",
+    "group": "Gerarchie di memoria"
   },
   {
     "title": "I/O asincrono + threads",
@@ -462,10 +540,22 @@
     "group": "Thread"
   },
   {
+    "title": "IC",
+    "question": "Come si calcola l'IC?",
+    "answer": "L'instruction count è il numero di istruzioni totali eseguite dalla CPU e si calcola facendo ICmemoria + ICcpu",
+    "group": "Gerarchie di memoria"
+  },
+  {
     "title": "implementazione di thread",
     "question": "Cosa ci serve per implementare i threads? ",
     "answer": "Un TCB, uno scheduler che lavori con i threads, e delle funzioni per gestirli (creazione, terminazione, yield, ecc...)",
     "group": "Thread"
+  },
+  {
+    "title": "Indirizzamento di memoria Direct Mapped",
+    "question": "Come funziona un indirizzamento di memoria di una memoria direct mapped con 8 set?",
+    "answer": "Se per esempio una memoria la memorizziamo in 32 bit, siccome log(2)8=3 e abbiamo 2 bit meno significativi per il byte offset perché log(2)4 byte = 2, i 3 bit nel mezzo che sono i bit per indirizzare al set corretto l'indirizzo e poi abbiamo il resto dei bit che sono la parte rappresentativa del dato e viene chiamata tag.",
+    "group": "Gerarchie di memoria"
   },
   {
     "title": "IPC",
@@ -546,8 +636,8 @@
     "group": "Componenti digitali"
   },
   {
-    "title": "Lettura memoria modulare",
-    "question": "Come funziona la lettura nella memoria modulare? Es di 2 moduli da 1gb ",
+    "title": "Lettura memoria modulare sequenziale",
+    "question": "Come funziona la lettura nella memoria modulare sequenziale? Es di 2 moduli da 1gb ",
     "answer": "La lettura si effettua considerando il bit più significativo dell'indirizzo, se è 0, si legge ma M0, altrimenti da M1. Per fare ciò possiamo usare un multiplexer, così da scegliere il dato letto corretto. (lez 9)",
     "group": "Componenti digitali"
   },
@@ -556,6 +646,12 @@
     "question": "Cosa sono?",
     "answer": "Sono fili elettrici messi verticali che rappresentano le colonne della memoria. Una riga completa è un dato, e la grandezza della riga, quindi il numero di colonne, rappresenta quanto è grande un dato",
     "group": "Componenti digitali"
+  },
+  {
+    "title": "Linee di cache",
+    "question": "Come si calcolano?",
+    "answer": "Si calcolano dividendo la capacità totale/il numero di parole in una linea di cache",
+    "group": "Gerarchie di memoria"
   },
   {
     "title": "Linee di parola",
@@ -650,7 +746,13 @@
   {
     "title": "Memoria modulare",
     "question": "Che cosa è?",
-    "answer": "La memoria modulare è un tipo di memoria in cui dividiamo la memoria totale da realizzare in n moduli (es banchi di RAM). Per esempio, se abbiamo da realizzare una memoria da 2 gb in 2 moduli, ne avrò due da 1 gb",
+    "answer": "Consiste nel creare una memoria grande attraverso più moduli più piccoli messi uno accanto all'altro. La memoria modulare può essere sequenziale o interallacciata",
+    "group": "Componenti digitali"
+  },
+  {
+    "title": "Memoria modulare sequenziale",
+    "question": "Che cosa è?",
+    "answer": "La memoria modulare sequenziale è un tipo di memoria in cui dividiamo la memoria totale da realizzare in n moduli (es banchi di RAM). Per esempio, se abbiamo da realizzare una memoria da 2 gb in 2 moduli, ne avrò due da 1 gb",
     "group": "Componenti digitali"
   },
   {
@@ -658,6 +760,12 @@
     "question": "Cosa sono le sintassi Mesa e Hoare? Come si differenziano tra loro?",
     "answer": "Sono entrambe sintassi usate quando si usano le locks, la prima, Mesa, una volta che il thread che ha la lock fa la signal risveglia il thread che aspettava (sempre che ci fosse) e lo mette in coda pronti, continuando con la propria esecuzione. \n\nLa sintassi Hoare invece, richiede maggiore attenzione nel suo utilizzo ma ha più potenziale, infatti, una volta che viene fatta la signal, passa anche la lock al thread risvegliato, e il thread che era in esecuzione si rimette nella coda pronti. La sintassi hoare può essere utile quando vogliamo dare un ordine ai thread risvegliati, per esempio creare code fifo o filo. \n\nCreare queste file è possibile anche con Mesa ma è meno intuitivo. Nonostante si possa passare una lock o risvegliare un thread specifico non è comunque dato l'ordine di esecuzione preciso, perché l'ordine di risveglio non è l'ordine di esecuzione. Per esempio, in bounded buffer non possiamo fare assunzioni perché non sappiamo se verrà eseguito prima un produttore o un consumatore",
     "group": "Sincronizzazione"
+  },
+  {
+    "title": "metriche memorie",
+    "question": "Quali sono le metriche in base alla quale valutiamo i tipi di memoria?",
+    "answer": "- costo\n- capacità\n- tempo di accesso",
+    "group": "Gerarchie di memoria"
   },
   {
     "title": "mfq",
@@ -676,6 +784,12 @@
     "question": "Mi disegni un latch sr?",
     "answer": "Un latch sr è formato da due or con un not sul fondo in cui il secondo ingresso dell'or è l'uscita dell'altro or negato e viceversa. Questo perché si tratta di una rete sequenziale e si basa sulle retroazioni, ovvero ingressi stabili ma che derivano da un ciclo interno della rete",
     "group": "Logica sequenziale"
+  },
+  {
+    "title": "Miss time e miss penalty",
+    "question": "Cosa sono? Come si calcolano?",
+    "answer": "miss time = il nostro costo, cioè quanto tempo ci mettiamo a recuperare un dato\nmiss time = hit time + miss penalty\nmiss penalty = costo di tempo aggiuntivo se il dato richiesto non è presente nel livello attuale e va ricercato in un livello inferiore.\nMiss penalty = tempo tot di livello n-1, o anche tn-1 * MRn-1* miss penalty n-2",
+    "group": "Gerarchie di memoria"
   },
   {
     "title": "Modelli di scheduling",
@@ -738,6 +852,24 @@
     "group": "ARM"
   },
   {
+    "title": "NVDIMM",
+    "question": "Cosa sono?",
+    "answer": "Le NVDIMM sono delle memorie ad alta velocità non volatili, costose e comode per alcune situazioni in cui abbiamo bisogno di grandi prestazioni e di non perdere i dati allo spegnimento della macchina",
+    "group": "Gerarchie di memoria"
+  },
+  {
+    "title": "NVMe",
+    "question": "Cosa sono?",
+    "answer": "Una memoria che molta un protocollo PCIe (PCI-express) ad alta velocità, di cui fanno parte le SSD. Sono però più lente delle NVDIMM",
+    "group": "Gerarchie di memoria"
+  },
+  {
+    "title": "Obbiettivi gerarchia di memoria",
+    "question": "Quali sono gli obbiettivi della gerarchia di memoria?",
+    "answer": "L'obbiettivo principale è quello di diminuire il bottleneck della architettura classica di Von Neumann, mettendo più livelli di memoria, in cui vicino alla CPU ci saranno le cache, ovvero le memorie più rapide (SRAM) e più in basso ci saranno le memorie non volatili. L'obbiettivo è di far credere alla CPU di avere un unica memoria con la velocità della cache L1 e la capacità dell'HD o dell'SSD",
+    "group": "Gerarchie di memoria"
+  },
+  {
     "title": "Oblivious scheduling",
     "question": "Cosa è l'oblivious scheduling?",
     "answer": "L'oblivious scheduling, o scheduling ignaro, è quando uno scheduler in un ambiente multicore non prende in considerazione dei possibili processi paralleli",
@@ -754,6 +886,18 @@
     "question": "Come funziona la open in unix?",
     "answer": "La open in unix prende tanti parametri perché fa più operazion logiche alla volta, per prima cosa infatti, controlla che il file esista, se non esiste, controlla i parametri passati, se ci sono dei parametri per gestire l'errore in caso di file non esistente, lo crea e ritorna il fd, altrimenti, ritorna l'errore. Se invece il file esiste, si controlla se è vuoto, se è vuoto, allora ritorniamo il fd, altrimenti controlla se ci sono parametri per la gestione di questo errore, se ci sono, allora tronca il file, altrimenti restituisce errore",
     "group": "Processi"
+  },
+  {
+    "title": "Ordinamento memoria",
+    "question": "Ordinami le memorie in base al tempo di accesso",
+    "answer": "1) SRAM\n2) DRAM\n3) Flash memory\n4) Hard disk",
+    "group": "Gerarchie di memoria"
+  },
+  {
+    "title": "Organizzazione delle cache",
+    "question": "Come possono essere organizzate le cache? Quali sono le differenze principali?",
+    "answer": "L'organizzazione di una cache principalmente si divide in 2 fattori: il numero di strade che può prendere lo stesso indirizzo di memoria, e il numero di set (insiemi di cache lines).\n\nAbbiamo visto 3 modi per organizzare le cache (B è il numero di linee di cache):\ndirect mapped cache, che ha 1 way e B set\nset associative cache, in cui ogni set contiene N linee, ha 1<N<B vie e on B/N set\nfully associative, con B way e 1 set",
+    "group": "Gerarchie di memoria"
   },
   {
     "title": "Ottenere il valore di uscita del figlio",
@@ -850,6 +994,18 @@
     "question": "Cosa è il principio di gerarchia?",
     "answer": "E' il riuscire a progettare una componente complessa attraverso moduli più piccoli collegate tra di loro",
     "group": "Basi di microarchitetture"
+  },
+  {
+    "title": "Principio di località",
+    "question": "Cosa è il principio di località?",
+    "answer": "Il principio di località è un principio che si basa su altri due sottoprincipi, il principio di località spaziale e il principio di località temporale. Questi principi sono frutto di osservazioni sulle statistiche dei dati ottenuti dalla memoria.\nIl principio di località spaziale, dice che se un dato viene richiesto, c'è un alta probabilità che in un breve lasso di tempo vengano richiesti anche le celle di memoria vicino a quel dato, pensiamo ad esempio a come utilizziamo solitamente gli array.\nIl principio di località temporale, dice che se un dato viene richiesto, c'è un'alta probabilità che in un breve lasso di tempo venga richiesto di nuovo, pensiamo ad esempio alle variabili contatori.",
+    "group": "Gerarchie di memoria"
+  },
+  {
+    "title": "Principio di località applicato alle gerarchie",
+    "question": "Come viene applicato il principio di località applicato alle gerarchie di memoria?",
+    "answer": "Quando prendiamo un dato per la prima volta, lo mettiamo subito nel livello più vicino alla CPU (località temporale) e con lui portiamo anche un blocco di dati adiacenti ad esso (località spaziale)",
+    "group": "Gerarchie di memoria"
   },
   {
     "title": "Principio di modularità",
@@ -1098,7 +1254,7 @@
     "group": "Domande orale"
   },
   {
-    "title": "Scrittura memoria modulare",
+    "title": "Scrittura memoria modulare sequenziale",
     "question": "Come si può fare?",
     "answer": "La scrittura possiamo farla facendo un demux dei bit più significativi che dividono la nostra memoria in moduli, e le uscite saranno i WE presenti nei moduli. Avremo anche dal nostro indirizzo i dati inviati per cercare l'indirizzo a tutti i moduli e una linea di wd connessa a tutti i moduli",
     "group": "Componenti digitali"
@@ -1254,6 +1410,12 @@
     "group": "Scheduling"
   },
   {
+    "title": "Tipo di memorie",
+    "question": "Di che tipo possono essere le memorie?",
+    "answer": "le memorie possono essere di tipo volatile e non volatile. \nle memorie volatili sono le sram, le dram, flip flop, registers, latches.\nle memoria non volatili sono i magnetic disks(hd), gli optical disk (cd), i tape, e le flash memory, rom, nvram.",
+    "group": "Gerarchie di memoria"
+  },
+  {
     "title": "Tipologie di load che conosce",
     "question": "Mi dice le tipologie di load che conosce?",
     "answer": "-",
@@ -1270,6 +1432,12 @@
     "question": "Cosa è il tp?",
     "answer": "E' il tempo di propagazione, ovvero il ritardo di propagazione del circuito",
     "group": "Logica combinatoria"
+  },
+  {
+    "title": "Trasferimento dati",
+    "question": "Come vengono trasferiti i dati? ",
+    "answer": "I dati vengono trasferiti a blocchi da 8-16 parole. Nelle cache questi blocchi si chiamano cache line",
+    "group": "Gerarchie di memoria"
   },
   {
     "title": "Un nipote thread",

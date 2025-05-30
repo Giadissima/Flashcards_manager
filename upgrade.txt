@@ -30,3 +30,4 @@ non posso cambiare il titolo
 salvarsi le risposte sbagliate e tra le opzioni selezionare un test di sole risposte sbagliate
 
 non si vedono i paragrafi nella view test
+risolvere il problema che non mi pusha il server su github

@@ -22,6 +22,8 @@ services:
       - MONGO_URL=mongodb://mongodb:27017/flashcard_db
     depends_on:
       - mongodb
+    volumes:
+      - ./client/data:/app/client/data
 
 volumes:
   mongo_data:
