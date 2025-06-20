@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlashGroup Manager</title>
+  <link rel="stylesheet" href="/src/styles.css">
+  <link rel="icon" href="/assets/favicon.png" type="image/x-icon">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+</head>
+
+<body class="d-flex align-items-center justify-content-center">
+  <!-- TODO mettere gli input required -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
+    crossorigin="anonymous"></script>
+  <script src="/src/utility.js"></script>
+    
+  <div class="container-md align-middle">
+    <h1 class="text-center">
+      Create a new group
+    </h1>
+    <form class="form-container needs-validation" novalidate onsubmit="addGroup(event)">
+      <div class="input-group mb-3">
+        <span class="input-group-text group-select">Group name</span>
+        <input type="text" id="name" class="form-control input" required>
+        <div class="invalid-feedback">
+          Please insert the group name.
+        </div>
+      </div>
+  
+      <div class="input-group mb-3">
+        <span class="input-group-text group-select">Select color</span>
+        <input type="color" class="color_picker" id="color" value="#007bff" required>
+        <div class="invalid-feedback">
+          Please select a color.
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-center mt-3">
+        <button type="submit" class="btn btn-success">Add new group</button>
+      </div>
+      </form>
+  </div>
+
+
+  <!-- parte js  -->
+  <script>
+    async function addGroup(event) {
+      event.preventDefault();
+      const form = event.target;
+
+      if (!form.checkValidity()) {
+        form.classList.add('was-validated');
+        return; // Blocca l'invio se il form non è valido
+      }
+
+      const name = document.getElementById("name").value;
+      const color = document.getElementById("color").value;
+      const newGroup = { name, color }
+      try {
+        const response = await fetch('/add-group', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newGroup) // Converte l'oggetto in JSON
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+          alert('Group added successfully!');
+        } else {
+          alert('Error adding Group: ' + result.message);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Error sending request.');
+      }
+      window.location.href = '/';
+
+    }
+  </script>
+</body>
+
+</html>

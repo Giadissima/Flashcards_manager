@@ -1,0 +1,182 @@
+[
+  {
+    "title": "cosa significa astrarre un thread?",
+    "question": "cosa significa astrarre un thread?",
+    "answer": "E' un concetto fondamentale alla base dei thread, in cui fingiamo che ci sia un numero illimitato di processori (uno per ogni thread). Questo comporta che ogni thread crede di avere sempre il processore, e il context switch è trasparente al thread, portandolo a pensare che la sua sia un esecuzione lineare senza interruzioni. Questo però ci ricorda anche il perché non possiamo fare supposizioni sul quale pezzo di codice tra più thread concorrenti verrà eseguito prima, dato che la cpu riordina le op a proprio piacimento",
+    "group": "Thread"
+  },
+  {
+    "title": "Creazione di uno zombie",
+    "question": "Quando è che si crea un processo zombie?",
+    "answer": "Quando il processo figlio termina prima che il padre abbia fatto la wait",
+    "group": "Processi"
+  },
+  {
+    "title": "Design pattern unix I/O",
+    "question": "Mi sapresti dire i concetti che stanno alla base di come viene strutturato l'I/O in unix?",
+    "answer": "1) uniformità. E' il concetto che permette l'astrazione del file system, ovvero tutte le operazioni che vengono fatte ad alto livello vengono viste come operazioni su file, attraverso le funzioni base (system call) come open, close, read, write. 2) Tutti i dispositivi I/O vengono orientati al byte 3) Prima di poter usare un file, va aperto, in maniera tale da ottenere il file descriptor sul quale potremo lavorarci. 4) Le read e le write vengono bufferate 5) bisogna sempre chiudere un file dopo l'uso, per poter permettere al garbage collector di raccogliere i file descriptor usati in precedenza dal processo",
+    "group": "Processi"
+  },
+  {
+    "title": "differenza di astrazione",
+    "question": "che vantaggi comporta l'astrazione ai thread user-level e quali invece ai thread kernel-level?",
+    "answer": "Il context switch nell'user level è molto veloce, ma come svantaggio ha che non sfrutta il parallelismo dei cores e lo scheduling non è pienamente efficiente dato che è interno della libreria e gestisce equamente solo i threads all'interno di essa, non conoscendo gli altri. Inoltre offrono un modo per averli in sistemi che non li hanno nativamente (su kernel multiprocesso). I threads a kernel lv invece, al contrario hanno un overhead molto più lento dato che ci sono le sc per gestirli, ma sfruttano i multicores",
+    "group": "Thread"
+  },
+  {
+    "title": "Funzioni legate ai processi",
+    "question": "Quali funzioni dei processi ci sono? quali sono con maggior probabilità usati dai padri e quali dai figli?",
+    "answer": "Il padre e il figlio usano la exit, il padre usa inoltre la wait, la waitpid, e la fork, mentre il figlio usa la exit, la getpid, la getppid, e la exec",
+    "group": "Processi"
+  },
+  {
+    "title": "implementazione di thread",
+    "question": "Cosa ci serve per implementare i threads? ",
+    "answer": "Un TCB, uno scheduler che lavori con i threads, e delle funzioni per gestirli (creazione, terminazione, yield, ecc...)",
+    "group": "Thread"
+  },
+  {
+    "title": "IPC",
+    "question": "Cosa sono gli IPC? Chi se ne occupa?",
+    "answer": "Gli inter process communication, ovvero tutti i meccanismi di comunicazione tra processi, tra i quali le pipes e le sockets. Si occupa di gestisce gli IPC il kernel, diventando quindi l'intermediario della comunicazione",
+    "group": "Processi"
+  },
+  {
+    "title": "Modelli di scheduling",
+    "question": "Che tipo di modelli di scheduling per la gestione dei thread ci sono? ",
+    "answer": "Ci sono i modelli cooperativi, e i modelli a prerilascio. I modelli cooperativi sono quelli più vecchi e ogni thread in questo modello rilascia autonomamente il processore attraverso il thread_yield(), garantendo un enorme cooperazione tra di loro e se gestito bene di efficienza, perché il context switch è più leggero. Il problema di questo modello è che è rischioso, perché un thread può monopolizzare un processore se programmato male o malevolo. Il modello a prerilascio è quello che usiamo in cui per gestire i thread si usano le sistem call e un timeout, rendendo il context switch più pesante ma più sicuro",
+    "group": "Thread"
+  },
+  {
+    "title": "MTAO x processo",
+    "question": "Cosa sono i programmi che devono gestire MTAO? come la gestiscono?",
+    "answer": "I programmi che devono gestire multiple things at once sono i programmi che hanno diverse funzionalità da eseguire, e quindi la soluzione ideale sarebbe creare un processo per ogni task, sfruttando gli IPC. Questa però si rivela una situazione lenta, e quindi per la maggior parte dei casi è preferibile al posto di creare tanti processi, creare tanti thread",
+    "group": "Processi"
+  },
+  {
+    "title": "Ogni thread...",
+    "question": "Ogni thread vede:",
+    "answer": "1) il codice condiviso 2) il suo stack personale, che però non è protetto dagli altri thread che potrebbero accederci comunque, il tcb, lo stato del processo che lo contiene, le variabili condivise, lo heap che è condiviso",
+    "group": "Thread"
+  },
+  {
+    "title": "Open in unix",
+    "question": "Come funziona la open in unix?",
+    "answer": "La open in unix prende tanti parametri perché fa più operazion logiche alla volta, per prima cosa infatti, controlla che il file esista, se non esiste, controlla i parametri passati, se ci sono dei parametri per gestire l'errore in caso di file non esistente, lo crea e ritorna il fd, altrimenti, ritorna l'errore. Se invece il file esiste, si controlla se è vuoto, se è vuoto, allora ritorniamo il fd, altrimenti controlla se ci sono parametri per la gestione di questo errore, se ci sono, allora tronca il file, altrimenti restituisce errore",
+    "group": "Processi"
+  },
+  {
+    "title": "Ottenere il valore di uscita del figlio",
+    "question": "Come fa il padre a ottenere il valore di uscita del figlio?",
+    "answer": "Attraverso la wait, che restituisce lo status da convertire (a me sembra in byte) che corrisponde al valore della exit",
+    "group": "Processi"
+  },
+  {
+    "title": "Passaggi di una fork",
+    "question": "Quali sono i passaggi che fa una fork?",
+    "answer": "1 - crea un PCB   2- crea lo spazio di indirizzamento   3- viene condiviso il codice del programma anche al nuovo processo   4 - il processo eredita il contesto del padre (variabili di ambiente, shell, args, priorità...)   5 - informa lo scheduler che il nuovo processo è nato  ",
+    "group": "Processi"
+  },
+  {
+    "title": "PCB e TCB",
+    "question": "Cosa cambia tra PCB e TCB?",
+    "answer": "Il PCB contiene info più generali, tra cui info sulla memoria, e lista dei thread del processo. Il tcb contiene informazioni specifiche sul singolo thread",
+    "group": "Thread"
+  },
+  {
+    "title": "Per lo scheduling, cosa cambia da thread e processi?",
+    "question": "Per lo scheduling, cosa cambia da thread e processi?",
+    "answer": "i thread hanno il TCB e la thread table, che è una per processo in caso di threads a user-level, e una per sistema in caso di threads a kernel-level. I processi hanno il PCB, e sono uno per sistema",
+    "group": "Thread"
+  },
+  {
+    "title": "Perché usare i thread?",
+    "question": "Perché usare i thread?",
+    "answer": "I thread occupano meno risorse, perché condividono lo spazio di indirizzamento (variabili globali, heap e fd aperti), la comunicazione è più efficace dato che vedono il codice, i thread anche se hanno il codice condiviso possono fare task differenti, e possiamo sfruttare al meglio il parallelismo dei multicores nei sistemi con kernel multithread.",
+    "group": "Thread"
+  },
+  {
+    "title": "pipe",
+    "question": "Cosa è una pipe",
+    "answer": "E' un meccanismo di comunicazione tra processi, in cui viene creato un canale monodirezionale, in cui un processo farà il mittente e uno il destinatario , sfruttando in C la funzione pipe che trasforma un array di 2 interi nel canale di comunicazione, in cui uno viene dedicato alla scrittora e uno alla lettura. Alla fine la pipe (l'array) va chiusa ",
+    "group": "Processi"
+  },
+  {
+    "title": "Posizione TCB",
+    "question": "Il TCB, dove si trova?",
+    "answer": "Il TCB si trova in diversi punti a seconda dello stato in cui è il thread. init -> è in creazione, running -> running list, waiting -> waiting list, ready -> ready list, terminated -> terminated list e poi successivamente deallocato",
+    "group": "Thread"
+  },
+  {
+    "title": "Processi leggeri",
+    "question": "Perché i thread vengono anche chiamati \"processi leggeri\"?",
+    "answer": "Perché condividono molte risorse, tra cui variabili globali, e l'heap. Il codice di base è condiviso ma a diversi thread possiamo fargli fare differenti task. Con codice e variabili condivise abbiam inoltre un modo per implementare una comunicazione più rapida degli IPC senza dover usare il kernel come intermediario",
+    "group": "Thread"
+  },
+  {
+    "title": "Processo figlio + terminazione prematura del padre",
+    "question": "Cosa succede se un processo padre termina senza aver fatto la wait del figlio e il figlio termina ancor prima del padre?",
+    "answer": "Il figlio inizialmente una volta terminato diventa zombie, il padre, termina e restituisce il suo valore al processo init, che controlla che ci siano rimasti degli \"orfani\". Una volta trovato il processo zombie lo \"adotta\" e fa la wait facendolo deallocare",
+    "group": "Processi"
+  },
+  {
+    "title": "Return processo terminato",
+    "question": "Cosa ritorna un processo terminato?",
+    "answer": "Ritorna al chiamante, ovvero alla funzione padre, un valore, che può essere gestito dal programmatore attraverso la exit o mandato dal kernel a seguito di un eccezione o upcall (sarà un valore negativo). Nel caso sia proprio la funzione \"main\" a terminare, il suo chiamante si chiama init",
+    "group": "Processi"
+  },
+  {
+    "title": "Shell",
+    "question": "Cosa è una shell?",
+    "answer": "Una shell è un controllore di jobs, ai quali assegna a ciascuno una task. La shell si occupa di creare questi jobs attraverso la fork e la exec",
+    "group": "Processi"
+  },
+  {
+    "title": "Stub",
+    "question": "cosa fa la funzione stub?",
+    "answer": "La funzione stub si occupa di chiamare la funzione e quindi il task che dovrà eseguire il thread, e in seguito alla sua terminazione si occuperà anche della sua deallocazione (infatti, chiama la funzione thread_exit)",
+    "group": "Thread"
+  },
+  {
+    "title": "TCB",
+    "question": "Come è fatto un TCB?",
+    "answer": "Un TCB è formato dai thread metadata (es. lo stato del thread, la priorità ecc), dalle informazioni sullo stack (quindi dove inizia e dove finisce), e dai registri salvati per il context switch",
+    "group": "Thread"
+  },
+  {
+    "title": "Terminazione di un processo",
+    "question": "Quando termina un processo?",
+    "answer": "Un processo termina quando conclude la propria esecuzione, a seguito di un'eccezione o upcall non gestita, oppure tramite la system call exit.",
+    "group": "Processi"
+  },
+  {
+    "title": "Thread API",
+    "question": "Quali sono le funzioni dei thread API?",
+    "answer": "1) creazione thread_create 2) terminazione thread_exit 3) thread_yield per rilasciare per un po' il processore (una specie di sleep passiva), thread_join",
+    "group": "Thread"
+  },
+  {
+    "title": "thread create",
+    "question": "Come è fatta la thread_create? Quali operazioni esegue?",
+    "answer": "La thread_create(&t, fn, args) crea un thread e lo salva dentro t, e gli fa eseguire la funzione fn, con gli argomenti passati. Quello che fa è allocare un nuovo tcb, creare lo spazio per lo stack del thread e metterci sopra fn e gli args, poi chiamare la stub che chiama fn(args) e si occuperà successivamente anche della sua deallocazione. Infine la create inserisce nella ready list il TCB ",
+    "group": "Thread"
+  },
+  {
+    "title": "thread lifecycle",
+    "question": "Dimmi il ciclo di vita di un thread",
+    "answer": "Da init passa a ready, da ready a running, da running passa o a waiting, o a finished o a ready, da waiting passa a ready",
+    "group": "Thread"
+  },
+  {
+    "title": "thread_exit",
+    "question": "cosa fa la thread_exit?",
+    "answer": "La thread exit sposta il thread nella terminated list, e inizia la sua deallocazione, rimuovendo le risorse a lui connesso e le informazioni del thread stesso. Infine rimuove il TCB dalla terminated list",
+    "group": "Thread"
+  },
+  {
+    "title": "Tipi di modelli di threads e processi",
+    "question": "Che tipi di modelli abbiamo che lavorano con i thread e processi applicati ai kernel e non?",
+    "answer": "Il kernel multiprocesso, che riesce a gestire più processi all'interno di un singolo programma, e kernel multithread, che supporta i thread all'interno di un singolo programma. I programmi a lv utente possono essere multithread, creati attraverso delle lib solitamente già implementate nei sistemi. Sta a noi quando si fa un thread, sempre se il kernel sia multithread, decidere se vogliamo sfruttare il kernel come intermediario o usare una libreria che li crea per noi. L'altro modello a lv utente è il singlethread, che supporta un thread alla volta. Semplice da realizzare, ma non sfruttta il parallelismo",
+    "group": "Thread"
+  }
+]

@@ -1,0 +1,1472 @@
+[
+  {
+    "title": "Affinity scheduling",
+    "question": "Cosa è l'affinity scheduling?",
+    "answer": "E' un algoritmo di scheduling per sistemi multicores in cui viene fatto un mfq per ogni core, però ci crea un problema: delle CPU a volte potrebbero essere senza lavoro e altre averne troppo, quindi quando una cpu ha bisogno di lavorare ruba alle altre CPU il lavoro. Ma qui si creano dei dubbi a cui non è facile rispondere: quanti processi alla volta dovrebbe rubare? Da chi dovrebbe rubarli? Quando ci conviene ribilanciare il lavoro? Questo algoritmo non è semplice da ottimizzare.\n\nSi chiama affinity perché i processi man mano che passa il tempo fanno affinità con la cpu perché una volta finita l'esecuzione ritornano nella lista pronti della stessa.",
+    "group": "Scheduling"
+  },
+  {
+    "title": "ALEE",
+    "question": "Cosa sono le alee?",
+    "answer": "Le ALEE sono fenomeni in cui l'output diventa instabile per un istante a causa del ritardo di un not. Si può evitare aggiungendo più componenti, ovvero anche nella mappak per esempio di aggiungere un rettangolo extra tra i quadrati che hanno il not, quindi aggiungere un and extra",
+    "group": "Logica combinatoria"
+  },
+  {
+    "title": "Algoritmi monoprocessori",
+    "question": "Quali sono gli algoritmi che abbiamo studiato per i sistemi monoprocessori?",
+    "answer": "MFQ, RR, MMF, SJF, FIFO, scheduling basato su priorità",
+    "group": "Scheduling"
+  },
+  {
+    "title": "Algoritmo del banchiere in multiple resources",
+    "question": "Come cambia l'algoritmo del banchiere con la molteplicità delle risorse?",
+    "answer": "Abbiamo un vettore di disponibilità D, un vettore di assegnamento A per ogni processo Pj, e un vettore di esigente E per ogni processo Pj (anche visti come matrici se prendiamo tutte le assegnazioni e esigente per ogni processo)",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "Algoritmo di Lamport's",
+    "question": "Cosa è l'algoritmo di Lamport's?",
+    "answer": "E' un vecchio algoritmo che funzionava per i vecchi sistemi, che diceva che l'unico modo per essere sicuro che le operazioni venissero eseguite in ordine nel caso di un produttore e un consumatore era fare delle load e delle store",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "ALU",
+    "question": "Disegnami la ALU + flags",
+    "answer": "-",
+    "group": "Componenti digitali"
+  },
+  {
+    "title": "AMAT",
+    "question": "Che cosa è? Come si calcola?",
+    "answer": "L'AMAT sta per Average Memory Access Time e serve per dare una metrica per capire quanto ci mette la cpu a reperire un dato in una gerarchia di memoria data.\nIl calcolo per l'amat è Hit time + miss rate * miss penalty",
+    "group": "Gerarchie di memoria"
+  },
+  {
+    "title": "Architettura CISC vs RISC",
+    "question": "Cosa sono e come si differenziano?",
+    "answer": "Stanno per Complex Instruction Set Computer e Reduced Instruction Set Computer. La CISC fa delle operazioni più complesse tutte in una volta, mentre la RISC fa piccole operazioni una dietro l'altra. La CISC, aggiunge al circuito maggiore complessità perché abbiamo bisogno di circuiti ad hoc per fare più operazioni in una, e non per forza è più efficiente di RISC. Inoltre, CISC è un architettura più costosa di RISC",
+    "group": "ARM"
+  },
+  {
+    "title": "Bit di istruzione",
+    "question": "Quanti bit ci vogliono per fare un istruzione in ARM? Cos'altro corrisponde a  quel numero di bit?",
+    "answer": "32, corrisponde anche al numero di celle della memoria virtuale, al numero di bit per parola e il numero dei bit che contengono i registri",
+    "group": "ARM"
+  },
+  {
+    "title": "Bounded buffer",
+    "question": "Che cosa è il bounded buffer?",
+    "answer": "Il bounded buffer, ovvero buffer a capacità limitata, è un metodo di comunicazione in cui si sfrutta un canale (ovvero il buffer) in cui un thread produce il messaggio da mettere nel buffer (thread produttore), e un thread lo legge (chiamato thread consumatore). ",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "Buffer",
+    "question": "Che cosa è un buffer?",
+    "answer": "Un buffer è una porta logica che riproduce lo stesso valore di ingresso e ne può amplificare la corrente o propagare a più porte l'uscita",
+    "group": "Basi di microarchitetture"
+  },
+  {
+    "title": "Byte, nibble, word",
+    "question": "Cosa è un byte, un nibble, un word?",
+    "answer": "Un byte è 8 bit, un nibble è 4 bit, e un word è una parola, ovvero un gruppo di bit di dimensioni variabili (variano in base al microprocessore in uso)",
+    "group": "Basi di microarchitetture"
+  },
+  {
+    "title": "Cache line o cache block?",
+    "question": "Qual'è la differenza tra i due?",
+    "answer": "Noi li usiamo come sinonimi (per le cache)",
+    "group": "Gerarchie di memoria"
+  },
+  {
+    "title": "cache su più core",
+    "question": "Dimmi tutto ciò che sai sul problema di coerenza di cache su un sistema di più core",
+    "answer": "-",
+    "group": "Domande orale"
+  },
+  {
+    "title": "Calcolo tp di full adder",
+    "question": "Calcolami il tp di un full adder a 32 bit",
+    "answer": "-",
+    "group": "Domande orale"
+  },
+  {
+    "title": "Chi gestisce i livelli della memoria?",
+    "question": "Chi gestisce i livelli della memoria?",
+    "answer": "registri -> cache -> main memory -> secondary storage\n\nil passaggio registri -> cache viene gestito dal compilatore\nil passaggio cache -> main memory viene gestito da microarchitettura (hw)\nil passaggio main memory -> secondary storage viene gestito dall'OS",
+    "group": "Gerarchie di memoria"
+  },
+  {
+    "title": "Ciclo della CPU",
+    "question": "Mi dici il ciclo della CPU?",
+    "answer": "Il ciclo della CPU ha diverse fasi, tutte racchiude in un while(true):\n1) fetch in cui viene presa dalla memoria l'operazione grazie al PC\n2) decode, in cui viene decodificata l'istruzione in una serie di bit più comprensibili per il processore\n3) execute, in cui viene eseguita l'operazione\n4) memory, è opzionale, serve per accedere allo stack\n5) writeback, molto comune ma non obbligatoria, per memorizzare i risultati delle operazioni in dei registri",
+    "group": "ARM"
+  },
+  {
+    "title": "ciclo di clock graficamente",
+    "question": "Come si determina graficamente un ciclo di clock?",
+    "answer": "Graficamente, un ciclo di clock inizia al fronte di salita  e finisce al prossimo fronte di salita",
+    "group": "Logica sequenziale"
+  },
+  {
+    "title": "Ciclo di clock nelle reti sequenziali",
+    "question": "Come si fa a calcolare un ciclo di clock nelle reti sequenziali?",
+    "answer": "t>=Tpr(tempo di propagazione del registro) + max{tpomega, tpsigma +  tsetup}",
+    "group": "Logica sequenziale"
+  },
+  {
+    "title": "Ciclo di vita di un processo",
+    "question": "Dimmi gli stati di lifecycle di un processo",
+    "answer": "new, ready, running, waiting, terminated",
+    "group": "Processi"
+  },
+  {
+    "title": "Codifica binaria e codifica a singolo 1",
+    "question": "Cosa cambia tra queste?",
+    "answer": "Quando facciamo una macchina a stati finiti, dobbiamo occuparci di dare una codifica degli stati e delle uscite in numeri binari, e si può utilizzare o la codifica binaria, ovvero mettere a uno stato o un ingresso un numero binario scelto, oppure la codifica a singolo 1, che è funzionale quando abbiamo pochi stati o uscite da codificare. Per esempio, se abbiamo tre stati blu, giallo e rosso, avremmo bisogno di 3 bit, in cui ognuno di essi avrà solamente 1 bit a 1, per esempio, Giallo=100, rosso=010, blu=001",
+    "group": "Logica sequenziale"
+  },
+  {
+    "title": "Come funziona l'invalidazione dei bit nelle cache",
+    "question": "Come funziona l'invalidazione dei bit nelle cache",
+    "answer": "-",
+    "group": "Domande orale"
+  },
+  {
+    "title": "Come funziona sjf",
+    "question": "Come funziona sjf",
+    "answer": "-",
+    "group": "Domande orale"
+  },
+  {
+    "title": "Come funzionano le spinlocks in user lv?",
+    "question": "Come funzionano le spinlocks in user lv ?",
+    "answer": "Abbiamo il caso fast path, in cui viene fatta una test and set per fare polling, nel caso slow path invece, viene richiesta una sc bloccante al kernel chiamata Kernel locks",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "Come possono essere le reti logiche?",
+    "question": "Come possono essere le reti logiche?",
+    "answer": "Le reti logiche possono essere sequenziali o combinatorie",
+    "group": "Basi di microarchitetture"
+  },
+  {
+    "title": "come riconoscere una rete sequenziale",
+    "question": "Come si differenzia una rete sequenziale da una combinatoria graficamente?",
+    "answer": "Perché a rete sequenziale è ciclica",
+    "group": "Logica sequenziale"
+  },
+  {
+    "title": "Come riordina la cpu le operazioni?",
+    "question": "Come riordina la cpu le operazioni?",
+    "answer": "Per esempio con un write buffer, ovvero quando viene fatta una write, invece di farla subito viene bufferata per permettere che venga eseguita un'altra operazione nel mentre",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "Come varia il tp?",
+    "question": "Come varia il tp?",
+    "answer": "Il tp varia o in base al numero di porte, dopo un certo numero diventa esponenziale o in base al numero di elementi inseriti in una singola porta logica",
+    "group": "Logica combinatoria"
+  },
+  {
+    "title": "comparatore",
+    "question": "Cosa è?",
+    "answer": "Ci sono due tipi di comparatori, quello per uguaglianza, che restituisce una sola uscita se a == b, e il comparatore per valore, che fa a-b e restituisce un numero positivo se a>b, 0 se a=b e negativo se b>a. Il comparatore per valore purtroppo dà risultati incongruenti quando c'è un overflow",
+    "group": "Componenti digitali"
+  },
+  {
+    "title": "Complemento a 2",
+    "question": "Come funziona la rappresentazione a complemento a 2?",
+    "answer": "E' la rappresentazione binaria maggiormente usata che consiste nel prendere una cifra positiva, ribaltarla, sommarci 1 per ottenere il numero binario negativo corrispondente. ha un unica rappresentazione dello zero ed è possibile farci le operazioni algebriche sopra senza problemi",
+    "group": "Basi di microarchitetture"
+  },
+  {
+    "title": "Complemento a 2 in arm",
+    "question": "Come si fa?",
+    "answer": "# complemento a due di 4\nMOV r0, #4\nMVN r1, r0\nADD R1, R1, #1",
+    "group": "ARM"
+  },
+  {
+    "title": "Concetti base della lock",
+    "question": "Quali sono i concetti base di una lock?",
+    "answer": "concetto safety= al massimo un lock holder\nconcetto liveness = se non ci sono thread che hanno quella lock, la acquisisco",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "Config proibita latch sr",
+    "question": "Che succede se faccio la configurazione proibita del latch sr?",
+    "answer": "Succede che Q=0 ma anche not q=0, e quindi non ha più senso dato che not q deve essere il contrario di q!",
+    "group": "Logica sequenziale"
+  },
+  {
+    "title": "confrontatore",
+    "question": "Cosa è un confrontatore? ",
+    "answer": "Un confrontatore è una rc che confronta gli ingressi e restituisce 1 se son uguali",
+    "group": "Logica combinatoria"
+  },
+  {
+    "title": "context switch causato da un interrupt handler",
+    "question": "cosa succede in un context switch involontario?",
+    "answer": "simple version:\n1) l'interrupt handler salva i registri sul kernel stack del thread da cambiare\n2) l'interrupt handler chiama la switch thread che sceglie il nuovo thread da eseguire\n3) la switch thread prende dal kernel stack il contesto(registri) del vecchio thread e lo salva sul tcb, poi prende il contesto del nuovo thread da eseguire dal tcb e lo mette nei registri attuali\n4) il nuovo thread viene eseguito\n\nfaster version:\n1) l'interrupt handler salva il contesto del vecchio thread sul tcb\n2) l'interrupt handler chiama la switch thread che sceglie il nuovo thread da eseguire\n3) la switch thread ripristina il contesto di esecuzione del nuovo thread da eseguire dal tcb (ripristino dei registri)\n4) il nuovo thread viene eseguito",
+    "group": "Thread"
+  },
+  {
+    "title": "Context switch tra thread",
+    "question": "Come può essere il context switch? Con quali funzioni può essere in un modo e con quali nell'altro? ",
+    "answer": "Un context switch può essere volontario o involontario, il context switch volontario si può fare con t_yield e t_join() se il thread che dobbiamo aspettare non ha ancora finito. Il context switch involontario invece, accade al seguito di un interrupt o di un exception, oppure più specificatamente con un timerout, o sono entrati thread con maggiore priorità nella coda (questo anche in base alle politiche di scheduling)",
+    "group": "Thread"
+  },
+  {
+    "title": "Copy and write e kernel",
+    "question": "Cosa è la copy and write? 2) Come fa il kernel a ricordarsi dei bit che aveva settato per la copy and write?",
+    "answer": "Sono memorizzati nel TCB e PCB",
+    "group": "Domande orale"
+  },
+  {
+    "title": "Cosa è un full adder?",
+    "question": "Cosa è un full adder?",
+    "answer": "Un full adder è un componente che effettua un addizione su n bit (full adder a n bit) e in cui ha in ingresso il riporto del full adder precedente collegato a lui, e Rout il riporto per l'eventuale full adder successivo a lui. Inoltre ha la z che serve per l'output del risultato dell'addizione. E' fatto in modo tale da poterlo connettere a componenti uguali a lui, per il primo della serie si può usare un half adder, un componente che non ha Rin",
+    "group": "Logica combinatoria"
+  },
+  {
+    "title": "cosa significa astrarre un thread?",
+    "question": "cosa significa astrarre un thread?",
+    "answer": "E' un concetto fondamentale alla base dei thread, in cui fingiamo che ci sia un numero illimitato di processori (uno per ogni thread). Questo comporta che ogni thread crede di avere sempre il processore, e il context switch è trasparente al thread, portandolo a pensare che la sua sia un esecuzione lineare senza interruzioni. Questo però ci ricorda anche il perché non possiamo fare supposizioni sul quale pezzo di codice tra più thread concorrenti verrà eseguito prima, dato che la cpu riordina le op a proprio piacimento",
+    "group": "Thread"
+  },
+  {
+    "title": "Cosa sono le risorse?",
+    "question": "Cosa sono le risorse? Come si differenziano?",
+    "answer": "Qualsiasi oggetto passivo di cui il thread/proc potrebbe aver bisogno per terminare il job assegnato (es monitor, cpu, spazio in mem, lock. Si differenziano in prerilasciabili, ovvero il S.O. può riprendersele, e non prerilasciabili, che deve per forza rilasciarla il thread/proc.",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "Costruire una memoria",
+    "question": "Come abbiamo visto che si costruisce una memoria? Questa soluzione va bene da usare?",
+    "answer": "Una memoria si costruisce con un demux che prende come ingresso  Il WE e i k bit di indirizzamento come bit di controllo. La memoria è un insieme di cella una sotto l'altra che vengono attivate dal WE e abbiamo un bus di WD connesso a ogni cella.  Per leggere il dato, avremo sulla destra un mux che prende come bit di cntrollo sempre i k bit, come ingressi le linee di parola e restituisce m bit di parola del dato letto. La memoria così disegnata però non è fattibile perché il ritardo cresce in maniera logaritmica ma richiede troppi transistor",
+    "group": "Componenti digitali"
+  },
+  {
+    "title": "CPI",
+    "question": "Cosa sono i CPI e come si calcolano?",
+    "answer": "I CPI sono i clockcycles per instruction = (clockcycles/IC)\n\noppure CPIperfect + CPIstall",
+    "group": "Gerarchie di memoria"
+  },
+  {
+    "title": "CPIstall, CPImem, CPIperfect",
+    "question": "Cosa sono? Come si calcolano?",
+    "answer": "CPImem =quanti cicli di clock servono in media per eseguire un operazione di memoria. \nCPIperfect = quanti cicli di clock ci mette la CPU per ottenere il dato senza mai fallire.\nCPIstall = quanti cicli di clock ci mette la CPU per ottenere il dato a seguito di un solo caso di miss\n\nCPImem = CPImem-hit + MR*CPImem-miss\nCPIperfect = ((ICcpu)/(IC)*CPIcpu+((ICmem)/IC)*CPImem-hit\nCPIstall = ((ICmem)/(IC)*Mr*Miss penalty",
+    "group": "Gerarchie di memoria"
+  },
+  {
+    "title": "CPSR",
+    "question": "Che cosa è?",
+    "answer": "E' il Computer Program Status Register, un registro a 32 bit che contiene i bit nzvc",
+    "group": "ARM"
+  },
+  {
+    "title": "CPU bound job, I/O bound job e workload misti",
+    "question": "Cosa sono?",
+    "answer": "CPU burst = tempo totale in cui il processo usa la CPU in maniera attiva\n I/O burst = tempo totale in cui il processo aspetta per operazioni  I/O\nCPU bound job = hanno un cpu burst notevole e un I/O burst molto ridotto, ovvero il processo utilizza molto di più la cpu rispetto che le operazioni di I/O\nI/O bound job = hanno un I/O burst notevole e un CPU burst molto ridotto, ovvero il processo utilizza molto di più le operazioni I/O rispetto che le operazioni della CPU.\nworkload misti= sono dei processi che hanno bisogno più o meno in egual misura di operazioni di  I/O e di CPU",
+    "group": "Scheduling"
+  },
+  {
+    "title": "CPUtime",
+    "question": "Che cosa è? Come si calcola?",
+    "answer": "La CPU time è il tempo totale che la CPU ci mette per eseguire un blocco di operazioni. Si può calcolare come CPUtime= IC * CPI * clockcycletime \nCPUtime = (CPIperfect + CPIstall) * clockcycletime\nCPUtime = clockcycles * clockcycletime",
+    "group": "Gerarchie di memoria"
+  },
+  {
+    "title": "Creazione di uno zombie",
+    "question": "Quando è che si crea un processo zombie?",
+    "answer": "Quando il processo figlio termina prima che il padre abbia fatto la wait",
+    "group": "Processi"
+  },
+  {
+    "title": "Criteri di scheduling in sistemi multiprocessore",
+    "question": "Di cosa dobbiamo tenere conto quando facciamo uno scheduling multiprocessore?",
+    "answer": "Uno scheduling per sistemi multiprocessore deve essere capace di lavorare con job sequenziali e con job paralleli, ovvero job che rendono meglio se messi in parallelo su core diversi e eseguiti in simultanea",
+    "group": "Scheduling"
+  },
+  {
+    "title": "Deadlock",
+    "question": "Che cosa è il deadlock?",
+    "answer": "Il deadlock è una situazione irreversibile di quando c'è un attesa circolare tra threads o processi, in cui ognuno di loro richiede una risorse che a sua volta è trattenuta da un'altro thread per terminare, anch'esso in attesa ",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "Decoder, mux, demux",
+    "question": "Cosa è un decoder? cosa è un mux? cosa è un demux?",
+    "answer": "Un decoder è una rete combinatoria che fa uscire 1 all'uscita scelta dagli ingressi, un mux prende degli ingressi e secondo il bit di controllo che è segnato in quel momento selezione l'ingresso da mandare in uscita, mentre un demux al contrario ha un ingresso e con il bit di controllo decide dove riprodurre l'uscita",
+    "group": "Logica combinatoria"
+  },
+  {
+    "title": "Definizioni criteri di scheduling",
+    "question": "Cosa significa overhead, equità, predicibilità, workload e scheduling di tipo work conserving?",
+    "answer": "ovrehead = il lavoro extra che deve fare lo scheduling per garantirne il funzionamento\nequità = lo scheduling deve garantire assenza di starvation\npredicibilità = quanto sono affidabili le metriche usate dallo scheduling? si discostano tanto da un esecuzione e l'altra?\nworkload = l'insieme di tasks che devono essere eseguire\nwork conserving = lo scheduler cerca di fare usare il più possibile la CPU al processo",
+    "group": "Scheduling"
+  },
+  {
+    "title": "Definizioni di stato per algoritmo del banchiere",
+    "question": "Quali sono le definizioni di stato per l'algoritmo del banchiere?",
+    "answer": "Safe state = c'è almeno una sequenza di richieste che portano alla terminazione dei processi senza provocare deadlock\nunsafe state = c'è almeno una sequenza di richieste che portano a deadlock\ndoomed state = il deadlock è inevitabile",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "Design pattern unix I/O",
+    "question": "Mi sapresti dire i concetti che stanno alla base di come viene strutturato l'I/O in unix?",
+    "answer": "1) uniformità. E' il concetto che permette l'astrazione del file system, ovvero tutte le operazioni che vengono fatte ad alto livello vengono viste come operazioni su file, attraverso le funzioni base (system call) come open, close, read, write. \n2) Tutti i dispositivi I/O vengono orientati al byte \n3) Prima di poter usare un file, va aperto, in maniera tale da ottenere il file descriptor sul quale potremo lavorarci. \n4) Le read e le write vengono bufferate \n5) bisogna sempre chiudere un file dopo l'uso, per poter permettere al garbage collector di raccogliere i file descriptor usati in precedenza dal processo",
+    "group": "Processi"
+  },
+  {
+    "title": "Designing a caching system",
+    "question": "Quali sono gli obbiettivi quando si realizza un sistema di cache? Quali sono le domande da porsi?",
+    "answer": "L'obbiettivo principale è minimizzare l'AMAT, e per farlo bisogna minimizzare tutti i fattori coinvolti nella formula, quindi Hit time, miss rate e miss penalty. Il fattore con impatto maggiore è il miss rate. Il miss penalty si abbassa aggiungendo più livelli di cache\n\nLe domande da porsi sono:\nquanto devo fare grande un blocco di cache?\nChe funzione uso per capire se un dato è presente nella cache?\nSe un dato non è presente, come lo ottengo?\nCome affronto i conflitti di blocco? Con quale metodo di rimpiazzo?\nCome mantengo la coerenza di valori nei differenti livelli di memoria?",
+    "group": "Gerarchie di memoria"
+  },
+  {
+    "title": "Detect and fix",
+    "question": "Come funziona il metodo detect and fix?",
+    "answer": "E' un metodo di risoluzione dei deadlock grafico, che consiste nell'analizzare il grafico delle risorse allocate ai vari processi o thread e trovarne i cicli, e a quel punto rimuoverli. Dal punto di vista pratico, rimuovere un ciclo significa o uccidere un thread o fare un rollback delle azioni. Se uccidiamo un thread abbiamo bisogno di un exception handler molto robusto e di un criterio per uccidere i thread, mentre un rollback delle azioni viene usato soprattutto nei database ed è una soluzione costosa in quanto dobbiamo salvarci più di uno stato alla volta",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "differenza di astrazione",
+    "question": "che vantaggi comporta l'astrazione ai thread user-level e quali invece ai thread kernel-level?",
+    "answer": "Il context switch nell'user level è molto veloce, ma come svantaggio ha che non sfrutta il parallelismo dei cores e lo scheduling non è pienamente efficiente dato che è interno della libreria e gestisce equamente solo i threads all'interno di essa, non conoscendo gli altri. Inoltre offrono un modo per averli in sistemi che non li hanno nativamente (su kernel multiprocesso). I threads a kernel lv invece, al contrario hanno un overhead molto più lento dato che ci sono le sc per gestirli, ma sfruttano i multicores",
+    "group": "Thread"
+  },
+  {
+    "title": "Differenza di tp tra and a 8 ingressi e gerarchia di and a 2 ingressi per fare un and a 8 ingressi",
+    "question": "Differenza di tp tra and a 8 ingressi e gerarchia di and a 2 ingressi per fare un and a 8 ingressi",
+    "answer": "per la gerarchia possiamo calcolare il tp come log in base 2 di 8 = 3, infatti l'albero saranno 3 livelli e quindi 3tp, mentre l'and di base a 8 ingressi non è calcolabile direttamente, perché varia in base alla tecnologia usata, ma sappiamo che usare gli alberi è più rapido di usare una porta molto grande, perché richiede un ordine di grandezza lineare o più",
+    "group": "Logica combinatoria"
+  },
+  {
+    "title": "Dimmi vero o falso su rc",
+    "question": "E' vero che in una rc ci sono sempre due livelli di logica dal punto di vista teorico? 2) Quanti lv di logica ha la struttura somma e prodotto? 3) qual'è il problema di avere un and a 50 ingressi?",
+    "answer": "-",
+    "group": "Domande orale"
+  },
+  {
+    "title": "Disciplina dinamica e statica",
+    "question": "Cosa sono?",
+    "answer": "La disciplina statica si basa sull'evitare che gli ingressi delle rs possano trovarsi nella combinazione di stati proibiti\n\nla disciplina dinamica si basa sull'evitare che gli ingressi cambino durante il fronte di salita del clock (thold) e che si stabilizzino prima del fronte di salita (tsetup)",
+    "group": "Logica sequenziale"
+  },
+  {
+    "title": "dove vengono usati maggiormente gli rmw?",
+    "question": "dove vengono usati maggiormente gli rmw?",
+    "answer": "Nelle lock in sistemi multiprocessore",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "DRAM",
+    "question": "Cosa sono? Vantaggi e svantaggi",
+    "answer": "Le DRAM sono memorie volatili in cui abbiamo un meccanismo interno a ogni  cella fatto da un transistor nmos, un condensatore e una messa a terra, messi per memorizzare il dato. Il vantaggio di questa rappresentazione è che per ogni cella siamo in grado di memorizzare 1 bit con un solo transistor, al contrario dei flip flop che ne servono circa 20, mentre lo svantaggio principale è a livello di prestazioni, perché i condensatori sono dispositivi fisici che dopo un po' perdono la carica, quindi abbiamo bisogno di un meccanismo di refresh, in cui ogni tot per tenere i dati bisogna riscriverli da capo",
+    "group": "Componenti digitali"
+  },
+  {
+    "title": "Elenco soluzioni deadlock",
+    "question": "Elencami i metodi di risoluzione del deadlock",
+    "answer": "1) detect and fix\n2) prevenzione statica\n3) prevenzione dinamica",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "Encoder",
+    "question": "Cosa è un encoder?",
+    "answer": "E' una rete combinatoria che, presa una serie di bit in ingresso dove solo uno tra loro sarà 1, uscirà qual'è l'ingresso a 1",
+    "group": "Logica combinatoria"
+  },
+  {
+    "title": "Es AMAT",
+    "question": "Se abbiamo un tempo di accesso alla memoria principale di 50 ns, e tL1 è 1 ns, con miss rates del 5% in l1, quanto tempo ci mette senza cache? quanto tempo ci mette con la cache? qual'è il fattore  di miglioramento?",
+    "answer": "AMAT = tL1 + MRL1 * MP(o Tm) = 1 + 0,005*50 = 3,5 ns. Fattore di miglioramento AMAT no cache / AMAT con cache = 50/3,5 = 14,3 quindi un x14",
+    "group": "Gerarchie di memoria"
+  },
+  {
+    "title": "ES indirizzamento 2",
+    "question": "Abbiamo un indirizzo da 32 bit, b=8, e B=128, come è formato l'indirizzo in una direct mapped cache?",
+    "answer": "block offset = log(2)8=3\nbyte offset = 2\nnum di set = log(2)128 = 7 bits\nbit di tag = 32-7-3-2=20",
+    "group": "Gerarchie di memoria"
+  },
+  {
+    "title": "ES indirizzamento 3",
+    "question": "S=B=128, b=8, ind=0xFEAC. Qual'è l'indirizzo della linea di cache e l'offset di blocco? Una volta trovato l'indirizzo, mi controlli che l'indirizzo 0xFEB4 sia nella stessa linea di cache? trovami un altro indirizzo dentro quella linea",
+    "answer": "block offset = log(2)8=3\nbyte offset = 2\nbit di set = log(2) 128 = 7\ntag = 32-12-=20\n\nriscrivo l'indirizzo in binario\n1...1 1110101 011 00 (tag, set, block offset, byte offset)\n\nriga = 1110101 = 117(10) quindi la 118esima riga\ncolonna = 011 = quarta colonna",
+    "group": "Gerarchie di memoria"
+  },
+  {
+    "title": "Es memoria direct mapped",
+    "question": "Se io ho parole da 32 bit e una memoria da 256x64, cosa significa? Come è fatto l'indirizzo?",
+    "answer": "64 indica quanto è grande una linea, quindi b=dim linea/dim parola, 256 dice il numero di linee di cache presenti\nblock offset = log(2)b = 4\nbit di set = log(2)256 = 8 bit\nbyte offset = log(2)4 byte = 2\nbit di tag = 32-8-4-2=18",
+    "group": "Gerarchie di memoria"
+  },
+  {
+    "title": "Es multiplexer",
+    "question": "Mi fai la tabella di verità e la mappak di un multiplexer a 2 ingressi e successivamente di un multiplexer a 2 ingressi con n>1 bit e successivamente di un multiplexer a 4 ingressi?",
+    "answer": "-",
+    "group": "Domande orale"
+  },
+  {
+    "title": "Es register file",
+    "question": "Mi fai il disegno di un register file che deve fare R2 + R1 = R0?",
+    "answer": "-",
+    "group": "ARM"
+  },
+  {
+    "title": "Es register file 2",
+    "question": "Mi disegni il register file se dobbiamo fare LOAD R0, R1, R2, che significano M[R1 +  R2]=R0?",
+    "answer": "-",
+    "group": "ARM"
+  },
+  {
+    "title": "Es register file 3",
+    "question": "Mi disegni un register file con un operazione di STORE (r0, r1, #4)? (=r0 viene scritto in M[r1 + 4])",
+    "answer": "-",
+    "group": "ARM"
+  },
+  {
+    "title": "Es sui demux",
+    "question": "Mi dici l'espressione logica di un demux?",
+    "answer": "Lezione 5",
+    "group": "Domande orale"
+  },
+  {
+    "title": "es sui multiplexer 2",
+    "question": "Se io ho un multiplexer con Xn ingressi, quanti bit mi servono per il bit di controllo? Inoltre, mi scrivi l'espressione logica di z? Mi puoi disegnare il multiplexer? Quale sarà il ritardo?",
+    "answer": "log in base 2 di n",
+    "group": "Domande orale"
+  },
+  {
+    "title": "esercizi lock",
+    "question": "Fammi il problema dei produttori e consumatori: 1) con una sola condition variables 2) con le lock 3) con i semafori",
+    "answer": "-",
+    "group": "Domande orale"
+  },
+  {
+    "title": "fattoriale ricorsivo in assembly",
+    "question": "Spiegami il fattoriale ricorsivo in assembly",
+    "answer": "-",
+    "group": "Domande orale"
+  },
+  {
+    "title": "FFD con WE",
+    "question": "Cosa è il flip flop d con il write enable?",
+    "answer": "E' una variante del flip flop d in cui, invece di ricevere in ingresso il clock e basta, riceve un and con il clock e un ingresso nuovo chiamato enable, in cui si protegge il flip flop d dalla scrittura finché non vogliamo noi e quindi finché enable=1, a quel punto, verrà scritto l'ingresso al prossimo fronte di salita del clock",
+    "group": "Logica sequenziale"
+  },
+  {
+    "title": "FIFO o FCFS",
+    "question": "Come funziona il FIFO? Quali sono i suoi vantaggi? Quali sono i suoi svantaggi?",
+    "answer": "Il FIFO è un algoritmo di scheduling non preemptive implementabile tramite una coda, in cui viene mandato in esecuzione il primo che arriva nella coda pronti. E' un algoritmo molto semplice, quindi poco costoso, e può essere vantaggioso quando abbiamo molti jobs di dimensioni molto simili. I suoi svantaggi sono invece che non ottimizza per niente il tempo di turnaround e di attesa, finendo molto spesso ad essere particolarmente inefficiente",
+    "group": "Scheduling"
+  },
+  {
+    "title": "Flip Flop D",
+    "question": "Come funziona il Flip Flop D?",
+    "answer": "E' un evoluzione del latch D che serve per prevenire di scrivere sempre quando il clock è alto, ma di scrivere solo al fronte di salita del clock. Questo si può fare attraverso due latch d connessi tra di loro, uno chiamato master, che ha come ingresso il clock negato, e il nostro ingresso D, e uno chiamato slave, che ha come ingresso il Q del master, e il clock. Si dice che quando lo slave può leggere l'input (ovvero quando il clock è alto) lo slave è trasparente perché può ricevere i nuovi input e calcolarli, mentre il master è opaco, quando il clock è basso, viceversa il master è trasparente e lo slave opaco",
+    "group": "Logica sequenziale"
+  },
+  {
+    "title": "Flip Flop resettabile",
+    "question": "Che cosa è?",
+    "answer": "E' un FFD in cui viene aggiunto un ulteriore ingresso chiamato reset, e quando è a 1 resettiamo l'uscita Q a 0, quando è a 0 lasciamo che il flip flop si comporti normalmente al variare di D. Questa variante di FFD può essere fatta sincrona, in cui Q viene resettato solo al fronte di salita del clock, o asincrona, in cui viene ignorata la componente del clock quando RESET=1",
+    "group": "Logica sequenziale"
+  },
+  {
+    "title": "Full adder propagazione di riporto a onda",
+    "question": "Cosa è?",
+    "answer": "E' il modo per scrivere un full adder a n bit tramite n full adder a 1 bit tutti in serie, si dice propagazione di riporto ad onda perché il full adder ha bisogno che il suo predecessore gli dia il riporto della somma precedente per poter fare il calcolo. Quindi quando n diventa troppo grande, il ritardo inizia a diventare importante",
+    "group": "Componenti digitali"
+  },
+  {
+    "title": "Funzionamento algoritmo del banchiere",
+    "question": "Come funziona l'algoritmo del banchiere?",
+    "answer": "- i processi dichiarano all'inizio il massimo delle risorse che dovranno usare per terminare la propria esecuzione\n- il banchiere accetta una richiesta solo se rimarrebbe in safe state. Per verificarlo fa una simulazione. Se una richiesta viene rifiutata, il banchiere mette  in wait il processo finché non può soddisfarla\n- il banchiere gestisce le richieste dinamicamente, ovvero man mano che arrivano decide se rifiutarle o accettarle",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "Funzionamento di mappek",
+    "question": "Come funzionano le mappek?",
+    "answer": "Supponiamo di studiare un uscita z. Bisogna fare una mappa per ogni output. In questo caso, disegniamo una matrice fatta con codice gray in cui scriviamo gli ingressi e i valori dell'uscita che risulta al variare di essi. Una volta finito, cerchiamo di fare i quadrati o rettangoli più grandi formati dagli \"1\" che possiamo, tenendo a mente che i rettangoli possono andare fuori dai bordi e rientrare dall'altra parte e che devono essere grandi come una potenza di 2. Per la semplificazione scriviamo questi uni come le costanti di ingresso che non cambiano in ogni rettangolone",
+    "group": "Logica combinatoria"
+  },
+  {
+    "title": "Funzionamento scheduling activation",
+    "question": "Come funziona lo scheduler activation?",
+    "answer": "Gli scheduler activation funzionano attraverso la cooperazione tra kernel e lo scheduling user-lv. Il kernel delega delle decisioni da eseguire allo scheduler, tramite delle upcall speciali, con un timeout di risposta molto più ampio del solito. Tra queste decisioni importanti potrebbero esserci per es la scelta di fare eseguire un thread schedulato in user lv, e allora lo scheduler deciderà quale fare partire (se ci sono thread da eseguire) e poi invierà risposta al kernel con quella che si chiama fare un activation. \n\nCome possiamo notare quindi in questa soluzione il kernel non è più ignaro dei thread in user-lv",
+    "group": "Thread"
+  },
+  {
+    "title": "Funzioni delle variabili di condizioni",
+    "question": "che funzioni hanno le variabili di condizioni?",
+    "answer": "cond.wait() aspetta finché un evento non accade sospendendo il thread. Usarlo sempre in un while per evitare gli spurius wakeup\n\ncond.signal() se ci sono thread in attesa dell'evento \"cond\", ne sveglia uno e lo fa mettere in coda pronti\n\ncond.broadcast() se ci sono thread in attesa dell'evento \"cond\", li sveglia tutti e li fa mettere in coda pronti. Soluzione da usare in casi specifici perché svegliarli tutti non significa eseguirli tutti, quindi potrebbe generare overhead inutilmente, dato che la sezione critica è in mutua esclusione",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "Funzioni legate ai processi",
+    "question": "Quali funzioni dei processi ci sono? quali sono con maggior probabilità usati dai padri e quali dai figli?",
+    "answer": "Il padre e il figlio usano la exit, il padre usa inoltre la wait, la waitpid, e la fork, mentre il figlio usa la exit, la getpid, la getppid, e la exec",
+    "group": "Processi"
+  },
+  {
+    "title": "Gang Scheduling",
+    "question": "Cosa è il gang scheduling?",
+    "answer": "E' un algoritmo di scheduling multicore che gestisce i processi paralleli eseguendo sempre i processi dello stesso programma insieme. Purtroppo non è un algoritmo molto efficiente perché il numero dei processi generati da un programma potrebbero essere di più dei cores sulla macchina",
+    "group": "Scheduling"
+  },
+  {
+    "title": "Gerarchia di memoria inclusiva e esclusiva",
+    "question": "Cosa sono?",
+    "answer": "Gerarchia inclusiva= quando viene richiesto un dato da un livello superiore, viene fatta una copia\ngerarchia esclusiva = quando viene richiesto un dato da un livello superiore, viene spostato",
+    "group": "Gerarchie di memoria"
+  },
+  {
+    "title": "Global env e virtual env",
+    "question": "Cosa cambia tra il global env e il virtual env?",
+    "answer": "Il global environment è il modello usato per la gestione dei thread, in cui c'è uno spazio di memoria condivisa in cui viene fatta la comunicazione. Il local environment invece, è il modello usato per la gestione dei processi, in cui ogni processo è isolato dagli altri e la comunicazione viene fatta esplicitandolo correttamente tra tutte le parti che dovranno comunicare",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "Hitrate e Missrate",
+    "question": "Cosa sono? Come si calcolano?",
+    "answer": "hitrate = frequenza di ricerche terminate con successo. Si può calcolare facendo (num di hit)/(num di accessi \n totali della memoria) oppure 1 - MR\nmissrate = frequenza di ricerche terminate con fallimento. Si può calcolare facendo (num di miss)/(num di accessi totali della memoria) oppure 1 - HR",
+    "group": "Gerarchie di memoria"
+  },
+  {
+    "title": "I/O asincrono + threads",
+    "question": "Cosa succede se implementiamo il cosiddetto \"I/O asincrono + threads\"?",
+    "answer": "E' un organizzazione in cui decidiamo di mettere un thread per ogni dispositivo di I/O lento. E' un'idea fallimentare in quanto l'attesa di questi thread non è passiva e facendo polling generano overhead inutile, inoltre, anche in termini di risorse, per quanto i thread condividono più risorse rispetto ai processi, è molto dispendiosa",
+    "group": "Thread"
+  },
+  {
+    "title": "IC",
+    "question": "Come si calcola l'IC?",
+    "answer": "L'instruction count è il numero di istruzioni totali eseguite dalla CPU e si calcola facendo ICmemoria + ICcpu",
+    "group": "Gerarchie di memoria"
+  },
+  {
+    "title": "implementazione di thread",
+    "question": "Cosa ci serve per implementare i threads? ",
+    "answer": "Un TCB, uno scheduler che lavori con i threads, e delle funzioni per gestirli (creazione, terminazione, yield, ecc...)",
+    "group": "Thread"
+  },
+  {
+    "title": "Indirizzamento di memoria Direct Mapped",
+    "question": "Come funziona un indirizzamento di memoria di una memoria direct mapped con 8 set?",
+    "answer": "Se per esempio una memoria la memorizziamo in 32 bit, siccome log(2)8=3 e abbiamo 2 bit meno significativi per il byte offset perché log(2)4 byte = 2, i 3 bit nel mezzo che sono i bit per indirizzare al set corretto l'indirizzo e poi abbiamo il resto dei bit che sono la parte rappresentativa del dato e viene chiamata tag.",
+    "group": "Gerarchie di memoria"
+  },
+  {
+    "title": "IPC",
+    "question": "Cosa sono gli IPC? Chi se ne occupa?",
+    "answer": "Gli inter process communication, ovvero tutti i meccanismi di comunicazione tra processi, tra i quali le pipes e le sockets. Si occupa di gestisce gli IPC il kernel, diventando quindi l'intermediario della comunicazione",
+    "group": "Processi"
+  },
+  {
+    "title": "Istruzioni condizionate",
+    "question": "Cosa sono?",
+    "answer": "Le istruzioni condizionate sono qualsiasi istruzione assembly compatibile a cui è stata aggiunto il suffisso di condizione, per esempio, \"ADD\" possiamo farlo diventare \"ADDEQ\". Si utilizzano dopo una compare per fare piccoli if else immediati, da non usare per interi rami if else grossi perché la complessità del codice diventa troppo alta",
+    "group": "ARM"
+  },
+  {
+    "title": "Istruzioni di accesso alla memoria",
+    "question": "Quali modi ci sono per accedere alla memoria in assembly?",
+    "answer": "Indirizzamento di base.\nLDR R0, [R1]\n\nindirizzamento di base + indice (offset)\nLDR R0, [R1, R2] -> R0 = R1+R2\n\npost-index.\nLDR R0, [R1], R2 -> fa la load R0 = [R1] e successivamente fa R1+=R2 (i++ del for)\n\npre-index.\nLDR R0, [R1, R2]! -> ADD R1 += R2, LDR R0, [R1] (++i del for). Si differenzia dall'indirizzamento base perché l'indirizzamento base non incrementa i valori in automatico, ma fa solo la load",
+    "group": "ARM"
+  },
+  {
+    "title": "Istruzioni di memoria multiple",
+    "question": "Quali sono?",
+    "answer": "Sono la LDMXX <src> {lista di registri} e la STMXX <src> {lista di registri}.\n\nLa LDM serve a caricare dall'indirizzo contenuto in [src] una serie di parole a 32 bit e le inserisce nei registri.\n\nLa STM serve a memorizzare in memoria a partire dall'indirizzo [dst] una serie di parole a 32 bit contenute nella lista dei registri scritti\n\nla \"XX\" stanno per Empty, o Full, e Ascending o Descending. Empty, sono tutte le combinazioni di stack possibili, Empty significa che l'SP punta al primo indirizzo vuoto dello stack, Full significa che punta all'ultimo indirizzo pieno. Ascending, significa che lo stack cresce dal basso verso l'alto, e descendant significa che cresce dall'alto verso il basso. Di default lo stack è in modalità FD",
+    "group": "ARM"
+  },
+  {
+    "title": "Istruzioni di set bit NZVC",
+    "question": "Cosa sono?",
+    "answer": "Sono qualsiasi istruzione con l'aggiunta del suffisso \"S\". Quello che fanno è, quando possibile, settare i bit del registro CPSR, ovvero i bit NZVC. Per esempio, \"MOVS\" setta i bit NZ, VC non hanno senso settarli perché non fa nessuna operazione che può causare riporti o overflow. Invece, \"ADDS\" setta tutti i bit",
+    "group": "ARM"
+  },
+  {
+    "title": "Istruzioni di shift",
+    "question": "Quali sono?",
+    "answer": "LSL, LSR,ROR, ASR <dst> <src1> <src2>",
+    "group": "ARM"
+  },
+  {
+    "title": "Istruzioni operative",
+    "question": "Quali sono le istruzioni operative?",
+    "answer": "Tutte le operazioni logico aritmetiche, quindi shift, somma, sottrazione, rotazione, moltiplicazione, divisione, or, and, xor, and bit a bit ecc",
+    "group": "ARM"
+  },
+  {
+    "title": "Jump in byte armv7",
+    "question": "Come è fatta l'istruzione di salto in linguaggio macchina? (aiuti:)2) i primi 4 bit sono con segno o senza segno? 3) se fossero senza segno che problema avrebbe? 4) si può creare una struttura in cui l'offset è senza segno? 5) come si compila un for in assembler? controlla la condizione e se è falsa esco",
+    "answer": "-",
+    "group": "Domande orale"
+  },
+  {
+    "title": "Latch D",
+    "question": "Come funziona il latch d?",
+    "answer": "Il latch d è un'evoluzione del latch sr in cui viene passato un solo ingresso D e abbiamo due and, di cui due negati, connessi al clock, in modo tale da scrivere i nostri S(ovvero d) e R (ovvero not D) del latch  sr quando il clock è alto. Questo circuito serve per evitare a configurazione proibita, ovvero S=1 e R=1",
+    "group": "Logica sequenziale"
+  },
+  {
+    "title": "Latch e Flip Flop combinati a automi",
+    "question": "Come mai i latch e Flip Flop non possono essere automi di mealy o di moore?",
+    "answer": "Perché hanno due soli stati e la logica in cui vengono implementati è troppo semplice per essere considerati automi",
+    "group": "Logica sequenziale"
+  },
+  {
+    "title": "latch sr",
+    "question": "Cosa è un latch sr? Spiegami la tabella di verità",
+    "answer": "un latch sr è una rs in cui abbiamo due ingressi, R (reset) e S(set), e due uscite, q e not q, se R=0&&S=1, vogliamo settare q=1 e quindi not q = 0. Se R=1&&S=0, vogliamo settare q=0 e quindi not q =1. Se R=0&&S=0 allora Q=valore che aveva precedentemente (memoria della rete sequenziale) e not q = valore che aveva precedentemente. La combinazione R=1&S=1 è proibita",
+    "group": "Logica sequenziale"
+  },
+  {
+    "title": "Lettura e scrittura DRAM",
+    "question": "Come funzionano?",
+    "answer": "Abbiamo un demux collegato alle linee di parola. Quando dobbiamo leggere un bit, il demux attiva la linea di parola corretta (gli dà corrente) e il transistor nmos chiude la linea di parola, e apre la linea di bit per ciascuna cella della riga, e il condensatore rilascia il dato.\n\nPer la scrittura invece funziona in maniera simile, avremmo un dispositivo che invia i bit della parola, e il demux, farà attivare nuovamente la linea di parola e l'nmos la linea di bit, così che la scrittura possa fare effetto",
+    "group": "Componenti digitali"
+  },
+  {
+    "title": "Lettura e scrittura memoria interallacciata",
+    "question": "Come funziona?",
+    "answer": "la lettura e scrittura su memoria interallacciata funziona nello stesso identico modo della memoria modulare, solo che invece di fare un mux e come bit di controllo metterci i bit più significativi ci mettiamo i bit meno significativi",
+    "group": "Componenti digitali"
+  },
+  {
+    "title": "Lettura memoria modulare sequenziale",
+    "question": "Come funziona la lettura nella memoria modulare sequenziale? Es di 2 moduli da 1gb ",
+    "answer": "La lettura si effettua considerando il bit più significativo dell'indirizzo, se è 0, si legge ma M0, altrimenti da M1. Per fare ciò possiamo usare un multiplexer, così da scegliere il dato letto corretto. (lez 9)",
+    "group": "Componenti digitali"
+  },
+  {
+    "title": "Linee di bit",
+    "question": "Cosa sono?",
+    "answer": "Sono fili elettrici messi verticali che rappresentano le colonne della memoria. Una riga completa è un dato, e la grandezza della riga, quindi il numero di colonne, rappresenta quanto è grande un dato",
+    "group": "Componenti digitali"
+  },
+  {
+    "title": "Linee di cache",
+    "question": "Come si calcolano?",
+    "answer": "Si calcolano dividendo la capacità totale/il numero di parole in una linea di cache",
+    "group": "Gerarchie di memoria"
+  },
+  {
+    "title": "Linee di parola",
+    "question": "Cosa sono?",
+    "answer": "Sono fili elettrici messi orizzontali che rappresentano le righe della memoria, sono tante quanto il numero di celle",
+    "group": "Componenti digitali"
+  },
+  {
+    "title": "Linguaggio ARM",
+    "question": "Cosa è?",
+    "answer": "è una codifica delle istruzioni, più ad alto livello del linguaggio macchina",
+    "group": "ARM"
+  },
+  {
+    "title": "Linguaggio macchina",
+    "question": "Cosa è?",
+    "answer": "Il linguaggio macchina è un set di bit precisi che formano un istruzione che il processore è in grado di capire. Non per forza un istruzione ARM corrisponde a una sola istruzione del linguaggio macchina",
+    "group": "ARM"
+  },
+  {
+    "title": "Little Endian e Big Endian",
+    "question": "Cosa sono? ARM che cosa usa?",
+    "answer": "Nella modalità little endian si accede alla memoria dal basso verso l'alto, quindi i dati più vecchi saranno sul basso, mentre nella modalità big endian si accede alla memoria al contrario. Se cerchiamo di vedere la memoria risultante come un array, se noi vogliamo inserire {\"A\",\"B\",\"C\",\"D\"} nella modalità little endian sarà un array al contrario, che parte da D e finisce con A, mentre nella modalità Big Endian sarà visto come un normale array",
+    "group": "ARM"
+  },
+  {
+    "title": "Load literal",
+    "question": "A cosa servono?",
+    "answer": "Servono per caricare dei puntatori in dei registri. Questi puntatori solitamente puntano a una etichetta oppure a un indirizzo.\n\nLDR R0, =LABEL\nLDR R1, = 0xffaacda9",
+    "group": "ARM"
+  },
+  {
+    "title": "Locks",
+    "question": "Cosa sono le locks? come si usano?",
+    "answer": "Le locks sono un meccanismo di sync.\n\nSi utilizza iniziando con la funzione lock.acquire() che ti permette di creare una sezione critica in mutua esclusione, infatti, la lock.acquire() controlla che non ci sia nessun thread già in una sezione critica, e che quindi la \"risorsa\" lock sia libera, se non lo è aspetta, altrimenti si dice che acquisisco la lock.\n\n\nQuando voglio uscire dalla sezione critica utilizzo la lock.release() che sveglia eventuali thread in attesa che avevano richiesto l'acquire()",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "Mappe di karnaugh orale",
+    "question": "Cosa sono le mappe di karnaugh e come funzionano 2) a che servono? 3) disegnare un esempio 4) qual'è la regola?",
+    "answer": "-",
+    "group": "Domande orale"
+  },
+  {
+    "title": "Mapped file o mapped segment",
+    "question": "cosa sono i mapped file o mapped segment?",
+    "answer": "Porzione di memoria condivisa",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "Mappek",
+    "question": "Cosa sono le mappe di karnaugh?",
+    "answer": "Le mappe di karnaugh o mappek sono delle mappe usate per semplificare le espressioni logiche per reti combinatorie a n ingressi con n <=4",
+    "group": "Logica combinatoria"
+  },
+  {
+    "title": "Mappek a 5 ingressi",
+    "question": "Possiamo fare una mappak a 5 ingressi?",
+    "answer": "Sì, ma dato che dobbiamo fare delle matrici, già a 5 ingressi inizia a diventare inefficiente il metodo di semplificazione. Infatti, dovremmo fare due matrici che ne creano una singola bidimensionale, in cui in una abbiamo il quinto ingresso = 0 e nell'altra il quinto ingresso=1",
+    "group": "Logica combinatoria"
+  },
+  {
+    "title": "Max Min Fairness",
+    "question": "Cosa è l'algoritmo max min fairness? Quali sono i suoi svantaggi? Ci sono delle varianti?",
+    "answer": "è un algoritmo utilizzato principalmente nelle reti, e che cerca di risolvere il problema dell'equità di RR cercando di massimizzare l'allocazione minima da dare a un processo rimanendo equo (dare il più possibile senza sbilanciarsi). Per esempio se io ho un budget di 100 quanti di tempo, e io ho p1 che per terminare ha bisogno di 20 quanti, p2=50 e p3=50, faccio 100/3=33, quindi vedo che 20 < 33 e assegno 20 a p1, così ci rimane 80 di budget- 80/2=40 che vengono assegnati equamente a p2 e p3.\n\nLo svantaggio di questo algoritmo è che è troppo costoso, infatti in realtà viene usato come benchmark.\n\nEsiste anche un'altra variante, che dà priorità ai processi che terminano prima, dando ancora più equità ai workload misti, ma questa variante è ancora più pesante della versione base",
+    "group": "Scheduling"
+  },
+  {
+    "title": "Memoria con porta in lettura",
+    "question": "Mi disegni schematicamente una memoria con una porta in lettura?",
+    "answer": "-",
+    "group": "Componenti digitali"
+  },
+  {
+    "title": "Memoria con porta in lettura e scrittura",
+    "question": "Mi disegni schematicamente una memoria con una porta in lettura e scrittura?",
+    "answer": "-",
+    "group": "Componenti digitali"
+  },
+  {
+    "title": "Memoria con porta in scrittura",
+    "question": "Mi disegni schematicamente una memoria con una porta in scrittura?",
+    "answer": "-",
+    "group": "Componenti digitali"
+  },
+  {
+    "title": "Memoria interallacciata",
+    "question": "Che cosa è?",
+    "answer": "Una memoria interallacciata è un altro modo per memorizzare i dati partendo da una memoria più grande e usando sottobanco più gruppi di memoria. La differenza tra la memoria modulare però, è che non ho un vero e proprio \"stacco\" tra un modulo e l'altro, perché gli indirizzi vengono assegnati ciclicamente a tutti i moduli, però abbiamo un vantaggio cruciale:\nse voglio leggere due indirizzi consecutivi, posso farlo in parallelo",
+    "group": "Componenti digitali"
+  },
+  {
+    "title": "Memoria modulare",
+    "question": "Che cosa è?",
+    "answer": "Consiste nel creare una memoria grande attraverso più moduli più piccoli messi uno accanto all'altro. La memoria modulare può essere sequenziale o interallacciata",
+    "group": "Componenti digitali"
+  },
+  {
+    "title": "Memoria modulare sequenziale",
+    "question": "Che cosa è?",
+    "answer": "La memoria modulare sequenziale è un tipo di memoria in cui dividiamo la memoria totale da realizzare in n moduli (es banchi di RAM). Per esempio, se abbiamo da realizzare una memoria da 2 gb in 2 moduli, ne avrò due da 1 gb",
+    "group": "Componenti digitali"
+  },
+  {
+    "title": "Mesa e Hoare",
+    "question": "Cosa sono le sintassi Mesa e Hoare? Come si differenziano tra loro?",
+    "answer": "Sono entrambe sintassi usate quando si usano le locks, la prima, Mesa, una volta che il thread che ha la lock fa la signal risveglia il thread che aspettava (sempre che ci fosse) e lo mette in coda pronti, continuando con la propria esecuzione. \n\nLa sintassi Hoare invece, richiede maggiore attenzione nel suo utilizzo ma ha più potenziale, infatti, una volta che viene fatta la signal, passa anche la lock al thread risvegliato, e il thread che era in esecuzione si rimette nella coda pronti. La sintassi hoare può essere utile quando vogliamo dare un ordine ai thread risvegliati, per esempio creare code fifo o filo. \n\nCreare queste file è possibile anche con Mesa ma è meno intuitivo. Nonostante si possa passare una lock o risvegliare un thread specifico non è comunque dato l'ordine di esecuzione preciso, perché l'ordine di risveglio non è l'ordine di esecuzione. Per esempio, in bounded buffer non possiamo fare assunzioni perché non sappiamo se verrà eseguito prima un produttore o un consumatore",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "metriche memorie",
+    "question": "Quali sono le metriche in base alla quale valutiamo i tipi di memoria?",
+    "answer": "- costo\n- capacità\n- tempo di accesso",
+    "group": "Gerarchie di memoria"
+  },
+  {
+    "title": "mfq",
+    "question": "Cosa è l'mfq e come funziona? Ci sono degli accorgimenti da farci? Come previene lo starvation?",
+    "answer": "L'MFQ, o Multi-Level Feedback Queue è un algoritmo di scheduling che cerca di trovare un compromesso tra tutti gli obbiettivi proposti dai criteri dello scheduling, tra cui un overhead, response time, turnaround time \n e throughput buono, rimanendo il più equo possibile e non generare lo starvation.\n\nL'MFQ pone diverse code di RR, una per ogni livello di priorità, e associa un quanto di tempo diverso a seconda della priorità in cui si trova. La priorità più alta è quella con un time slice minore, mentre la coda con la priorità più bassa ha il time slice maggiore. Quando un processo viene creato, viene messo nella coda con priorità più alta. Ogni volta che un processo viene eseguito e non termina, viene scalato di priorità, di un livello inferiore (meno urgente).\n\nL'MFQ è un algoritmo molto buono per i sistemi monoprocessori, veniva usato addirittura da Windows. Però, vanno comunque fatti degli accorgimenti per farlo funzionare a dovere, per esempio, un processo che richiede l'uso della tastiera dovrebbe scalare più rapidamente di priorità rispetto a uno che legge solo la memoria, per garantire un response time buono.\n\nPreviene lo starvation facendo si che dopo un po' che un processo aspetta senza essere eseguito viene scalato di priorità",
+    "group": "Scheduling"
+  },
+  {
+    "title": "MFQ in multiprocessore",
+    "question": "Come funziona MFQ nei sistemi multiprocessore?",
+    "answer": "Abbiamo le nostre code di MFQ condivise a tutte le CPU, ogni CPU quando ha bisogno di un processo da eseguire chiede alla spinlock dello scheduler. Lo scheduler non può mai sospendersi, per questo viene usata l'attesa attiva",
+    "group": "Scheduling"
+  },
+  {
+    "title": "Mi disegni un latch sr?",
+    "question": "Mi disegni un latch sr?",
+    "answer": "Un latch sr è formato da due or con un not sul fondo in cui il secondo ingresso dell'or è l'uscita dell'altro or negato e viceversa. Questo perché si tratta di una rete sequenziale e si basa sulle retroazioni, ovvero ingressi stabili ma che derivano da un ciclo interno della rete",
+    "group": "Logica sequenziale"
+  },
+  {
+    "title": "Miss time e miss penalty",
+    "question": "Cosa sono? Come si calcolano?",
+    "answer": "miss time = il nostro costo, cioè quanto tempo ci mettiamo a recuperare un dato\nmiss time = hit time + miss penalty\nmiss penalty = costo di tempo aggiuntivo se il dato richiesto non è presente nel livello attuale e va ricercato in un livello inferiore.\nMiss penalty = tempo tot di livello n-1, o anche tn-1 * MRn-1* miss penalty n-2",
+    "group": "Gerarchie di memoria"
+  },
+  {
+    "title": "Modelli di scheduling",
+    "question": "Che tipo di modelli di scheduling per la gestione dei thread ci sono? ",
+    "answer": "Ci sono i modelli cooperativi, e i modelli a prerilascio. I modelli cooperativi sono quelli più vecchi e ogni thread in questo modello rilascia autonomamente il processore attraverso il thread_yield(), garantendo un enorme cooperazione tra di loro e se gestito bene di efficienza, perché il context switch è più leggero. Il problema di questo modello è che è rischioso, perché un thread può monopolizzare un processore se programmato male o malevolo. Il modello a prerilascio è quello che usiamo in cui per gestire i thread si usano le sistem call e un timeout, rendendo il context switch più pesante ma più sicuro",
+    "group": "Thread"
+  },
+  {
+    "title": "Modulo e segno",
+    "question": "Cosa è la rappresentazione modulo e segno? ",
+    "answer": "E' un modo per rappresentare i numeri binari, in cui il bit più significativo è riservato al segno. Purtroppo ha due svantaggi nell'usarlo:\n1) abbiamo doppia rappresentazione dello zero\n2) le somme non danno sempre risultati corretti",
+    "group": "Basi di microarchitetture"
+  },
+  {
+    "title": "Moltiplicazione",
+    "question": "Con quali istruzioni si fa?",
+    "answer": "MULL <dest> <src1> <src2> per moltiplicazioni con numeri piccoli, altrimenti, UMULL<dest1> <dest2> <src1> <src2> per moltiplicazioni più grandi per numeri senza segno, e smull che è uguale alla umull ma è per numeri con segno",
+    "group": "ARM"
+  },
+  {
+    "title": "Monitor",
+    "question": "Cosa è un monitor?",
+    "answer": "Un monitor è un meccanismo di sync un po' particolare, perché è più ad alto lv rispetto agli altri meccanismi visti, e quindi più semplice da usare, che usa a sua volta meccanismi interni più a basso lv come locks+ cond. variabl3 oppure mutex. Se usiamo un monitor è più semplice evitare race cond. Ha diverse caratteristiche: 1) esegue incapsulamento delle variabili condivise al suo interno, permettendo di visualizzarle o modificarle solo tramite funzioni esposte all'esterno del monitor 2) tutto il codice interno al monitor viene eseguito in mutua esclusione ",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "Motivi deadlock",
+    "question": "Quali possono essere le cause che portano al deadlock?",
+    "answer": "Le cause possono essere le seguenti:\n1) risorse limitate e non prerilasciabili\n2) wait while holding, ovvero un thread o un processo detiene una risorsa mentre ne aspetta un altra\n3) le due cause precedenti possono generare attesa circolare, e quindi il deadlock.\n\nRisolvendo una di queste cause risolviamo il deadlock ma non per forza lo starvation",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "MTAO x processo",
+    "question": "Cosa sono i programmi che devono gestire MTAO? come la gestiscono?",
+    "answer": "I programmi che devono gestire multiple things at once sono i programmi che hanno diverse funzionalità da eseguire, e quindi la soluzione ideale sarebbe creare un processo per ogni task, sfruttando gli IPC. Questa però si rivela una situazione lenta, e quindi per la maggior parte dei casi è preferibile al posto di creare tanti processi, creare tanti thread",
+    "group": "Processi"
+  },
+  {
+    "title": "Multiplexer a più ingressi",
+    "question": "Multiplexer a n ingressi a 1 bit o multiplexer a 2 ingressi a 1 bit. Quali delle due strutture potrebbe crearci più problemi? al variare di n qual'è il ritardo?",
+    "answer": "tp",
+    "group": "Domande orale"
+  },
+  {
+    "title": "Mutex o semafori?",
+    "question": "I semafori sono la stessa cosa dei mutex?",
+    "answer": "No, i semafori hanno un contatore che può essere >= 0, mentre le mutex hanno un contatore per un unica risorsa binario",
+    "group": "Domande orale"
+  },
+  {
+    "title": "Mutua esclusione",
+    "question": "cosa è la mutua esclusione?",
+    "answer": "La mutua esclusione è il concetto in cui si può accedere o a una risorsa o a una sezione critica uno alla volta",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "Num registri",
+    "question": "Quanti registri abbiamo in ARMv7?",
+    "answer": "16",
+    "group": "ARM"
+  },
+  {
+    "title": "NVDIMM",
+    "question": "Cosa sono?",
+    "answer": "Le NVDIMM sono delle memorie ad alta velocità non volatili, costose e comode per alcune situazioni in cui abbiamo bisogno di grandi prestazioni e di non perdere i dati allo spegnimento della macchina",
+    "group": "Gerarchie di memoria"
+  },
+  {
+    "title": "NVMe",
+    "question": "Cosa sono?",
+    "answer": "Una memoria che molta un protocollo PCIe (PCI-express) ad alta velocità, di cui fanno parte le SSD. Sono però più lente delle NVDIMM",
+    "group": "Gerarchie di memoria"
+  },
+  {
+    "title": "Obbiettivi gerarchia di memoria",
+    "question": "Quali sono gli obbiettivi della gerarchia di memoria?",
+    "answer": "L'obbiettivo principale è quello di diminuire il bottleneck della architettura classica di Von Neumann, mettendo più livelli di memoria, in cui vicino alla CPU ci saranno le cache, ovvero le memorie più rapide (SRAM) e più in basso ci saranno le memorie non volatili. L'obbiettivo è di far credere alla CPU di avere un unica memoria con la velocità della cache L1 e la capacità dell'HD o dell'SSD",
+    "group": "Gerarchie di memoria"
+  },
+  {
+    "title": "Oblivious scheduling",
+    "question": "Cosa è l'oblivious scheduling?",
+    "answer": "L'oblivious scheduling, o scheduling ignaro, è quando uno scheduler in un ambiente multicore non prende in considerazione dei possibili processi paralleli",
+    "group": "Scheduling"
+  },
+  {
+    "title": "Ogni thread...",
+    "question": "Ogni thread vede:",
+    "answer": "1) il codice condiviso 2) il suo stack personale, che però non è protetto dagli altri thread che potrebbero accederci comunque, il tcb, lo stato del processo che lo contiene, le variabili condivise, lo heap che è condiviso",
+    "group": "Thread"
+  },
+  {
+    "title": "Open in unix",
+    "question": "Come funziona la open in unix?",
+    "answer": "La open in unix prende tanti parametri perché fa più operazion logiche alla volta, per prima cosa infatti, controlla che il file esista, se non esiste, controlla i parametri passati, se ci sono dei parametri per gestire l'errore in caso di file non esistente, lo crea e ritorna il fd, altrimenti, ritorna l'errore. Se invece il file esiste, si controlla se è vuoto, se è vuoto, allora ritorniamo il fd, altrimenti controlla se ci sono parametri per la gestione di questo errore, se ci sono, allora tronca il file, altrimenti restituisce errore",
+    "group": "Processi"
+  },
+  {
+    "title": "Ordinamento memoria",
+    "question": "Ordinami le memorie in base al tempo di accesso",
+    "answer": "1) SRAM\n2) DRAM\n3) Flash memory\n4) Hard disk",
+    "group": "Gerarchie di memoria"
+  },
+  {
+    "title": "Organizzazione delle cache",
+    "question": "Come possono essere organizzate le cache? Quali sono le differenze principali?",
+    "answer": "L'organizzazione di una cache principalmente si divide in 2 fattori: il numero di strade che può prendere lo stesso indirizzo di memoria, e il numero di set (insiemi di cache lines).\n\nAbbiamo visto 3 modi per organizzare le cache (B è il numero di linee di cache):\ndirect mapped cache, che ha 1 way e B set\nset associative cache, in cui ogni set contiene N linee, ha 1<N<B vie e on B/N set\nfully associative, con B way e 1 set",
+    "group": "Gerarchie di memoria"
+  },
+  {
+    "title": "Ottenere il valore di uscita del figlio",
+    "question": "Come fa il padre a ottenere il valore di uscita del figlio?",
+    "answer": "Attraverso la wait, che restituisce lo status da convertire (a me sembra in byte) che corrisponde al valore della exit",
+    "group": "Processi"
+  },
+  {
+    "title": "Overhead della thread switch",
+    "question": "Da dove deriva l'overhead della thread switch?",
+    "answer": "L'overhead viene dalla gestione delle liste e dalle copie necessarie per il cambio del thread da eseguire. Inoltre, se viene eseguito un thread che non fa parte dello stesso processo, la cache potrebbe essere ricaricata da zero.\n\nContribuiscono all'overhead anche le exception, page fault(codice non caricato precedentemente in memoria), MMU/TLB invalidation (operazioni per invalidare vecchi dati)",
+    "group": "Thread"
+  },
+  {
+    "title": "Particolarità di LDM e STM",
+    "question": "Qual'è?",
+    "answer": "LDM e STM di base non modificano lo stack pointer, se voglio lo stesso modificarlo posso fare:\nLDM SP!, {r1, r2, r3} ed è la stessa cosa di fare\nPOP {r1,r2,r3}\nuguale per la store",
+    "group": "ARM"
+  },
+  {
+    "title": "Passaggi di una fork",
+    "question": "Quali sono i passaggi che fa una fork?",
+    "answer": "1 - crea un PCB   \n2- crea lo spazio di indirizzamento   \n3- viene condiviso il codice del programma anche al nuovo processo   \n4 - il processo eredita il contesto del padre (variabili di ambiente, shell, args, priorità...)   \n5 - informa lo scheduler che il nuovo processo è nato  ",
+    "group": "Processi"
+  },
+  {
+    "title": "PCB e TCB",
+    "question": "Cosa cambia tra PCB e TCB?",
+    "answer": "Il PCB contiene info più generali, tra cui info sulla memoria, e lista dei thread del processo. Il tcb contiene informazioni specifiche sul singolo thread",
+    "group": "Thread"
+  },
+  {
+    "title": "Per lo scheduling, cosa cambia da thread e processi?",
+    "question": "Per lo scheduling, cosa cambia da thread e processi?",
+    "answer": "i thread hanno il TCB e la thread table, che è una per processo in caso di threads a user-level, e una per sistema in caso di threads a kernel-level. I processi hanno il PCB, e sono uno per sistema",
+    "group": "Thread"
+  },
+  {
+    "title": "Perché usare i thread?",
+    "question": "Perché usare i thread?",
+    "answer": "I thread occupano meno risorse, perché condividono lo spazio di indirizzamento (variabili globali, heap e fd aperti), la comunicazione è più efficace dato che vedono il codice, i thread anche se hanno il codice condiviso possono fare task differenti, e possiamo sfruttare al meglio il parallelismo dei multicores nei sistemi con kernel multithread.",
+    "group": "Thread"
+  },
+  {
+    "title": "pipe",
+    "question": "Cosa è una pipe",
+    "answer": "E' un meccanismo di comunicazione tra processi, in cui viene creato un canale monodirezionale, in cui un processo farà il mittente e uno il destinatario , sfruttando in C la funzione pipe che trasforma un array di 2 interi nel canale di comunicazione, in cui uno viene dedicato alla scrittora e uno alla lettura. Alla fine la pipe (l'array) va chiusa ",
+    "group": "Processi"
+  },
+  {
+    "title": "Posizione TCB",
+    "question": "Il TCB, dove si trova?",
+    "answer": "Il TCB si trova in diversi punti a seconda dello stato in cui è il thread. init -> è in creazione, running -> running list, waiting -> waiting list, ready -> ready list, terminated -> terminated list e poi successivamente deallocato",
+    "group": "Thread"
+  },
+  {
+    "title": "Postulati algebra booleana",
+    "question": "Quali sono i postulati dell'algebra booleana?",
+    "answer": "not A + A = 1\nnot A * A = 0\nA * 0 = 0\nA * 1 = A\nA + 1 = 1",
+    "group": "Logica combinatoria"
+  },
+  {
+    "title": "Preemptive scheduler",
+    "question": "Perché il preemptive scheduler prende spesso una decisione rispetto allo scheduler non preemptive?",
+    "answer": "Perché lo scheduler preemptive se trova un processo che ha maggiore priorità di esecuzione ferma il processo in esecuzione e ci mette il nuovo processo, mentre nel modello non preemptive la decisione viene fatta solo dopo che il processo di esecuzione termina o va in timer out e non viene fermato \"nel mezzo\"",
+    "group": "Scheduling"
+  },
+  {
+    "title": "Prevenire riordinamento operazioni",
+    "question": "Come si può prevenire il riordinamento delle operazioni fatto dalla cpu?",
+    "answer": "Attraverso i meccanismi di sincronizzazione, in particolare, più a basso livello possibile troviamo per prevenirlo le memory barrier instructions. I meccanismi di sync più ad alto livello sfruttano le memory barrier instructions",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "Prevenzione statica",
+    "question": "Come funziona il metodo di prevenzione statica per la risoluzione dei deadlock?",
+    "answer": "Si tratta di un metodo in cui si usano dei criteri per rendere impossibile il verificarsi delle cause che portano a deadlock. Tra questi:\n- ordinamento delle lock. Diamo sempre le lock in un ordine preciso, per esempio in ordine alfabetico, molto usato dai kernel\n- rimuovere il wait while holding. Se un thread o processo ha una risorsa e sta aspettando per un'altra, rilascia la risorsa che già aveva prima di fare la wait.\n- virtualizzazione delle risorse. Non sempre possibile, ma consiste nel fare credere che le risorse siano illimitate e poi lasciare un gestore a occuparsi di decidere a chi devono andare le vere risorse fisiche, metodo usato per esempio con le stampanti.\n- Metodo \"o tutte o nessuna\". Si tratta di chiedere anticipatamente tutte le risorse che serviranno a quel thread/proc, e se sono tutte libere le prende, altrimenti aspetta e non ne prende nessuna",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "Principio di astrazione",
+    "question": "Cosa è il principio di astrazione? Quali sono i vantaggi?",
+    "answer": "E' il riuscire a spiegare il funzionamento di un dispositivo complesso come il computer attraverso diversi livelli che collaborano tra di loro creando livelli superiori sempre più astratti. La comunicazione è possibile attraverso le funzionalità e le politiche. Il livello Li ha n funzionalità, perché queste funzionalità funzionino, hanno bisogno di interfacciarsi con i meccanismi, dei componenti che fanno da intermediari con il livello Li-1, e chiedono i dati richiesti dalle funzionalità alle politiche. Il vantaggio di astrarre i livelli è che li rendi indipendenti tra di loro e se viene cambiato un livello inferiore con un altro il livello superiore non se ne accorge dato che chiede i dati ai meccanismi",
+    "group": "Basi di microarchitetture"
+  },
+  {
+    "title": "Principio di disciplina",
+    "question": "Cosa è il principio di disciplina?",
+    "answer": "La disciplina è il concentrarsi quando si crea un componente a crearne uno generico senza troppe funzionalità, per poter prediligere la riusabilità del componente rispetto alla personalizzazione",
+    "group": "Basi di microarchitetture"
+  },
+  {
+    "title": "Principio di gerarchia",
+    "question": "Cosa è il principio di gerarchia?",
+    "answer": "E' il riuscire a progettare una componente complessa attraverso moduli più piccoli collegate tra di loro",
+    "group": "Basi di microarchitetture"
+  },
+  {
+    "title": "Principio di località",
+    "question": "Cosa è il principio di località?",
+    "answer": "Il principio di località è un principio che si basa su altri due sottoprincipi, il principio di località spaziale e il principio di località temporale. Questi principi sono frutto di osservazioni sulle statistiche dei dati ottenuti dalla memoria.\nIl principio di località spaziale, dice che se un dato viene richiesto, c'è un alta probabilità che in un breve lasso di tempo vengano richiesti anche le celle di memoria vicino a quel dato, pensiamo ad esempio a come utilizziamo solitamente gli array.\nIl principio di località temporale, dice che se un dato viene richiesto, c'è un'alta probabilità che in un breve lasso di tempo venga richiesto di nuovo, pensiamo ad esempio alle variabili contatori.",
+    "group": "Gerarchie di memoria"
+  },
+  {
+    "title": "Principio di località applicato alle gerarchie",
+    "question": "Come viene applicato il principio di località applicato alle gerarchie di memoria?",
+    "answer": "Quando prendiamo un dato per la prima volta, lo mettiamo subito nel livello più vicino alla CPU (località temporale) e con lui portiamo anche un blocco di dati adiacenti ad esso (località spaziale)",
+    "group": "Gerarchie di memoria"
+  },
+  {
+    "title": "Principio di modularità",
+    "question": "Cosa è il principio di modularità?",
+    "answer": "i moduli devono avere interfacce e funzioni ben definite, ovvero di cui è ben nota la funzionalità",
+    "group": "Basi di microarchitetture"
+  },
+  {
+    "title": "Principio di regolarità",
+    "question": "Cosa è il principio di regolarità?",
+    "answer": "Il principio di regolarità è una delle tre y, in cui nella progettazione si utilizzano dei moduli standardizzati e comuni tipo bus e anello",
+    "group": "Basi di microarchitetture"
+  },
+  {
+    "title": "Priority inversion problem",
+    "question": "Che cosa è il priority inversion problem?",
+    "answer": "E' un problema che si verifica nell'algoritmo di scheduling MFQ in cui un processo con più alta priorità richiede una risorsa che è allocata a un processo che è in una lista con più a bassa priorità",
+    "group": "Scheduling"
+  },
+  {
+    "title": "Processi leggeri",
+    "question": "Perché i thread vengono anche chiamati \"processi leggeri\"?",
+    "answer": "Perché condividono molte risorse, tra cui variabili globali, e l'heap. Il codice di base è condiviso ma a diversi thread possiamo fargli fare differenti task. Con codice e variabili condivise abbiam inoltre un modo per implementare una comunicazione più rapida degli IPC senza dover usare il kernel come intermediario",
+    "group": "Thread"
+  },
+  {
+    "title": "Processo figlio + terminazione prematura del padre",
+    "question": "Cosa succede se un processo padre termina senza aver fatto la wait del figlio e il figlio termina ancor prima del padre?",
+    "answer": "Il figlio inizialmente una volta terminato diventa zombie, il padre, termina e restituisce il suo valore al processo init, che controlla che ci siano rimasti degli \"orfani\". Una volta trovato il processo zombie lo \"adotta\" e fa la wait facendolo deallocare",
+    "group": "Processi"
+  },
+  {
+    "title": "Proprietà logica booleana",
+    "question": "Dimmi le proprietà della logica booleana con più di una variabile",
+    "answer": "commutativa:\nA*B = B*A\nA+B = B+A\n\nassociativa\nA*(B*C)=(A*B)*C\nA+(B+C)=(A+B)+C\n\ndistributiva\n(B+C)(B+D) = B+(C*D)\n(B*C)+(B*D)=B*(C+D)\n\nde morgan\nnot a * not b = not (A+B)\nnot a + not b = not(A*B)",
+    "group": "Logica combinatoria"
+  },
+  {
+    "title": "Push e Pop",
+    "question": "Quando dobbiamo farla?",
+    "answer": "i registri r0-r3 e r12 sono temporanei, ciò significa che se nel codice dobbiamo fare una BL e quei registri ci servono ancora dobbiamo preservarli facendo una push prima della BL e una pop dopo la BL.\n\nGli altri registri sono chiamati persistenti, e sta al chiamato prima di terminare se li ha usati a riportarli ai valori precedenti con la push e pop",
+    "group": "ARM"
+  },
+  {
+    "title": "Qual'è l'idea dell'algoritmo del banchiere?",
+    "question": "Qual'è l'idea dell'algoritmo del banchiere?",
+    "answer": "Il banchiere presta i soldi solo se è sicuro che verranno restituiti e se ce ne sono abbastanza. Il sistema analogamente dà una risorsa solo se siamo sicuri che accettando la richiesta rimaniamo in un safe state",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "Quando viene fatto lo scheduling dei processi da eseguire?",
+    "question": "Quando viene fatto lo scheduling dei processi da eseguire?",
+    "answer": "La decisione di quale processo deve essere eseguito varia in base alla scelta del tipo di scheduling. Per il modello Preemptive, la decisione viene presa quando un processo:\n1) switcha da running a waiting\n2) switcha da running a ready\n3) switcha da waiting a ready\n4) termina\nNel modello non preemptive invece, la decisione viene presa solo nei punti 1 e 4",
+    "group": "Scheduling"
+  },
+  {
+    "title": "Race conditions",
+    "question": "Cosa sono le race conditions?",
+    "answer": "La race condition è una situazione che si verifica quando più thread si concorrono una risorsa senza usare meccanismi di sync, rendendo la variabile di valore imprevedibile perché dipendente dal riordinamento delle operazioni della cpu",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "Range complemento a 2",
+    "question": "Mi dici il range di numeri con l'utilizzo della rappresentazione complemento a 2?",
+    "answer": "[-2^(n-1),2^(n-1)-1]",
+    "group": "Basi di microarchitetture"
+  },
+  {
+    "title": "Range modulo e segno",
+    "question": "Mi sapresti dire il range dei numeri con la rappresentazione modulo e segno?",
+    "answer": "[-2^(n-1)-1,2^(n-1)-1], uno in meno della rappresentazione complemento a 2 perché abbiamo 2 rappresentazioni per lo zero",
+    "group": "Basi di microarchitetture"
+  },
+  {
+    "title": "Registri e disciplina dinamica",
+    "question": "Quali sono i comportamenti che grazie alla disciplina dinamica riusciamo ad evitare nei registri?",
+    "answer": "Che gli input cambino subito dopo la fronte di salita del clock non permettendo la scrittura corretta del dato",
+    "group": "Logica sequenziale"
+  },
+  {
+    "title": "Registri persistenti",
+    "question": "Quali sono?",
+    "answer": "R4-R11, R13-R15",
+    "group": "ARM"
+  },
+  {
+    "title": "Registri speciali",
+    "question": "Quali sono i registri speciali?",
+    "answer": "R13 -> sp, R14 -> lr, R15 -> PC",
+    "group": "ARM"
+  },
+  {
+    "title": "Registri temporanei",
+    "question": "Quali sono?",
+    "answer": "R0-R3, R12",
+    "group": "ARM"
+  },
+  {
+    "title": "rete combinatoria",
+    "question": "Da cosa dipende l'output di una rete combinatoria?",
+    "answer": "Dipende  unicamente dai valori di input e dal calcolo che la rete fa su quegli input per determinarne l'output",
+    "group": "Logica combinatoria"
+  },
+  {
+    "title": "Rete combinatoria",
+    "question": "Cosa è una rete combinatoria?",
+    "answer": "Una rete combinatoria è un circuito formato da porte logiche che prende n ingressi e m uscite, con gli indici sia di uscite sia di ingressi che partono da 0 e finiscono a n-1 o m-1. Una rete combinatoria è un insieme di funzioni applicate ognuna a un'uscita che potenzialmente vengono applicate a tutti gli ingressi",
+    "group": "Logica combinatoria"
+  },
+  {
+    "title": "Rete di Mealy",
+    "question": "Cosa è una rete di Mealy?",
+    "answer": "Una rete di Mealy è una rete sequenziale in cui abbiamo la funzione omega che viene determinata dagli ingressi e dagli stati, e produce le uscite, e la funzione sigma, che viene determinata dagli ingressi e dallo stato attuale e genera un nuovo stato",
+    "group": "Logica sequenziale"
+  },
+  {
+    "title": "Rete di Moore",
+    "question": "Cosa è una rete di Moore?",
+    "answer": "Una rete di Moore è una rete sequenziale in cui abbiamo la funzione omega i cui valori delle uscite dipendono esclusivamente da quelli dello stato attuale, e la funzione sigma in cui i valori degli ingressi e lo stato attuale generano un nuovo stato",
+    "group": "Logica sequenziale"
+  },
+  {
+    "title": "Rete sequenziale",
+    "question": "Da cosa dipende l'output di una rete sequenziale?",
+    "answer": "L'output di una rete sequenziale dipende dal calcolo che viene fatto sugli input attuali, ma anche sui valori precedenti degli input",
+    "group": "Logica sequenziale"
+  },
+  {
+    "title": "Reti logiche",
+    "question": "Come si differenziano le reti logiche?",
+    "answer": "Le reti logiche si differenziano in reti sequenziali e reti combinatorie",
+    "group": "Domande orale"
+  },
+  {
+    "title": "Reti sequenziali",
+    "question": "Cosa li caratterizza le reti sequenziali? Parlami degli ingressi e delle uscite",
+    "answer": "Le reti sequenziali hanno il concetto di stato, ovvero salvarsi i valori di input che sono stati precedentemente inviati e grazie ad essi generare nuovi output sempre deterministici. La rete sequenziale è composta da 3 fattori: \nomega: è la funzione che calcola le uscite\nsigma: è la funzione che calcola gli stati\nstato: lo stato attuale della rs",
+    "group": "Logica sequenziale"
+  },
+  {
+    "title": "Reti sincrone",
+    "question": "Cosa sono le reti sincrone? chi ne fa parte?",
+    "answer": "Sono delle reti sequenziali che hanno un registro di stati interno, che cambia solamente ai fronti di salita del clock, motivo per il quale è chiamato sincronizzato. Una rete sequenziale sincrona deve essere formata da almeno un registro, che deve o devono essere connessi per ogni componente ciclica della rete, e tutti i registri devono tenere lo stesso segnale di clock.\n\nNe fanno parte le reti di Mealy e di Moore, e quando si fanno degli automi con questi due modelli dobbiamo considerare che la lunghezza del ciclo di clock debba essere sufficientemente lunga per non creare incongruenze nella rete",
+    "group": "Logica sequenziale"
+  },
+  {
+    "title": "Return processo terminato",
+    "question": "Cosa ritorna un processo terminato?",
+    "answer": "Ritorna al chiamante, ovvero alla funzione padre, un valore, che può essere gestito dal programmatore attraverso la exit o mandato dal kernel a seguito di un eccezione o upcall (sarà un valore negativo). Nel caso sia proprio la funzione \"main\" a terminare, il suo chiamante si chiama init",
+    "group": "Processi"
+  },
+  {
+    "title": "Riflessioni su mfq in multicore",
+    "question": "Ha senso usare mfq in multicore?",
+    "answer": "mfq in multicore è troppo costoso, una miglioria potrebbe essere usare un vettore di spinlocks tante quante sono le code per diminuire la sezione critica, ma rimane comunque il problema.\n\na quel punto si potrebbe pensare di implementare l'affinity scheduling",
+    "group": "Scheduling"
+  },
+  {
+    "title": "Riordimento op CPU",
+    "question": "Perché la CPU riordina le operazioni?",
+    "answer": "La CPU riordina le operazioni per gestire meglio l'overhead, a patto che il risultato rimanga lo stesso (considerando un solo thread, ma abbiamo detto che se una risorsa è contesa dobbiamo usare dei meccanismi speciali per mantenere una congruenza)",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "Ritardo di contaminazione",
+    "question": "Cosa è il ritardo di contaminazione?",
+    "answer": "E' il ritardo da quando gli ingressi sono stabili a quando l'uscita inizia a cambiare. Tc <= Tp (=il tempo di percorso del cammino minimo)",
+    "group": "Logica combinatoria"
+  },
+  {
+    "title": "ritardo di propagazione",
+    "question": "Cos'è il ritardo di propagazione?",
+    "answer": "Il ritardo di propagazione è il tempo che intercorre tra un cambiamento all'ingresso di una porta logica e il risultato visibile all'uscita.\n(=il tempo max di percorso della rete, chiamato anche percorso critico)",
+    "group": "Logica combinatoria"
+  },
+  {
+    "title": "Ritardo di propagazione di un and fatto come una gerarchia di and",
+    "question": "qual'è?",
+    "answer": "E' log in base 2 di n (n = numero di ingressi)",
+    "group": "Logica combinatoria"
+  },
+  {
+    "title": "RMW",
+    "question": "Cosa sono gli RMW?",
+    "answer": "Gli rmw sono op speciali fornite dal l'architettura che permettono di fare un set di operazioni in modo atomico. Stanno alla base delle lock nei sistemi multiproc, dato che usare perle lock multiproc il metodo di disabilitare gli interrupt in tutti i cores genererebbe troppo overhead. Es di rmw sono test-and-set, compare and swap, ldrex e strex in arm (load link e store conditional). qLa scelta del RMW da utilizzare non cambia nel risultato, ma aolo nelle performance",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "RR",
+    "question": "cos è l'RR?",
+    "answer": "Il round robin è un modello di scheduling in cui abbiamo una coda di processi come in FIFO e ogni processo viene eseguito per un quanto di tempo prefissato. Il problema di questo modello è calcolare il quanto di tempo giusto, perché un quanto troppo grande significherebbe ricadere nel modello FIFO, e un quanto troppo piccolo genererebbe troppo overhead e sarebbe inefficiente. Solitamente il quanto ideale nei sistemi moderni è 20-100ms. RR inizia prendendo il primo processo dalla coda pronti, setta un timer per il timeout del quanto di tempo e lo esegue, se il processo non è terminato in quel quanto di tempo lo mette alla fine della coda",
+    "group": "Scheduling"
+  },
+  {
+    "title": "RR 2",
+    "question": "RR dal punto di vista del turnaround time è ottimo? MFQ è ottimo per? Qual'è il priority inversion problem?",
+    "answer": "-",
+    "group": "Domande orale"
+  },
+  {
+    "title": "RR vs FIFO",
+    "question": "Confrontami i due modelli",
+    "answer": "RR è generalmente meglio di FIFO, ma ci sono delle situazioni in cui non è equo o comunque FIFO riesce ad essere più efficiente. Per esempio, se tutti i processi durano più o meno lo stesso tempo non ha senso dividerli, oppure RR non è efficiente nel caso di workload misti, perché i processi I/O bound beneficerebbero di un quanto di tempo piccolo perché hanno da aspettare le risposte dei dispositivi, mentre i processi CPU bound beneficerebbero di un quanto più grande perché hanno bisogno di sfruttare al massimo la CPU. Quindi l'algoritmo non è equo perché dà più chance di terminazione ai processi di tipo CPU bound rispetto a quelli I/O bound",
+    "group": "Scheduling"
+  },
+  {
+    "title": "RR vs SJF",
+    "question": "Cosa puoi dire degli algoritmi RR e SJF a confronto?",
+    "answer": "Le performance di RR non sono molto scostanti da quelle di SJF, per quanto RR introduce un maggior overhead e non è equo per workload misti (dà più chance di terminazione a processi CPU bound)",
+    "group": "Scheduling"
+  },
+  {
+    "title": "Salto",
+    "question": "Mi elenchi i tipi di salto che ci sono in assembly?",
+    "answer": "Salto incondizionato.\nSi esegue con l'istruzione \"B\" (branch)\n\nsalto condizionato.\nA seguito di una compare, è possibile valutare i bit NZVC dal CPSR attraverso le seguenti condizioni aggiungibili sull'istruzione \"B\":\nEQ = uguale\nNE = not equal\n\nnum con segno:\nGT = greater than\nGE = greater or equal\nLT = less than\nLE = less equal\n\nnumeri senza segno:\nHI = higher\nLO = lower\nHS = higher or same\nLS = lower or same ",
+    "group": "ARM"
+  },
+  {
+    "title": "Scheduler activation",
+    "question": "Che cosa è lo scheduler activation?",
+    "answer": "Lo scheduler activation è un meccanismo di scheduling che cerca di migliorare la soluzione di usare lo scheduler user-lv che ha un overhead più basso rispetto al meccanismo kernel-lv, ma senza la criticità del modello ovvero quella che se un thread user-lv esegue una system call bloccante, allora tutti i thread che aveva quel processo vengono bloccati, dato che il kernel non li vede",
+    "group": "Thread"
+  },
+  {
+    "title": "Scheduler activation ad oggi",
+    "question": "Lo scheduler activation perché è una soluzione non utilizzata nei sistemi moderni?",
+    "answer": "E' un meccanismo complesso da implementare. Inoltre, dipende troppo dagli scheduler user-lv, che potrebbero abusare della cooperazione del kernel generando troppo overhead",
+    "group": "Thread"
+  },
+  {
+    "title": "Scheduling basato su priorità",
+    "question": "Cosa è lo scheduling basato su priorità?",
+    "answer": "Viene eseguito sempre il processo con priorità più alta (ovvero con il valore più basso). L'algoritmo può essere preemptive o non preemptive, e può causare starvation. Un'alternativa sicura dallo starvation è la versione aging in cui man mano che passa il tempo i processi aumentano di priorità. ",
+    "group": "Scheduling"
+  },
+  {
+    "title": "Scheduling criteria",
+    "question": "Quali sono gli scheduling criteria?",
+    "answer": "- massimizzare l'uso della CPU\n- massimizzare il throughput, ovvero il numero di task che si riescono a fare in un unità di tempo\n- minimizzare il waiting time, ovvero il tempo in cui un processo deve aspettare nella ready list prima di essere eseguito\n- minimizzare il tempo di risposta, una metrica per i sistemi interattivi in cui ci sono molti più input dell'utente e serve un tempo di risposta breve\n- minimizzare il turnaround, ovvero il tempo totale in cui il processo rimane in vita",
+    "group": "Scheduling"
+  },
+  {
+    "title": "Scheduling RR",
+    "question": "Parliamo dello scheduling di RR, quali sono i pro e i contro?",
+    "answer": "-",
+    "group": "Domande orale"
+  },
+  {
+    "title": "Scrittura memoria modulare sequenziale",
+    "question": "Come si può fare?",
+    "answer": "La scrittura possiamo farla facendo un demux dei bit più significativi che dividono la nostra memoria in moduli, e le uscite saranno i WE presenti nei moduli. Avremo anche dal nostro indirizzo i dati inviati per cercare l'indirizzo a tutti i moduli e una linea di wd connessa a tutti i moduli",
+    "group": "Componenti digitali"
+  },
+  {
+    "title": "Semafori",
+    "question": "Cosa sono i semafori?",
+    "answer": "I semafori o mutex, sono un meccanismo di sync con un intero >=0 e una coda di attesa al suo interno. Si crea un mutex per tutti i thread. Un mutex ha due funzioni principali: 1) V() anche chiamata Sempost(), in cui se c'è un thread in coda lo sveglia,  altrimenti, aumenta il contatore interno. 2) P() o Semwait, in cui viene decrementato il contatorr interno se >0, altrimenti si aggiunge il thread corrente in coda",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "Semplificare le espressioni logiche",
+    "question": "Che vantaggi porta semplificare le espressioni logiche?",
+    "answer": "Talvolta ci porta il vantaggio di risparmiare sul tempo di propagazione, ma sicuramente il vantaggio che porta sempre è una diminuzione di costi per realizzare il circuito",
+    "group": "Logica combinatoria"
+  },
+  {
+    "title": "Shell",
+    "question": "Cosa è una shell?",
+    "answer": "Una shell è un controllore di jobs, ai quali assegna a ciascuno una task. La shell si occupa di creare questi jobs attraverso la fork e la exec",
+    "group": "Processi"
+  },
+  {
+    "title": "Sintassi Mesa",
+    "question": "Come funziona la sintassi Mesa?",
+    "answer": "-",
+    "group": "Domande orale"
+  },
+  {
+    "title": "SJF",
+    "question": "Come funziona SJF? Quali sono i suoi vantaggi? Quali sono i suoi svantaggi?",
+    "answer": "SJF, o shortest job first, è un algoritmo che può essere sia preemptive sia non preemptive, in cui viene eseguito sempre il processo che ci metterà meno a terminare. L'implementazione preemptive è una variante in cui quando arriva un processo che dura meno di quello attualmente in esecuzione viene fatto il context switch, infatti questa variante si chiama Shortest Remaining Time First (SRTF).\n\nIl suo vantaggio è quello di avere un tempo di risposta ottimale ma al tempo stesso molto variabile, e nei sistemi interattivi può essere ottimo o un po' peggiore in base alla situazione, ma il suo principale svantaggio è che può provocare starvation, e anche che ordinare i processi per durata ha un costo, e se si trova processi che durano tutti più o meno lo stesso tempo diventa costoso e poco efficiente.",
+    "group": "Scheduling"
+  },
+  {
+    "title": "Somma di prodotti",
+    "question": "Cosa è la somma di prodotti?",
+    "answer": "La somma di prodotti è il modo per scrivere sotto forma di espressione logica una rete combinatoria partendo da una tabella di verità. Scriviamo nell'espressione * per fare un and e il + per fare un or",
+    "group": "Logica combinatoria"
+  },
+  {
+    "title": "Sommatore",
+    "question": "Un full adder, come può essere creato?",
+    "answer": "Possiamo crearlo come sommatore completo a propagazione di riporto a onda, oppure come sommatore a anticipazione di riporto, o come sommatore a prefissi",
+    "group": "Componenti digitali"
+  },
+  {
+    "title": "Sottrattore",
+    "question": "Come si fa un sottrattore?",
+    "answer": "Un sottrattore si può realizzare scrivendo il numero in complemento a due e sommandolo normalmente, quindi, a livello di hardware, quello che facciamo è fare passare il numero su un negatore e negare tutti i bit, poi sommarlo con il secondo numero e passare rin a 1 per aggiungere l'1 per fare il complemento a 2",
+    "group": "Componenti digitali"
+  },
+  {
+    "title": "Space sharing",
+    "question": "Cosa è lo space sharing?",
+    "answer": "Lo space sharing è un algoritmo di scheduling che raggruppa i processi con i propri threads e li manda in esecuzione a gruppi e alloca i processori a task differenti",
+    "group": "Scheduling"
+  },
+  {
+    "title": "Spinlocks",
+    "question": "Cosa sono le spinlocks?",
+    "answer": "Le spinlocks hanno la stessa utilità delle locks, solo che fanno attesa attiva. Infatti, sono utili per quando pensiamo che la lock verrà acquisita in un breve lasso di tempo. Quando viene eseguita una spinlocks, fa polling per un certo lasso di tempo, e se in questo tempo acquisisce la lock siamo nel caeo di FAST PATH, altrimenti, siamo nel caso di SLOW PATH,in cui dopo il polling si mette in attesa passiva dell'evento. È importante che la spinlocks riesca a ottenere la lock nel caso fast path ovviamente, per avere un overhead migliore",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "Spurius wakeup",
+    "question": "cosa sono gli spurius wakeup? ",
+    "answer": "Gli spurius wakeup sono degli eventi molto rari ma possibili in cui una wait di una variabile di condizione potrebbe risvegliarsi per altri motivi, quindi per evitarlo mettere sempre la wait in un while, così da ricontrollare due volte se si è svegliata per caso o meno",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "SRAM",
+    "question": "Che cosa è?",
+    "answer": "E' una memoria volatile più costosa ma più efficiente della dram. \nLa SRAM infatti, ha un meccanismo interno alla cella diverso dalla DRAM, abbiamo due transistor che si connettono a due not in croce (e per fare i not ci vogliono 2 transistor). Risultato: la croce di not rende stabile la cella, senza bisogno di un meccanismo di refresh, però è più costosa perché ci vogliono per ogni cella 6 transistor al posto della DRAM che ne richiedeva solo uno",
+    "group": "Componenti digitali"
+  },
+  {
+    "title": "starvation",
+    "question": "Cosa è la starvation?",
+    "answer": "Lo starvation è quando i thread/proc aspettano teoricamenre all'infinito,  perché succede sempre qualche evento che ha più priorità di lui",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "Stub",
+    "question": "cosa fa la funzione stub?",
+    "answer": "La funzione stub si occupa di chiamare la funzione e quindi il task che dovrà eseguire il thread, e in seguito alla sua terminazione si occuperà anche della sua deallocazione (infatti, chiama la funzione thread_exit)",
+    "group": "Thread"
+  },
+  {
+    "title": "Switch volontario",
+    "question": "Come funziona lo switch volontario di un thread?",
+    "answer": "1) salvo i registri sul tcb del thread da sostituire\n2) switcho gli stacks, ovvero cambio il puntatore dello stack mettendoci l'indirizzo di partenza dello stack del thread che verrà eseguito\n3) vengono ripristinati i registri dal tcb del nuovo thread\n4) viene fatto un return (se i thread sono in user-lv) altrimenti un iret (se i thread sono in kernel level)",
+    "group": "Thread"
+  },
+  {
+    "title": "switch_threads()",
+    "question": "Come funziona la switch threads?",
+    "answer": "1) Salva i reg del vecchio thread dal kernel stack al tcb (processo evitato se usiamo la faster version)\n2) attraverso le politiche di scheduling sceglie il nuovo thread da eseguire\n3) il vecchio thread viene messo o nella waiting list o nella ready list\n4) viene ripreso il contesto di esecuzione (i registri) del nuovo thread dal tcb\n5) viene spostato il nuovo thread nella running list e viene eseguito",
+    "group": "Thread"
+  },
+  {
+    "title": "TCB",
+    "question": "Come è fatto un TCB?",
+    "answer": "Un TCB è formato dai thread metadata (es. lo stato del thread, la priorità ecc), dalle informazioni sullo stack (quindi dove inizia e dove finisce), e dai registri salvati per il context switch",
+    "group": "Thread"
+  },
+  {
+    "title": "Teorema automa di Moore",
+    "question": "Qual'è il teorema degli automi di Moore?",
+    "answer": "La versione dell'automa di Moore di una rete ha sempre un numero di stati >= al numero di stati della versione con l'automa di Mealy",
+    "group": "Logica sequenziale"
+  },
+  {
+    "title": "Terminazione di un processo",
+    "question": "Quando termina un processo?",
+    "answer": "Un processo termina quando conclude la propria esecuzione, a seguito di un'eccezione o upcall non gestita, oppure tramite la system call exit.",
+    "group": "Processi"
+  },
+  {
+    "title": "Thread API",
+    "question": "Quali sono le funzioni dei thread API?",
+    "answer": "1) creazione thread_create 2) terminazione thread_exit 3) thread_yield per rilasciare per un po' il processore (una specie di sleep passiva), thread_join",
+    "group": "Thread"
+  },
+  {
+    "title": "thread create",
+    "question": "Come è fatta la thread_create? Quali operazioni esegue?",
+    "answer": "La thread_create(&t, fn, args) crea un thread e lo salva dentro t, e gli fa eseguire la funzione fn, con gli argomenti passati. Quello che fa è allocare un nuovo tcb, creare lo spazio per lo stack del thread e metterci sopra fn e gli args, poi chiamare la stub che chiama fn(args) e si occuperà successivamente anche della sua deallocazione. Infine la create inserisce nella ready list il TCB ",
+    "group": "Thread"
+  },
+  {
+    "title": "thread lifecycle",
+    "question": "Dimmi il ciclo di vita di un thread",
+    "answer": "init, ready, running, waiting, finished",
+    "group": "Thread"
+  },
+  {
+    "title": "thread_exit",
+    "question": "cosa fa la thread_exit?",
+    "answer": "La thread exit sposta il thread nella terminated list, e inizia la sua deallocazione, rimuovendo le risorse a lui connesso e le informazioni del thread stesso. Infine rimuove il TCB dalla terminated list",
+    "group": "Thread"
+  },
+  {
+    "title": "Tipi di modelli di threads e processi",
+    "question": "Che tipi di modelli abbiamo che lavorano con i thread e processi applicati ai kernel e non?",
+    "answer": "Il kernel multiprocesso, che riesce a gestire più processi all'interno di un singolo programma, e kernel multithread, che supporta i thread all'interno di un singolo programma. I programmi a lv utente possono essere multithread, creati attraverso delle lib solitamente già implementate nei sistemi. Sta a noi quando si fa un thread, sempre se il kernel sia multithread, decidere se vogliamo sfruttare il kernel come intermediario o usare una libreria che li crea per noi. L'altro modello a lv utente è il singlethread, che supporta un thread alla volta. Semplice da realizzare, ma non sfruttta il parallelismo",
+    "group": "Thread"
+  },
+  {
+    "title": "Tipi di processi",
+    "question": "Che tipi di processi ci sono?",
+    "answer": "Ci sono processi sequenziali, e processi paralleli, ovvero processi che fanno parte dello stesso programma e hanno bisogno di molto scambio di dati. Quando si crea un algoritmo muticores bisogna stare attenti ai processi paralleli, noi ne abbiamo visti principalmente di due tipi:\n1) producer-consumer pipeline\nin cui tutti i processi coinvolti fanno una catena di montaggio in cui un processo ha bisogno dei dati del processo precedente per generare un nuovo dato che a sua volta verrà usato dal processo successivo. Se uno dei processi non è in esecuzione tutta la catena viene quindi bloccata\n2) bulk synchronous parallel (BSP)\nk processi lavorano a fasi chiamate superstep. Ogni superstep consiste nel comunicare nuovi dati con la barriera di sincronizzazione. Questa barriera si occupa di aggiornare tutti i processi con i nuovi dati appena c'è un cambiamento, e se non riesce, mette tutti in attesa. Quindi, anche per questo modello è fondamentale avere tutti questi processi in esecuzione in contemporanea",
+    "group": "Scheduling"
+  },
+  {
+    "title": "Tipo di memorie",
+    "question": "Di che tipo possono essere le memorie?",
+    "answer": "le memorie possono essere di tipo volatile e non volatile. \nle memorie volatili sono le sram, le dram, flip flop, registers, latches.\nle memoria non volatili sono i magnetic disks(hd), gli optical disk (cd), i tape, e le flash memory, rom, nvram.",
+    "group": "Gerarchie di memoria"
+  },
+  {
+    "title": "Tipologie di load che conosce",
+    "question": "Mi dice le tipologie di load che conosce?",
+    "answer": "-",
+    "group": "Domande orale"
+  },
+  {
+    "title": "Tipologie di reti sequenziali",
+    "question": "Parlami delle due tipologie di reti sequenziali",
+    "answer": "Le reti sequenziali possono essere di Mealy e di Moore",
+    "group": "Logica sequenziale"
+  },
+  {
+    "title": "tp",
+    "question": "Cosa è il tp?",
+    "answer": "E' il tempo di propagazione, ovvero il ritardo di propagazione del circuito",
+    "group": "Logica combinatoria"
+  },
+  {
+    "title": "Trasferimento dati",
+    "question": "Come vengono trasferiti i dati? ",
+    "answer": "I dati vengono trasferiti a blocchi da 8-16 parole. Nelle cache questi blocchi si chiamano cache line",
+    "group": "Gerarchie di memoria"
+  },
+  {
+    "title": "Un nipote thread",
+    "question": "Può un figlio thread generare un altro figlio thread?",
+    "answer": "un thread può generare un altro thread, unica cosa non ha senso parlare di gerarchie e quindi di \"nipoti\" dato che i threads convidivono lo stesso codice e quindi sono più \"colleghi\"",
+    "group": "Thread"
+  },
+  {
+    "title": "Utilità sincronizzazione",
+    "question": "Perché serve la sincronizzazione?",
+    "answer": "Perché i processori riordinano le operazioni a proprio piacimento, inoltre, un thread potrebbe essere fermato in qualsiasi momento, e le variabili condivise possono essere imprevedibilli",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "Variabili di condizione",
+    "question": " A cosa servono le condition variables?",
+    "answer": "Servono per aspettare in maniera passiva (quindi sospendere il thread) finché non accade l'evento per il quale il thread stava aspettando. Es. un thread consumatore nota che non ci sono messaggi nel buffer, e quindi va in wait finché il produttore non ne producerà uno.",
+    "group": "Sincronizzazione"
+  },
+  {
+    "title": "Vincolo sul tempo di hold",
+    "question": "qual'è?",
+    "answer": "Thold <= Tcr + Tcsigma",
+    "group": "Logica sequenziale"
+  },
+  {
+    "title": "Visione logica di una memoria",
+    "question": "Qual'è?",
+    "answer": "si tratta di vedere la memoria come un grosso array, in cui ci sono n celle e ogni cella è grande m. Se questo m è un byte, si dice che la memoria è indirizzabile al byte. Ci vogliono k bit per indirizzare una memoria,  k= log_2(n)",
+    "group": "Componenti digitali"
+  }
+]

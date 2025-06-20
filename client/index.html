@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flashcard Manager</title>
+  <link rel="icon" href="/assets/favicon.png" type="image/x-icon">
+  <link rel="stylesheet" href="/src/styles.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+</head>
+<body>
+  <script src="/src/utility.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
+  <div class="container text-center" style="margin-top: 1rem;">
+    <div class="row">
+      <div class="col">
+        <a type="button" class="btn btn-warning" href="/new-card" style="color: white"><b><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/></svg> Create a new Card</b></a>
+      </div>
+      <div class="col">
+        <a type="button" class="btn btn-info" href="/new-group" style="color: white"><b><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="m260-520 220-360 220 360H260ZM700-80q-75 0-127.5-52.5T520-260q0-75 52.5-127.5T700-440q75 0 127.5 52.5T880-260q0 75-52.5 127.5T700-80Zm-580-20v-320h320v320H120Zm580-60q42 0 71-29t29-71q0-42-29-71t-71-29q-42 0-71 29t-29 71q0 42 29 71t71 29Zm-500-20h160v-160H200v160Zm202-420h156l-78-126-78 126Zm78 0ZM360-340Zm340 80Z"/></svg> Create a new Group</b></a>
+      </div>
+      <div class="col">
+        <a type="button" class="btn btn-success" href="/start-test" style="color: white"><b><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M480-120 200-272v-240L40-600l440-240 440 240v320h-80v-276l-80 44v240L480-120Zm0-332 274-148-274-148-274 148 274 148Zm0 241 200-108v-151L480-360 280-470v151l200 108Zm0-241Zm0 90Zm0 0Z"/></svg> Start test</b></a>
+      </div>
+    </div>
+  </div>
+  <div class="container mt-4">
+    <div id="cards_container" class="row g-3"></div>
+  </div>
+
+  <!-- Bootstrap Toast (visibile solo quando viene copiato il contenuto) -->
+  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div id="toastSuccess" class="toast align-items-center text-bg-success border-0 custom-toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body">
+          Content copied to clipboard. Use ctrl+v for using it.
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap Toast (visibile solo quando viene cancellata correttamente una card) -->
+  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div id="toastSuccessDelete" class="toast align-items-center text-bg-success border-0 custom-toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body">
+          Card cancellation successfully completed.
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- parte js  -->
+  <script> 
+    async function deleteCard(card_title) {
+
+      let res = await fetch('/delete-card', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ "title": decodeURIComponent(card_title) })
+      });
+      try {
+        result = await res.json();
+        console.log(result);
+      } catch (e) {
+        console.error("Errore nel parsing della risposta JSON", e);
+        alert("Errore nella rimozione della card");
+        return;
+      }
+      if (res.ok) {
+        localStorage.setItem('showDeleteToast', 'true');
+        // Ricarica la pagina
+        location.reload();
+
+      } else {
+        alert('Error removing card');
+        console.error(result.message)
+      }
+
+    }
+
+    async function modifyCard(title="", answer="", question="", group=""){
+      // Crea l'URL con i parametri
+      const url = `/card?title=${title}&answer=${answer}&question=${question}&group=${group}`;
+      // Reindirizza alla pagina con i parametri
+      window.location.href = url;
+    }
+
+    function loadPageContent(){
+      loadFlashcard(createIndexCard);
+      if (localStorage.getItem('showDeleteToast') === 'true') {
+        localStorage.removeItem('showDeleteToast');
+        const toastElement = document.getElementById('toastSuccessDelete');
+        if (toastElement) {
+          const toast = new bootstrap.Toast(toastElement);
+          toast.show();
+        }
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", loadPageContent);
+  </script>
+  
+</body>
+</html>
