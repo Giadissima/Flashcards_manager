@@ -14,10 +14,10 @@ import { FlashcardsService } from './flashcards.service';
 export class FlashcardsController {
   constructor(private readonly flashcardsService: FlashcardsService) {}
 
-  // @Post()
-  // create(@Body() createFlashcardDto: CreateFlashcardDto) {
-  //   return this.flashcardsService.create(createFlashcardDto);
-  // }
+  @Post()
+  create(@Body() createFlashcardDto: CreateFlashcardDto) {
+    return this.flashcardsService.create(createFlashcardDto);
+  }
 
   // @Get()
   // findAll() {
