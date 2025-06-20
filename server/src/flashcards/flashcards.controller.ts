@@ -9,13 +9,14 @@ import {
 } from '@nestjs/common';
 
 import { FlashcardsService } from './flashcards.service';
+import { FlashcardRequestDto } from './flashcards.dto';
 
 @Controller('flashcards')
 export class FlashcardsController {
   constructor(private readonly flashcardsService: FlashcardsService) {}
 
   @Post()
-  create(@Body() createFlashcardDto: CreateFlashcardDto) {
+  create(@Body() createFlashcardDto: FlashcardRequestDto):any {
     return this.flashcardsService.create(createFlashcardDto);
   }
 

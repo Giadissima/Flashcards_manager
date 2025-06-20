@@ -1,10 +1,11 @@
+import { FlashcardRequestDto } from './flashcards.dto';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class FlashcardsService {
-  // create(createFlashcardDto: CreateFlashcardDto) {
-  //   return 'This action adds a new flashcard';
-  // }
+  create(createFlashcardDto: FlashcardRequestDto) {
+    return 'This action adds a new flashcard';
+  }
 
   // findAll() {
   //   return `This action returns all flashcards`;
