@@ -24,7 +24,7 @@ import { join } from 'path';
       imports: [ConfigModule], // importa ConfigModule se non globale
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        uri: configService.get<string>('MONGO_URI'),
+        uri: configService.get<string>('MONGO_URL'),
       }),
     }),
     FlashcardsModule,

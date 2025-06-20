@@ -1,31 +1,16 @@
-# Usa immagine Node base leggera
 FROM node:22
 
-# Cartella di lavoro dentro il container
 WORKDIR /app
 
-# Copia i package.json e package-lock.json per server (per installare dipendenze)
+# Copia solo i file di configurazione per installare le dipendenze
 COPY server/package*.json ./server/
 
-# Installa dipendenze di server
+# Installa dipendenze
 WORKDIR /app/server
 RUN npm install
 
-# Torna a /app per copiare il resto
-WORKDIR /app
-
-# Copia tutta la cartella client
-COPY client ./client
-
-# Copia tutta la cartella server
-COPY server ./server
-
-# Costruisci il progetto NestJS
-WORKDIR /app/server
-RUN npm run build
-
-# Esponi la porta su cui gira NestJS
+# Espone la porta NestJS
 EXPOSE 3000
 
-# Comando di avvio server NestJS 
-CMD ["node", "dist/main.js"]
+# Avvia in modalità dev con watch (necessario bind mount per hot reload)
+CMD ["npm", "run", "dev"]

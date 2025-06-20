@@ -1,6 +1,7 @@
 services:
   mongodb:
     image: mongo:8.0.9
+    command: ["mongod", "--quiet"] # log solo di errori gravi
     container_name: mongodb
     restart: unless-stopped
     volumes:
@@ -14,7 +15,7 @@ services:
   app:
     build:
       context: .  # cartella dove c'è Dockerfile server
-    container_name: flashcard_manager
+    container_name: flashcards_manager
     restart: unless-stopped
     ports:
       - "3000:3000"
@@ -23,7 +24,14 @@ services:
     depends_on:
       - mongodb
     volumes:
-      - ./client/data:/app/client/data
+      # Bind mount per il codice client
+      - ./client:/app/client
+      # Bind mount per il codice server
+      - ./server:/app/server
+      - server-data:/app/server/data
+      - client-data:/app/client/data
 
 volumes:
   mongo_data:
+  server-data:
+  client-data: # TODO da verificare se toglierne uno dei due
