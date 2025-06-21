@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString, Length } from 'class-validator';
-import { charMinLength, nameMaxLength, titleMaxLength } from 'src/config';
+import { IsMongoId, IsOptional, IsString, Length } from 'class-validator';
+import { charMinLength, idLength, nameMaxLength, titleMaxLength } from 'src/config';
 
 /** The Dto file contains the description of the client requests and the server's responses*/
 export class CreateSubjectDto {
@@ -28,4 +28,14 @@ export class CreateSubjectDto {
   })
   icon: string; // TODO vedere da input come viene inviato il dato e metterci dei controlli
   // TODO non va bene che se lascio icon null me lo pusha lo stesso con il valore null
+}
+
+export class UpdateSubjectDto extends CreateSubjectDto {
+  @IsMongoId()
+  @Length(idLength, idLength)
+  @ApiProperty({
+    description: 'subject id',
+    example: null,
+  })
+  id: string;
 }

@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Subject, SubjectDocument } from './subject.schema';
-import { CreateSubjectDto } from './subject.dto';
+import { CreateSubjectDto, UpdateSubjectDto } from './subject.dto';
 import { Model, SortOrder } from 'mongoose';
-import { BasePaginatedResult, FilterRequest } from 'src/common.dto';
+import { BasePaginatedResult, FilterRequest, validateObjectIdParam } from 'src/common.dto';
 
 @Injectable()
 export class SubjectService {
@@ -38,8 +38,32 @@ export class SubjectService {
     return { result, count };
   }
 
-  // async deleteEmail(id: string): Promise<void> {
-  //   // eslint-disable-next-line @typescript-eslint/naming-convention
-  //   await this.subjectModel.deleteOne({ _id: id }).exec();
-  // }
+  async delete(
+    id: string,
+  ): Promise<void | BadRequestException | NotFoundException> {
+    if (!validateObjectIdParam(id))
+      throw new BadRequestException('The id does not satisfy requirements');
+
+    const result = await this.subjectModel.deleteOne({ _id: id });
+    if (result.deletedCount === 0) {
+      throw new NotFoundException(`Subject with id ${id} not found`);
+    }
+  }
+
+  async update(
+    id: string,
+    updateObj: UpdateSubjectDto,
+  ): Promise<void | NotFoundException> {
+    console.log(id);
+    if (!validateObjectIdParam(id))
+      throw new BadRequestException('The id does not satisfy requirements');
+
+    const result = await this.subjectModel
+      .findByIdAndUpdate({ _id: id }, updateObj, { new: true })
+      .exec();
+
+    if (!result) {
+      throw new NotFoundException('Subject with id ${id} not found');
+    }
+  }
 }

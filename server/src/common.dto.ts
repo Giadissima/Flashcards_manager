@@ -1,4 +1,4 @@
-import { Filters, nameMaxLength } from './config';
+import { Filters, idLength, nameMaxLength } from './config';
 import { IsIn, IsString, Max, Min } from 'class-validator';
 
 import { ApiProperty } from '@nestjs/swagger';
@@ -48,4 +48,8 @@ export class FilterRequest {
 export interface BasePaginatedResult<T> {
   count: number;
   result: T[];
+}
+
+export function validateObjectIdParam(id: string) {
+  return typeof id === 'string' && id.length == idLength;
 }
