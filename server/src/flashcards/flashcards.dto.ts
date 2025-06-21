@@ -9,20 +9,13 @@ import {
 
 import { ApiProperty } from '@nestjs/swagger';
 
-// import { NotFoundError } from "rxjs";
-
-// TODO queste righe cancellate serviranno?
-// ? this line import config file without dependecy injection
-// const userDto = configFn().userDto;
-// if(!userDto) throw new NotFoundError("CONFIG FILE NOT INITIALIZED")
-
 //TODO fixare l'errore che il config non prende i valori dal .env
 /** The Dto file contains the description of the client requests and the server's responses*/
 export class FlashcardRequestDto {
   @IsString()
   @Length(charMinLenght, titleMaxLenght)
   @ApiProperty({
-    description: 'Titolo della flashcard',
+    description: 'Titolo',
     example: 'Esercizio addizioni',
   })
   title: string;
@@ -47,10 +40,9 @@ export class FlashcardRequestDto {
   @IsMongoId()
   @Length(charMinLenght, idMaxLenght)
   @ApiProperty({
-    description: 'group id',
-    example: 'Operazioni aritmetiche',
+    description: 'group id', // TODO example
   })
-  group: string;
+  group_id: string;
 }
 
 // export class AuthenticationResponse {
