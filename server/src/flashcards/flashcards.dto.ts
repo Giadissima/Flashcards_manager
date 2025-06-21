@@ -40,7 +40,8 @@ export class FlashcardRequestDto {
   @IsMongoId()
   @Length(charMinLenght, idMaxLenght)
   @ApiProperty({
-    description: 'group id', // TODO example
+    description: 'group id',
+    example: null,
   })
   group_id: string;
 }

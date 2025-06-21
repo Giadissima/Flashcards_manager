@@ -1,6 +1,5 @@
 import * as mongoose from 'mongoose';
 
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 import { Document } from 'mongoose';
@@ -23,9 +22,6 @@ export class Flashcard {
   @Prop({ required: true })
   answer: string;
 
-  @ApiPropertyOptional({
-    description: 'group id (opzionale)',
-  })
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Group', required: false })
   group: mongoose.Types.ObjectId;
 }
