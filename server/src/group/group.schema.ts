@@ -1,20 +1,26 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-
-import { Document } from 'mongoose';
+import mongoose, { Document } from 'mongoose';
 
 export type GroupDocument = Group & Document;
 
 // ? This file contains Group MongoDb's schema
 @Schema({
-  collection: 'Group',
+  collection: 'group',
   collation: { locale: 'it', caseFirst: 'off', strength: 1 },
 })
 export class Group {
   @Prop({ required: true })
   name: string;
 
-  @Prop({ required: true })
+  @Prop({ required: false }) // TODO dovrà essere obbligatorio!
   color: string; // TODO non deve essere una stringa!
+
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'subject',
+    required: false,
+  })
+  group: mongoose.Types.ObjectId;
 }
 
-export const UserSchema = SchemaFactory.createForClass(Group);
+export const GroupSchema = SchemaFactory.createForClass(Group);

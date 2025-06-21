@@ -3,7 +3,6 @@ import * as mongoose from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 import { Document } from 'mongoose';
-import { Group } from '../group/group.schema';
 
 export type FlashcardDocument = Flashcard & Document;
 
@@ -22,7 +21,7 @@ export class Flashcard {
   @Prop({ required: true })
   answer: string;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Group', required: false })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'group', required: false })
   group: mongoose.Types.ObjectId;
 }
 

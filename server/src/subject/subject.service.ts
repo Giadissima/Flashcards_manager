@@ -1,26 +1,33 @@
 import { Injectable } from '@nestjs/common';
-import { CreateSubjectDto } from './dto/create-subject.dto';
-import { UpdateSubjectDto } from './dto/update-subject.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Subject } from './subject.schema';
+import { CreateSubjectDto } from './subject.dto';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class SubjectService {
-  create(createSubjectDto: CreateSubjectDto) {
-    return 'This action adds a new subject';
+  constructor(
+    @InjectModel(Subject.name) private subjectModel: Model<Subject>,
+  ) {}
+
+  async create(createSubjectDto: CreateSubjectDto) {
+    await new this.subjectModel({ ...createSubjectDto }).save();
+    return 'Success';
   }
 
-  findAll() {
-    return `This action returns all subject`;
-  }
+  // findAll() {
+  //   return `This action returns all subject`;
+  // }
 
-  findOne(id: number) {
-    return `This action returns a #${id} subject`;
-  }
+  // findOne(id: number) {
+  //   return `This action returns a #${id} subject`;
+  // }
 
-  update(id: number, updateSubjectDto: UpdateSubjectDto) {
-    return `This action updates a #${id} subject`;
-  }
+  // update(id: number, updateSubjectDto: UpdateSubjectDto) {
+  //   return `This action updates a #${id} subject`;
+  // }
 
-  remove(id: number) {
-    return `This action removes a #${id} subject`;
-  }
+  // remove(id: number) {
+  //   return `This action removes a #${id} subject`;
+  // }
 }

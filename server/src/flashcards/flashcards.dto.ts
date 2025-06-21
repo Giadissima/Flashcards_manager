@@ -2,21 +2,20 @@ import { IsMongoId, IsOptional, IsString, Length } from 'class-validator';
 import {
   answerMaxLenght,
   charMinLenght,
-  idMaxLenght,
+  idLenght,
   questionMaxLenght,
   titleMaxLenght,
 } from 'src/config';
 
 import { ApiProperty } from '@nestjs/swagger';
 
-//TODO fixare l'errore che il config non prende i valori dal .env
 /** The Dto file contains the description of the client requests and the server's responses*/
 export class FlashcardRequestDto {
   @IsString()
   @Length(charMinLenght, titleMaxLenght)
   @ApiProperty({
-    description: 'Titolo',
-    example: 'Esercizio addizioni',
+    description: 'Title',
+    example: 'Esercizio addizioni', // TODO tradurlo in inglese
   })
   title: string;
 
@@ -38,7 +37,7 @@ export class FlashcardRequestDto {
 
   @IsOptional()
   @IsMongoId()
-  @Length(charMinLenght, idMaxLenght)
+  @Length(idLenght, idLenght)
   @ApiProperty({
     description: 'group id',
     example: null,
