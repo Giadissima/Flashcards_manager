@@ -1,10 +1,10 @@
 import { IsMongoId, IsOptional, IsString, Length } from 'class-validator';
 import {
-  answerMaxLenght,
-  charMinLenght,
-  idLenght,
-  questionMaxLenght,
-  titleMaxLenght,
+  answerMaxLength,
+  charMinLength,
+  idLength,
+  questionMaxLength,
+  titleMaxLength,
 } from 'src/config';
 
 import { ApiProperty } from '@nestjs/swagger';
@@ -12,7 +12,7 @@ import { ApiProperty } from '@nestjs/swagger';
 /** The Dto file contains the description of the client requests and the server's responses*/
 export class FlashcardRequestDto {
   @IsString()
-  @Length(charMinLenght, titleMaxLenght)
+  @Length(charMinLength, titleMaxLength)
   @ApiProperty({
     description: 'Title',
     example: 'Esercizio addizioni', // TODO tradurlo in inglese
@@ -20,7 +20,7 @@ export class FlashcardRequestDto {
   title: string;
 
   @IsString()
-  @Length(charMinLenght, questionMaxLenght)
+  @Length(charMinLength, questionMaxLength)
   @ApiProperty({
     description: 'question',
     example: 'Quanto fa 2+2?',
@@ -28,7 +28,7 @@ export class FlashcardRequestDto {
   question: string;
 
   @IsString()
-  @Length(charMinLenght, answerMaxLenght)
+  @Length(charMinLength, answerMaxLength)
   @ApiProperty({
     description: 'answer',
     example: '2+2=4',
@@ -37,7 +37,7 @@ export class FlashcardRequestDto {
 
   @IsOptional()
   @IsMongoId()
-  @Length(idLenght, idLenght)
+  @Length(idLength, idLength)
   @ApiProperty({
     description: 'group id',
     example: null,
