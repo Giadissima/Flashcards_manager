@@ -1,9 +1,17 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Subject, SubjectDocument } from './subject.schema';
 import { CreateSubjectDto, UpdateSubjectDto } from './subject.dto';
 import { Model, SortOrder } from 'mongoose';
-import { BasePaginatedResult, FilterRequest, validateObjectIdParam } from 'src/common.dto';
+import {
+  BasePaginatedResult,
+  FilterRequest,
+  validateObjectIdParam,
+} from 'src/common.dto';
 
 @Injectable()
 export class SubjectService {
@@ -54,7 +62,6 @@ export class SubjectService {
     id: string,
     updateObj: UpdateSubjectDto,
   ): Promise<void | NotFoundException> {
-    console.log(id);
     if (!validateObjectIdParam(id))
       throw new BadRequestException('The id does not satisfy requirements');
 
