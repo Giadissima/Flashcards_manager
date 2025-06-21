@@ -25,7 +25,7 @@ export class SubjectService {
   }
 
   findOne(id: string): Promise<SubjectDocument | null> {
-    return this.subjectModel.findOne({ _id: id }).exec();
+    return this.subjectModel.findById(id).exec();
   }
 
   async findAll(

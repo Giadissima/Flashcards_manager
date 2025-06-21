@@ -29,3 +29,13 @@ export class CreateGroupDto {
   })
   subject_id: string;
 }
+
+export class UpdateGroupDto extends CreateGroupDto {
+  @IsMongoId()
+  @Length(idLength, idLength)
+  @ApiProperty({
+    description: 'Group id',
+    example: null,
+  })
+  id: string;
+}

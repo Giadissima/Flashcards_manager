@@ -1,4 +1,4 @@
-import { Subject, SubjectSchema } from './subject.schema'
+import { Subject, SubjectSchema } from './subject.schema';
 
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';

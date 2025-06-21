@@ -17,10 +17,10 @@ export class Group {
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'subject',
+    ref: 'Subject',
     required: false,
   })
-  group: mongoose.Types.ObjectId;
+  subject_id: mongoose.Types.ObjectId;
 }
 
 export const GroupSchema = SchemaFactory.createForClass(Group);

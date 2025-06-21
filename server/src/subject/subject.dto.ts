@@ -1,6 +1,11 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsMongoId, IsOptional, IsString, Length } from 'class-validator';
-import { charMinLength, idLength, nameMaxLength, titleMaxLength } from 'src/config';
+import {
+  charMinLength,
+  idLength,
+  nameMaxLength,
+  titleMaxLength,
+} from 'src/config';
 
 /** The Dto file contains the description of the client requests and the server's responses*/
 export class CreateSubjectDto {
