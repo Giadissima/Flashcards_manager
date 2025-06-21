@@ -10,7 +10,7 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 
 /** The Dto file contains the description of the client requests and the server's responses*/
-export class FlashcardRequestDto {
+export class CreateFlashcardDto {
   @IsString()
   @Length(charMinLength, titleMaxLength)
   @ApiProperty({
@@ -45,9 +45,12 @@ export class FlashcardRequestDto {
   group_id: string;
 }
 
-// export class AuthenticationResponse {
-//   @ApiProperty({
-//     description: "Jwt token"
-//   })
-//   jwt: string
-// }
+export class UpdateFlashcardDto extends CreateFlashcardDto {
+  @IsMongoId()
+  @Length(idLength, idLength)
+  @ApiProperty({
+    description: 'Group id',
+    example: null,
+  })
+  id: string;
+}

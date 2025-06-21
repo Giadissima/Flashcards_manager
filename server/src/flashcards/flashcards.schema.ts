@@ -21,8 +21,8 @@ export class Flashcard {
   @Prop({ required: true })
   answer: string;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'group', required: false })
-  group: mongoose.Types.ObjectId;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Group', required: false })
+  group_id: mongoose.Types.ObjectId;
 }
 
 export const FlashcardSchema = SchemaFactory.createForClass(Flashcard);

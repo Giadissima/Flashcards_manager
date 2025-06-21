@@ -1,45 +1,59 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 
 import { FlashcardsService } from './flashcards.service';
-import { FlashcardRequestDto } from './flashcards.dto';
+import { ApiOperation } from '@nestjs/swagger';
+import { FilterRequest, BasePaginatedResult } from 'src/common.dto';
+import { CreateFlashcardDto, UpdateFlashcardDto } from './flashcards.dto';
+import { FlashcardDocument } from './flashcards.schema';
 
 @Controller('flashcards')
 export class FlashcardsController {
   constructor(private readonly flashcardsService: FlashcardsService) {}
 
+  @ApiOperation({ description: 'create a new Flashcard obj and push it on db' })
   @Post()
-  create(@Body() createFlashcardDto: FlashcardRequestDto):any {
+  create(@Body() createFlashcardDto: CreateFlashcardDto): Promise<void> {
     return this.flashcardsService.create(createFlashcardDto);
   }
 
-  // @Get()
-  // findAll() {
-  //   return this.flashcardsService.findAll();
-  // }
+  @ApiOperation({ description: 'get all Flashcard from db with filters' })
+  @Get('all')
+  findAll(
+    @Query() filters: FilterRequest,
+  ): Promise<BasePaginatedResult<FlashcardDocument>> {
+    return this.flashcardsService.findAll(filters);
+  }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.flashcardsService.findOne(+id);
-  // }
+  @ApiOperation({ description: 'get a specific Flashcard from db' })
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.flashcardsService.findOne(id);
+  }
 
-  // @Patch(':id')
-  // update(
-  //   @Param('id') id: string,
-  //   @Body() updateFlashcardDto: UpdateFlashcardDto,
-  // ) {
-  //   return this.flashcardsService.update(+id, updateFlashcardDto);
-  // }
+  @Patch(':id')
+  update(
+    @Param('id') id: string,
+    @Body() updateFlashcardDto: UpdateFlashcardDto,
+  ) {
+    return this.flashcardsService.update(id, updateFlashcardDto);
+  }
 
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.flashcardsService.remove(+id);
-  // }
+  @ApiOperation({ description: 'Delete one Flashcard from db' })
+  @Delete(':id')
+  delete(
+    @Param('id') id: string,
+  ): Promise<void | BadRequestException | NotFoundException> {
+    return this.flashcardsService.delete(id);
+  }
 }

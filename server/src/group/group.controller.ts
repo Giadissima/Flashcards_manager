@@ -23,13 +23,13 @@ export class GroupController {
 
   @ApiOperation({ description: 'create a new Group obj and push it on db' })
   @Post()
-  create(@Body() createGroupDto: CreateGroupDto) {
+  create(@Body() createGroupDto: CreateGroupDto): Promise<void> {
     return this.groupService.create(createGroupDto);
   }
 
   @ApiOperation({ description: 'get all Group from db with filters' })
   @Get('all')
-  async findAll(
+  findAll(
     @Query() filters: FilterRequest,
   ): Promise<BasePaginatedResult<GroupDocument>> {
     return this.groupService.findAll(filters);
@@ -48,9 +48,9 @@ export class GroupController {
 
   @ApiOperation({ description: 'Delete one Group from db' })
   @Delete(':id')
-  async delete(
+  delete(
     @Param('id') id: string,
   ): Promise<void | BadRequestException | NotFoundException> {
-    await this.groupService.delete(id);
+    return this.groupService.delete(id);
   }
 }

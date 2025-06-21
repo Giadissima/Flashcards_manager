@@ -17,9 +17,8 @@ import {
 export class GroupService {
   constructor(@InjectModel(Group.name) private groupModel: Model<Group>) {}
 
-  async create(createGroupDto: CreateGroupDto): Promise<string> {
+  async create(createGroupDto: CreateGroupDto): Promise<void> {
     await new this.groupModel({ ...createGroupDto }).save();
-    return 'Success';
   }
 
   findOne(id: string): Promise<GroupDocument | null> {

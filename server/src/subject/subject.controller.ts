@@ -22,13 +22,13 @@ export class SubjectController {
 
   @ApiOperation({ description: 'create a new subject obj and push it on db' })
   @Post()
-  create(@Body() createSubjectDto: CreateSubjectDto) {
+  create(@Body() createSubjectDto: CreateSubjectDto): Promise<void> {
     return this.subjectService.create(createSubjectDto);
   }
 
   @ApiOperation({ description: 'get all subject from db with filters' })
   @Get('all')
-  async findAll(
+  findAll(
     @Query() filters: FilterRequest,
   ): Promise<BasePaginatedResult<SubjectDocument>> {
     return this.subjectService.findAll(filters);
@@ -47,9 +47,9 @@ export class SubjectController {
 
   @ApiOperation({ description: 'Delete one subject from db' })
   @Delete(':id')
-  async delete(
+  delete(
     @Param('id') id: string,
   ): Promise<void | BadRequestException | NotFoundException> {
-    await this.subjectService.delete(id);
+    return this.subjectService.delete(id);
   }
 }

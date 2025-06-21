@@ -19,9 +19,8 @@ export class SubjectService {
     @InjectModel(Subject.name) private subjectModel: Model<Subject>,
   ) {}
 
-  async create(createSubjectDto: CreateSubjectDto): Promise<string> {
+  async create(createSubjectDto: CreateSubjectDto): Promise<void> {
     await new this.subjectModel({ ...createSubjectDto }).save();
-    return 'Success';
   }
 
   findOne(id: string): Promise<SubjectDocument | null> {
