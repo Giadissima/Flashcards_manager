@@ -4,6 +4,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { FlashcardsModule } from './flashcards/flashcards.module';
 import { GroupModule } from './group/group.module';
+import { ImportExportModule } from './import-export/import-export.module';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ServeStaticModule } from '@nestjs/serve-static';
@@ -30,6 +31,7 @@ import { join } from 'path';
     FlashcardsModule,
     GroupModule,
     SubjectModule,
+    ImportExportModule,
   ],
   controllers: [AppController],
   providers: [AppService],
