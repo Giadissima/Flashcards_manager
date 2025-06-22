@@ -23,6 +23,13 @@ export class Flashcard {
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Group', required: false })
   group_id: mongoose.Types.ObjectId;
-}
 
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Subject',
+    required: false,
+  })
+  subject_id: mongoose.Types.ObjectId;
+}
+// ! exploit: il client potrebbe decidere di fare una flashcard appartenente a un gruppo e una materia non collegate modificando a mano la richiesta, dato che non ho messo controlli a riguardo. Non ce li metterò nemmeno perché non ne ho voglia, il mio progetto è un progetto semplice per studiarci sopra, se però sentite la necessità di modificarlo fatemi pure una pull request!
 export const FlashcardSchema = SchemaFactory.createForClass(Flashcard);

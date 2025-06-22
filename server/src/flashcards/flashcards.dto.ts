@@ -43,6 +43,15 @@ export class CreateFlashcardDto {
     example: null,
   })
   group_id: string;
+
+  @IsOptional()
+  @IsMongoId()
+  @Length(idLength, idLength)
+  @ApiProperty({
+    description: 'subject id',
+    example: null,
+  })
+  subject_id: string;
 }
 
 export class UpdateFlashcardDto extends CreateFlashcardDto {

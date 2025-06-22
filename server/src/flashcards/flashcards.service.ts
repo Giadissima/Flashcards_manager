@@ -26,7 +26,7 @@ export class FlashcardsService {
   findOne(id: string): Promise<FlashcardDocument | null> {
     return this.flashcardModel
       .findById(id)
-      .populate({ path: 'group_id', populate: { path: 'subject_id' } })
+      .populate(['group_id', 'subject_id'])
       .exec();
   }
 
@@ -42,7 +42,7 @@ export class FlashcardsService {
         ])
         .skip(filter.skip)
         .limit(filter.limit)
-        .populate({ path: 'group_id', populate: { path: 'subject_id' } })
+        .populate(['group_id', 'subject_id'])
         .exec(),
       this.flashcardModel.find().countDocuments(),
     ]);
