@@ -9,9 +9,6 @@ export type GroupDocument = Group & Document;
   collation: { locale: 'it', caseFirst: 'off', strength: 1 },
 })
 export class Group {
-  @Prop({ required: false }) // TODO vedere se poi rimuoverlo (non dovrebbe più servire)
-  _id: string;
-
   @Prop({ required: true })
   name: string;
 

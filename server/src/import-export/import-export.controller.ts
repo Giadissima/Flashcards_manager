@@ -2,12 +2,15 @@ import {
   Controller,
   Get,
   Post,
+  Res,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiOperation } from '@nestjs/swagger';
 import { ImportExportService } from './import-export.service';
+import { Writable } from 'stream';
+import { Response } from 'express';
 
 @Controller('import-export')
 export class ImportExportController {
@@ -61,7 +64,13 @@ export class ImportExportController {
   @ApiOperation({
     description: 'it allows to upload a file contains groups on db',
   })
-  exportFlashcards(): Promise<any> {
-    return this.importService.exportFlashcards();
+  async exportFlashcards(@Res() res: Response): Promise<void> {
+    const stream = await this.importService.exportFlashcardsToFileStream();
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader(
+      'Content-Disposition',
+      'attachment; filename="flashcards.json"',
+    );
+    stream.pipe(res as unknown as Writable);
   }
 }

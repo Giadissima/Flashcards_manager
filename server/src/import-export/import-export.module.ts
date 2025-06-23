@@ -1,5 +1,6 @@
 import { Flashcard, FlashcardSchema } from 'src/flashcards/flashcards.schema';
 import { Group, GroupSchema } from 'src/group/group.schema';
+import { Subject, SubjectSchema } from 'src/subject/subject.schema';
 
 import { ImportExportController } from './import-export.controller';
 import { ImportExportService } from './import-export.service';
@@ -12,6 +13,7 @@ import { MongooseModule } from '@nestjs/mongoose';
   imports: [
     MongooseModule.forFeature([
       { name: Flashcard.name, schema: FlashcardSchema },
+      { name: Subject.name, schema: SubjectSchema },
       { name: Group.name, schema: GroupSchema },
     ]),
   ],
