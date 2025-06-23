@@ -82,6 +82,7 @@ export class ImportExportService {
         console.log(group_doc?._id);
       }
 
+      // ? flashcard creation
       await this.flashcardModel.create({
         title: item.title?.trim(),
         question: item.question?.trim(),
@@ -136,7 +137,5 @@ export class ImportExportService {
 
     return createReadStream(filePath);
   }
-  // TODO vedere se è possibile rimuovere alcuni campi per tenere più pulito il file (con una select)
   // TODO l'export dovrà essere filtrato per gruppi e materie
-  // TODO ci sarà solo un import singolo delle flashcards
 }

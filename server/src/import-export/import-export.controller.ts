@@ -54,12 +54,6 @@ export class ImportExportController {
       },
     },
   })
-  @Post('upload-groups')
-  @UseInterceptors(FileInterceptor('file'))
-  uploadGroupJson(@UploadedFile() file: Express.Multer.File): Promise<void> {
-    return this.importService.importGroupsFromFile(file);
-  }
-
   @Get('export-flashcards')
   @ApiOperation({
     description: 'it allows to upload a file contains groups on db',

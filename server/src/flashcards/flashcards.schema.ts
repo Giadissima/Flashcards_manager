@@ -10,6 +10,7 @@ export type FlashcardDocument = Flashcard & Document;
 @Schema({
   collection: 'flashcard',
   collation: { locale: 'it', caseFirst: 'off', strength: 1 },
+  timestamps: true,
 })
 export class Flashcard {
   @Prop({ required: true })

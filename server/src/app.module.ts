@@ -10,6 +10,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { SubjectModule } from './subject/subject.module';
 import { join } from 'path';
+import { TestModule } from './test/test.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { join } from 'path';
     GroupModule,
     SubjectModule,
     ImportExportModule,
+    TestModule,
   ],
   controllers: [AppController],
   providers: [AppService],
