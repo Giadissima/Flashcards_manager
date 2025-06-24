@@ -14,10 +14,10 @@ export class Subject {
   name: string;
 
   @Prop({ required: false })
-  icon: string; // TODO non deve essere una stringa!
+  icon?: string; // TODO non deve essere una stringa!
 
   @Prop({ required: false })
-  desc: string;
+  desc?: string;
 }
 
 export const SubjectSchema = SchemaFactory.createForClass(Subject);

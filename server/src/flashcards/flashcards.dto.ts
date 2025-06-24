@@ -42,7 +42,7 @@ export class CreateFlashcardDto {
     description: 'group id',
     example: null,
   })
-  group_id: string;
+  group_id?: string;
 
   @IsOptional()
   @IsMongoId()
@@ -51,7 +51,7 @@ export class CreateFlashcardDto {
     description: 'subject id',
     example: null,
   })
-  subject_id: string;
+  subject_id?: string;
 }
 
 export class UpdateFlashcardDto extends CreateFlashcardDto {
@@ -63,3 +63,4 @@ export class UpdateFlashcardDto extends CreateFlashcardDto {
   })
   id: string;
 }
+// TODO caricare le immagini

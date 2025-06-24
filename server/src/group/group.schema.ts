@@ -13,7 +13,7 @@ export class Group {
   name: string;
 
   @Prop({ required: false }) // TODO dovrà essere obbligatorio!
-  color: string; // TODO non deve essere una stringa!
+  color?: string; // TODO non deve essere una stringa!
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
