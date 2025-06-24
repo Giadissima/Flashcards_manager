@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { FlattenMaps, Model } from 'mongoose';
 import { FileDocument, FileMongo } from './file.schema';
+import { ReadStream } from 'fs';
+import { Binary } from 'mongodb';
 
 @Injectable()
 export class FileService {
@@ -16,7 +18,16 @@ export class FileService {
     }).save();
   }
 
-  findOne(id: string): Promise<FileDocument | null> {
-    return this.fileModel.findById(id).exec();
+  // aggiungere una res per fare il download del file
+  async findOne(id: string) {
+    return this.fileModel.findById(id).lean().exec();
+  }
+
+  convertBuffer(b) {
+    return Buffer.isBuffer(b)
+      ? b
+      : b instanceof Binary
+        ? b.buffer // estrai il buffer dal Binary
+        : Buffer.from(b);
   }
 }
