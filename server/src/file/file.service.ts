@@ -11,7 +11,6 @@ export class FileService {
     @InjectModel(FileMongo.name) private fileModel: Model<FileMongo>,
   ) {}
   create(file: Express.Multer.File[]): Promise<FileDocument> {
-    console.dir(file); // prima di dare errore
     return new this.fileModel({
       content: file[0].buffer,
       mimetype: file[0].mimetype,

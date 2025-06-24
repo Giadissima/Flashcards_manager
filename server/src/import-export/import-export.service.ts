@@ -64,7 +64,6 @@ export class ImportExportService {
       const group_obj: GroupFileFormat | undefined = item.group_id;
 
       let group_doc: GroupDocument | undefined = undefined;
-      console.log(group_obj);
       if (group_obj && subject_doc) {
         group_doc = await this.groupModel
           .findOneAndUpdate(
@@ -79,7 +78,6 @@ export class ImportExportService {
             { upsert: true, new: true },
           )
           .exec();
-        console.log(group_doc?._id);
       }
 
       // ? flashcard creation
@@ -96,7 +94,6 @@ export class ImportExportService {
   async exportFlashcardsToFileStream(): Promise<ReadStream> {
     const filePath = join(__dirname, '..', 'tmp', 'flashcards_export.json');
     const dir = dirname(filePath);
-    console.log(dir);
     if (!existsSync(dir)) {
       mkdirSync(dir, { recursive: true }); // crea la cartella tmp e tutte le eventuali sottocartelle mancanti
     }
