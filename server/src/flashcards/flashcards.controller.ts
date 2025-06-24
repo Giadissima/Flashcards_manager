@@ -9,13 +9,16 @@ import {
   Patch,
   Post,
   Query,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
 
 import { FlashcardsService } from './flashcards.service';
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiOperation } from '@nestjs/swagger';
 import { FilterRequest, BasePaginatedResult } from 'src/common.dto';
 import { CreateFlashcardDto, UpdateFlashcardDto } from './flashcards.dto';
 import { FlashcardDocument } from './flashcards.schema';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 
 @Controller('flashcards')
 export class FlashcardsController {
@@ -23,8 +26,45 @@ export class FlashcardsController {
 
   @ApiOperation({ description: 'create a new Flashcard obj and push it on db' })
   @Post()
-  create(@Body() createFlashcardDto: CreateFlashcardDto): Promise<void> {
-    return this.flashcardsService.create(createFlashcardDto);
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'question_img', maxCount: 1 },
+      { name: 'answer_img', maxCount: 1 },
+    ]),
+  )
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        title: { type: 'string', example: 'Esercizio addizioni' },
+        question: { type: 'string', example: 'Quanto fa 2+2?' },
+        answer: { type: 'string', example: '2+2=4' },
+        group_id: { type: 'string', example: null },
+        subject_id: { type: 'string', example: null },
+        question_img: {
+          type: 'string',
+          format: 'binary',
+          description: 'Image file for the question',
+        },
+        answer_img: {
+          type: 'string',
+          format: 'binary',
+          description: 'Image file for the answer',
+        },
+      },
+      required: ['title', 'question', 'answer'],
+    },
+  })
+  create(
+    @Body() createFlashcardDto: CreateFlashcardDto,
+    @UploadedFiles()
+    files: {
+      question_img?: Express.Multer.File[];
+      answer_img?: Express.Multer.File[];
+    },
+  ): Promise<void> {
+    return this.flashcardsService.create(createFlashcardDto, files);
   }
 
   @ApiOperation({ description: 'get all Flashcard from db with filters' })

@@ -20,7 +20,6 @@ export class CreateGroupDto {
   })
   color: string; // TODO vedere da input come viene inviato il dato e metterci dei controlli
 
-  @IsOptional() // TODO togliere l'opzionale, un argomento è sempre connesso a una materia
   @IsMongoId()
   @Length(idLength, idLength)
   @ApiProperty({

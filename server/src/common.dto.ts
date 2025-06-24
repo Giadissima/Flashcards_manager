@@ -3,6 +3,7 @@ import { IsIn, IsString, Max, Min } from 'class-validator';
 
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
+import { Types } from 'mongoose';
 
 export class FilterRequest {
   @Type(() => Number)
@@ -51,7 +52,11 @@ export interface BasePaginatedResult<T> {
 }
 
 export function validateObjectIdParam(id: string) {
-  return typeof id === 'string' && id.length == idLength;
+  return (
+    typeof id === 'string' &&
+    id.length == idLength &&
+    !Types.ObjectId.isValid(id)
+  );
 }
 
 export function shuffleArray<T>(array: T[]): T[] {
