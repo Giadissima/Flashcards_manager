@@ -9,12 +9,15 @@ import {
   Query,
   BadRequestException,
   NotFoundException,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { SubjectService } from './subject.service';
 import { CreateSubjectDto, UpdateSubjectDto } from './subject.dto';
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiOperation } from '@nestjs/swagger';
 import { BasePaginatedResult, FilterRequest } from 'src/common.dto';
 import { SubjectDocument } from './subject.schema';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('subject')
 export class SubjectController {
@@ -22,8 +25,28 @@ export class SubjectController {
 
   @ApiOperation({ description: 'create a new subject obj and push it on db' })
   @Post()
-  create(@Body() createSubjectDto: CreateSubjectDto): Promise<void> {
-    return this.subjectService.create(createSubjectDto);
+  @UseInterceptors(FileInterceptor('icon'))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', example: 'Matematica' },
+        desc: { type: 'string', example: 'Materia scientifica di base' },
+        icon: {
+          type: 'string',
+          format: 'binary',
+          description: 'Image file for the subject icon',
+        },
+      },
+      required: ['name'],
+    },
+  })
+  create(
+    @Body() createSubjectDto: CreateSubjectDto,
+    @UploadedFile() icon?: Express.Multer.File,
+  ): Promise<void> {
+    return this.subjectService.create(createSubjectDto, icon);
   }
 
   @ApiOperation({ description: 'get all subject from db with filters' })

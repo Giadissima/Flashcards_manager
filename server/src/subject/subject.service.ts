@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  UploadedFile,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Subject, SubjectDocument } from './subject.schema';
@@ -12,15 +13,23 @@ import {
   FilterRequest,
   validateObjectIdParam,
 } from 'src/common.dto';
+import { FileService } from 'src/file/file.service';
 
 @Injectable()
 export class SubjectService {
   constructor(
     @InjectModel(Subject.name) private subjectModel: Model<Subject>,
+    private readonly fileService: FileService,
   ) {}
 
-  async create(createSubjectDto: CreateSubjectDto): Promise<void> {
-    await new this.subjectModel({ ...createSubjectDto }).save();
+  async create(
+    createSubjectDto: CreateSubjectDto,
+    @UploadedFile() icon?: Express.Multer.File,
+  ): Promise<void> {
+    const icon_id = icon
+      ? (await this.fileService.create([icon]))._id
+      : undefined;
+    await new this.subjectModel({ ...createSubjectDto, icon: icon_id }).save();
   }
 
   findOne(id: string): Promise<SubjectDocument | null> {
