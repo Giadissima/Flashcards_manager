@@ -11,9 +11,10 @@ import {
   Query,
 } from '@nestjs/common';
 import { TestService } from './test.service';
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiNotFoundResponse, ApiOperation } from '@nestjs/swagger';
 import { BasePaginatedResult, FilterRequest } from 'src/common.dto';
 import { TestDocument } from './test.schema';
+import { TestFiltersRequest } from './test.dto';
 
 @Controller('test')
 export class TestController {
@@ -21,10 +22,21 @@ export class TestController {
 
   @ApiOperation({ description: 'create a new Test' })
   @Post()
-  // TODO aggiungere su swagger che può ritornare anche notfoundexception
-  create(): Promise<TestDocument> {
+  @ApiNotFoundResponse({
+    type: NotFoundException,
+    description: 'Error creating test',
+  })
+  create(@Body() filters: TestFiltersRequest): Promise<TestDocument> {
     // TODO come input i filtri del nuovo test
-    return this.testService.create();
+    return this.testService.create(filters);
+  }
+
+  @ApiOperation({ description: 'get all test from db with filters' })
+  @Get('all')
+  findAll(
+    @Query() filters: FilterRequest,
+  ): Promise<BasePaginatedResult<TestDocument>> {
+    return this.testService.findAll(filters);
   }
 
   @ApiOperation({
@@ -36,23 +48,16 @@ export class TestController {
     return this.testService.findOne(id);
   }
 
-  @ApiOperation({ description: 'get all test from db with filters' })
-  @Get('all')
-  findAll(
-    @Query() filters: FilterRequest,
-  ): Promise<BasePaginatedResult<TestDocument>> {
-    return this.testService.findAll(filters);
-  }
-
-  @Patch(':id')
+  @Patch(':test_id/answer/:question_id')
   updateAnswer(
-    @Param('id') id: string,
+    @Param('test_id') test_id: string,
+    @Param('question_id') question_id: string,
     @Query('is_correct') is_correct: boolean,
   ) {
-    return this.testService.updateAnswer(id, is_correct);
+    return this.testService.updateAnswer(test_id, question_id, is_correct);
   }
 
-  @Patch(':id')
+  @Patch(':id/time')
   updateElapsedTime(@Param('id') id: string, @Query('time') time: number) {
     return this.testService.updateElapsedTime(id, time);
   }

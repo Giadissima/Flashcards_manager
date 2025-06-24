@@ -3,6 +3,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -25,6 +26,15 @@ async function bootstrap() {
         `,
     });
   }
+
+  app.useGlobalPipes( // class-validation
+    new ValidationPipe({
+      whitelist: true, // rimuove campi non dichiarati nei DTO
+      forbidNonWhitelisted: true, // lancia errore se ci sono campi extra
+      transform: true, // converte automaticamente i tipi (es. string → number)
+    }),
+  );
+
   await app.listen(process.env.PORT ?? 3000);
 }
 
