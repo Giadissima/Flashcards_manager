@@ -1,5 +1,5 @@
 import { Filters, idLength, nameMaxLength } from './config';
-import { IsIn, IsString, Max, Min } from 'class-validator';
+import { IsIn, IsString, Max, MaxLength, Min } from 'class-validator';
 
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
@@ -26,7 +26,7 @@ export class FilterRequest {
   limit: number;
 
   @IsString()
-  @Max(nameMaxLength)
+  @MaxLength(nameMaxLength)
   @ApiProperty({
     description: 'field name to select the sorting method',
     required: true,
