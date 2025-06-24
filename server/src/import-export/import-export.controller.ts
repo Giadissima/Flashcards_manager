@@ -39,6 +39,7 @@ export class ImportExportController {
     return this.importService.importFlashcardsFromFile(file);
   }
 
+  // TODO vedere perché chiede un file di input
   @ApiOperation({
     description: 'it allows to upload a file contains groups on db',
   })
@@ -53,7 +54,7 @@ export class ImportExportController {
         },
       },
     },
-  })
+  }) // TODO non funziona la populate interna della materia
   @Get('export-flashcards')
   @ApiOperation({
     description: 'it allows to upload a file contains groups on db',
