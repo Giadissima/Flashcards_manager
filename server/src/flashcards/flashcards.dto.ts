@@ -14,56 +14,47 @@ import { Transform } from 'class-transformer';
 export class CreateFlashcardDto {
   @IsString()
   @Length(charMinLength, titleMaxLength)
-  @ApiProperty({
-    description: 'Title',
-    example: 'Esercizio addizioni', // TODO tradurlo in inglese
-  })
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   title: string;
 
   @IsString()
   @Length(charMinLength, questionMaxLength)
-  @ApiProperty({
-    description: 'question',
-    example: 'Quanto fa 2+2?',
-  })
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   question: string;
 
   @IsString()
   @Length(charMinLength, answerMaxLength)
-  @ApiProperty({
-    description: 'answer',
-    example: '2+2=4',
-  })
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   answer: string;
 
   @IsOptional()
   @IsMongoId()
   @Length(idLength, idLength)
-  @ApiProperty({
-    description: 'group id',
-    example: null,
-  })
-  @Transform(({ value }) => (value === '' ? undefined : value))
+  @Transform(({ value }) =>
+    typeof value === 'string'
+      ? value.trim() || undefined // "" diventa undefined
+      : value,
+  )
   group_id?: string;
 
   @IsOptional()
   @IsMongoId()
   @Length(idLength, idLength)
-  @Transform(({ value }) => (value === '' ? undefined : value))
-  @ApiProperty({
-    description: 'subject id',
-    example: null,
-  })
+  @Transform(({ value }) =>
+    typeof value === 'string' ? value.trim() || undefined : value,
+  )
   subject_id?: string;
 }
 
 export class UpdateFlashcardDto extends CreateFlashcardDto {
   @IsMongoId()
   @Length(idLength, idLength)
+  @Transform(({ value }) =>
+    typeof value === 'string' ? value.trim() || undefined : value,
+  )
   @ApiProperty({
     description: 'Group id',
     example: null,
   })
   id: string;
 }
-// TODO caricare le immagini
