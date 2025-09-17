@@ -5,16 +5,18 @@
     <div class="col-md-4 mb-4 px-2">
         <div class="card h-100">
           <div class="card-body custom-card d-flex flex-column">
-            <div class="colorful-card-title" style="background-color: blue !important">
+            <div 
+            class="colorful-card-title"
+            [style.background-color]="getCardColor(card)">
               <h5 class="card-title">{{ card.title }}</h5>
             </div>
   
             <div class="card-body-custom">
-              <p class="card-text text-wrap-custom">{{ card.question }}</p>
+              <p class="card-text text-wrap-custom">{{ getCardBody(card) }}</p>
   
               <div class="mt-auto d-flex gap-2 flex-wrap">
                 <button class="btn btn-primary card-button" (click)="seeAnswer(card)">
-                  Vedi risposta
+                  {{getCardButtonText(card)}}
                 </button>
   
                 <button type="button" class="btn btn-danger card-button" (click)="deleteCard(card)">

@@ -13,6 +13,9 @@ import { FlashcardService } from '../flashcard/flashcard.service';
 })
 export class Home implements OnInit{
   flashcards!: Flashcard[];
+  
+  // mappa _id -> boolean (true = mostra risposta)
+  showAnswerMap: Record<string, boolean> = {};
 
   constructor(private flashcardsService: FlashcardService) {}
 
@@ -22,13 +25,38 @@ export class Home implements OnInit{
       limit: 10,
       sortField: "_id",
       sortDirection: "asc"
-    }).then(f => {this.flashcards = f.data; console.dir(this.flashcards)});
+    }).then(f => {
+      this.flashcards = f.data; 
+      console.dir(this.flashcards); // TODO rimuoverlo
+      this.flashcards.forEach(card => {
+          if (card._id) this.showAnswerMap[card._id] = false;
+        });
+    });
 
   }
 
-  
+  getCardColor(card: Flashcard): string {
+    // se group_id è un oggetto Group, usa il suo colore
+    if (card.group_id && typeof card.group_id !== 'string' && card.group_id.color) {
+      return card.group_id.color;
+    }
+    // fallback
+    return 'blue';
+  }
+
+  getCardBody(card: Flashcard): string {
+    if (!card._id) return card.question;
+    return this.showAnswerMap[card._id] ? card.answer : card.question;
+  }
+
+  // cambia da 'Vedi risposta' a 'Vedi domanda'
+  getCardButtonText(card: Flashcard): string {
+    return this.showAnswerMap[card._id] ? 'Vedi domanda' : 'Vedi risposta';
+  }
+
   seeAnswer(card: Flashcard): void {
-    alert(`Risposta: ${card.answer}`);
+    if(!card._id) return;
+    this.showAnswerMap[card._id] = !this.showAnswerMap[card._id];
   }
 
   deleteCard(card: Flashcard): void {
