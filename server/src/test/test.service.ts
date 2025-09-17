@@ -115,7 +115,7 @@ export class TestService {
   async findAll(
     filter: FilterRequest,
   ): Promise<BasePaginatedResult<TestDocument>> {
-    const [result, count] = await Promise.all([
+    const [data, count] = await Promise.all([
       this.testModel
         .find()
         .sort([
@@ -127,7 +127,7 @@ export class TestService {
         .exec(),
       this.testModel.find().countDocuments(),
     ]);
-    return { result, count };
+    return { data, count };
   }
 
   findOne(id: string) {
