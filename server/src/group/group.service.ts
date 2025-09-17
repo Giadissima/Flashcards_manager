@@ -28,7 +28,7 @@ export class GroupService {
   async findAll(
     filter: FilterRequest,
   ): Promise<BasePaginatedResult<GroupDocument>> {
-    const [result, count] = await Promise.all([
+    const [data, count] = await Promise.all([
       this.groupModel
         .find()
         .sort([
@@ -41,7 +41,7 @@ export class GroupService {
         .exec(),
       this.groupModel.find().countDocuments(),
     ]);
-    return { result, count };
+    return { data, count };
   }
 
   async delete(

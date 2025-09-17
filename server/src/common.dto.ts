@@ -48,7 +48,7 @@ export class FilterRequest {
 
 export interface BasePaginatedResult<T> {
   count: number;
-  result: T[];
+  data: T[];
 }
 
 export function validateObjectIdParam(id: string) {

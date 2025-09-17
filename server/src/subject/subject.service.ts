@@ -39,7 +39,7 @@ export class SubjectService {
   async findAll(
     filter: FilterRequest,
   ): Promise<BasePaginatedResult<SubjectDocument>> {
-    const [result, count] = await Promise.all([
+    const [data, count] = await Promise.all([
       this.subjectModel
         .find()
         .sort([
@@ -51,7 +51,7 @@ export class SubjectService {
         .exec(),
       this.subjectModel.find().countDocuments(),
     ]);
-    return { result, count };
+    return { data, count };
   }
 
   async delete(

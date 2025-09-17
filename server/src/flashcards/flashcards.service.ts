@@ -56,7 +56,7 @@ export class FlashcardsService {
   async findAll(
     filter: FilterRequest,
   ): Promise<BasePaginatedResult<FlashcardDocument>> {
-    const [result, count] = await Promise.all([
+    const [data, count] = await Promise.all([
       this.flashcardModel
         .find()
         .sort([
@@ -69,7 +69,7 @@ export class FlashcardsService {
         .exec(),
       this.flashcardModel.find().countDocuments(),
     ]);
-    return { result, count };
+    return { data, count };
   }
 
   async delete(
