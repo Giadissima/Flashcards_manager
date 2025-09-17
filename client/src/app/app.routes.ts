@@ -1,5 +1,4 @@
 import { CreateFlashcard } from './flashcard/create-flashcard/create-flashcard';
-import { DeleteFlashcard } from './flashcard/delete-flashcard/delete-flashcard';
 import { EditFlashcard } from './flashcard/edit-flashcard/edit-flashcard';
 import { Home } from './home/home';
 import { Routes } from '@angular/router';
@@ -12,7 +11,6 @@ export const routes: Routes = [
   { path: 'home', component: Home },
   { path: 'create-card', component: CreateFlashcard },
   { path: 'edit-card', component: EditFlashcard },
-  { path: 'delete-card', component: DeleteFlashcard },
   { path: 'setup-test', component: SetupTest },
   { path: 'test-runner', component: TestRunner },
   { path: 'test-result', component: TestResult },
