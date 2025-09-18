@@ -114,6 +114,26 @@ export class RestClientService {
       });
   }
 
+  async patch(endpoint: string, body: any, httpParams?: HttpParams): Promise<any> {
+    const reqOpts = {
+      params: httpParams || new HttpParams(),
+      headers: new HttpHeaders()
+    };
+
+    return firstValueFrom(this.http.patch(this.url + endpoint, body, reqOpts))
+      .catch((error) => {
+        console.log("[PATCH] error", error);
+        if (error.status == 401 && ((error.error || {}).error || {}).code == 'INVALID_TOKEN') {
+          // gestione token invalido (se serve)
+        } else if (error.status == 0) {
+          this.offlineException.emit(error);
+        } else if (error.status >= 500) {
+          this.serverErrorException.emit(error);
+        }
+        throw error;
+      });
+  }
+
   async delete<T>(endpoint: string, params?: any, reqOpts?: any, locale?: string): Promise<T> {
     const loc = locale || "it";
     if (!reqOpts || reqOpts == null) {
