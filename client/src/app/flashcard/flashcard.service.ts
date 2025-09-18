@@ -24,13 +24,13 @@ private baseUrl = baseUrlAPI + 'flashcards/';
   }
 
   // Crea una flashcard
-  createFlashcard(card: Flashcard): Observable<Flashcard> {
-    return this.http.post<Flashcard>(this.baseUrl, card);
+  createFlashcard(card: Flashcard): Promise<void> {
+    return this.restClient.post(this.baseUrl, card);
   }
 
   // Modifica una flashcard
-  updateFlashcard(id: number, card: Flashcard): Observable<Flashcard> {
-    return this.http.put<Flashcard>(`${this.baseUrl}/${id}`, card);
+  updateFlashcard(id: number, card: Flashcard): Promise<void> {
+    return this.restClient.patch(`${this.baseUrl}/${id}`, card);
   }
 
   // Elimina una flashcard
