@@ -1,26 +1,75 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" href="#">Flashcards manager</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-
-  <div class="collapse navbar-collapse" id="navbarSupportedContent">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item active">
-        <a class="nav-link" [routerLink]="['/home']" routerLinkActive="router-link-active" >Home<span class="sr-only"></span></a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" [routerLink]="['/create-card']" routerLinkActive="router-link-active" >Create card</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" [routerLink]="['/edit-card']" routerLinkActive="router-link-active" >Edit card</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" [routerLink]="['/setup-test']" routerLinkActive="router-link-active" >Start quiz</a>
-      </li>
-    </ul>
+<nav style="display: flex; justify-content: space-between; align-items: center; background-color: #fdf6f0; padding: 10px 20px; font-family: 'Helvetica Neue', sans-serif;">
+  <!-- Sinistra: Logo + Nome progetto -->
+  <div style="display: flex; align-items: center;">
+    <img src="assets/logo3.png" alt="Logo" style="height: 30px; margin-right: 10px;">
+    <span style="font-size: 18px; color: #6b4c3b;">PastelProject</span>
   </div>
+
+  <!-- Centro: Menu -->
+  <div style="display: flex; gap: 30px;">
+    <div class="dropdown">
+      <span class="menu-item">Groups</span>
+      <div class="dropdown-content">
+        <a href="#">Create Group</a>
+        <a href="#">Manage Groups</a>
+      </div>
+    </div>
+    <div class="dropdown">
+      <span class="menu-item">Subjects</span>
+      <div class="dropdown-content">
+        <a href="#">New Subject</a>
+        <a href="#">Manage Subjects</a>
+      </div>
+    </div>
+    <div class="dropdown">
+      <span class="menu-item">Test</span>
+      <div class="dropdown-content">
+        <a href="#">Start Test</a>
+        <a href="#">Results</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Destra: Pulsante pesca -->
+  <button style="background-color: #ffb3a7; border: none; padding: 8px 16px; border-radius: 5px; color: white; font-weight: bold; cursor: pointer;">
+    Create Card
+  </button>
 </nav>
-<div class="container">
-  <router-outlet />
-</div>
+
+<style>
+  .menu-item {
+    color: #6b4c3b;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .dropdown {
+    position: relative;
+  }
+
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    top: 25px;
+    background-color: #fffaf7;
+    box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 1;
+  }
+
+  .dropdown:hover .dropdown-content {
+    display: block;
+  }
+
+  .dropdown-content a {
+    display: block;
+    padding: 5px 10px;
+    text-decoration: none;
+    color: #6b4c3b;
+  }
+
+  .dropdown-content a:hover {
+    background-color: #ffe5dc;
+  }
+</style>
