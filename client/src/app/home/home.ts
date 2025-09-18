@@ -3,11 +3,13 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Flashcard } from '../models/flashcard.dto';
 import { FlashcardService } from '../flashcard/flashcard.service';
+import { Toast } from '../toast/toast';
+import { ToastService } from '../toast/toast.service';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, Toast],
   templateUrl: './home.html',
   styleUrl: './home.scss'
 })
@@ -17,7 +19,7 @@ export class Home implements OnInit{
   // mappa _id -> boolean (true = mostra risposta)
   showAnswerMap: Record<string, boolean> = {};
 
-  constructor(private flashcardsService: FlashcardService) {}
+  constructor(private flashcardsService: FlashcardService, private toast: ToastService) {}
 
   ngOnInit(): void {
     this.flashcardsService.getAllFlashcards({
@@ -59,11 +61,15 @@ export class Home implements OnInit{
     this.showAnswerMap[card._id] = !this.showAnswerMap[card._id];
   }
 
-  deleteCard(card: Flashcard): void {
+  async deleteCard(card: Flashcard): Promise<void> {
     if (!card._id) return;
-    this.flashcardsService.deleteFlashcard(card._id).subscribe(() => {
+    try {
+      await this.flashcardsService.deleteFlashcard(card._id);
+      this.toast.show("Card succesfully deleted", 'success');
       this.flashcards = this.flashcards.filter(c => c._id !== card._id);
-    });
+    } catch (error: any) {
+      this.toast.show("Error", 'error');
+    }
   }
 
   modifyCard(card: Flashcard): void {

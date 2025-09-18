@@ -133,10 +133,10 @@ export class RestClientService {
 
     return firstValueFrom(this.http.delete(this.url + endpoint, reqOpts)).catch(error => {
       console.error("[DELETE] error", error);
-      if (error.status == 401 && ((error.error || {}).error || {}).code == 'INVALID_TOKEN') {
-          this.router.navigate(['/auth/logout']);
-      }
-      else if (error.status == 0) {
+      // if (error.status == 401 && ((error.error || {}).error || {}).code == 'INVALID_TOKEN') {
+      //     this.router.navigate(['/auth/logout']);
+      // } else
+      if (error.status == 0) {
         this.offlineException.emit(error);
       }
       else if (error.status >= 500) {

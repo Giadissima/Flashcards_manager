@@ -34,7 +34,7 @@ private baseUrl = baseUrlAPI + 'flashcards/';
   }
 
   // Elimina una flashcard
-  deleteFlashcard(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  deleteFlashcard(id: string): Promise<void>{
+    return this.restClient.delete<void>(this.baseUrl + id)
   }
 }

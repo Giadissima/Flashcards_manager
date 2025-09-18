@@ -55,7 +55,7 @@ export function validateObjectIdParam(id: string) {
   return (
     typeof id === 'string' &&
     id.length == idLength &&
-    !Types.ObjectId.isValid(id)
+    Types.ObjectId.isValid(id)
   );
 }
 
