@@ -1,5 +1,5 @@
 import { Filters, idLength, nameMaxLength } from './config';
-import { IsIn, IsString, Max, MaxLength, Min } from 'class-validator';
+import { IsIn, IsMongoId, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
 
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
@@ -44,6 +44,14 @@ export class FilterRequest {
     default: 'desc',
   })
   sortDirection: string;
+
+  @IsOptional()
+  @IsMongoId()
+  @ApiProperty({
+    description: 'Filter by subject ID',
+    required: false,
+  })
+  subject_id?: string;
 }
 
 export interface BasePaginatedResult<T> {
