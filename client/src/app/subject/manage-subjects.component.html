@@ -1,0 +1,29 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Manage Subjects</h1>
+    <button class="btn btn-primary" (click)="createSubject()">Create New Subject</button>
+  </div>
+
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Icon</th>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let subject of subjects">
+        <td><img [src]="subject.icon || 'assets/logo3.png'" alt="icon" class="subject-icon"></td>
+        <td>{{ subject.name }}</td>
+        <td>{{ subject.desc }}</td>
+        <td>
+          <button class="btn btn-sm btn-warning me-2" (click)="editSubject(subject._id)">Edit</button>
+          <button class="btn btn-sm btn-danger" (click)="deleteSubject(subject._id)">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<app-toast></app-toast>
