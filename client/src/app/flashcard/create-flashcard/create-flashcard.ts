@@ -5,13 +5,12 @@ import { answerMaxLength, charMinLength, idLength, questionMaxLength, titleMaxLe
 
 import { CommonModule } from '@angular/common';
 import { FlashcardService } from '../flashcard.service';
+import { Group } from '../../models/group.dto';
+import { GroupService } from '../../group/group.service';
+import { Subject } from '../../models/subject.dto';
+import { SubjectService } from '../../subject/subject.service';
 import { Toast } from "../../toast/toast";
 import { ToastService } from '../../toast/toast.service';
-
-interface Group {
-  _id: string;
-  name: string;
-}
 
 @Component({
   selector: 'app-create-card',
@@ -23,11 +22,14 @@ interface Group {
 export class CreateFlashcard implements OnInit {
   cardForm!: FormGroup;
   groups: Group[] = [];
+  subjects: Subject[] = [];
 
   constructor(
     private fb: FormBuilder,
     private flashcardService: FlashcardService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private groupService: GroupService,
+    private subjectService: SubjectService
   ) {}
 
   ngOnInit(): void {
@@ -35,17 +37,51 @@ export class CreateFlashcard implements OnInit {
       title: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(titleMaxLength)]],
       question: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(questionMaxLength)]],
       answer: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(answerMaxLength)]],
-      group_id: ['']
+      group_id: [{ value: '', disabled: true }],
+      subject_id: ['']
     });
 
-    this.loadGroups();
+    this.loadSubjects();
+
+    this.cardForm.get('subject_id')?.valueChanges.subscribe(subjectId => {
+      this.groups = [];
+      this.cardForm.get('group_id')?.reset({ value: '', disabled: !subjectId });
+      
+      if (subjectId) {
+        this.loadGroupsBySubject(subjectId);
+      }
+    });
   }
 
-  async loadGroups() {
+  async loadGroupsBySubject(subjectId: string) {
     try {
-      // this.groups = await this.flashcardService.getGroups(); TODO
+      const response = await this.groupService.getAllGroups({
+        skip: 0,
+        limit: 50,
+        sortField: 'name',
+        sortDirection: 'asc',
+        subject_id: subjectId
+      });
+      this.groups = response.data;
+      this.cardForm.get('group_id')?.enable();
     } catch (err) {
-      console.error('Error loading groups', err);
+      console.error('Error loading groups for subject ' + subjectId, err);
+      this.toastService.show('Failed to load groups for the selected subject', 'error');
+    }
+  }
+
+  async loadSubjects() {
+    try {
+      const response = await this.subjectService.getAllSubjects({
+        skip: 0,
+        limit: 50,
+        sortField: 'name',
+        sortDirection: 'asc'
+      });
+      this.subjects = response.data;
+    } catch (err) {
+      console.error('Error loading subjects', err);
+      this.toastService.show('Failed to load subjects', 'error');
     }
   }
 
@@ -64,7 +100,7 @@ export class CreateFlashcard implements OnInit {
     const newCard = this.cardForm.value;
 
     try {
-      const result = await this.flashcardService.createFlashcard(newCard); // supponendo addCard ritorni la risposta
+      await this.flashcardService.createFlashcard(newCard);
       this.toastService.show("Card successfully added", 'success')
       this.cardForm.reset();
     } catch (err: any) {
