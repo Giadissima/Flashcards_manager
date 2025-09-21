@@ -3,39 +3,71 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Flashcard } from '../models/flashcard.dto';
 import { FlashcardService } from '../flashcard/flashcard.service';
+import { FormsModule } from '@angular/forms'; // Import FormsModule for ngModel
+import { Group } from '../models/group.dto';
+import { GroupService } from '../group/group.service';
 import { Router } from '@angular/router';
+import { Subject } from '../models/subject.dto';
+import { SubjectService } from '../subject/subject.service';
 import { Toast } from '../toast/toast';
 import { ToastService } from '../toast/toast.service';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, Toast],
+  imports: [CommonModule, Toast, FormsModule],
   templateUrl: './home.html',
   styleUrl: './home.scss'
 })
-export class Home implements OnInit{
-  flashcards!: Flashcard[];
-  
+export class Home implements OnInit {
+  flashcards: Flashcard[] = [];
+  subjects: Subject[] = [];
+  groups: Group[] = [];
+  selectedSubjectId: string | null = null;
+  selectedGroupId: string | null = null;
+
   // mappa _id -> boolean (true = mostra risposta)
   showAnswerMap: Record<string, boolean> = {};
 
-  constructor(private flashcardsService: FlashcardService, private toast: ToastService, private router: Router) {}
+  constructor(
+    private flashcardsService: FlashcardService,
+    private toast: ToastService,
+    private router: Router,
+    private subjectService: SubjectService,
+    private groupService: GroupService
+  ) {}
 
+  // TODO mettere dei valori di default, non deve essere obbligatorio il filter né mettere tutti i parametri dentro filter
   ngOnInit(): void {
-    this.flashcardsService.getAllFlashcards({
+    this.subjectService.getAllSubjects({
+      sortField: '_id',
+      sortDirection: 'asc',
       skip: 0,
-      limit: 10,
-      sortField: "_id",
-      sortDirection: "asc"
-    }).then(f => {
-      this.flashcards = f.data; 
-      console.dir(this.flashcards); // TODO rimuoverlo
-      this.flashcards.forEach(card => {
-          if (card._id) this.showAnswerMap[card._id] = false;
-        });
-    });
+      limit: 50
+    }).then((data)=>this.subjects=data.data);
+    
+    this.groupService.getAllGroups({
+      sortField: '_id',
+      sortDirection: 'asc',
+      skip: 0,
+      limit: 50
+    }).then((data)=>this.groups=data.data);
+    this.loadFlashcards();
+  }
 
+  loadFlashcards(): void {
+    this.flashcardsService.getAll({
+      sortField: '_id',
+      sortDirection: 'asc',
+      skip: 0,
+      limit: 50,
+      subject_id: this.selectedSubjectId || undefined,
+      group_id: this.selectedGroupId || undefined
+    }).then((data)=>this.flashcards=data.data);
+  }
+
+  onFilterChange(): void {
+    this.loadFlashcards();
   }
 
   getCardColor(card: Flashcard): string {
@@ -65,7 +97,7 @@ export class Home implements OnInit{
   async deleteCard(card: Flashcard): Promise<void> {
     if (!card._id) return;
     try {
-      await this.flashcardsService.deleteFlashcard(card._id);
+      await this.flashcardsService.delete(card._id);
       this.toast.show("Card succesfully deleted", 'success');
       this.flashcards = this.flashcards.filter(c => c._id !== card._id);
     } catch (error: any) {

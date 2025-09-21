@@ -56,9 +56,15 @@ export class FlashcardsService {
   async findAll(
     filter: FilterRequest,
   ): Promise<BasePaginatedResult<FlashcardDocument>> {
+    let query:any = {};
+    if(filter.subject_id)
+      query.subject_id = filter.subject_id;
+    if(filter.group_id)
+      query.group_id = filter.group_id;
+
     const [data, count] = await Promise.all([
       this.flashcardModel
-        .find()
+        .find(query)
         .sort([
           [filter.sortField, filter.sortDirection as SortOrder],
           ['_id', 'desc'],

@@ -52,6 +52,14 @@ export class FilterRequest {
     required: false,
   })
   subject_id?: string;
+
+  @IsOptional()
+  @IsMongoId()
+  @ApiProperty({
+    description: 'Filter by subject ID',
+    required: false,
+  })
+  group_id?: string;
 }
 
 export interface BasePaginatedResult<T> {

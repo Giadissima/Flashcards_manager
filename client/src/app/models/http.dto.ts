@@ -37,3 +37,8 @@ export interface SimplePaginatedResponse{
 export interface GroupFilter extends SimplePaginatedResponse {
   subject_id?: string;
 }
+
+export interface CardFilter extends SimplePaginatedResponse {
+  subject_id?: string;
+  group_id?: string;
+}

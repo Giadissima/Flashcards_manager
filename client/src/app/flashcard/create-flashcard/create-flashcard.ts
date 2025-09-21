@@ -1,4 +1,5 @@
 // create-card.component.ts
+
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { answerMaxLength, charMinLength, idLength, questionMaxLength, titleMaxLength } from '../../../config/config';
@@ -100,7 +101,7 @@ export class CreateFlashcard implements OnInit {
     const newCard = this.cardForm.value;
 
     try {
-      await this.flashcardService.createFlashcard(newCard);
+      await this.flashcardService.create(newCard);
       this.toastService.show("Card successfully added", 'success')
       this.cardForm.reset();
     } catch (err: any) {

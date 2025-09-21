@@ -47,7 +47,7 @@ export class EditFlashcard implements OnInit {
 
   async loadCardData(id: string): Promise<void> {
     try {
-      const card = await this.flashcardService.getFlashcardById(id);
+      const card = await this.flashcardService.getById(id);
       this.editForm.patchValue(card);
     } catch (error) {
       this.toastService.show('Failed to load card data', 'error');
@@ -61,7 +61,7 @@ export class EditFlashcard implements OnInit {
     }
 
     try {
-      await this.flashcardService.updateFlashcard(this.cardId, this.editForm.value);
+      await this.flashcardService.update(this.cardId, this.editForm.value);
       this.toastService.show('Card updated successfully', 'success');
       this.router.navigate(['/home']);
     } catch (error) {

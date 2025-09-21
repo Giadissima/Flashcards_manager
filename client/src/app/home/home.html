@@ -1,3 +1,26 @@
+<div class="filter-bar mb-4">
+  <div class="row">
+    <div class="col-md-6">
+      <label for="subjectFilter" class="form-label">Filtra per Materia:</label>
+      <select id="subjectFilter" class="form-select" [(ngModel)]="selectedSubjectId" (ngModelChange)="onFilterChange()">
+        <option [ngValue]="null">Tutte le materie</option>
+        @for (subject of subjects; track subject._id) {
+          <option [ngValue]="subject._id">{{ subject.name }}</option>
+        }
+      </select>
+    </div>
+    <div class="col-md-6">
+      <label for="groupFilter" class="form-label">Filtra per Gruppo:</label>
+      <select id="groupFilter" class="form-select" [(ngModel)]="selectedGroupId" (ngModelChange)="onFilterChange()">
+        <option [ngValue]="null">Tutti i gruppi</option>
+        @for (group of groups; track group._id) {
+          <option [ngValue]="group._id">{{ group.name }}</option>
+        }
+      </select>
+    </div>
+  </div>
+</div>
+
 <!-- col-md-4 appariranno 3 cards per riga, perché Bootstrap lavora con griglie di 12 colonne e io voglio che ne prenda 12/4 = 3 -->
 <!-- card h-100 da un altezza uguale a tutte le card, dicendo che devono prendere altezza 100% del contenitore padre-->
   <div class="row">

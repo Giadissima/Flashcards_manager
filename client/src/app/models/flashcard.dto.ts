@@ -1,15 +1,5 @@
-export interface Subject{
-  name: string;
-  icon?: string; // TODO non deve essere una stringa!
-  desc?: string;
-}
-
-export interface Group{
-  color: string;
-  name: string;
-  _id: string;
-  subject_id: string
-}
+import { Group } from "./group.dto";
+import { Subject } from "./subject.dto";
 
 export interface Flashcard {
   _id: string;  // id generato da MongoDB
