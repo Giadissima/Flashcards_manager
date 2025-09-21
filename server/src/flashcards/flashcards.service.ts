@@ -29,8 +29,8 @@ export class FlashcardsService {
       answer_img?: Express.Multer.File[];
     },
   ): Promise<void> {
-    const question_img = files.question_img;
-    const answer_img = files.answer_img;
+    const question_img = files?.question_img;
+    const answer_img = files?.answer_img;
 
     const question_img_id = question_img
       ? (await this.fileService.create(question_img))._id

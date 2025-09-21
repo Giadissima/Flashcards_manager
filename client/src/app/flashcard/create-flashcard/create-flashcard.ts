@@ -1,6 +1,7 @@
 // create-card.component.ts
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { answerMaxLength, charMinLength, idLength, questionMaxLength, titleMaxLength } from '../../../config/config';
 
 import { CommonModule } from '@angular/common';
 import { FlashcardService } from '../flashcard.service';
@@ -31,10 +32,10 @@ export class CreateFlashcard implements OnInit {
 
   ngOnInit(): void {
     this.cardForm = this.fb.group({
-      title: ['', Validators.required],
-      question: ['', Validators.required],
-      answer: ['', Validators.required],
-      group: ['']
+      title: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(titleMaxLength)]],
+      question: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(questionMaxLength)]],
+      answer: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(answerMaxLength)]],
+      group_id: ['']
     });
 
     this.loadGroups();
@@ -63,7 +64,7 @@ export class CreateFlashcard implements OnInit {
     const newCard = this.cardForm.value;
 
     try {
-      const result = this.flashcardService.createFlashcard(newCard); // supponendo addCard ritorni la risposta
+      const result = await this.flashcardService.createFlashcard(newCard); // supponendo addCard ritorni la risposta
       this.toastService.show("Card successfully added", 'success')
       this.cardForm.reset();
     } catch (err: any) {
