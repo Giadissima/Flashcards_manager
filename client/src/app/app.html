@@ -13,8 +13,8 @@
         <svg class="position-absolute top-100 start-50 translate-middle-x" style="margin-top: 2px;" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#6b4c3b"><path d="M480-360 280-560h400L480-360Z"/></svg>
       </span>
       <div class="dropdown-content">
-        <a href="#">Create Group</a>
-        <a href="#">Manage Groups</a>
+        <a routerLink="/create-group">Create Group</a>
+        <a routerLink="/manage-groups">Manage Groups</a>
       </div>
     </div>
     <div class="dropdown">
@@ -23,8 +23,8 @@
         <svg class="position-absolute top-100 start-50 translate-middle-x" style="margin-top: 2px;" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#6b4c3b"><path d="M480-360 280-560h400L480-360Z"/></svg>
       </span>
       <div class="dropdown-content">
-        <a href="#">New Subject</a>
-        <a href="#">Manage Subjects</a>
+        <a routerLink="/create-subject">New Subject</a>
+        <a routerLink="/manage-subjects">Manage Subjects</a>
       </div>
     </div>
     <div class="dropdown">
@@ -40,7 +40,7 @@
   </div>
 
   <!-- Destra: Pulsante pesca -->
-  <button style="background-color: #70ebff; border: none; padding: 8px 16px; border-radius: 5px; color: white; font-weight: bold; cursor: pointer;">
+  <button routerLink="/create-card" style="background-color: #70ebff; border: none; padding: 8px 16px; border-radius: 5px; color: white; font-weight: bold; cursor: pointer;">
     Create Card
   </button>
 </nav>
