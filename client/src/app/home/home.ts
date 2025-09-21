@@ -79,7 +79,7 @@ export class Home implements OnInit{
 
   copyCard(card: Flashcard): void {
     // esempio: copi solo il testo
-    navigator.clipboard.writeText(`${card.title}\n${card.question}\n${card.answer}`);
+    navigator.clipboard.writeText(`${card.title}\nQuestion: ${card.question}\nAnswer: ${card.answer}`);
     alert('Card copiata negli appunti!');
   }
 }
