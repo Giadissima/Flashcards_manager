@@ -33,3 +33,7 @@ export interface SimplePaginatedResponse{
   limit: number;
   // filter: FilterInterface TODO lasciato già predisposto per la ricerca per data
 }
+
+export interface GroupFilter extends SimplePaginatedResponse {
+  subject_id?: string;
+}
