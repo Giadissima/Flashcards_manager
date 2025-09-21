@@ -1,0 +1,24 @@
+<div class="container mt-4">
+  <h1>Edit Group</h1>
+
+  <form [formGroup]="editForm" (ngSubmit)="updateGroup()">
+    <div class="mb-3">
+      <label for="name" class="form-label">Name</label>
+      <input type="text" id="name" formControlName="name" class="form-control">
+    </div>
+
+    <div class="mb-3">
+      <label for="color" class="form-label">Color</label>
+      <input type="color" id="color" formControlName="color" class="form-control">
+    </div>
+
+    <div class="mb-3">
+      <label for="subject_id" class="form-label">Subject ID</label>
+      <input type="text" id="subject_id" formControlName="subject_id" class="form-control">
+      <!-- This should probably be a dropdown select of subjects in a real app -->
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+  </form>
+</div>
+<app-toast></app-toast>
