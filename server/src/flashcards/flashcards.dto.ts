@@ -11,7 +11,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 
 /** The Dto file contains the description of the client requests and the server's responses*/
-export class CreateFlashcardDto {
+export class ModifyFlashcardDto {
   @IsString()
   @Length(charMinLength, titleMaxLength)
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
@@ -44,17 +44,4 @@ export class CreateFlashcardDto {
     typeof value === 'string' ? value.trim() || undefined : value,
   )
   subject_id?: string;
-}
-
-export class UpdateFlashcardDto extends CreateFlashcardDto {
-  @IsMongoId()
-  @Length(idLength, idLength)
-  @Transform(({ value }) =>
-    typeof value === 'string' ? value.trim() || undefined : value,
-  )
-  @ApiProperty({
-    description: 'Group id',
-    example: null,
-  })
-  id: string;
 }

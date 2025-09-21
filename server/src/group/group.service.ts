@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Group, GroupDocument } from './group.schema';
-import { CreateGroupDto, UpdateGroupDto } from './group.dto';
+import { ModifyGroupDto } from './group.dto';
 import { Model, SortOrder } from 'mongoose';
 import {
   BasePaginatedResult,
@@ -17,7 +17,7 @@ import {
 export class GroupService {
   constructor(@InjectModel(Group.name) private groupModel: Model<Group>) {}
 
-  async create(createGroupDto: CreateGroupDto): Promise<void> {
+  async create(createGroupDto: ModifyGroupDto): Promise<void> {
     await new this.groupModel({ ...createGroupDto }).save();
   }
 
@@ -28,9 +28,14 @@ export class GroupService {
   async findAll(
     filter: FilterRequest,
   ): Promise<BasePaginatedResult<GroupDocument>> {
+    const query: any = {};
+    if (filter.subject_id) {
+      query.subject_id = filter.subject_id;
+    }
+
     const [data, count] = await Promise.all([
       this.groupModel
-        .find()
+        .find(query)
         .sort([
           [filter.sortField, filter.sortDirection as SortOrder],
           ['_id', 'desc'],
@@ -39,7 +44,7 @@ export class GroupService {
         .limit(filter.limit)
         .populate('subject_id')
         .exec(),
-      this.groupModel.find().countDocuments(),
+      this.groupModel.find(query).countDocuments(),
     ]);
     return { data, count };
   }
@@ -58,7 +63,7 @@ export class GroupService {
 
   async update(
     id: string,
-    updateObj: UpdateGroupDto,
+    updateObj: ModifyGroupDto,
   ): Promise<void | NotFoundException> {
     if (!validateObjectIdParam(id))
       throw new BadRequestException('The id does not satisfy requirements');

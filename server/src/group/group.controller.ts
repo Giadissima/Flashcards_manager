@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 
 import { GroupService } from './group.service';
-import { CreateGroupDto, UpdateGroupDto } from './group.dto';
+import { ModifyGroupDto } from './group.dto';
 import { ApiOperation } from '@nestjs/swagger';
 import { FilterRequest, BasePaginatedResult } from '../common.dto';
 import { GroupDocument } from './group.schema';
@@ -23,7 +23,7 @@ export class GroupController {
 
   @ApiOperation({ description: 'create a new Group obj and push it on db' })
   @Post()
-  create(@Body() createGroupDto: CreateGroupDto): Promise<void> {
+  create(@Body() createGroupDto: ModifyGroupDto): Promise<void> {
     return this.groupService.create(createGroupDto);
   }
 
@@ -42,7 +42,7 @@ export class GroupController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateGroupDto: UpdateGroupDto) {
+  update(@Param('id') id: string, @Body() updateGroupDto: ModifyGroupDto) {
     return this.groupService.update(id, updateGroupDto);
   }
 

@@ -13,7 +13,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { SubjectService } from './subject.service';
-import { CreateSubjectDto, UpdateSubjectDto } from './subject.dto';
+import { ModifySubjectDto } from './subject.dto';
 import { ApiBody, ApiConsumes, ApiOperation } from '@nestjs/swagger';
 import { BasePaginatedResult, FilterRequest } from 'src/common.dto';
 import { SubjectDocument } from './subject.schema';
@@ -43,7 +43,7 @@ export class SubjectController {
     },
   })
   create(
-    @Body() createSubjectDto: CreateSubjectDto,
+    @Body() createSubjectDto: ModifySubjectDto,
     @UploadedFile() icon?: Express.Multer.File,
   ): Promise<void> {
     return this.subjectService.create(createSubjectDto, icon);
@@ -64,7 +64,7 @@ export class SubjectController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSubjectDto: UpdateSubjectDto) {
+  update(@Param('id') id: string, @Body() updateSubjectDto: ModifySubjectDto) {
     return this.subjectService.update(id, updateSubjectDto);
   }
 

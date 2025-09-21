@@ -16,7 +16,7 @@ import {
 import { FlashcardsService } from './flashcards.service';
 import { ApiBody, ApiConsumes, ApiOperation } from '@nestjs/swagger';
 import { FilterRequest, BasePaginatedResult } from 'src/common.dto';
-import { CreateFlashcardDto, UpdateFlashcardDto } from './flashcards.dto';
+import { ModifyFlashcardDto } from './flashcards.dto';
 import { FlashcardDocument } from './flashcards.schema';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 
@@ -57,7 +57,7 @@ export class FlashcardsController {
     },
   })
   create(
-    @Body() createFlashcardDto: CreateFlashcardDto,
+    @Body() createFlashcardDto: ModifyFlashcardDto,
     @UploadedFiles()
     files: {
       question_img?: Express.Multer.File[];
@@ -84,7 +84,7 @@ export class FlashcardsController {
   @Patch(':id')
   update(
     @Param('id') id: string,
-    @Body() updateFlashcardDto: UpdateFlashcardDto,
+    @Body() updateFlashcardDto: ModifyFlashcardDto,
   ) {
     return this.flashcardsService.update(id, updateFlashcardDto);
   }

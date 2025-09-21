@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Subject, SubjectDocument } from './subject.schema';
-import { CreateSubjectDto, UpdateSubjectDto } from './subject.dto';
+import { ModifySubjectDto } from './subject.dto';
 import { Model, SortOrder } from 'mongoose';
 import {
   BasePaginatedResult,
@@ -23,7 +23,7 @@ export class SubjectService {
   ) {}
 
   async create(
-    createSubjectDto: CreateSubjectDto,
+    createSubjectDto: ModifySubjectDto,
     @UploadedFile() icon?: Express.Multer.File,
   ): Promise<void> {
     const icon_id = icon
@@ -68,7 +68,7 @@ export class SubjectService {
 
   async update(
     id: string,
-    updateObj: UpdateSubjectDto,
+    updateObj: ModifySubjectDto,
   ): Promise<void | NotFoundException> {
     if (!validateObjectIdParam(id))
       throw new BadRequestException('The id does not satisfy requirements');

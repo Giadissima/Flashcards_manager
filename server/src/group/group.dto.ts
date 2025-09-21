@@ -5,7 +5,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 
 /** The Dto file contains the description of the client requests and the server's responses*/
-export class CreateGroupDto {
+export class ModifyGroupDto {
   @IsString()
   @Length(charMinLength, nameMaxLength)
   @ApiProperty({
@@ -35,19 +35,4 @@ export class CreateGroupDto {
       : value,
   )
   subject_id: string;
-}
-
-export class UpdateGroupDto extends CreateGroupDto {
-  @IsMongoId()
-  @Length(idLength, idLength)
-  @ApiProperty({
-    description: 'Group id',
-    example: null,
-  })
-  @Transform(({ value }) =>
-    typeof value === 'string'
-      ? value.trim() || undefined // "" diventa undefined
-      : value,
-  )
-  id: string;
 }

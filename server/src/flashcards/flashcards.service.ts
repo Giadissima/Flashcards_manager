@@ -1,4 +1,4 @@
-import { CreateFlashcardDto, UpdateFlashcardDto } from './flashcards.dto';
+import { ModifyFlashcardDto } from './flashcards.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import {
   BadRequestException,
@@ -23,7 +23,7 @@ export class FlashcardsService {
   ) {}
 
   async create(
-    createFlashcardDto: CreateFlashcardDto,
+    createFlashcardDto: ModifyFlashcardDto,
     files: {
       question_img?: Express.Multer.File[];
       answer_img?: Express.Multer.File[];
@@ -86,7 +86,7 @@ export class FlashcardsService {
 
   async update(
     id: string,
-    updateObj: UpdateFlashcardDto,
+    updateObj: ModifyFlashcardDto,
   ): Promise<void | NotFoundException> {
     if (!validateObjectIdParam(id))
       throw new BadRequestException('The id does not satisfy requirements');
