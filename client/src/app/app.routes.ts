@@ -10,7 +10,7 @@ export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'home', component: Home },
   { path: 'create-card', component: CreateFlashcard },
-  { path: 'edit-card', component: EditFlashcard },
+  { path: 'edit-card/:id', component: EditFlashcard },
   { path: 'setup-test', component: SetupTest },
   { path: 'test-runner', component: TestRunner },
   { path: 'test-result', component: TestResult },

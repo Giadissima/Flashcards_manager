@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Flashcard } from '../models/flashcard.dto';
 import { FlashcardService } from '../flashcard/flashcard.service';
+import { Router } from '@angular/router';
 import { Toast } from '../toast/toast';
 import { ToastService } from '../toast/toast.service';
 
@@ -19,7 +20,7 @@ export class Home implements OnInit{
   // mappa _id -> boolean (true = mostra risposta)
   showAnswerMap: Record<string, boolean> = {};
 
-  constructor(private flashcardsService: FlashcardService, private toast: ToastService) {}
+  constructor(private flashcardsService: FlashcardService, private toast: ToastService, private router: Router) {}
 
   ngOnInit(): void {
     this.flashcardsService.getAllFlashcards({
@@ -73,8 +74,9 @@ export class Home implements OnInit{
   }
 
   modifyCard(card: Flashcard): void {
-    // qui puoi navigare verso un componente di edit
-    console.log('Modifica card', card);
+    if (card._id) {
+      this.router.navigate(['/edit-card', card._id]);
+    }
   }
 
   copyCard(card: Flashcard): void {

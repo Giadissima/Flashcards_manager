@@ -1,1 +1,73 @@
-<p>edit-flashcard works!</p>
+<div class="container-md">
+  <h1 class="text-center">Edit Card</h1>
+
+  <form [formGroup]="editForm" (ngSubmit)="updateCard()" class="needs-validation" novalidate>
+    <div class="input-group mb-3">
+      <span class="input-group-text">Title</span>
+      <input type="text" formControlName="title" class="form-control" [class.is-invalid]="editForm.get('title')?.invalid && editForm.get('title')?.touched">
+      @if(editForm.get('title')?.hasError('minlength')){
+        <div class="invalid-feedback">
+          Title should have min 2 characters.
+        </div>
+      } @else {
+        @if(editForm.get('title')?.hasError('maxlength')){
+            <div class="invalid-feedback">
+              Title's max characters reached.
+            </div>
+          }
+        @else {
+          @if(editForm.get('title')?.touched){
+          <div class="invalid-feedback">Please insert a title.</div>
+        }
+        }
+      }
+    </div>
+
+    <div class="input-group mb-3">
+      <span class="input-group-text">Question</span>
+      <input type="text" formControlName="question" class="form-control" [class.is-invalid]="editForm.get('question')?.invalid && editForm.get('question')?.touched">
+      @if(editForm.get('question')?.hasError('minlength')){
+        <div class="invalid-feedback">
+          Question should have min 2 characters.
+        </div>
+      } @else {
+        @if(editForm.get('question')?.hasError('maxlength')){
+            <div class="invalid-feedback">
+              Question's max characters reached.
+            </div>
+          }
+        @else {
+          @if(editForm.get('question')?.touched){
+          <div class="invalid-feedback">Please insert a question.</div>
+        }
+        }
+      }
+    </div>
+
+    <div class="input-group mb-3">
+      <span class="input-group-text">Answer</span>
+      <textarea formControlName="answer" class="form-control" rows="1" (input)="textAreaAutoResize($event)" [class.is-invalid]="editForm.get('answer')?.invalid && editForm.get('answer')?.touched"></textarea>
+      @if(editForm.get('answer')?.hasError('minlength')){
+        <div class="invalid-feedback">
+          Answer should have min 2 characters.
+        </div>
+      } @else {
+        @if(editForm.get('answer')?.hasError('maxlength')){
+            <div class="invalid-feedback">
+              Answer's max characters reached.
+            </div>
+          }
+        @else {
+          @if(editForm.get('answer')?.touched){
+          <div class="invalid-feedback">Please insert a answer.</div>
+        }
+        }
+      }
+    </div>
+
+    <div class="d-flex justify-content-center mt-3">
+      <button type="submit" class="btn btn-primary">Save Changes</button>
+    </div>
+  </form>
+</div>
+<app-toast></app-toast>
