@@ -4,6 +4,8 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 
 import { CommonModule } from '@angular/common';
 import { GroupService } from './../group.service';
+import { Subject } from '../../models/subject.dto';
+import { SubjectService } from '../../subject/subject.service';
 import { Toast } from '../../toast/toast';
 import { ToastService } from '../../toast/toast.service';
 
@@ -17,20 +19,22 @@ import { ToastService } from '../../toast/toast.service';
 export class EditGroupComponent implements OnInit {
   editForm!: FormGroup;
   groupId?: string;
+  subjects: Subject[] = [];
 
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
     private groupService: GroupService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private subjectService: SubjectService
   ) {}
 
   ngOnInit(): void {
     this.editForm = this.fb.group({
       name: ['', Validators.required],
-      color: ['#000000', Validators.required],
-      subject_id: ['', Validators.required]
+      color: ['#75d2cb', Validators.required],
+      subject_id: ['']
     });
 
     this.route.paramMap.subscribe(params => {
@@ -40,12 +44,19 @@ export class EditGroupComponent implements OnInit {
         this.loadGroupData(id);
       }
     });
+
+    this.loadSubjects();
   }
 
   async loadGroupData(id: string): Promise<void> {
     try {
       const group = await this.groupService.getGroupById(id);
-      this.editForm.patchValue(group);
+      console.dir(group);
+      this.editForm.patchValue({
+      name: group.name,
+      color: group.color,
+      subject_id: typeof group.subject_id === 'string' ? '' : group.subject_id._id
+    });
     } catch (error) {
       this.toastService.show('Failed to load group data', 'error');
     }
@@ -63,6 +74,21 @@ export class EditGroupComponent implements OnInit {
       this.router.navigate(['/manage-groups']);
     } catch (error) {
       this.toastService.show('Failed to update group', 'error');
+    }
+  }
+
+  async loadSubjects() {
+    try {
+      const response = await this.subjectService.getAllSubjects({
+        skip: 0,
+        limit: 50,
+        sortField: 'name',
+        sortDirection: 'asc'
+      });
+      this.subjects = response.data;
+    } catch (err) {
+      console.error('Error loading subjects', err);
+      this.toastService.show('Failed to load subjects', 'error');
     }
   }
 }
