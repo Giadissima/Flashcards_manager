@@ -3,9 +3,9 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { CommonModule } from '@angular/common';
-import { SubjectService } from './subject.service';
-import { Toast } from '../toast/toast';
-import { ToastService } from '../toast/toast.service';
+import { SubjectService } from '../subject.service';
+import { Toast } from '../../toast/toast';
+import { ToastService } from '../../toast/toast.service';
 
 @Component({
   selector: 'app-edit-subject',
@@ -55,7 +55,6 @@ export class EditSubjectComponent implements OnInit {
       this.editForm.markAllAsTouched();
       return;
     }
-    console.log("AAAA", this.subjectId);
     try {
       await this.subjectService.updateSubject(this.subjectId, this.editForm.value);
       this.toastService.show('Subject updated successfully', 'success');

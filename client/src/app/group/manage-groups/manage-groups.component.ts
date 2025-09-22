@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
 
-import { Group } from '../models/group.dto';
-import { GroupService } from './group.service';
-import { ToastService } from '../toast/toast.service';
-import { Toast } from '../toast/toast';
+import { CommonModule } from '@angular/common';
+import { Group } from '../../models/group.dto';
+import { GroupService } from '../group.service';
+import { Router } from '@angular/router';
+import { Toast } from '../../toast/toast';
+import { ToastService } from '../../toast/toast.service';
 
 @Component({
   selector: 'app-manage-groups',

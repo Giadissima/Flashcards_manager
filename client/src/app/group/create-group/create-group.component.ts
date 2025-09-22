@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
 
-import { GroupService } from './group.service';
-import { ToastService } from '../toast/toast.service';
-import { Toast } from '../toast/toast';
+import { CommonModule } from '@angular/common';
+import { GroupService } from '../group.service';
+import { Router } from '@angular/router';
+import { Toast } from '../../toast/toast';
+import { ToastService } from '../../toast/toast.service';
 
 @Component({
   selector: 'app-create-group',

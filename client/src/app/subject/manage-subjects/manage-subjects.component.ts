@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
 
-import { Subject } from '../models/subject.dto';
-import { SubjectService } from './subject.service';
-import { ToastService } from '../toast/toast.service';
-import { Toast } from '../toast/toast';
+import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { Subject } from '../../models/subject.dto';
+import { SubjectService } from './../subject.service';
+import { Toast } from '../../toast/toast';
+import { ToastService } from '../../toast/toast.service';
 
 @Component({
   selector: 'app-manage-subjects',

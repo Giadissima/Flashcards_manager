@@ -1,16 +1,16 @@
 import { CreateFlashcard } from './flashcard/create-flashcard/create-flashcard';
+import { CreateGroupComponent } from './group/create-group/create-group.component';
+import { CreateSubjectComponent } from './subject/create-subject/create-subject.component';
 import { EditFlashcard } from './flashcard/edit-flashcard/edit-flashcard';
+import { EditGroupComponent } from './group/edit-group/edit-group.component';
+import { EditSubjectComponent } from './subject/edit-subject/edit-subject.component';
 import { Home } from './home/home';
+import { ManageGroupsComponent } from './group/manage-groups/manage-groups.component';
+import { ManageSubjectsComponent } from './subject/manage-subjects/manage-subjects.component';
 import { Routes } from '@angular/router';
 import { SetupTest } from './test/setup-test/setup-test';
 import { TestResult } from './test/test-result/test-result';
 import { TestRunner } from './test/test-runner/test-runner';
-import { ManageGroupsComponent } from './group/manage-groups.component';
-import { CreateGroupComponent } from './group/create-group.component';
-import { EditGroupComponent } from './group/edit-group.component';
-import { ManageSubjectsComponent } from './subject/manage-subjects.component';
-import { CreateSubjectComponent } from './subject/create-subject.component';
-import { EditSubjectComponent } from './subject/edit-subject.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
