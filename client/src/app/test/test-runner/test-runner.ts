@@ -61,7 +61,6 @@ export class TestRunner implements OnInit {
       group_id: filters.group_id,
       subject_id: filters.subject_id,
       limit: filters.limit,
-      random: true,
       skip: 0,
       sortDirection: 'asc',
       sortField: '_id'
