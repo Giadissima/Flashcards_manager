@@ -28,7 +28,7 @@ export class CreateSubjectComponent implements OnInit {
   ngOnInit(): void {
     this.subjectForm = this.fb.group({
       name: ['', Validators.required],
-      desc: ['', Validators.required]
+      desc: [undefined]
     });
   }
 

@@ -1,4 +1,4 @@
-import { IsMongoId, IsString, Length } from 'class-validator';
+import { IsMongoId, IsOptional, IsString, Length } from 'class-validator';
 import {
   charMinLength,
   idLength,
@@ -21,6 +21,7 @@ export class ModifySubjectDto {
   name: string;
 
   @IsString()
+  @IsOptional()
   @Length(charMinLength, titleMaxLength)
   @ApiProperty({
     description: 'Description',
