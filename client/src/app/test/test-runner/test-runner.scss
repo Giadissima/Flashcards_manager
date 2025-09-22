@@ -1,0 +1,49 @@
+.icon-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  transition: all 0.2s ease;
+
+  svg {
+    width: 24px;
+    height: 24px;
+    fill: var(--text-light-color);
+  }
+
+  &:hover {
+    background-color: var(--secondary-color);
+  }
+}
+
+// Style for the radio button itself when its corresponding icon is selected
+input[type="radio"]:checked + svg {
+    fill: var(--primary-color);
+}
+
+.selected-icon {
+    // This class is now used on the SVG, not the wrapper
+    // We can use the :checked pseudo-class to handle the selection state
+    // but for compatibility with the [class.selected-icon] binding, we can do this:
+    fill: var(--primary-color) !important; // Use important to override default fill
+}
+
+
+#results {
+    background-color: var(--white-color);
+    padding: calc(var(--spacing-unit) * 4);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--box-shadow-md);
+    text-align: center;
+    margin-top: calc(var(--spacing-unit) * 4);
+
+    div {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: var(--spacing-unit);
+    }
+}

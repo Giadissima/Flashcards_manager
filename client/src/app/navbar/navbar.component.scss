@@ -2,47 +2,56 @@ nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #f0f1fd;
-  padding: 15px 20px;
-  font-family: 'Helvetica Neue', sans-serif;
+  background-color: var(--white-color);
+  padding: var(--spacing-unit) calc(var(--spacing-unit) * 3);
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: var(--box-shadow-sm);
 }
 
 .logo-container {
   display: flex;
   align-items: center;
   text-decoration: none;
-  color: inherit;
+  gap: var(--spacing-unit);
 }
 
 .logo {
-  height: 50px;
-  margin-right: 10px;
+  height: 40px;
 }
 
 .project-name {
-  font-size: 18px;
-  color: #6b4c3b;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-color);
 }
 
 .menu-container {
   display: flex;
-  gap: 30px;
+  gap: calc(var(--spacing-unit) * 4);
 }
 
 .create-card-btn {
-  background-color: #70ebff;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 5px;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
+  // This now uses the global .btn and .btn-primary styles
+  // We can add specific overrides here if needed
 }
 
 .menu-item {
-  color: #6b4c3b;
+  color: var(--text-light-color);
+  font-weight: 600;
   cursor: pointer;
   position: relative;
+  padding-bottom: var(--spacing-unit);
+  transition: color 0.2s ease;
+}
+
+.menu-item:hover {
+    color: var(--primary-color);
+}
+
+.arrow-icon {
+    // This can be removed if we use a better dropdown indicator
+    // For now, let's keep it simple
+    display: none;
 }
 
 .dropdown {
@@ -52,15 +61,17 @@ nav {
 .dropdown-content {
   display: none;
   position: absolute;
-  top: 40px;
+  top: 100%;
   left: 50%;
   transform: translateX(-50%);
-  background-color: #fffaf7;
-  box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
-  padding: 10px;
-  border-radius: 5px;
-  z-index: 1;
+  background-color: var(--white-color);
+  box-shadow: var(--box-shadow-md);
+  padding: var(--spacing-unit);
+  border-radius: var(--border-radius-md);
+  z-index: 10;
   white-space: nowrap;
+  margin-top: var(--spacing-unit);
+  border: 1px solid var(--border-color);
 }
 
 .dropdown:hover .dropdown-content {
@@ -69,19 +80,15 @@ nav {
 
 .dropdown-content a {
   display: block;
-  padding: 5px 10px;
+  padding: var(--spacing-unit) calc(var(--spacing-unit) * 1.5);
   text-decoration: none;
-  color: #6b4c3b;
+  color: var(--text-light-color);
+  font-weight: 600;
+  border-radius: var(--border-radius-sm);
+  transition: all 0.2s ease;
 }
 
 .dropdown-content a:hover {
-  background-color: #ffe5dc;
-}
-
-.arrow-icon {
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  margin-top: 2px;
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
 }
