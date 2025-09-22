@@ -1,1 +1,37 @@
-<p>setup-test works!</p>
+<div class="container-md align-middle">
+  <h1 class="text-center">Insert data and start a new Test</h1>
+  <form [formGroup]="testForm" (ngSubmit)="startTest()" class="form-container needs-validation" novalidate>
+    <div class="input-group mb-3">
+      <span class="input-group-text select text-center">Subject</span>
+      <select class="form-select input" formControlName="subject_id">
+        <option [ngValue]="null" selected>Choose the subject</option>
+        @for (subject of subjects; track subject._id) {
+          <option [value]="subject._id">{{ subject.name }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="input-group mb-3">
+      <span class="input-group-text select text-center">Group</span>
+      <select class="form-select input" formControlName="group_id">
+        <option [ngValue]="null" selected>Choose the group</option>
+        @for (group of groups; track group._id) {
+          <option [value]="group._id">{{ group.name }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="input-group mb-3">
+      <span class="input-group-text select text-center">Number of questions</span>
+      <input type="number" formControlName="num" class="form-control input">
+    </div>
+
+    <div *ngIf="testForm.errors?.['atLeastOneRequired'] && (testForm.touched || testForm.dirty)" class="alert alert-danger mt-2">
+      Please select at least a subject or a group.
+    </div>
+
+    <div class="d-flex justify-content-center mt-3">
+      <button type="submit" class="btn btn-success" [disabled]="testForm.invalid">Start new test</button>
+    </div>
+  </form>
+</div>
