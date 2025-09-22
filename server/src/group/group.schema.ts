@@ -18,7 +18,7 @@ export class Group {
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Subject',
-    required: true,
+    required: false,
   })
   subject_id: mongoose.Types.ObjectId;
 }

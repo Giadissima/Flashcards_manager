@@ -23,6 +23,7 @@ export class ModifyGroupDto {
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   color: string; // TODO vedere da input come viene inviato il dato e metterci dei controlli
 
+  @IsOptional()
   @IsMongoId()
   @Length(idLength, idLength)
   @ApiProperty({

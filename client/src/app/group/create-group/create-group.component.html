@@ -12,10 +12,12 @@
       <input type="color" id="color" formControlName="color" class="form-control">
     </div>
 
-    <div class="mb-3">
-      <label for="subject_id" class="form-label">Subject ID</label>
-      <input type="text" id="subject_id" formControlName="subject_id" class="form-control">
-      <!-- This should probably be a dropdown select of subjects in a real app -->
+    <div class="input-group mb-3">
+      <span class="input-group-text">Subject</span>
+      <select formControlName="subject_id" class="form-select">
+        <option [ngValue]="null">Nessuna materia</option>
+        <option *ngFor="let s of subjects" [value]="s._id">{{ s.name }}</option>
+      </select>
     </div>
 
     <button type="submit" class="btn btn-primary">Create Group</button>
