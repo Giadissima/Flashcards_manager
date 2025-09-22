@@ -1,0 +1,46 @@
+<nav>
+  <!-- Sinistra: Logo + Nome progetto -->
+  <a routerLink="/home" class="logo-container">
+    <img src="assets/logo2.png" alt="Logo" class="logo">
+    <span class="project-name">Flashcards Manager</span>
+  </a>
+
+  <!-- Centro: Menu -->
+  <div class="menu-container">
+    <div class="dropdown">
+      <span class="menu-item">
+        Groups
+        <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#6b4c3b"><path d="M480-360 280-560h400L480-360Z"/></svg>
+      </span>
+      <div class="dropdown-content">
+        <a routerLink="/create-group">Create Group</a>
+        <a routerLink="/manage-groups">Manage Groups</a>
+      </div>
+    </div>
+    <div class="dropdown">
+      <span class="menu-item">
+        Subjects
+        <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#6b4c3b"><path d="M480-360 280-560h400L480-360Z"/></svg>
+      </span>
+      <div class="dropdown-content">
+        <a routerLink="/create-subject">New Subject</a>
+        <a routerLink="/manage-subjects">Manage Subjects</a>
+      </div>
+    </div>
+    <div class="dropdown">
+      <span class="menu-item">
+        Test
+        <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#6b4c3b"><path d="M480-360 280-560h400L480-360Z"/></svg>
+      </span>
+      <div class="dropdown-content">
+        <a routerLink="/setup-test">Start Test</a>
+        <a routerLink="/test-result">Results</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Destra: Pulsante crea card -->
+  <button routerLink="/create-card" class="create-card-btn">
+    Create Card
+  </button>
+</nav>

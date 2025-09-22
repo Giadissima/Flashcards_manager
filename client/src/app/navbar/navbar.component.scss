@@ -1,0 +1,87 @@
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f0f1fd;
+  padding: 15px 20px;
+  font-family: 'Helvetica Neue', sans-serif;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+}
+
+.logo {
+  height: 50px;
+  margin-right: 10px;
+}
+
+.project-name {
+  font-size: 18px;
+  color: #6b4c3b;
+}
+
+.menu-container {
+  display: flex;
+  gap: 30px;
+}
+
+.create-card-btn {
+  background-color: #70ebff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.menu-item {
+  color: #6b4c3b;
+  cursor: pointer;
+  position: relative;
+}
+
+.dropdown {
+  position: relative;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #fffaf7;
+  box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+  padding: 10px;
+  border-radius: 5px;
+  z-index: 1;
+  white-space: nowrap;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.dropdown-content a {
+  display: block;
+  padding: 5px 10px;
+  text-decoration: none;
+  color: #6b4c3b;
+}
+
+.dropdown-content a:hover {
+  background-color: #ffe5dc;
+}
+
+.arrow-icon {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 2px;
+}
