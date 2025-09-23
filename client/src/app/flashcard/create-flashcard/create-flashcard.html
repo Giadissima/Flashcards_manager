@@ -64,20 +64,20 @@
         }
       }
     </div>
+    
+        <div class="input-group mb-3">
+          <span class="input-group-text">Subject</span>
+          <select formControlName="subject_id" class="form-select">
+            <option value="">Choose the subject</option>
+            <option *ngFor="let s of subjects" [value]="s._id">{{ s.name }}</option>
+          </select>
+        </div>
 
     <div class="input-group mb-3">
       <span class="input-group-text">Group</span>
       <select formControlName="group_id" class="form-select">
         <option value="">Choose the group</option>
         <option *ngFor="let g of groups" [value]="g._id">{{ g.name }}</option>
-      </select>
-    </div>
-
-    <div class="input-group mb-3">
-      <span class="input-group-text">Subject</span>
-      <select formControlName="subject_id" class="form-select">
-        <option value="">Choose the subject</option>
-        <option *ngFor="let s of subjects" [value]="s._id">{{ s.name }}</option>
       </select>
     </div>
 
