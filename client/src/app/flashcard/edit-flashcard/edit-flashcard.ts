@@ -60,8 +60,19 @@ export class EditFlashcard implements OnInit {
       return;
     }
 
+    const { _id, title, question, answer } = this.editForm.value;
+
+    const card: Flashcard = {
+      _id,
+      group_id: this.editForm.value.group_id?._id ?? undefined,     // gestisce sia oggetto che stringa
+      subject_id: this.editForm.value.group_id.subject_id._id, // TODO se non esiste il gruppo ma esiste la materia dà errore per come risulta l'oggetto, perché subject è dentro group
+      title,
+      question,
+      answer,
+    };
+    
     try {
-      await this.flashcardService.update(this.cardId, this.editForm.value);
+      await this.flashcardService.update(this.cardId, card);
       this.toastService.show('Card updated successfully', 'success');
       this.router.navigate(['/home']);
     } catch (error) {
