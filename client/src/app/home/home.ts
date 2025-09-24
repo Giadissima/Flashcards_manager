@@ -67,7 +67,16 @@ export class Home implements OnInit {
   }
 
   onFilterChange(): void {
-    this.loadFlashcards();
+    if(this.selectedSubjectId == null){
+      this.loadGroupsBySubject(undefined);
+
+    }else
+    if (this.selectedSubjectId) {
+      this.loadGroupsBySubject(this.selectedSubjectId);
+    } else {
+      this.groups = [];
+    }
+  this.loadFlashcards();
   }
 
   getCardColor(card: Flashcard): string {
@@ -102,6 +111,22 @@ export class Home implements OnInit {
       this.flashcards = this.flashcards.filter(c => c._id !== card._id);
     } catch (error: any) {
       this.toast.show("Error", 'error');
+    }
+  }
+
+  async loadGroupsBySubject(subjectId: string|undefined) {
+    try {
+      const response = await this.groupService.getAllGroups({
+        skip: 0,
+        limit: 50,
+        sortField: 'name',
+        sortDirection: 'asc',
+        subject_id: subjectId
+      });
+      this.groups = response.data;
+    } catch (err) {
+      console.error('Error loading groups for subject ' + subjectId, err);
+      this.toast.show('Failed to load groups for the selected subject', 'error');
     }
   }
 
