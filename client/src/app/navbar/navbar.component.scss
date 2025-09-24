@@ -4,7 +4,7 @@ nav {
   align-items: center;
   background-color: var(--white-color);
   padding: var(--spacing-unit) calc(var(--spacing-unit) * 3);
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--secondary-color);
   box-shadow: var(--box-shadow-sm);
 }
 
@@ -16,11 +16,12 @@ nav {
 }
 
 .create-card-btn{
-  border-radius: 1rem;
-  padding: 5px;
+  border-radius: 0.4rem;
+  width:7rem;
+  padding: 6px;
   background-color: var(--secondary-color);
-  color: var(--text-light-color);
-  border: 1px solid var(--text-light-color);
+  color: var(--text-color);
+  border: 0px solid var(--text-light-color);
 }
 
 .logo {
@@ -74,7 +75,7 @@ nav {
   z-index: 10;
   white-space: nowrap;
   margin-top: var(--spacing-unit);
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--secondary-color);
 }
 
 .dropdown:hover .dropdown-content {

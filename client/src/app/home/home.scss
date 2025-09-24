@@ -58,5 +58,12 @@
   }
 }
 .border-bootstrap-btn-custom{
-  border: 1px solid var(--bs-btn-active-bg); // variable took by bootstrap
+  border: 1px solid var(--secondary-color); // variable took by bootstrap
+  &.active{
+    background-color: var(--secondary-color); // variable took by bootstrap
+  }
+  color: var(--text-color); // variable took by bootstrap
+}
+.border-bootstrap-btn-custom:hover{
+    background-color: var(--secondary-color); // variable took by bootstrap
 }

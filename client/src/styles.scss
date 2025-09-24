@@ -11,7 +11,6 @@
   --text-color: #344054;
   --text-light-color: #667085;
   --white-color: #FFFFFF;
-  --border-color: #E9D7FE;
   --success-color: #12B76A;
   --danger-color: #F04438;
   --warning-color: #F79009;
@@ -118,10 +117,40 @@ h1, h2, h3, h4, h5, h6 {
     border-color: #039855;
 }
 
+.btn-outline-danger {
+  background-color: transparent;
+  color: var(--danger-color);
+  border-color: var(--danger-color);
+}
+.btn-outline-danger:hover:not(:disabled) {
+  background-color: var(--danger-color);
+  color: var(--white-color);
+}
+
+.btn-outline-warning {
+  background-color: transparent;
+  color: var(--warning-color);
+  border-color: var(--warning-color);
+}
+.btn-outline-warning:hover:not(:disabled) {
+  background-color: var(--warning-color);
+  color: var(--white-color);
+}
+
+.btn-outline-success {
+  background-color: transparent;
+  color: var(--success-color);
+  border-color: var(--success-color);
+}
+.btn-outline-success:hover:not(:disabled) {
+  background-color: var(--success-color);
+  color: var(--white-color);
+}
+
 /* Cards */
 .card {
   background-color: var(--white-color);
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--secondary-color);
   border-radius: var(--border-radius-lg);
   box-shadow: var(--box-shadow-md);
   overflow: hidden; /* Ensures content respects border-radius */
@@ -142,7 +171,7 @@ h1, h2, h3, h4, h5, h6 {
     width: 100%;
     padding: calc(var(--spacing-unit) * 1.25) calc(var(--spacing-unit) * 1.5);
     border-radius: var(--border-radius-md);
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--secondary-color);
     background-color: var(--white-color);
     color: var(--text-color);
     font-family: var(--font-family);
@@ -160,8 +189,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .input-group-text {
-    background-color: #F9FAFB;
-    border: 1px solid #D0D5DD;
+    background-color: var(--secondary-color);
+    border: 1px solid var(--secondary-color);
     border-right: none;
     padding: calc(var(--spacing-unit) * 1.25) calc(var(--spacing-unit) * 1.5);
     border-radius: var(--border-radius-md) 0 0 var(--border-radius-md);
