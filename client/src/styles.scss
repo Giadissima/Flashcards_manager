@@ -195,6 +195,7 @@ h1, h2, h3, h4, h5, h6 {
     padding: calc(var(--spacing-unit) * 1.25) calc(var(--spacing-unit) * 1.5);
     border-radius: var(--border-radius-md) 0 0 var(--border-radius-md);
     font-weight: 600;
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .input-group .form-control {

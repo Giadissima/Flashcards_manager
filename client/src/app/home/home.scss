@@ -67,3 +67,15 @@
 .border-bootstrap-btn-custom:hover{
     background-color: var(--secondary-color); // variable took by bootstrap
 }
+
+.input-group:focus-within .input-group-text {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px var(--secondary-color);
+  z-index: 3;
+}
+
+.input-group:focus-within .form-control {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px var(--secondary-color);
+  z-index: 3;
+}
