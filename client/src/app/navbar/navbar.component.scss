@@ -15,6 +15,14 @@ nav {
   gap: var(--spacing-unit);
 }
 
+.create-card-btn{
+  border-radius: 1rem;
+  padding: 5px;
+  background-color: var(--secondary-color);
+  color: var(--text-light-color);
+  border: 1px solid var(--text-light-color);
+}
+
 .logo {
   height: 40px;
 }
@@ -28,11 +36,6 @@ nav {
 .menu-container {
   display: flex;
   gap: calc(var(--spacing-unit) * 4);
-}
-
-.create-card-btn {
-  // This now uses the global .btn and .btn-primary styles
-  // We can add specific overrides here if needed
 }
 
 .menu-item {

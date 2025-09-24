@@ -25,6 +25,9 @@ export class Home implements OnInit {
   groups: Group[] = [];
   selectedSubjectId: string | null = null;
   selectedGroupId: string | null = null;
+  searchTerm: string = '';
+  sortBy: 'title' | 'createdAt' = 'title';
+  sortDirection: 'asc' | 'desc' = 'asc';
 
   // mappa _id -> boolean (true = mostra risposta)
   showAnswerMap: Record<string, boolean> = {};
@@ -36,47 +39,59 @@ export class Home implements OnInit {
     private subjectService: SubjectService,
     private groupService: GroupService
   ) {}
-
-  // TODO mettere dei valori di default, non deve essere obbligatorio il filter né mettere tutti i parametri dentro filter
+// TODO mettere dei valori di default, non deve essere obbligatorio il filter né mettere tutti i parametri dentro filter
   ngOnInit(): void {
     this.subjectService.getAllSubjects({
       sortField: '_id',
       sortDirection: 'asc',
       skip: 0,
       limit: 50
-    }).then((data)=>this.subjects=data.data);
-    
+    }).then((data) => this.subjects = data.data);
+
     this.groupService.getAllGroups({
       sortField: '_id',
       sortDirection: 'asc',
       skip: 0,
       limit: 50
-    }).then((data)=>this.groups=data.data);
+    }).then((data) => this.groups = data.data);
     this.loadFlashcards();
   }
 
   loadFlashcards(): void {
     this.flashcardsService.getAll({
-      sortField: '_id',
-      sortDirection: 'asc',
+      sortField: this.sortBy,
+      sortDirection: this.sortDirection,
       skip: 0,
       limit: 50,
       subject_id: this.selectedSubjectId || undefined,
-      group_id: this.selectedGroupId || undefined
-    }).then((data)=>this.flashcards=data.data);
+      group_id: this.selectedGroupId || undefined,
+      title: this.searchTerm || undefined
+    }).then((data) => this.flashcards = data.data);
   }
 
   onFilterChange(): void {
-    if(this.selectedSubjectId == null){
+    if (this.selectedSubjectId == null) {
       this.loadGroupsBySubject(undefined);
-
-    }else
-    if (this.selectedSubjectId) {
+    } else if (this.selectedSubjectId) {
       this.loadGroupsBySubject(this.selectedSubjectId);
     } else {
       this.groups = [];
     }
-  this.loadFlashcards();
+    this.loadFlashcards();
+  }
+
+  onSearchTermChange(): void {
+    this.loadFlashcards();
+  }
+
+  setSortBy(field: 'title' | 'createdAt'): void {
+    if (this.sortBy === field) {
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortBy = field;
+      this.sortDirection = 'asc';
+    }
+    this.loadFlashcards();
   }
 
   getCardColor(card: Flashcard): string {
@@ -99,7 +114,7 @@ export class Home implements OnInit {
   }
 
   seeAnswer(card: Flashcard): void {
-    if(!card._id) return;
+    if (!card._id) return;
     this.showAnswerMap[card._id] = !this.showAnswerMap[card._id];
   }
 
@@ -114,7 +129,7 @@ export class Home implements OnInit {
     }
   }
 
-  async loadGroupsBySubject(subjectId: string|undefined) {
+  async loadGroupsBySubject(subjectId: string | undefined) {
     try {
       const response = await this.groupService.getAllGroups({
         skip: 0,

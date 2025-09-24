@@ -41,4 +41,5 @@ export interface GroupFilter extends SimplePaginatedResponse {
 export interface CardFilter extends SimplePaginatedResponse {
   subject_id?: string;
   group_id?: string;
+  title?: string;
 }

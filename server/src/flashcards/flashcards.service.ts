@@ -56,11 +56,16 @@ export class FlashcardsService {
   async findAll(
     filter: FilterRequest,
   ): Promise<BasePaginatedResult<FlashcardDocument>> {
-    let query:any = {};
-    if(filter.subject_id)
+    const query: any = {};
+    if (filter.subject_id) {
       query.subject_id = filter.subject_id;
-    if(filter.group_id)
+    }
+    if (filter.group_id) {
       query.group_id = filter.group_id;
+    }
+    if (filter.title) {
+      query.title = { $regex: filter.title, $options: 'i' };
+    }
 
     const [data, count] = await Promise.all([
       this.flashcardModel
@@ -73,7 +78,7 @@ export class FlashcardsService {
         .limit(filter.limit)
         .populate(['group_id', 'subject_id'])
         .exec(),
-      this.flashcardModel.find().countDocuments(),
+      this.flashcardModel.find(query).countDocuments(),
     ]);
     return { data, count };
   }

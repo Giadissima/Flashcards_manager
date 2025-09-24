@@ -60,6 +60,14 @@ export class FilterRequest {
     required: false,
   })
   group_id?: string;
+
+  @IsOptional()
+  @IsString()
+  @ApiProperty({
+    description: 'Search a title',
+    required: false,
+  })
+  title?: string;
 }
 
 export interface BasePaginatedResult<T> {
