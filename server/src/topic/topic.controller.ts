@@ -28,7 +28,7 @@ export class TopicController {
   }
 
   @ApiOperation({ description: 'get all Topic from db with filters' })
-  @Get('all')
+  @Get()
   findAll(
     @Query() filters: FilterRequest,
   ): Promise<BasePaginatedResult<TopicDocument>> {

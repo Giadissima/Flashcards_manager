@@ -1,8 +1,8 @@
 import { TopicFilter, PaginatedResponse } from '../models/http.dto';
 import { Topic } from '../models/topic.dto';
 import { Injectable } from '@angular/core';
-import { RestApiService } from '../api/rest-api.service';
-import { baseUrlAPI } from '../../../config/config';
+import { RestClientService } from '../api/rest-api.service';
+import { baseUrlAPI } from '../../config/config';
 
 @Injectable({
   providedIn: 'root',
@@ -10,7 +10,7 @@ import { baseUrlAPI } from '../../../config/config';
 export class TopicService {
   private baseUrl = baseUrlAPI + 'topic/';
 
-  constructor(private restClient: RestApiService) {}
+  constructor(private restClient: RestClientService) {}
 
   getAllTopics(filter: TopicFilter): Promise<PaginatedResponse<Topic>> {
     return this.restClient.get<PaginatedResponse<Topic>>(

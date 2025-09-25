@@ -43,7 +43,7 @@ export class ManageTopicsComponent implements OnInit {
     }
   }
 
-  onSubjectChange() {
+  onFilterChange() {
     this.loadTopics();
   }
 

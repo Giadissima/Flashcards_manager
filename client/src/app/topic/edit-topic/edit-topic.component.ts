@@ -7,10 +7,12 @@ import { ToastService } from '../../toast/toast.service';
 import { SubjectService } from '../../subject/subject.service';
 import { Subject } from '../../models/subject.dto';
 
+import { Toast } from '../../toast/toast';
+
 @Component({
   selector: 'app-edit-topic',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, Toast],
   templateUrl: './edit-topic.component.html',
   styleUrls: ['./edit-topic.component.scss']
 })

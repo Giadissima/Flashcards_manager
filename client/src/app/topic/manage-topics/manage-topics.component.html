@@ -18,7 +18,7 @@
   <div class="mt-3">
     <div class="input-group mb-3">
       <span class="input-group-text">Subject</span>
-      <select class="form-select" [(ngModel)]="selectedSubjectId" (ngModelChange)="onSubjectChange()">
+      <select class="form-select" [(ngModel)]="selectedSubjectId" (ngModelChange)="onFilterChange()">
         <option [ngValue]="null">All Subjects</option>
         @for (subject of subjects; track subject._id) {
           <option [value]="subject._id">{{ subject.name }}</option>
