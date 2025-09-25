@@ -38,13 +38,13 @@ export class TestRunner implements OnInit {
   ngOnInit(): void {
     this.startTime = Date.now();
     this.route.queryParams.subscribe(params => {
-      const groupId = params['group_id'];
+      const topicId = params['topic_id'];
       const subjectId = params['subject_id'];
       const num = params['num'];
 
-      if ((groupId || subjectId) && num) {
+      if ((topicId || subjectId) && num) {
         this.loadFlashcards({
-          group_id: groupId,
+          topic_id: topicId,
           subject_id: subjectId,
           limit: num
         });
@@ -56,9 +56,9 @@ export class TestRunner implements OnInit {
     return this.testForm.get('answers') as FormArray;
   }
 
-  loadFlashcards(filters: { group_id?: string, subject_id?: string, limit: number }): void {
+  loadFlashcards(filters: { topic_id?: string, subject_id?: string, limit: number }): void {
     this.flashcardService.getAll({
-      group_id: filters.group_id,
+      topic_id: filters.topic_id,
       subject_id: filters.subject_id,
       limit: filters.limit,
       skip: 0,
@@ -73,8 +73,8 @@ export class TestRunner implements OnInit {
   }
 
   getCardColor(card: Flashcard): string {
-    if (card.group_id && typeof card.group_id !== 'string' && card.group_id.color) {
-      return card.group_id.color;
+    if (card.topic_id && typeof card.topic_id !== 'string' && card.topic_id.color) {
+      return card.topic_id.color;
     }
     return 'blue';
   }

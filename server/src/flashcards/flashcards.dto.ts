@@ -35,7 +35,7 @@ export class ModifyFlashcardDto {
       ? value.trim() || undefined // "" diventa undefined
       : value,
   )
-  group_id?: string;
+  topic_id?: string;
 
   @IsOptional()
   @IsMongoId()

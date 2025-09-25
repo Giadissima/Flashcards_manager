@@ -11,11 +11,11 @@
         </select>
       </div>
       <div class="col-auto">
-        <label for="groupFilter" class="visually-hidden">Group</label>
-        <select id="groupFilter" class="form-select" [(ngModel)]="selectedGroupId" (ngModelChange)="onFilterChange()">
-          <option [ngValue]="null">All Groups</option>
-          @for (group of groups; track group._id) {
-            <option [ngValue]="group._id">{{ group.name }}</option>
+        <label for="topicFilter" class="visually-hidden">Topic</label>
+        <select id="topicFilter" class="form-select" [(ngModel)]="selectedTopicId" (ngModelChange)="onFilterChange()">
+          <option [ngValue]="null">All Topics</option>
+          @for (topic of topics; track topic._id) {
+            <option [ngValue]="topic._id">{{ topic.name }}</option>
           }
         </select>
       </div>

@@ -40,7 +40,7 @@ export class FlashcardsController {
         title: { type: 'string', example: 'Esercizio addizioni' },
         question: { type: 'string', example: 'Quanto fa 2+2?' },
         answer: { type: 'string', example: '2+2=4' },
-        group_id: { type: 'string', example: null },
+        topic_id: { type: 'string', example: null },
         subject_id: { type: 'string', example: null },
         question_img: {
           type: 'string',

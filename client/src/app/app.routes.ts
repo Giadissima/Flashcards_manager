@@ -1,11 +1,13 @@
 import { CreateFlashcard } from './flashcard/create-flashcard/create-flashcard';
-import { CreateGroupComponent } from './group/create-group/create-group.component';
+import { CreateTopicComponent } from './topic/create-topic/create-topic.component';
+import { EditTopicComponent } from './topic/edit-topic/edit-topic.component';
+import { ManageTopicsComponent } from './topic/manage-topics/manage-topics.component';
 import { CreateSubjectComponent } from './subject/create-subject/create-subject.component';
 import { EditFlashcard } from './flashcard/edit-flashcard/edit-flashcard';
-import { EditGroupComponent } from './group/edit-group/edit-group.component';
+
 import { EditSubjectComponent } from './subject/edit-subject/edit-subject.component';
 import { Home } from './home/home';
-import { ManageGroupsComponent } from './group/manage-groups/manage-groups.component';
+
 import { ManageSubjectsComponent } from './subject/manage-subjects/manage-subjects.component';
 import { Routes } from '@angular/router';
 import { SetupTest } from './test/setup-test/setup-test';
@@ -20,9 +22,9 @@ export const routes: Routes = [
   { path: 'setup-test', component: SetupTest },
   { path: 'test-runner', component: TestRunner },
   { path: 'test-result', component: TestResult },
-  { path: 'manage-groups', component: ManageGroupsComponent },
-  { path: 'create-group', component: CreateGroupComponent },
-  { path: 'edit-group/:id', component: EditGroupComponent },
+  { path: 'manage-topics', component: ManageTopicsComponent },
+  { path: 'create-topic', component: CreateTopicComponent },
+  { path: 'edit-topic/:id', component: EditTopicComponent },
   { path: 'manage-subjects', component: ManageSubjectsComponent },
   { path: 'create-subject', component: CreateSubjectComponent },
   { path: 'edit-subject/:id', component: EditSubjectComponent },

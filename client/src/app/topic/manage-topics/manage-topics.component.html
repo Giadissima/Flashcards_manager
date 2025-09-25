@@ -1,0 +1,57 @@
+<div class="filter-bar mb-4">
+  <div class="row">
+    <div class="col-md-6">
+      <label for="subjectFilter" class="form-label">Filtra per Materia:</label>
+      <select id="subjectFilter" class="form-select" [(ngModel)]="selectedSubjectId" (ngModelChange)="onFilterChange()">
+        <option [ngValue]="null">Tutte le materie</option>
+        @for (subject of subjects; track subject._id) {
+          <option [ngValue]="subject._id">{{ subject.name }}</option>
+        }
+      </select>
+    </div>
+  </div>
+</div>
+<div class="container mt-4">
+  <h1>Manage Topics</h1>
+  <button class="btn btn-primary" (click)="createTopic()">Create New Topic</button>
+
+  <div class="mt-3">
+    <div class="input-group mb-3">
+      <span class="input-group-text">Subject</span>
+      <select class="form-select" [(ngModel)]="selectedSubjectId" (ngModelChange)="onSubjectChange()">
+        <option [ngValue]="null">All Subjects</option>
+        @for (subject of subjects; track subject._id) {
+          <option [value]="subject._id">{{ subject.name }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <table class="table table-striped mt-3">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Color</th>
+        <th>Subject</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (topic of topics; track topic._id) {
+        <tr>
+          <td>{{ topic.name }}</td>
+          <td>
+            <span [style.backgroundColor]="topic.color" class="color-preview"></span>
+            {{ topic.color }}
+          </td>
+          <td>{{ getSubjectName(topic.subject_id) }}</td>
+          <td>
+            <button class="btn btn-sm btn-warning me-2" (click)="editTopic(topic._id)">Edit</button>
+            <button class="btn btn-sm btn-danger" (click)="deleteTopic(topic._id)">Delete</button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+<app-toast></app-toast>

@@ -40,11 +40,11 @@ export class ImportExportController {
   }
 
   @ApiOperation({
-    description: 'it allows to upload a file contains groups on db',
+    description: 'it allows to upload a file contains topics on db',
   })
   @Get('export-flashcards')
   @ApiOperation({
-    description: 'it allows to upload a file contains groups on db',
+    description: 'it allows to upload a file contains topics on db',
   })
   async exportFlashcards(@Res() res: Response): Promise<void> {
     const stream = await this.importService.exportFlashcardsToFileStream();

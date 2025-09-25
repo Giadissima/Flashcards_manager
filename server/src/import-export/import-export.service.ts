@@ -11,10 +11,10 @@ import {
 import { Model } from 'mongoose';
 import { dirname, join } from 'path';
 import { Flashcard } from 'src/flashcards/flashcards.schema';
-import { Group, GroupDocument } from 'src/group/group.schema';
+import { Topic, TopicDocument } from 'src/topic/topic.schema';
 import {
   FlashcardFileFormat,
-  GroupFileFormat,
+  TopicFileFormat,
   SubjectFileFormat,
 } from './file.dto';
 import { Subject, SubjectDocument } from 'src/subject/subject.schema';
@@ -24,7 +24,7 @@ export class ImportExportService {
   constructor(
     @InjectModel('Flashcard') private readonly flashcardModel: Model<Flashcard>,
     @InjectModel('Subject') private readonly subjectModel: Model<Subject>,
-    @InjectModel('Group') private readonly groupModel: Model<Group>,
+    @InjectModel('Topic') private readonly topicModel: Model<Topic>,
   ) {}
 
   async importFlashcardsFromFile(file: Express.Multer.File): Promise<void> {
@@ -42,7 +42,7 @@ export class ImportExportService {
     // ? subject creation
     for (const item of data) {
       const subject_obj: SubjectFileFormat | undefined =
-        item.subject_id ?? item.group_id?.subject_id;
+        item.subject_id ?? item.topic_id?.subject_id;
 
       let subject_doc: SubjectDocument | undefined = undefined;
       if (subject_obj)
@@ -60,18 +60,18 @@ export class ImportExportService {
           )
           .exec();
 
-      // ? group creation
-      const group_obj: GroupFileFormat | undefined = item.group_id;
+      // ? topic creation
+      const topic_obj: TopicFileFormat | undefined = item.topic_id;
 
-      let group_doc: GroupDocument | undefined = undefined;
-      if (group_obj && subject_doc) {
-        group_doc = await this.groupModel
+      let topic_doc: TopicDocument | undefined = undefined;
+      if (topic_obj && subject_doc) {
+        topic_doc = await this.topicModel
           .findOneAndUpdate(
-            { name: group_obj.name, subject_id: subject_doc._id },
+            { name: topic_obj.name, subject_id: subject_doc._id },
             {
               $setOnInsert: {
-                name: group_obj.name.trim(),
-                color: group_obj.color.trim(),
+                name: topic_obj.name.trim(),
+                color: topic_obj.color.trim(),
                 subject_id: subject_doc._id,
               },
             },
@@ -85,7 +85,7 @@ export class ImportExportService {
         title: item.title?.trim(),
         question: item.question?.trim(),
         answer: item.answer?.trim(),
-        group_id: group_doc?._id,
+        topic_id: topic_doc?._id,
         subject_id: subject_doc?._id,
       });
     }
@@ -102,8 +102,7 @@ export class ImportExportService {
     const cursor = this.flashcardModel
       .find()
       .populate({
-        path: 'group_id',
-        populate: { path: 'subject_id' },
+                  path: 'topic_id',        populate: { path: 'subject_id' },
       })
       .populate('subject_id')
       .lean() // questo comando converte in oggetto puro il risultato e non più in un oggetto di mongoose, permettendo nel caso di export di risparmiare memoria

@@ -5,7 +5,7 @@ import { AppService } from './app.service';
 import { FileModule } from './file/file.module';
 import { FileService } from './file/file.service';
 import { FlashcardsModule } from './flashcards/flashcards.module';
-import { GroupModule } from './group/group.module';
+import { TopicModule } from './topic/topic.module';
 import { ImportExportModule } from './import-export/import-export.module';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -33,7 +33,7 @@ import { join } from 'path';
     }),
     FileModule,
     FlashcardsModule,
-    GroupModule,
+    TopicModule,
     SubjectModule,
     ImportExportModule,
     TestModule,

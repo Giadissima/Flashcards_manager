@@ -1,6 +1,6 @@
 import { Subject } from "./subject.dto";
 
-export interface Group {
+export interface Topic {
   _id?: string;
   name: string;
   color: string;

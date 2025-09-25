@@ -5,7 +5,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 
 /** The Dto file contains the description of the client requests and the server's responses*/
-export class ModifyGroupDto {
+export class ModifyTopicDto {
   @IsString()
   @Length(charMinLength, nameMaxLength)
   @ApiProperty({

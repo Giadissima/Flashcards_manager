@@ -3,12 +3,12 @@ export interface FlashcardFileFormat {
   title: string;
   question: string;
   answer: string;
-  group_id: GroupFileFormat | undefined;
+  topic_id: TopicFileFormat | undefined;
   subject_id: SubjectFileFormat | undefined;
   __v: number;
 }
 
-export interface GroupFileFormat {
+export interface TopicFileFormat {
   _id: string;
   name: string;
   color: string;

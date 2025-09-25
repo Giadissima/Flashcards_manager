@@ -4,8 +4,8 @@ import { CommonModule } from '@angular/common';
 import { Flashcard } from '../models/flashcard.dto';
 import { FlashcardService } from '../flashcard/flashcard.service';
 import { FormsModule } from '@angular/forms'; // Import FormsModule for ngModel
-import { Group } from '../models/group.dto';
-import { GroupService } from '../group/group.service';
+import { Topic } from '../models/topic.dto';
+import { TopicService } from '../topic/topic.service';
 import { Router } from '@angular/router';
 import { Subject } from '../models/subject.dto';
 import { SubjectService } from '../subject/subject.service';
@@ -22,9 +22,9 @@ import { ToastService } from '../toast/toast.service';
 export class Home implements OnInit {
   flashcards: Flashcard[] = [];
   subjects: Subject[] = [];
-  groups: Group[] = [];
+  topics: Topic[] = [];
   selectedSubjectId: string | null = null;
-  selectedGroupId: string | null = null;
+  selectedTopicId: string | null = null;
   searchTerm: string = '';
   sortBy: 'title' | 'createdAt' = 'title';
   sortDirection: 'asc' | 'desc' = 'asc';
@@ -37,7 +37,7 @@ export class Home implements OnInit {
     private toast: ToastService,
     private router: Router,
     private subjectService: SubjectService,
-    private groupService: GroupService
+    private topicService: TopicService
   ) {}
 // TODO mettere dei valori di default, non deve essere obbligatorio il filter né mettere tutti i parametri dentro filter
   ngOnInit(): void {
@@ -48,12 +48,12 @@ export class Home implements OnInit {
       limit: 50
     }).then((data) => this.subjects = data.data);
 
-    this.groupService.getAllGroups({
+    this.topicService.getAllTopics({
       sortField: '_id',
       sortDirection: 'asc',
       skip: 0,
       limit: 50
-    }).then((data) => this.groups = data.data);
+    }).then((data) => this.topics = data.data);
     this.loadFlashcards();
   }
 
@@ -64,18 +64,18 @@ export class Home implements OnInit {
       skip: 0,
       limit: 50,
       subject_id: this.selectedSubjectId || undefined,
-      group_id: this.selectedGroupId || undefined,
+      topic_id: this.selectedTopicId || undefined,
       title: this.searchTerm || undefined
     }).then((data) => this.flashcards = data.data);
   }
 
   onFilterChange(): void {
     if (this.selectedSubjectId == null) {
-      this.loadGroupsBySubject(undefined);
+      this.loadTopicsBySubject(undefined);
     } else if (this.selectedSubjectId) {
-      this.loadGroupsBySubject(this.selectedSubjectId);
+      this.loadTopicsBySubject(this.selectedSubjectId);
     } else {
-      this.groups = [];
+      this.topics = [];
     }
     this.loadFlashcards();
   }
@@ -95,9 +95,9 @@ export class Home implements OnInit {
   }
 
   getCardColor(card: Flashcard): string {
-    // se group_id è un oggetto Group, usa il suo colore
-    if (card.group_id && typeof card.group_id !== 'string' && card.group_id.color) {
-      return card.group_id.color;
+    // se topic_id è un oggetto Topic, usa il suo colore
+    if (card.topic_id && typeof card.topic_id !== 'string' && card.topic_id.color) {
+      return card.topic_id.color;
     }
     // fallback
     return 'blue';
@@ -129,19 +129,19 @@ export class Home implements OnInit {
     }
   }
 
-  async loadGroupsBySubject(subjectId: string | undefined) {
+  async loadTopicsBySubject(subjectId: string | undefined) {
     try {
-      const response = await this.groupService.getAllGroups({
+      const response = await this.topicService.getAllTopics({
         skip: 0,
         limit: 50,
         sortField: 'name',
         sortDirection: 'asc',
         subject_id: subjectId
       });
-      this.groups = response.data;
+      this.topics = response.data;
     } catch (err) {
-      console.error('Error loading groups for subject ' + subjectId, err);
-      this.toast.show('Failed to load groups for the selected subject', 'error');
+      console.error('Error loading topics for subject ' + subjectId, err);
+      this.toast.show('Failed to load topics for the selected subject', 'error');
     }
   }
 

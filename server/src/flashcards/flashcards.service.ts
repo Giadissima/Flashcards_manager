@@ -49,7 +49,7 @@ export class FlashcardsService {
   findOne(id: string): Promise<FlashcardDocument | null> {
     return this.flashcardModel
       .findById(id)
-      .populate(['group_id', 'subject_id'])
+      .populate(['topic_id', 'subject_id'])
       .exec();
   }
 
@@ -60,8 +60,8 @@ export class FlashcardsService {
     if (filter.subject_id) {
       query.subject_id = filter.subject_id;
     }
-    if (filter.group_id) {
-      query.group_id = filter.group_id;
+    if (filter.topic_id) {
+      query.topic_id = filter.topic_id;
     }
     if (filter.title) {
       query.title = { $regex: filter.title, $options: 'i' };
@@ -76,7 +76,7 @@ export class FlashcardsService {
         ])
         .skip(filter.skip)
         .limit(filter.limit)
-        .populate(['group_id', 'subject_id'])
+        .populate(['topic_id', 'subject_id'])
         .exec(),
       this.flashcardModel.find(query).countDocuments(),
     ]);

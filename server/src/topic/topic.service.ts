@@ -4,8 +4,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Group, GroupDocument } from './group.schema';
-import { ModifyGroupDto } from './group.dto';
+import { Topic, TopicDocument } from './topic.schema';
+import { ModifyTopicDto } from './topic.dto';
 import { Model, SortOrder } from 'mongoose';
 import {
   BasePaginatedResult,
@@ -14,27 +14,27 @@ import {
 } from 'src/common.dto';
 
 @Injectable()
-export class GroupService {
-  constructor(@InjectModel(Group.name) private groupModel: Model<Group>) {}
+export class TopicService {
+  constructor(@InjectModel(Topic.name) private topicModel: Model<Topic>) {}
 
-  async create(createGroupDto: ModifyGroupDto): Promise<void> {
-    await new this.groupModel({ ...createGroupDto }).save();
+  async create(createTopicDto: ModifyTopicDto): Promise<void> {
+    await new this.topicModel({ ...createTopicDto }).save();
   }
 
-  findOne(id: string): Promise<GroupDocument | null> {
-    return this.groupModel.findById(id).populate('subject_id').exec();
+  findOne(id: string): Promise<TopicDocument | null> {
+    return this.topicModel.findById(id).populate('subject_id').exec();
   }
 
   async findAll(
     filter: FilterRequest,
-  ): Promise<BasePaginatedResult<GroupDocument>> {
+  ): Promise<BasePaginatedResult<TopicDocument>> {
     const query: any = {};
     if (filter.subject_id) {
       query.subject_id = filter.subject_id;
     }
 
     const [data, count] = await Promise.all([
-      this.groupModel
+      this.topicModel
         .find(query)
         .sort([
           [filter.sortField, filter.sortDirection as SortOrder],
@@ -44,7 +44,7 @@ export class GroupService {
         .limit(filter.limit)
         .populate('subject_id')
         .exec(),
-      this.groupModel.find(query).countDocuments(),
+      this.topicModel.find(query).countDocuments(),
     ]);
     return { data, count };
   }
@@ -55,25 +55,25 @@ export class GroupService {
     if (!validateObjectIdParam(id))
       throw new BadRequestException('The id does not satisfy requirements');
 
-    const result = await this.groupModel.deleteOne({ _id: id });
+    const result = await this.topicModel.deleteOne({ _id: id });
     if (result.deletedCount === 0) {
-      throw new NotFoundException(`Group with id ${id} not found`);
+      throw new NotFoundException(`Topic with id ${id} not found`);
     }
   }
 
   async update(
     id: string,
-    updateObj: ModifyGroupDto,
+    updateObj: ModifyTopicDto,
   ): Promise<void | NotFoundException> {
     if (!validateObjectIdParam(id))
       throw new BadRequestException('The id does not satisfy requirements');
 
-    const result = await this.groupModel
+    const result = await this.topicModel
       .findByIdAndUpdate({ _id: id }, updateObj, { new: true })
       .exec();
 
     if (!result) {
-      throw new NotFoundException('Group with id ${id} not found');
+      throw new NotFoundException('Topic with id ${id} not found');
     }
   }
 }

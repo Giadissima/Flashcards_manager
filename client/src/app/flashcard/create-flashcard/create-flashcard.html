@@ -74,11 +74,13 @@
         </div>
 
     <div class="input-group mb-3">
-      <span class="input-group-text">Group</span>
-      <select formControlName="group_id" class="form-select">
-        <option value="">Choose the group</option>
-        <option *ngFor="let g of groups" [value]="g._id">{{ g.name }}</option>
-      </select>
+        <span class="input-group-text">Topic</span>
+        <select formControlName="topic_id" class="form-select">
+          <option value="">Choose the topic</option>
+          @for (t of topics; track t._id) {
+            <option [value]="t._id">{{ t.name }}</option>
+          }
+
     </div>
 
     <div class="d-flex justify-content-center mt-3">

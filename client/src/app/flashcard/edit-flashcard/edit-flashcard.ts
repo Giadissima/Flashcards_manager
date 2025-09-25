@@ -33,7 +33,7 @@ export class EditFlashcard implements OnInit {
     title: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(titleMaxLength)]],
     question: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(questionMaxLength)]],
     answer: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(answerMaxLength)]],
-    group_id: ['']
+    topic_id: ['']
   });
 
     this.route.paramMap.subscribe(params => {
@@ -64,8 +64,8 @@ export class EditFlashcard implements OnInit {
 
     const card: Flashcard = {
       _id,
-      group_id: this.editForm.value.group_id?._id ?? undefined,     // gestisce sia oggetto che stringa
-      subject_id: this.editForm.value.group_id.subject_id._id, // TODO se non esiste il gruppo ma esiste la materia dà errore per come risulta l'oggetto, perché subject è dentro group
+      topic_id: this.editForm.value.topic_id?._id ?? undefined,     // gestisce sia oggetto che stringa
+      subject_id: this.editForm.value.topic_id.subject_id._id, // TODO se non esiste il topic ma esiste la materia dà errore per come risulta l'oggetto, perché subject è dentro topic
       title,
       question,
       answer,

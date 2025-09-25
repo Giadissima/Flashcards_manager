@@ -34,12 +34,12 @@ export interface SimplePaginatedResponse{
   // filter: FilterInterface TODO lasciato già predisposto per la ricerca per data
 }
 
-export interface GroupFilter extends SimplePaginatedResponse {
+export interface TopicFilter extends SimplePaginatedResponse {
   subject_id?: string;
 }
 
 export interface CardFilter extends SimplePaginatedResponse {
   subject_id?: string;
-  group_id?: string;
+  topic_id?: string;
   title?: string;
 }

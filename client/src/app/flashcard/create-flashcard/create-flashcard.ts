@@ -6,8 +6,8 @@ import { answerMaxLength, charMinLength, idLength, questionMaxLength, titleMaxLe
 
 import { CommonModule } from '@angular/common';
 import { FlashcardService } from '../flashcard.service';
-import { Group } from '../../models/group.dto';
-import { GroupService } from '../../group/group.service';
+import { Topic } from '../../models/topic.dto';
+import { TopicService } from '../../topic/topic.service';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
 import { Toast } from "../../toast/toast";
@@ -22,14 +22,14 @@ import { ToastService } from '../../toast/toast.service';
 })
 export class CreateFlashcard implements OnInit {
   cardForm!: FormGroup;
-  groups: Group[] = [];
+  topics: Topic[] = [];
   subjects: Subject[] = [];
 
   constructor(
     private fb: FormBuilder,
     private flashcardService: FlashcardService,
     private toastService: ToastService,
-    private groupService: GroupService,
+    private topicService: TopicService,
     private subjectService: SubjectService
   ) {}
 
@@ -38,36 +38,36 @@ export class CreateFlashcard implements OnInit {
       title: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(titleMaxLength)]],
       question: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(questionMaxLength)]],
       answer: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(answerMaxLength)]],
-      group_id: [{ value: '', disabled: true }],
+      topic_id: [{ value: '', disabled: true }],
       subject_id: ['']
     });
 
     this.loadSubjects();
 
     this.cardForm.get('subject_id')?.valueChanges.subscribe(subjectId => {
-      this.groups = [];
-      this.cardForm.get('group_id')?.reset({ value: '', disabled: !subjectId });
+      this.topics = [];
+      this.cardForm.get('topic_id')?.reset({ value: '', disabled: !subjectId });
       
       if (subjectId) {
-        this.loadGroupsBySubject(subjectId);
+        this.loadTopicsBySubject(subjectId);
       }
     });
   }
 
-  async loadGroupsBySubject(subjectId: string) {
+  async loadTopicsBySubject(subjectId: string) {
     try {
-      const response = await this.groupService.getAllGroups({
+      const response = await this.topicService.getAllTopics({
         skip: 0,
         limit: 50,
         sortField: 'name',
         sortDirection: 'asc',
         subject_id: subjectId
       });
-      this.groups = response.data;
-      this.cardForm.get('group_id')?.enable();
+      this.topics = response.data;
+      this.cardForm.get('topic_id')?.enable();
     } catch (err) {
-      console.error('Error loading groups for subject ' + subjectId, err);
-      this.toastService.show('Failed to load groups for the selected subject', 'error');
+      console.error('Error loading topics for subject ' + subjectId, err);
+      this.toastService.show('Failed to load topics for the selected subject', 'error');
     }
   }
 

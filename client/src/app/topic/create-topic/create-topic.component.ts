@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { CommonModule } from '@angular/common';
-import { GroupService } from '../group.service';
+import { TopicService } from '../topic.service';
 import { Router } from '@angular/router';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
@@ -10,26 +10,26 @@ import { Toast } from '../../toast/toast';
 import { ToastService } from '../../toast/toast.service';
 
 @Component({
-  selector: 'app-create-group',
+  selector: 'app-create-topic',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, Toast],
-  templateUrl: './create-group.component.html',
-  styleUrls: ['./create-group.component.scss']
+  templateUrl: './create-topic.component.html',
+  styleUrls: ['./create-topic.component.scss']
 })
-export class CreateGroupComponent implements OnInit {
-  groupForm!: FormGroup;
+export class CreateTopicComponent implements OnInit {
+  topicForm!: FormGroup;
   subjects: Subject[] = [];
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private groupService: GroupService,
+    private topicService: TopicService,
     private toastService: ToastService,
     private subjectService: SubjectService
   ) {}
 
   ngOnInit(): void {
-    this.groupForm = this.fb.group({
+    this.topicForm = this.fb.group({
       name: ['', Validators.required],
       color: ['#75d2cb', Validators.required], // Default to black
       subject_id: [null] // Assuming subject_id is required
@@ -37,18 +37,18 @@ export class CreateGroupComponent implements OnInit {
     this.loadSubjects();
   }
 
-  async createGroup(): Promise<void> {
-    if (this.groupForm.invalid) {
-      this.groupForm.markAllAsTouched();
+  async createTopic(): Promise<void> {
+    if (this.topicForm.invalid) {
+      this.topicForm.markAllAsTouched();
       return;
     }
 
     try {
-      await this.groupService.createGroup(this.groupForm.value);
-      this.toastService.show('Group created successfully', 'success');
-      this.router.navigate(['/manage-groups']);
+      await this.topicService.createTopic(this.topicForm.value);
+      this.toastService.show('Topic created successfully', 'success');
+      this.router.navigate(['/manage-topics']);
     } catch (error) {
-      this.toastService.show('Failed to create group', 'error');
+      this.toastService.show('Failed to create topic', 'error');
     }
   }
 

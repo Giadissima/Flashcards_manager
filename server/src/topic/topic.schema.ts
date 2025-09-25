@@ -1,14 +1,14 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
 
-export type GroupDocument = Group & Document;
+export type TopicDocument = Topic & Document;
 
-// ? This file contains Group MongoDb's schema
+// ? This file contains Topic MongoDb's schema
 @Schema({
-  collection: 'group',
+  collection: 'topic',
   collation: { locale: 'it', caseFirst: 'off', strength: 1 },
 })
-export class Group {
+export class Topic {
   @Prop({ required: true })
   name: string;
 
@@ -23,4 +23,4 @@ export class Group {
   subject_id: mongoose.Types.ObjectId;
 }
 
-export const GroupSchema = SchemaFactory.createForClass(Group);
+export const TopicSchema = SchemaFactory.createForClass(Topic);

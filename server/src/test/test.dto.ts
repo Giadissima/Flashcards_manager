@@ -22,7 +22,7 @@ export class TestFiltersRequest {
     required: false,
     type: [String],
   })
-  groups?: string[];
+  topics?: string[];
 
   @IsOptional()
   @IsString()

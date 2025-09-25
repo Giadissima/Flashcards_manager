@@ -59,7 +59,7 @@ export class FilterRequest {
     description: 'Filter by subject ID',
     required: false,
   })
-  group_id?: string;
+  topic_id?: string;
 
   @IsOptional()
   @IsString()

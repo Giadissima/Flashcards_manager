@@ -22,8 +22,8 @@ export class Flashcard {
   @Prop({ required: true })
   answer: string;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Group', required: false })
-  group_id: mongoose.Types.ObjectId;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Topic', required: false })
+  topic_id: mongoose.Types.ObjectId;
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,

@@ -1,0 +1,31 @@
+<div class="container mt-4">
+<h1>Create New Topic</h1>
+
+<form [formGroup]="topicForm" (ngSubmit)="createTopic()">
+  <div class="mb-3">
+    <label for="name" class="form-label">Name</label>
+    <input type="text" class="form-control" id="name" formControlName="name" required>
+    <div *ngIf="topicForm.get('name')?.invalid && topicForm.get('name')?.touched" class="text-danger">
+      Name is required.
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <label for="color" class="form-label">Color</label>
+    <input type="color" class="form-control form-control-color" id="color" formControlName="color" title="Choose your color">
+  </div>
+
+  <div class="input-group mb-3">
+    <span class="input-group-text">Subject</span>
+    <select class="form-select" formControlName="subject_id">
+      <option value="">Choose the subject</option>
+      @for (subject of subjects; track subject._id) {
+        <option [value]="subject._id">{{ subject.name }}</option>
+      }
+    </select>
+  </div>
+
+  <button type="submit" class="btn btn-primary">Create Topic</button>
+</form>
+</div>
+<app-toast></app-toast>

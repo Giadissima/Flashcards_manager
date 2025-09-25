@@ -2,8 +2,8 @@ import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validatio
 import { Component, OnInit } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
-import { Group } from '../../models/group.dto';
-import { GroupService } from '../../group/group.service';
+import { Topic } from '../../models/topic.dto';
+import { TopicService } from '../../topic/topic.service';
 import { Router } from '@angular/router';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
@@ -25,51 +25,51 @@ export function atLeastOneValidator(controls: string[]): ValidatorFn {
 export class SetupTest implements OnInit {
   testForm: FormGroup;
   subjects: Subject[] = [];
-  groups: Group[] = [];
-  allGroups: Group[] = [];
+  topics: Topic[] = [];
+  allTopics: Topic[] = [];
 
   constructor(
     private fb: FormBuilder,
     private subjectService: SubjectService,
-    private groupService: GroupService,
+    private topicService: TopicService,
     private router: Router
   ) {
     this.testForm = this.fb.group({
       subject_id: [null],
-      group_id: [null],
+      topic_id: [null],
       num: [10, [Validators.required, Validators.min(1)]]
-    }, { validators: atLeastOneValidator(['subject_id', 'group_id']) });
+    }, { validators: atLeastOneValidator(['subject_id', 'topic_id']) });
   }
 
   ngOnInit(): void {
     this.subjectService.getAllSubjects({ limit: 50, skip: 0, sortDirection: 'asc', sortField: 'name' })
       .then(response => this.subjects = response.data);
 
-    this.groupService.getAllGroups({ limit: 50, skip: 0, sortDirection: 'asc', sortField: 'name' })
+    this.topicService.getAllTopics({ limit: 50, skip: 0, sortDirection: 'asc', sortField: 'name' })
       .then(response => {
-        this.allGroups = response.data;
-        this.groups = response.data;
+        this.allTopics = response.data;
+        this.topics = response.data;
       });
 
     this.testForm.get('subject_id')?.valueChanges.subscribe(subjectId => {
       if (subjectId) {
-        this.groups = this.allGroups.filter(g => (g.subject_id as Subject)?._id === subjectId);
+        this.topics = this.allTopics.filter(g => (g.subject_id as Subject)?._id === subjectId);
       } else {
-        this.groups = this.allGroups;
+        this.topics = this.allTopics;
       }
-      this.testForm.get('group_id')?.setValue(null);
+      this.testForm.get('topic_id')?.setValue(null);
     });
   }
 
   startTest(): void {
     if (this.testForm.valid) {
-      const { subject_id, group_id, num } = this.testForm.value;
+      const { subject_id, topic_id, num } = this.testForm.value;
       const queryParams: any = { num };
       if (subject_id) {
         queryParams.subject_id = subject_id;
       }
-      if (group_id) {
-        queryParams.group_id = group_id;
+      if (topic_id) {
+        queryParams.topic_id = topic_id;
       }
       this.router.navigate(['/test-runner'], { queryParams });
     }

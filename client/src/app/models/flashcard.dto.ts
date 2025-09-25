@@ -1,4 +1,4 @@
-import { Group } from "./group.dto";
+import { Topic } from "./topic.dto";
 import { Subject } from "./subject.dto";
 
 export interface Flashcard {
@@ -8,7 +8,7 @@ export interface Flashcard {
   question: string;
   answer: string;
 
-  group_id?: string | Group;      // ObjectId serializzato come stringa (lato client viene castato sempre a stringa)
+  topic_id?: string | Topic;      // ObjectId serializzato come stringa (lato client viene castato sempre a stringa)
   subject_id?: string | Subject;    // ObjectId serializzato come stringa
   question_img_id?: string; 
   answer_img_id?: string;

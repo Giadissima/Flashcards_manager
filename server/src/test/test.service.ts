@@ -28,12 +28,12 @@ export class TestService {
     const numQuestions = filters.max_answer ?? 50;
     const questionsArrays: { _id: Types.ObjectId }[] = [];
 
-    const groupIds = filters.groups?.map((id) => new Types.ObjectId(id)) ?? [];
+    const topicIds = filters.topics?.map((id) => new Types.ObjectId(id)) ?? [];
     const subjectId = filters.subject
       ? new Types.ObjectId(filters.subject)
       : null;
 
-    if (!subjectId && groupIds.length === 0) {
+    if (!subjectId && topicIds.length === 0) {
       // ? caso: nessun filtro, prendo domande random
       const randomQuestions: { _id: Types.ObjectId }[] =
         await this.flashcardModel.aggregate([
@@ -41,7 +41,7 @@ export class TestService {
           { $project: { _id: 1 } },
         ]);
       questionsArrays.push(...randomQuestions);
-    } else if (subjectId && groupIds.length === 0) {
+    } else if (subjectId && topicIds.length === 0) {
       // ? caso: solo subject, prendo domande di una certa materia
       const questions: { _id: Types.ObjectId }[] =
         await this.flashcardModel.aggregate([
@@ -50,14 +50,14 @@ export class TestService {
           { $project: { _id: 1 } },
         ]);
       questionsArrays.push(...questions);
-    } else if (subjectId && groupIds.length > 0) {
+    } else if (subjectId && topicIds.length > 0) {
       // ? caso: subject + gruppi, prendo domande di una certa materia e solo di alcuni argomenti
-      const perGroupLimit = Math.floor(numQuestions / groupIds.length);
-      for (const groupId of groupIds) {
+      const perTopicLimit = Math.floor(numQuestions / topicIds.length);
+      for (const topicId of topicIds) {
         const questions: { _id: Types.ObjectId }[] =
           await this.flashcardModel.aggregate([
-            { $match: { subject_id: subjectId, group_id: groupId } },
-            { $sample: { size: perGroupLimit } },
+            { $match: { subject_id: subjectId, topic_id: topicId } },
+            { $sample: { size: perTopicLimit } },
             { $project: { _id: 1 } },
           ]);
         questionsArrays.push(...questions);
@@ -98,7 +98,7 @@ export class TestService {
 
     const result = await this.testModel.findByIdAndDelete(id);
     if (result == null) {
-      throw new NotFoundException(`Group with id ${id} not found`);
+      throw new NotFoundException(`Topic with id ${id} not found`);
     }
   }
 

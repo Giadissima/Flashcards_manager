@@ -12,11 +12,11 @@
     </div>
 
     <div class="input-group mb-3">
-      <span class="input-group-text select text-center">Group</span>
-      <select class="form-select input" formControlName="group_id">
-        <option [ngValue]="null" selected>Choose the group</option>
-        @for (group of groups; track group._id) {
-          <option [value]="group._id">{{ group.name }}</option>
+      <span class="input-group-text select text-center">Topic</span>
+      <select class="form-select input" formControlName="topic_id">
+        <option [ngValue]="null" selected>Choose the topic</option>
+        @for (topic of topics; track topic._id) {
+          <option [value]="topic._id">{{ topic.name }}</option>
         }
       </select>
     </div>
@@ -27,7 +27,7 @@
     </div>
 
     <div *ngIf="testForm.errors?.['atLeastOneRequired'] && (testForm.touched || testForm.dirty)" class="alert alert-danger mt-2">
-      Please select at least a subject or a group.
+      Please select at least a subject or a topic.
     </div>
 
     <div class="d-flex justify-content-center mt-3">
