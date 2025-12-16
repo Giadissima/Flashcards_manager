@@ -1,5 +1,5 @@
-import { Topic } from "./topic.dto";
 import { Subject } from "./subject.dto";
+import { Topic } from "./topic.dto";
 
 export interface Flashcard {
   _id: string;  // id generato da MongoDB

@@ -14,7 +14,7 @@ import {
 import { TopicService } from './topic.service';
 import { ModifyTopicDto } from './topic.dto';
 import { ApiOperation } from '@nestjs/swagger';
-import { FilterRequest, BasePaginatedResult } from '../common.dto';
+import { FlashcardFilterRequest, BasePaginatedResult } from '../common.dto';
 import { TopicDocument } from './topic.schema';
 
 @Controller('topic')
@@ -30,7 +30,7 @@ export class TopicController {
   @ApiOperation({ description: 'get all Topic from db with filters' })
   @Get()
   findAll(
-    @Query() filters: FilterRequest,
+    @Query() filters: FlashcardFilterRequest,
   ): Promise<BasePaginatedResult<TopicDocument>> {
     return this.topicService.findAll(filters);
   }

@@ -9,7 +9,7 @@ import { ModifyTopicDto } from './topic.dto';
 import { Model, SortOrder } from 'mongoose';
 import {
   BasePaginatedResult,
-  FilterRequest,
+  FlashcardFilterRequest,
   validateObjectIdParam,
 } from 'src/common.dto';
 
@@ -26,7 +26,7 @@ export class TopicService {
   }
 
   async findAll(
-    filter: FilterRequest,
+    filter: FlashcardFilterRequest,
   ): Promise<BasePaginatedResult<TopicDocument>> {
     const query: any = {};
     if (filter.subject_id) {

@@ -43,3 +43,7 @@ export interface CardFilter extends SimplePaginatedResponse {
   topic_id?: string;
   title?: string;
 }
+
+// ha gli stessi attributi di cardfilter tranne il titolo
+export type TestFilter = Omit<CardFilter, 'title'>;
+

@@ -2,11 +2,14 @@ import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validatio
 import { Component, OnInit } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
-import { Topic } from '../../models/topic.dto';
-import { TopicService } from '../../topic/topic.service';
 import { Router } from '@angular/router';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
+import { Test } from '../../models/test.dto';
+import { TestService } from '../test.service';
+import { ToastService } from '../../toast/toast.service';
+import { Topic } from '../../models/topic.dto';
+import { TopicService } from '../../topic/topic.service';
 
 export function atLeastOneValidator(controls: string[]): ValidatorFn {
   return (group: AbstractControl): ValidationErrors | null => {
@@ -31,6 +34,8 @@ export class SetupTest implements OnInit {
   constructor(
     private fb: FormBuilder,
     private subjectService: SubjectService,
+    private testService: TestService,
+    private toastService: ToastService,
     private topicService: TopicService,
     private router: Router
   ) {
@@ -71,7 +76,19 @@ export class SetupTest implements OnInit {
       if (topic_id) {
         queryParams.topic_id = topic_id;
       }
+
+
       this.router.navigate(['/test-runner'], { queryParams });
+    }
+  }
+
+  async createTest(test: Test): Promise<void> {
+    try {
+      await this.testService.create(test);
+    } catch (err: any) {
+      console.error(err);
+      window.alert("Unable to create the test");
+      this.router.navigate(['']);
     }
   }
 }

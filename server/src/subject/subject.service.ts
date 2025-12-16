@@ -10,7 +10,7 @@ import { ModifySubjectDto } from './subject.dto';
 import { Model, SortOrder } from 'mongoose';
 import {
   BasePaginatedResult,
-  FilterRequest,
+  FlashcardFilterRequest,
   validateObjectIdParam,
 } from 'src/common.dto';
 import { FileService } from 'src/file/file.service';
@@ -37,7 +37,7 @@ export class SubjectService {
   }
 
   async findAll(
-    filter: FilterRequest,
+    filter: FlashcardFilterRequest,
   ): Promise<BasePaginatedResult<SubjectDocument>> {
     const [data, count] = await Promise.all([
       this.subjectModel

@@ -15,7 +15,7 @@ import {
 import { SubjectService } from './subject.service';
 import { ModifySubjectDto } from './subject.dto';
 import { ApiBody, ApiConsumes, ApiOperation } from '@nestjs/swagger';
-import { BasePaginatedResult, FilterRequest } from 'src/common.dto';
+import { BasePaginatedResult, FlashcardFilterRequest } from 'src/common.dto';
 import { SubjectDocument } from './subject.schema';
 import { FileInterceptor } from '@nestjs/platform-express';
 
@@ -52,7 +52,7 @@ export class SubjectController {
   @ApiOperation({ description: 'get all subject from db with filters' })
   @Get('all')
   findAll(
-    @Query() filters: FilterRequest,
+    @Query() filters: FlashcardFilterRequest,
   ): Promise<BasePaginatedResult<SubjectDocument>> {
     return this.subjectService.findAll(filters);
   }

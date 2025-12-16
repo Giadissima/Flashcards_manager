@@ -1,4 +1,4 @@
-import { ModifyFlashcardDto } from './flashcards.dto';
+import { ModifyFlashcardDto, RandomFlashcardsDTO } from './flashcards.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import {
   BadRequestException,
@@ -9,7 +9,7 @@ import { Flashcard, FlashcardDocument } from './flashcards.schema';
 import { Model, SortOrder } from 'mongoose';
 import {
   BasePaginatedResult,
-  FilterRequest,
+  FlashcardFilterRequest,
   validateObjectIdParam,
 } from 'src/common.dto';
 import { FileService } from 'src/file/file.service';
@@ -54,8 +54,37 @@ export class FlashcardsService {
   }
 
   async findAll(
-    filter: FilterRequest,
+    filter: FlashcardFilterRequest,
   ): Promise<BasePaginatedResult<FlashcardDocument>> {
+    const query: any = {};
+    if (filter.subject_id) {
+      query.subject_id = filter.subject_id;
+    }
+    if (filter.topic_id) {
+      query.topic_id = filter.topic_id;
+    }
+    if (filter.title) {
+      query.title = { $regex: filter.title, $options: 'i' };
+    }
+
+    const [data, count] = await Promise.all([
+      this.flashcardModel
+        .find(query)
+        .sort([
+          [filter.sortField, filter.sortDirection as SortOrder],
+          ['_id', 'desc'],
+        ])
+        .skip(filter.skip)
+        .limit(filter.limit)
+        .populate(['topic_id', 'subject_id'])
+        .exec(),
+      this.flashcardModel.find(query).countDocuments(),
+    ]);
+    return { data, count };
+  }
+
+  // TODO
+  getRandom(size: RandomFlashcardsDTO): Promise<FlashcardDocument[]> {
     const query: any = {};
     if (filter.subject_id) {
       query.subject_id = filter.subject_id;

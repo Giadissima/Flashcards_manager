@@ -5,7 +5,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { Types } from 'mongoose';
 
-export class FilterRequest {
+export class BasicFilterRequest{
   @Type(() => Number)
   @Min(Filters.skipMinLength)
   @ApiProperty({
@@ -44,30 +44,6 @@ export class FilterRequest {
     default: 'desc',
   })
   sortDirection: string;
-
-  @IsOptional()
-  @IsMongoId()
-  @ApiProperty({
-    description: 'Filter by subject ID',
-    required: false,
-  })
-  subject_id?: string;
-
-  @IsOptional()
-  @IsMongoId()
-  @ApiProperty({
-    description: 'Filter by subject ID',
-    required: false,
-  })
-  topic_id?: string;
-
-  @IsOptional()
-  @IsString()
-  @ApiProperty({
-    description: 'Search a title',
-    required: false,
-  })
-  title?: string;
 }
 
 export interface BasePaginatedResult<T> {

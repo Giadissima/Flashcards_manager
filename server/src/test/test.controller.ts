@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { TestService } from './test.service';
 import { ApiNotFoundResponse, ApiOperation } from '@nestjs/swagger';
-import { BasePaginatedResult, FilterRequest } from 'src/common.dto';
+import { BasePaginatedResult, FlashcardFilterRequest } from 'src/common.dto';
 import { TestDocument } from './test.schema';
 import { TestFiltersRequest } from './test.dto';
 
@@ -34,7 +34,7 @@ export class TestController {
   @ApiOperation({ description: 'get all test from db with filters' })
   @Get('all')
   findAll(
-    @Query() filters: FilterRequest,
+    @Query() filters: FlashcardFilterRequest,
   ): Promise<BasePaginatedResult<TestDocument>> {
     return this.testService.findAll(filters);
   }

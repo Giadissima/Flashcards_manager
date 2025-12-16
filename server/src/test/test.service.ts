@@ -6,7 +6,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import {
   BasePaginatedResult,
-  FilterRequest,
+  FlashcardFilterRequest,
   shuffleArray,
   validateObjectIdParam,
 } from 'src/common.dto';
@@ -113,7 +113,7 @@ export class TestService {
   }
 
   async findAll(
-    filter: FilterRequest,
+    filter: FlashcardFilterRequest,
   ): Promise<BasePaginatedResult<TestDocument>> {
     const [data, count] = await Promise.all([
       this.testModel
