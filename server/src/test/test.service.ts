@@ -6,15 +6,15 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import {
   BasePaginatedResult,
-  FlashcardFilterRequest,
   shuffleArray,
   validateObjectIdParam,
 } from 'src/common.dto';
 
-import { Flashcard, FlashcardDocument } from 'src/flashcards/flashcards.schema';
+import { Flashcard } from 'src/flashcards/flashcards.schema';
 import { Test, TestDocument } from './test.schema';
-import { FilterQuery, Model, SortOrder, Types } from 'mongoose';
-import { TestFiltersRequest } from './test.dto';
+import { Model, SortOrder, Types } from 'mongoose';
+import { TestCreateRequest } from './test.dto';
+import { FlashcardFilterDTO } from 'src/flashcards/flashcards.dto';
 
 @Injectable()
 export class TestService {
@@ -24,64 +24,8 @@ export class TestService {
   ) {}
 
   // TODO devo trovare un modo per filtrare solo le domande che non hanno categoria
-  async create(filters: TestFiltersRequest): Promise<TestDocument> {
-    const numQuestions = filters.max_answer ?? 50;
-    const questionsArrays: { _id: Types.ObjectId }[] = [];
-
-    const topicIds = filters.topics?.map((id) => new Types.ObjectId(id)) ?? [];
-    const subjectId = filters.subject
-      ? new Types.ObjectId(filters.subject)
-      : null;
-
-    if (!subjectId && topicIds.length === 0) {
-      // ? caso: nessun filtro, prendo domande random
-      const randomQuestions: { _id: Types.ObjectId }[] =
-        await this.flashcardModel.aggregate([
-          { $sample: { size: numQuestions } },
-          { $project: { _id: 1 } },
-        ]);
-      questionsArrays.push(...randomQuestions);
-    } else if (subjectId && topicIds.length === 0) {
-      // ? caso: solo subject, prendo domande di una certa materia
-      const questions: { _id: Types.ObjectId }[] =
-        await this.flashcardModel.aggregate([
-          { $match: { subject_id: subjectId } },
-          { $sample: { size: numQuestions } },
-          { $project: { _id: 1 } },
-        ]);
-      questionsArrays.push(...questions);
-    } else if (subjectId && topicIds.length > 0) {
-      // ? caso: subject + gruppi, prendo domande di una certa materia e solo di alcuni argomenti
-      const perTopicLimit = Math.floor(numQuestions / topicIds.length);
-      for (const topicId of topicIds) {
-        const questions: { _id: Types.ObjectId }[] =
-          await this.flashcardModel.aggregate([
-            { $match: { subject_id: subjectId, topic_id: topicId } },
-            { $sample: { size: perTopicLimit } },
-            { $project: { _id: 1 } },
-          ]);
-        questionsArrays.push(...questions);
-      }
-    }
-    if (questionsArrays.length == 0)
-      throw new BadRequestException(
-        'Non sono riuscito a trovare domande che soddisfano i filtri richiesti',
-      );
-    const shuffled = shuffleArray(questionsArrays).slice(0, numQuestions); // taglia se troppe
-
-    const test = await this.testModel.create({
-      questions: shuffled.map((q: { _id: Types.ObjectId }) => ({
-        flashcard_id: q._id,
-      })),
-    });
-
-    const test_obj: TestDocument | null = await this.testModel
-      .findById(test._id)
-      .populate('questions.flashcard_id')
-      .exec();
-    if (test_obj == null)
-      throw new NotFoundException('errore nella creazione del test');
-    return test_obj;
+  async create(test: TestCreateRequest): Promise<TestDocument> {
+    return new this.testModel(test).save();
   }
 
   updateElapsedTime(id: string, time: number) {
@@ -113,7 +57,7 @@ export class TestService {
   }
 
   async findAll(
-    filter: FlashcardFilterRequest,
+    filter: FlashcardFilterDTO,
   ): Promise<BasePaginatedResult<TestDocument>> {
     const [data, count] = await Promise.all([
       this.testModel

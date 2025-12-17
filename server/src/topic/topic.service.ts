@@ -7,11 +7,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Topic, TopicDocument } from './topic.schema';
 import { ModifyTopicDto } from './topic.dto';
 import { Model, SortOrder } from 'mongoose';
-import {
-  BasePaginatedResult,
-  FlashcardFilterRequest,
-  validateObjectIdParam,
-} from 'src/common.dto';
+import { BasePaginatedResult, validateObjectIdParam } from 'src/common.dto';
+import { FlashcardFilterDTO } from 'src/flashcards/flashcards.dto';
 
 @Injectable()
 export class TopicService {
@@ -26,7 +23,7 @@ export class TopicService {
   }
 
   async findAll(
-    filter: FlashcardFilterRequest,
+    filter: FlashcardFilterDTO,
   ): Promise<BasePaginatedResult<TopicDocument>> {
     const query: any = {};
     if (filter.subject_id) {

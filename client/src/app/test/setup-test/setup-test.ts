@@ -1,11 +1,14 @@
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
+import { Question, Test } from '../../models/test.dto';
 
 import { CommonModule } from '@angular/common';
+import { Flashcard } from '../../models/flashcard.dto';
+import { FlashcardService } from '../../flashcard/flashcard.service';
+import { RandomCardFIlter } from '../../models/http.dto';
 import { Router } from '@angular/router';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
-import { Test } from '../../models/test.dto';
 import { TestService } from '../test.service';
 import { ToastService } from '../../toast/toast.service';
 import { Topic } from '../../models/topic.dto';
@@ -35,6 +38,7 @@ export class SetupTest implements OnInit {
     private fb: FormBuilder,
     private subjectService: SubjectService,
     private testService: TestService,
+    private flashcardService: FlashcardService,
     private toastService: ToastService,
     private topicService: TopicService,
     private router: Router
@@ -66,29 +70,28 @@ export class SetupTest implements OnInit {
     });
   }
 
-  startTest(): void {
+  async startTest(): Promise<void> {
     if (this.testForm.valid) {
-      const { subject_id, topic_id, num } = this.testForm.value;
-      const queryParams: any = { num };
-      if (subject_id) {
-        queryParams.subject_id = subject_id;
-      }
-      if (topic_id) {
-        queryParams.topic_id = topic_id;
-      }
-
-
-      this.router.navigate(['/test-runner'], { queryParams });
+      const { subject_id, topic_id, numFlashcard } = this.testForm.value;
+      const queryParams: RandomCardFIlter = { subject_id, topic_id, numFlashcard };
+      
+      await this.createTest(queryParams);
     }
   }
 
-  async createTest(test: Test): Promise<void> {
+  async createTest(query: RandomCardFIlter): Promise<void> {
     try {
-      await this.testService.create(test);
+      let flashcard: {_id:string}[] = await this.flashcardService.getRandom(query);
+      const questions: Question[] = flashcard.map(fc => ({
+        flashcard_id: fc._id,
+      }));
+      await this.testService.create({questions});
+      // this.router.navigate(['/test-runner'], { queryParams });
+      this.router.navigate(['/test-runner']);
     } catch (err: any) {
       console.error(err);
       window.alert("Unable to create the test");
       this.router.navigate(['']);
+        }
+      }
     }
-  }
-}

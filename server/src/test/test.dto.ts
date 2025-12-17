@@ -1,48 +1,18 @@
-import {
-  IsArray,
-  IsNumber,
-  IsOptional,
-  IsString,
-  Length,
-  Min,
-} from 'class-validator';
+import { IsArray, IsOptional, IsString, ValidateNested } from "class-validator";
 
-import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { idLength } from 'src/config';
+import { Type } from "class-transformer";
 
-export class TestFiltersRequest {
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true }) // ogni elemento deve essere stringa
-  @Length(idLength, idLength, { each: true })
-  @Type(() => String)
-  @ApiProperty({
-    description: 'Array di gruppi (ids) da filtrare',
-    required: false,
-    type: [String],
-  })
-  topics?: string[];
-
-  @IsOptional()
+export class QuestionDto {
   @IsString()
-  @Length(idLength, idLength)
-  @Type(() => String)
-  @ApiProperty({
-    description: 'id della materia da filtrare',
-    required: false,
-    type: String,
-  })
-  subject?: string;
+  flashcard_id: string;
 
-  @IsNumber()
-  @Type(() => Number)
   @IsOptional()
-  @Min(1)
-  @ApiProperty({
-    description: 'Number of question to display',
-    required: false,
-    example: 0,
-  })
-  max_answer?: number;
+  is_correct?: boolean;
+}
+
+export class TestCreateRequest {
+  @IsArray()
+  @ValidateNested({ each: true }) // valida ogni elemento dell'array
+  @Type(() => QuestionDto)        // trasforma ogni elemento in QuestionDto
+  questions: QuestionDto[];
 }

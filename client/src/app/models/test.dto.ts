@@ -1,7 +1,7 @@
 import { Flashcard } from "./flashcard.dto";
 
 export interface Test {
-  _id: string;  // id generato da MongoDB
+  _id?: string;  // id generato da MongoDB
   notes?: string;
   completed_at?: Date;
   elapsed_time?: number;

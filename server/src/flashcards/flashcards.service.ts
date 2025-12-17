@@ -1,4 +1,8 @@
-import { ModifyFlashcardDto, RandomFlashcardsDTO } from './flashcards.dto';
+import {
+  FlashcardFilterDTO,
+  ModifyFlashcardDto,
+  RandomFlashcardsDTO,
+} from './flashcards.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import {
   BadRequestException,
@@ -6,12 +10,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Flashcard, FlashcardDocument } from './flashcards.schema';
-import { Model, SortOrder } from 'mongoose';
-import {
-  BasePaginatedResult,
-  FlashcardFilterRequest,
-  validateObjectIdParam,
-} from 'src/common.dto';
+import { Model, SortOrder, Types } from 'mongoose';
+import { BasePaginatedResult, validateObjectIdParam } from 'src/common.dto';
 import { FileService } from 'src/file/file.service';
 
 @Injectable()
@@ -54,7 +54,7 @@ export class FlashcardsService {
   }
 
   async findAll(
-    filter: FlashcardFilterRequest,
+    filter: FlashcardFilterDTO,
   ): Promise<BasePaginatedResult<FlashcardDocument>> {
     const query: any = {};
     if (filter.subject_id) {
@@ -83,33 +83,27 @@ export class FlashcardsService {
     return { data, count };
   }
 
-  // TODO
-  getRandom(size: RandomFlashcardsDTO): Promise<FlashcardDocument[]> {
+  getRandom(filter: RandomFlashcardsDTO): Promise<{ _id: string }[]> {
     const query: any = {};
     if (filter.subject_id) {
-      query.subject_id = filter.subject_id;
-    }
-    if (filter.topic_id) {
-      query.topic_id = filter.topic_id;
-    }
-    if (filter.title) {
-      query.title = { $regex: filter.title, $options: 'i' };
+      query.subject_id = new Types.ObjectId(filter.subject_id);
     }
 
-    const [data, count] = await Promise.all([
-      this.flashcardModel
-        .find(query)
-        .sort([
-          [filter.sortField, filter.sortDirection as SortOrder],
-          ['_id', 'desc'],
-        ])
-        .skip(filter.skip)
-        .limit(filter.limit)
-        .populate(['topic_id', 'subject_id'])
-        .exec(),
-      this.flashcardModel.find(query).countDocuments(),
-    ]);
-    return { data, count };
+    if (filter.topic_id) {
+      query.topic_id = new Types.ObjectId(filter.topic_id);
+    }
+
+    return this.flashcardModel
+      .aggregate<{ _id: string }>([
+        { $match: query },
+        { $sample: { size: filter.numFlashcard } },
+        {
+          $project: {
+            _id: { $toString: '$_id' },
+          },
+        },
+      ])
+      .exec();
   }
 
   async delete(

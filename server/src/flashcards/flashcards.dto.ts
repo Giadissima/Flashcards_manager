@@ -8,6 +8,7 @@ import {
   Max,
   Min,
 } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
 import {
   answerMaxLength,
   charMinLength,
@@ -17,7 +18,6 @@ import {
 } from 'src/config';
 
 import { BasicFilterRequest } from 'src/common.dto';
-import { Transform } from 'class-transformer';
 
 /** The Dto file contains the description of the client requests and the server's responses*/
 export class ModifyFlashcardDto {
@@ -67,7 +67,7 @@ export class FlashcardFilterDTO extends BasicFilterRequest {
   @IsOptional()
   @IsMongoId()
   @ApiProperty({
-    description: 'Filter by subject ID',
+    description: 'Filter by topic ID',
     required: false,
   })
   topic_id?: string;
@@ -81,13 +81,31 @@ export class FlashcardFilterDTO extends BasicFilterRequest {
   title?: string;
 }
 
-export class RandomFlashcardsDTO extends OmitType(
-  FlashcardFilterDTO,
-  ['title'],
-) {
+export class RandomFlashcardsDTO {
   @IsOptional()
+  @IsMongoId()
+  @ApiProperty({
+    description: 'Filter by subject ID',
+    required: false,
+  })
+  subject_id?: string;
+
+  @IsOptional()
+  @IsMongoId()
+  @ApiProperty({
+    description: 'Filter by topic ID',
+    required: false,
+  })
+  topic_id?: string;
+
+  @IsOptional()
+  @Type(() => Number)
   @IsInt()
   @Min(1)
   @Max(30)
+  @ApiProperty({
+    description: 'Number of flashcard requested',
+    required: false,
+  })
   numFlashcard: number = 10;
 }

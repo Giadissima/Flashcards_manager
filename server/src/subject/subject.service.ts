@@ -10,10 +10,10 @@ import { ModifySubjectDto } from './subject.dto';
 import { Model, SortOrder } from 'mongoose';
 import {
   BasePaginatedResult,
-  FlashcardFilterRequest,
   validateObjectIdParam,
 } from 'src/common.dto';
 import { FileService } from 'src/file/file.service';
+import { FlashcardFilterDTO } from 'src/flashcards/flashcards.dto';
 
 @Injectable()
 export class SubjectService {
@@ -37,7 +37,7 @@ export class SubjectService {
   }
 
   async findAll(
-    filter: FlashcardFilterRequest,
+    filter: FlashcardFilterDTO,
   ): Promise<BasePaginatedResult<SubjectDocument>> {
     const [data, count] = await Promise.all([
       this.subjectModel

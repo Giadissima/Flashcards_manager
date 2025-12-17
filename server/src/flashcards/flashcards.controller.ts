@@ -15,8 +15,12 @@ import {
 
 import { FlashcardsService } from './flashcards.service';
 import { ApiBody, ApiConsumes, ApiOperation } from '@nestjs/swagger';
-import { FlashcardFilterRequest, BasePaginatedResult } from 'src/common.dto';
-import { ModifyFlashcardDto, RandomFlashcardsDTO } from './flashcards.dto';
+import { BasePaginatedResult } from 'src/common.dto';
+import {
+  FlashcardFilterDTO,
+  ModifyFlashcardDto,
+  RandomFlashcardsDTO,
+} from './flashcards.dto';
 import { FlashcardDocument } from './flashcards.schema';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 
@@ -70,7 +74,7 @@ export class FlashcardsController {
   @ApiOperation({ description: 'get all Flashcard from db with filters' })
   @Get('all')
   findAll(
-    @Query() filters: FlashcardFilterRequest,
+    @Query() filters: FlashcardFilterDTO,
   ): Promise<BasePaginatedResult<FlashcardDocument>> {
     return this.flashcardsService.findAll(filters);
   }
@@ -79,9 +83,7 @@ export class FlashcardsController {
     description: 'get random flashcards from db to create a new test',
   })
   @Get('random')
-  getRandom(
-    @Query() filters: RandomFlashcardsDTO,
-  ): Promise<FlashcardDocument[]> {
+  getRandom(@Query() filters: RandomFlashcardsDTO): Promise<{ _id: string }[]> {
     return this.flashcardsService.getRandom(filters);
   }
 

@@ -12,29 +12,29 @@ import {
 } from '@nestjs/common';
 import { TestService } from './test.service';
 import { ApiNotFoundResponse, ApiOperation } from '@nestjs/swagger';
-import { BasePaginatedResult, FlashcardFilterRequest } from 'src/common.dto';
+import { BasePaginatedResult } from 'src/common.dto';
 import { TestDocument } from './test.schema';
-import { TestFiltersRequest } from './test.dto';
+import { TestCreateRequest } from './test.dto';
+import { FlashcardFilterDTO } from 'src/flashcards/flashcards.dto';
 
 @Controller('test')
 export class TestController {
   constructor(private readonly testService: TestService) {}
 
-  @ApiOperation({ description: 'create a new Test' })
+  @ApiOperation({ description: 'create a new plain Test' })
   @Post()
   @ApiNotFoundResponse({
     type: NotFoundException,
     description: 'Error creating test',
   })
-  create(@Body() filters: TestFiltersRequest): Promise<TestDocument> {
-    // TODO come input i filtri del nuovo test
-    return this.testService.create(filters);
+  create(@Body() test: TestCreateRequest): Promise<TestDocument> {
+    return this.testService.create(test);
   }
 
   @ApiOperation({ description: 'get all test from db with filters' })
   @Get('all')
   findAll(
-    @Query() filters: FlashcardFilterRequest,
+    @Query() filters: FlashcardFilterDTO,
   ): Promise<BasePaginatedResult<TestDocument>> {
     return this.testService.findAll(filters);
   }

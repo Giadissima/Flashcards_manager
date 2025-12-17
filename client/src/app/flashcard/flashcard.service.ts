@@ -1,4 +1,4 @@
-import { CardFilter, PaginatedResponse, SimplePaginatedResponse } from '../models/http.dto';
+import { CardFilter, PaginatedResponse, RandomCardFIlter, SimplePaginatedResponse } from '../models/http.dto';
 
 import { Flashcard } from '../models/flashcard.dto';
 import { HttpClient } from '@angular/common/http';
@@ -22,6 +22,15 @@ private baseUrl = baseUrlAPI + 'flashcards/';
         filter
       );
     }
+
+    // Legge tutte le flashcard
+  getRandom(filter: RandomCardFIlter): Promise<{_id: string}[]> {
+      return this.restClient.get<{_id: string}[]>(
+        this.baseUrl + 'random/',
+        filter
+      );
+    }
+
 
   // Legge una singola flashcard
   getById(id: string): Promise<Flashcard> {

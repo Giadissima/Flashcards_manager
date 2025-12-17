@@ -13,3 +13,4 @@ export interface Flashcard {
   question_img_id?: string; 
   answer_img_id?: string;
 }
+

@@ -1,5 +1,6 @@
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as morgan from 'morgan';
+
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
@@ -20,7 +21,7 @@ async function bootstrap() {
 
     const document = SwaggerModule.createDocument(app, config.build());
     SwaggerModule.setup(`/swagger`, app, document, {
-      customSiteTitle: 'Nest-Middlewares-with-Swagger',
+      customSiteTitle: 'FlashcardManager-Swagger',
       swaggerOptions: {
         persistAuthorization: true,
       },
