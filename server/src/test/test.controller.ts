@@ -56,6 +56,14 @@ export class TestController {
   ) {
     return this.testService.updateAnswer(test_id, question_id, is_correct);
   }
+  
+  @Get(':test_id/question/:question_index')
+  getQuestion(
+    @Param('test_id') test_id: string,
+    @Param('question_index') question_index: number,
+  ) {
+    return this.testService.getQuestion(test_id, question_index);
+  }
 
   @Patch(':id/time')
   updateElapsedTime(@Param('id') id: string, @Query('time') time: number) {

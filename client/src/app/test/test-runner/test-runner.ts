@@ -16,12 +16,16 @@ import { FlashcardService } from '../../flashcard/flashcard.service';
 export class TestRunner implements OnInit {
   testForm: FormGroup;
   flashcards: Flashcard[] = [];
-  currentCardIndex = 0;
   showAnswerMap: Record<string, boolean> = {};
-  testFinished = false;
+  testFinished = false; // TODO
   correctAnswers = 0;
   incorrectAnswers = 0;
-  elapsedTime = '0';
+
+  testId!: string;
+  questions: any[] = [];
+  currentIndex: number = 0;
+  timeElapsed: number = 0; // in secondi
+  timerSub!: Subscription;
   private startTime = 0;
 
   constructor(
@@ -90,20 +94,20 @@ export class TestRunner implements OnInit {
   }
 
   nextCard(): void {
-    if (this.currentCardIndex < this.flashcards.length - 1) {
-      this.currentCardIndex++;
+    if (this.currentIndex < this.flashcards.length - 1) {
+      this.currentIndex++;
     }
   }
 
   previousCard(): void {
-    if (this.currentCardIndex > 0) {
-      this.currentCardIndex--;
+    if (this.currentIndex > 0) {
+      this.currentIndex--;
     }
   }
 
   finishTest(): void {
     const endTime = Date.now();
-    this.elapsedTime = ((endTime - this.startTime) / 1000 / 60).toFixed(2);
+    this.timeElapsed = ((endTime - this.startTime) / 1000 / 60).toFixed(2);
     this.correctAnswers = this.answers.controls.filter(control => control.value.isCorrect === true).length;
     this.incorrectAnswers = this.answers.controls.filter(control => control.value.isCorrect === false).length;
     this.testFinished = true;
@@ -112,7 +116,7 @@ export class TestRunner implements OnInit {
       state: {
         correct: this.correctAnswers,
         incorrect: this.incorrectAnswers,
-        elapsedTime: this.elapsedTime,
+        elapsedTime: this.timeElapsed,
         total: this.flashcards.length
       }
     });

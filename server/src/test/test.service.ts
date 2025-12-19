@@ -15,14 +15,28 @@ import { Test, TestDocument } from './test.schema';
 import { Model, SortOrder, Types } from 'mongoose';
 import { TestCreateRequest } from './test.dto';
 import { FlashcardFilterDTO } from 'src/flashcards/flashcards.dto';
+import { FlashcardsService } from 'src/flashcards/flashcards.service';
 
 @Injectable()
 export class TestService {
   constructor(
     @InjectModel(Test.name) private testModel: Model<Test>,
     @InjectModel(Flashcard.name) private flashcardModel: Model<Flashcard>,
+    private readonly flashcardService: FlashcardsService,
   ) {}
 
+  async getQuestion(test_id: string, index: number) {
+    const test = await this.testModel
+      .findById(test_id)
+      .select({ questions: { $slice: [index, 1] } })
+      .lean();
+
+    if (!test || !test.questions || test.questions.length === 0)
+      throw new NotFoundException(`Error searching question sended`); // TODO controllare l'inglese
+
+    const flashcardId = test.questions[0].flashcard_id;
+    return this.flashcardService.findOne(flashcardId.toString());
+  }
   // TODO devo trovare un modo per filtrare solo le domande che non hanno categoria
   async create(test: TestCreateRequest): Promise<TestDocument> {
     return new this.testModel(test).save();
