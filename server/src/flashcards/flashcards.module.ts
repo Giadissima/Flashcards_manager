@@ -15,5 +15,6 @@ import { MongooseModule } from '@nestjs/mongoose';
     ]),
     FileModule,
   ],
+  exports: [FlashcardsService],
 })
 export class FlashcardsModule {}
