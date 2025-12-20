@@ -85,9 +85,9 @@ export class SetupTest implements OnInit {
       const questions: Question[] = flashcard.map(fc => ({
         flashcard_id: fc._id,
       }));
-      await this.testService.create({questions});
-      // this.router.navigate(['/test-runner'], { queryParams });
-      this.router.navigate(['/test-runner']);
+      const test = await this.testService.create({questions});
+      this.router.navigate(['/test', test!._id]);
+
     } catch (err: any) {
       console.error(err);
       window.alert("Unable to create the test");

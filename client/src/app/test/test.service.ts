@@ -1,7 +1,7 @@
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { PaginatedResponse, TestFilter } from '../models/http.dto';
 
 import { Flashcard } from '../models/flashcard.dto';
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { RestClientService } from '../api/rest-api.service';
 import { Test } from '../models/test.dto';
@@ -23,13 +23,22 @@ private baseUrl = baseUrlAPI + 'test/';
       );
     }
 
-  // Legge un singola test
+  // Legge un singolo test
   getById(id: string): Promise<Test> {
     return this.restClient.get<Test>(this.baseUrl + id);
   }
 
+  updateElapsedTime(testId: string, elapsedTime: number): Promise<void> {
+    const params = new HttpParams().set('time', elapsedTime);
+    return this.restClient.patch(
+      `${this.baseUrl}${testId}/time`,
+      {},
+      params
+    );
+  }
+
   // Crea un test
-  create(test: Test): Promise<void> {
+  create(test: Test): Promise<Test> {
     return this.restClient.post(this.baseUrl, test);
   }
 
@@ -41,5 +50,10 @@ private baseUrl = baseUrlAPI + 'test/';
   // Elimina un test
   delete(id: string): Promise<void>{
     return this.restClient.delete<void>(this.baseUrl + id)
+  }
+
+  updateAnswer(test_id: string, flashcard_id:string, is_correct: boolean): Promise<void> {
+    const queryParam = new HttpParams().set('is_correct', is_correct);
+    return this.restClient.patch(`${this.baseUrl}${test_id}/answer/${flashcard_id}`, {}, queryParam);
   }
 }

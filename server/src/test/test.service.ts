@@ -19,6 +19,11 @@ import { FlashcardsService } from 'src/flashcards/flashcards.service';
 
 @Injectable()
 export class TestService {
+  update(id: string, test: TestDocument) {
+    if (!validateObjectIdParam(id))
+      throw new BadRequestException('The id does not satisfy requirements');
+    return this.testModel.findByIdAndUpdate(id, test);
+  }
   constructor(
     @InjectModel(Test.name) private testModel: Model<Test>,
     @InjectModel(Flashcard.name) private flashcardModel: Model<Flashcard>,
@@ -64,7 +69,7 @@ export class TestService {
     if (!validateObjectIdParam(test_id) || !validateObjectIdParam(question_id))
       throw new BadRequestException('The id does not satisfy requirements');
     return this.testModel.findOneAndUpdate(
-      { _id: test_id, 'questions._id': question_id },
+      { _id: test_id, 'questions.flashcard_id': question_id },
       { $set: { 'questions.$.is_correct': is_correct } },
       { new: true },
     );
@@ -88,10 +93,12 @@ export class TestService {
     return { data, count };
   }
 
-  findOne(id: string) {
-    return this.testModel
-      .findById(id)
-      .populate('questions.flashcard_id')
-      .exec();
+  async findOne(id: string): Promise<TestDocument> {
+    const test = await this.testModel.findById(id).exec();
+
+    if (!test || test == null)
+      throw new NotFoundException('test not found');
+
+    return test;
   }
 }

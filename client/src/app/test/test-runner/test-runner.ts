@@ -1,10 +1,13 @@
 import { ActivatedRoute, Router } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { Subscription, interval } from 'rxjs';
 
 import { CommonModule } from '@angular/common';
 import { Flashcard } from '../../models/flashcard.dto';
 import { FlashcardService } from '../../flashcard/flashcard.service';
+import { Test } from '../../models/test.dto';
+import { TestService } from '../test.service';
 
 @Component({
   selector: 'app-test-runner',
@@ -15,16 +18,14 @@ import { FlashcardService } from '../../flashcard/flashcard.service';
 })
 export class TestRunner implements OnInit {
   testForm: FormGroup;
-  flashcards: Flashcard[] = [];
-  showAnswerMap: Record<string, boolean> = {};
+  showAnswer: boolean = false;
   testFinished = false; // TODO
-  correctAnswers = 0;
-  incorrectAnswers = 0;
+  flashcard!: Flashcard;
 
   testId!: string;
-  questions: any[] = [];
-  currentIndex: number = 0;
-  timeElapsed: number = 0; // in secondi
+  test: Test | undefined = undefined;
+  currentIndex: number = -1;
+  elapsedTime: number = 0; // in secondi
   timerSub!: Subscription;
   private startTime = 0;
 
@@ -32,48 +33,84 @@ export class TestRunner implements OnInit {
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private flashcardService: FlashcardService,
+    private testService: TestService,
     private router: Router
   ) {
     this.testForm = this.fb.group({
-      answers: this.fb.array([])
+      isCorrect: [null]
     });
   }
 
   ngOnInit(): void {
-    this.startTime = Date.now();
-    this.route.queryParams.subscribe(params => {
-      const topicId = params['topic_id'];
-      const subjectId = params['subject_id'];
-      const num = params['num'];
-
-      if ((topicId || subjectId) && num) {
-        this.loadFlashcards({
-          topic_id: topicId,
-          subject_id: subjectId,
-          limit: num
-        });
+    this.route.paramMap.subscribe(params => {
+      const id = params.get('test_id');
+      if(id){
+        this.testId = id;
+        this.getTest()
+        // imposto un timer da aggiornare ogni 30 secondi
+        this.timerSub = interval(1000).subscribe(() => this.updateTimer());
+      }else {
+        alert("non è stato possibile prendere il test");
       }
     });
   }
 
-  get answers(): FormArray {
-    return this.testForm.get('answers') as FormArray;
+  updateTimer() {
+    if(!this.testId) return;
+    this.elapsedTime++;
+    if(this.elapsedTime %30000 == 0)
+      this.testService.updateElapsedTime(this.testId, this.elapsedTime)
+        .catch(err => console.error('Errore aggiornamento timer', err));;
+  }
+  
+  async getTest() {
+    if(!this.testId) return;
+    
+    this.test = await this.testService.getById(this.testId);
+    await this.loadNextFlashcard();
+    // TODO if test è già finito allora dai errore e vai ai risultati
+    if(this.elapsedTime == 0)
+      this.elapsedTime = this.test.elapsed_time ?? 0;
   }
 
-  loadFlashcards(filters: { topic_id?: string, subject_id?: string, limit: number }): void {
-    this.flashcardService.getAll({
-      topic_id: filters.topic_id,
-      subject_id: filters.subject_id,
-      limit: filters.limit,
-      skip: 0,
-      sortDirection: 'asc',
-      sortField: '_id'
-    }).then(response => {
-      this.flashcards = response.data;
-      this.flashcards.forEach(() => {
-        this.answers.push(this.fb.group({ isCorrect: null }));
-      });
-    });
+  ngOnDestroy() {
+    if (this.timerSub) {
+      this.timerSub.unsubscribe();
+    }
+  }
+
+  async updateAnswer(){
+    const answer = this.testForm.get("isCorrect")?.value;
+    const flashcard_id = this.test?.questions[this.currentIndex]?.flashcard_id;
+    if(answer != null && flashcard_id){
+      this.testService.updateAnswer(this.testId, flashcard_id, answer);
+    }
+  }
+
+  async loadNextFlashcard() {
+    await this.updateAnswer();
+    this.testForm.reset({ isCorrect: null });
+    this.currentIndex++;
+    const question = this.test?.questions[this.currentIndex].flashcard_id;
+    if(!question) {
+      this.currentIndex--;
+      return;
+    }
+    this.flashcard = await this.flashcardService.getById(question);
+    this.showAnswer = false;
+  }
+
+  async loadPreviousFlashcard() {
+    await this.updateAnswer();
+    this.testForm.reset({ isCorrect: null });
+    this.currentIndex--;
+    const question = this.test?.questions[this.currentIndex].flashcard_id;
+    if(!question) {
+      this.currentIndex--;
+      return;
+    }
+    this.flashcard = await this.flashcardService.getById(question);
+    this.showAnswer = false;
   }
 
   getCardColor(card: Flashcard): string {
@@ -85,40 +122,24 @@ export class TestRunner implements OnInit {
 
   seeAnswer(card: Flashcard): void {
     if (!card._id) return;
-    this.showAnswerMap[card._id] = !this.showAnswerMap[card._id];
+    this.showAnswer = !this.showAnswer;
   }
 
   getCardButtonText(card: Flashcard): string {
     if (!card._id) return '';
-    return this.showAnswerMap[card._id] ? 'Vedi domanda' : 'Vedi risposta';
+    return this.showAnswer ? 'Vedi domanda' : 'Vedi risposta';
   }
 
-  nextCard(): void {
-    if (this.currentIndex < this.flashcards.length - 1) {
-      this.currentIndex++;
+  async finishTest() {
+    await this.getTest(); // aggiorno le risposte
+    if(!this.test) return;
+    const answer = this.testForm.get("isCorrect")?.value;
+    if(answer != null && this.test?.questions?.[this.currentIndex]){
+      this.test.questions[this.currentIndex].is_correct = answer;
     }
-  }
-
-  previousCard(): void {
-    if (this.currentIndex > 0) {
-      this.currentIndex--;
-    }
-  }
-
-  finishTest(): void {
-    const endTime = Date.now();
-    this.timeElapsed = ((endTime - this.startTime) / 1000 / 60).toFixed(2);
-    this.correctAnswers = this.answers.controls.filter(control => control.value.isCorrect === true).length;
-    this.incorrectAnswers = this.answers.controls.filter(control => control.value.isCorrect === false).length;
-    this.testFinished = true;
-
-    this.router.navigate(['/test-result'], {
-      state: {
-        correct: this.correctAnswers,
-        incorrect: this.incorrectAnswers,
-        elapsedTime: this.timeElapsed,
-        total: this.flashcards.length
-      }
-    });
+    this.test.completed_at = new Date();
+    this.test.elapsed_time = this.elapsedTime;
+    this.testService.update(this.testId, this.test);
+    this.router.navigate(['/test-result'], {queryParams: {id: this.testId}});
   }
 }

@@ -9,6 +9,6 @@ export interface Test {
 }
 
 export type Question = {
-  flashcard_id: string | Flashcard;
+  flashcard_id: string;
   is_correct?: boolean;
 }

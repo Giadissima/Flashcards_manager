@@ -44,7 +44,7 @@ export class TestController {
       'get a specific test from db (resume or check a finished test)',
   })
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: string): Promise<TestDocument> {
     return this.testService.findOne(id);
   }
 
@@ -52,11 +52,15 @@ export class TestController {
   updateAnswer(
     @Param('test_id') test_id: string,
     @Param('question_id') question_id: string,
-    @Query('is_correct') is_correct: boolean,
+    @Query('is_correct') is_correct: string,
   ) {
-    return this.testService.updateAnswer(test_id, question_id, is_correct);
+    return this.testService.updateAnswer(
+      test_id,
+      question_id,
+      is_correct === 'true' ? true : false,
+    );
   }
-  
+
   @Get(':test_id/question/:question_index')
   getQuestion(
     @Param('test_id') test_id: string,
@@ -68,6 +72,11 @@ export class TestController {
   @Patch(':id/time')
   updateElapsedTime(@Param('id') id: string, @Query('time') time: number) {
     return this.testService.updateElapsedTime(id, time);
+  }
+
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() test: TestDocument) {
+    return this.testService.update(id, test);
   }
 
   @ApiOperation({ description: 'Delete one Flashcard from db' })
