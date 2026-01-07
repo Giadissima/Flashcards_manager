@@ -69,7 +69,6 @@ export class TestRunner implements OnInit {
     
     this.test = await this.testService.getById(this.testId);
     await this.loadNextFlashcard();
-    // TODO if test è già finito allora dai errore e vai ai risultati
     if(this.elapsed_time == 0)
       this.elapsed_time = this.test.elapsed_time ?? 0;
   }
@@ -134,6 +133,7 @@ export class TestRunner implements OnInit {
   async finishTest() {
     if(!this.test) return;
     await this.updateAnswer();
+    this.test = await this.testService.getById(this.testId);
     this.test.completedAt = new Date();
     this.test.elapsed_time = this.elapsed_time;
     this.testService.update(this.testId, this.test);

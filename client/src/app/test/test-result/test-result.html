@@ -1,8 +1,91 @@
-<h1>Test results</h1>
+<div class="container mt-4">
 
-<h2>Elapsed time: </h2> <p>{{elapsed_time | duration}}</p>
-<h2>Blank questions: </h2><p>{{stats.blank}}</p>
-<h2>Correct questions: </h2><p>{{stats.correct}}</p>
-<h2>Wrong questions: </h2><p>{{stats.wrong}}</p>
-<h2>Created at: </h2><p>{{createdAt | date:'short'}}</p>
-<h2>Completed at: </h2><p>{{completedAt | date:'short'}}</p>
+  <!-- Header -->
+  <div class="header">
+    <h1>Risultati del Test</h1>
+    <a routerLink="/" class="btn btn-primary">
+      <i class="fas fa-home"></i>
+      Torna alla Home
+    </a>
+  </div>
+
+  <!-- Main Grid Layout -->
+  <div class="summary-grid" *ngIf="test">
+    
+    <!-- Score Card -->
+    <div class="card score-card">
+      <div class="score">
+        {{ stats.correct }} <span>/ {{ test.questions.length }}</span>
+      </div>
+      <div class="percentage">
+        {{ (stats.correct / test.questions.length) * 100 | number:'1.0-0' }}% di risposte corrette
+      </div>
+      <div class="progress-bar">
+        <div class="progress-bar-inner" [style.width.%]="(stats.correct / test.questions.length) * 100"></div>
+      </div>
+    </div>
+
+    <!-- Stat: Correct Answers -->
+    <div class="card stat-card stat-card--correct">
+      <div class="icon"><i class="fas fa-check"></i></div>
+      <div class="details">
+        <h4>Corrette</h4>
+        <p>{{ stats.correct }}</p>
+      </div>
+    </div>
+
+    <!-- Stat: Wrong Answers -->
+    <div class="card stat-card stat-card--wrong">
+      <div class="icon"><i class="fas fa-times"></i></div>
+      <div class="details">
+        <h4>Errate</h4>
+        <p>{{ stats.wrong }}</p>
+      </div>
+    </div>
+
+    <!-- Stat: Blank Answers -->
+    <div class="card stat-card stat-card--blank">
+      <div class="icon"><i class="fas fa-minus"></i></div>
+      <div class="details">
+        <h4>Non date</h4>
+        <p>{{ stats.blank }}</p>
+      </div>
+    </div>
+
+    <!-- Stat: Duration -->
+    <div class="card stat-card stat-card--time">
+      <div class="icon"><i class="fas fa-clock"></i></div>
+      <div class="details">
+        <h4>Durata</h4>
+        <p>{{ elapsed_time | duration }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Questions Review -->
+  @if(questions && questions.length){
+    <div class="questions-review" >
+    <h2>Riepilogo Domande</h2>
+  
+    @for (q of questions; track q.id) {
+    <div class="card question-card" 
+        [ngClass]="{
+          'card--correct': q.is_correct === 'true',
+          'card--incorrect': q.is_correct === 'false'
+        }">
+      <div class="card-body">
+        <div class="question-text">{{ q.question }}</div>
+  
+        <div class="answer-block correct-answer">
+          <p>Risposta corretta</p>
+          <span class="answer">{{ q.answer}}</span>
+        </div>
+      </div>
+    </div>
+    }
+    </div>
+  }
+</div>
+
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">

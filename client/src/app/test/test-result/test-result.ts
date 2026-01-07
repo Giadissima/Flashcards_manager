@@ -1,13 +1,17 @@
+import { CommonModule, DatePipe, NgClass } from '@angular/common';
+
 import { ActivatedRoute } from '@angular/router';
 import { Component } from '@angular/core';
-import { DatePipe } from '@angular/common';
 import { DurationExtendedFormatPipe } from '../../../pipes/duration.extended.pipe';
+import { Flashcard } from '../../models/flashcard.dto';
+import { FlashcardService } from '../../flashcard/flashcard.service';
 import { Test } from '../../models/test.dto';
 import { TestService } from '../test.service';
 
 @Component({
   selector: 'app-test-result',
-  imports: [DatePipe, DurationExtendedFormatPipe],
+  standalone: true,
+  imports: [DatePipe, CommonModule,DurationExtendedFormatPipe, NgClass],
   templateUrl: './test-result.html',
   styleUrl: './test-result.scss'
 })
@@ -18,10 +22,17 @@ export class TestResult {
   elapsed_time = 0;
   createdAt?: Date;
   completedAt?: Date;
+  questions: {
+        id: string,
+        is_correct: string,
+        question: string,
+        answer: string
+      }[] = [];;
 
   constructor(
     private route: ActivatedRoute,
     private testService: TestService,
+    private flashcardService: FlashcardService
   ){}
 
   ngOnInit(): void {
@@ -40,7 +51,10 @@ export class TestResult {
     //get test
     if(!this.testId) return;
     this.test = await this.testService.getById(this.testId);
-    if(!this.test) alert("error getting test");
+    if(!this.test) {
+      alert("error getting test");
+      return;
+    }
 
     // setup html variables
     this.stats = this.test.questions.reduce(
@@ -55,7 +69,30 @@ export class TestResult {
     this.elapsed_time = this.test.elapsed_time ?? 0;
     this.completedAt = this.test.completedAt;
     this.createdAt = this.test.createdAt;
+
+    // load questions' array
+    await this.loadQuestions();
   }
 
+  async loadQuestions() {
+  if (!this.test || !this.test.questions) return;
 
+  this.questions = await Promise.all(
+    this.test.questions.map(async (q) => {
+      const flashcard = await this.flashcardService.getById(q.flashcard_id);
+      let res;
+      if(q.is_correct === true) res = 'true';
+      else if(q.is_correct === false) res = 'false';
+      else res = 'blank';
+      return {
+        id: flashcard?._id,
+        is_correct: res,
+        question: flashcard?.question ?? 'Domanda non disponibile',
+        answer: flashcard?.answer ?? 'Risposta non disponibile'
+
+      };
+    })
+  );
+}
+ // TODO aggiungere con le pipe il completato at e creato at:
 }
