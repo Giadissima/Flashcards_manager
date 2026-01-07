@@ -4,6 +4,7 @@ import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule } from '@angular
 import { Subscription, interval } from 'rxjs';
 
 import { CommonModule } from '@angular/common';
+import { DurationPipe } from '../../../pipes/duration.pipe';
 import { Flashcard } from '../../models/flashcard.dto';
 import { FlashcardService } from '../../flashcard/flashcard.service';
 import { Test } from '../../models/test.dto';
@@ -12,7 +13,7 @@ import { TestService } from '../test.service';
 @Component({
   selector: 'app-test-runner',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, DurationPipe],
   templateUrl: './test-runner.html',
   styleUrls: ['./test-runner.scss']
 })
@@ -25,7 +26,7 @@ export class TestRunner implements OnInit {
   testId!: string;
   test: Test | undefined = undefined;
   currentIndex: number = -1;
-  elapsedTime: number = 0; // in secondi
+  elapsed_time: number = 0; // in secondi
   timerSub!: Subscription;
   private startTime = 0;
 
@@ -57,9 +58,9 @@ export class TestRunner implements OnInit {
 
   updateTimer() {
     if(!this.testId) return;
-    this.elapsedTime++;
-    if(this.elapsedTime %30000 == 0)
-      this.testService.updateElapsedTime(this.testId, this.elapsedTime)
+    this.elapsed_time++;
+    if(this.elapsed_time % 30 == 0)
+      this.testService.updateElapsedTime(this.testId, this.elapsed_time)
         .catch(err => console.error('Errore aggiornamento timer', err));;
   }
   
@@ -69,8 +70,8 @@ export class TestRunner implements OnInit {
     this.test = await this.testService.getById(this.testId);
     await this.loadNextFlashcard();
     // TODO if test è già finito allora dai errore e vai ai risultati
-    if(this.elapsedTime == 0)
-      this.elapsedTime = this.test.elapsed_time ?? 0;
+    if(this.elapsed_time == 0)
+      this.elapsed_time = this.test.elapsed_time ?? 0;
   }
 
   ngOnDestroy() {
@@ -91,7 +92,7 @@ export class TestRunner implements OnInit {
     await this.updateAnswer();
     this.testForm.reset({ isCorrect: null });
     this.currentIndex++;
-    const question = this.test?.questions[this.currentIndex].flashcard_id;
+    const question = this.test?.questions[this.currentIndex]?.flashcard_id;
     if(!question) {
       this.currentIndex--;
       return;
@@ -131,15 +132,11 @@ export class TestRunner implements OnInit {
   }
 
   async finishTest() {
-    await this.getTest(); // aggiorno le risposte
     if(!this.test) return;
-    const answer = this.testForm.get("isCorrect")?.value;
-    if(answer != null && this.test?.questions?.[this.currentIndex]){
-      this.test.questions[this.currentIndex].is_correct = answer;
-    }
-    this.test.completed_at = new Date();
-    this.test.elapsed_time = this.elapsedTime;
+    await this.updateAnswer();
+    this.test.completedAt = new Date();
+    this.test.elapsed_time = this.elapsed_time;
     this.testService.update(this.testId, this.test);
-    this.router.navigate(['/test-result'], {queryParams: {id: this.testId}});
+    this.router.navigate(['/test-result',this.testId],);
   }
 }

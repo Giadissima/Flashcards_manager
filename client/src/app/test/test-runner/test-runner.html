@@ -1,4 +1,7 @@
 <div class="container mt-4" *ngIf="flashcard">
+  <div class="row justify-content-right">
+    {{elapsed_time | duration}}
+  </div>
   <div class="row justify-content-center">
     <div class="col-md-8">
       <form [formGroup]="testForm" (ngSubmit)="finishTest()">

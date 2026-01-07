@@ -1,1 +1,8 @@
-<p>test-result works!</p>
+<h1>Test results</h1>
+
+<h2>Elapsed time: </h2> <p>{{elapsed_time | duration}}</p>
+<h2>Blank questions: </h2><p>{{stats.blank}}</p>
+<h2>Correct questions: </h2><p>{{stats.correct}}</p>
+<h2>Wrong questions: </h2><p>{{stats.wrong}}</p>
+<h2>Created at: </h2><p>{{createdAt | date:'short'}}</p>
+<h2>Completed at: </h2><p>{{completedAt | date:'short'}}</p>

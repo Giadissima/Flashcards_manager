@@ -21,7 +21,7 @@ export class Test {
   notes: string;
 
   @Prop({ type: Date, required: false })
-  completed_at: Date;
+  completedAt: Date;
 
   @Prop({ required: false })
   elapsed_time: number;

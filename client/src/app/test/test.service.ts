@@ -28,8 +28,8 @@ private baseUrl = baseUrlAPI + 'test/';
     return this.restClient.get<Test>(this.baseUrl + id);
   }
 
-  updateElapsedTime(testId: string, elapsedTime: number): Promise<void> {
-    const params = new HttpParams().set('time', elapsedTime);
+  updateElapsedTime(testId: string, elapsed_time: number): Promise<void> {
+    const params = new HttpParams().set('time', elapsed_time);
     return this.restClient.patch(
       `${this.baseUrl}${testId}/time`,
       {},

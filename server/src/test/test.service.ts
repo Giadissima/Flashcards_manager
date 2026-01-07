@@ -47,7 +47,7 @@ export class TestService {
     return new this.testModel(test).save();
   }
 
-  updateElapsedTime(id: string, time: number) {
+  updateelapsed_time(id: string, time: number) {
     if (!validateObjectIdParam(id))
       throw new BadRequestException('The id does not satisfy requirements');
     return this.testModel.findByIdAndUpdate(id, { elapsed_time: time });

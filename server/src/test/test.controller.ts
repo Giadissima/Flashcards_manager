@@ -70,8 +70,8 @@ export class TestController {
   }
 
   @Patch(':id/time')
-  updateElapsedTime(@Param('id') id: string, @Query('time') time: number) {
-    return this.testService.updateElapsedTime(id, time);
+  updateelapsed_time(@Param('id') id: string, @Query('time') time: number) {
+    return this.testService.updateelapsed_time(id, time);
   }
 
   @Patch(':id')

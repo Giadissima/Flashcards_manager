@@ -19,7 +19,7 @@ export const routes: Routes = [
   { path: 'edit-card/:id', component: EditFlashcard },
   { path: 'setup-test', component: SetupTest },
   { path: 'test/:test_id', component: TestRunner },
-  { path: 'test-result', component: TestResult },
+  { path: 'test-result/:test_id', component: TestResult },
   { path: 'manage-topics', component: ManageTopicsComponent },
   { path: 'create-topic', component: CreateTopicComponent },
   { path: 'edit-topic/:id', component: EditTopicComponent },
