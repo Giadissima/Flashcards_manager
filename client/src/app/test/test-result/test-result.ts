@@ -94,5 +94,6 @@ export class TestResult {
     })
   );
 }
- // TODO aggiungere con le pipe il completato at e creato at:
+ // TODO aggiungere con le pipe il completato at e creato at e il titolo delle card
+ // TODO se ci sono troppe domande cambiare la visualizzazione del riepilogo delle domande, magari metterci solo quelle sbagliate o non date
 }
