@@ -93,10 +93,12 @@ export class FlashcardsService {
       query.topic_id = new Types.ObjectId(filter.topic_id);
     }
 
+    const sampleSize = filter.numFlashcard || 10; // Default to 10 if numFlashcard is not provided or is falsy
+
     return this.flashcardModel
       .aggregate<{ _id: string }>([
         { $match: query },
-        { $sample: { size: filter.numFlashcard } },
+        { $sample: { size: sampleSize } },
         {
           $project: {
             _id: { $toString: '$_id' },

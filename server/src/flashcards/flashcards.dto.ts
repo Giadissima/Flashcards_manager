@@ -107,5 +107,5 @@ export class RandomFlashcardsDTO {
     description: 'Number of flashcard requested',
     required: false,
   })
-  numFlashcard: number = 10;
+  numFlashcard?: number = 10;
 }

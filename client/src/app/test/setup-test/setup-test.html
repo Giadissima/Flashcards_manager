@@ -23,7 +23,7 @@
 
     <div class="input-group mb-3">
       <span class="input-group-text select text-center">Number of questions</span>
-      <input type="number" formControlName="num" class="form-control input">
+      <input type="number" formControlName="numFlashcard" class="form-control input">
     </div>
 
     <div *ngIf="testForm.errors?.['atLeastOneRequired'] && (testForm.touched || testForm.dirty)" class="alert alert-danger mt-2">

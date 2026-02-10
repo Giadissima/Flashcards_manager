@@ -39,14 +39,13 @@ export class SetupTest implements OnInit {
     private subjectService: SubjectService,
     private testService: TestService,
     private flashcardService: FlashcardService,
-    private toastService: ToastService,
     private topicService: TopicService,
     private router: Router
   ) {
     this.testForm = this.fb.group({
       subject_id: [null],
       topic_id: [null],
-      num: [10, [Validators.required, Validators.min(1)]]
+      numFlashcard: [10, [Validators.required, Validators.min(1)]]
     }, { validators: atLeastOneValidator(['subject_id', 'topic_id']) });
   }
 
@@ -90,7 +89,7 @@ export class SetupTest implements OnInit {
 
     } catch (err: any) {
       console.error(err);
-      window.alert("Unable to create the test");
+      window.alert("Unable to create the test"); // TODO change in toast
       this.router.navigate(['']);
         }
       }

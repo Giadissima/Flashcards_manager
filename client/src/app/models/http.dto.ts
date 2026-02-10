@@ -37,7 +37,7 @@ export interface SimplePaginatedResponse{
 export interface TopicFilter extends SimplePaginatedResponse {
   subject_id?: string;
 }
-//TODO pulire i file dto e cercare di fare meglio le divisioni delle classi/interfacce sia qui sia nel server
+// TODO pulire i file dto e cercare di fare meglio le divisioni delle classi/interfacce sia qui sia nel server
 export interface CardFilter extends SimplePaginatedResponse {
   subject_id?: string;
   topic_id?: string;

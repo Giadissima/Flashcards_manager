@@ -11,7 +11,7 @@ import { TestService } from '../test.service';
 @Component({
   selector: 'app-test-result',
   standalone: true,
-  imports: [DatePipe, CommonModule,DurationExtendedFormatPipe, NgClass],
+  imports: [CommonModule,DurationExtendedFormatPipe, NgClass],
   templateUrl: './test-result.html',
   styleUrl: './test-result.scss'
 })
@@ -95,5 +95,5 @@ export class TestResult {
   );
 }
  // TODO aggiungere con le pipe il completato at e creato at e il titolo delle card
- // TODO se ci sono troppe domande cambiare la visualizzazione del riepilogo delle domande, magari metterci solo quelle sbagliate o non date
+ // TODO se ci sono troppe domande cambiare la visualizzazione del riepilogo delle domande, magari metterci solo quelle sbagliate di default e metterci una filter
 }

@@ -14,7 +14,8 @@ services:
 
   app:
     build:
-      context: .  # cartella dove c'è Dockerfile server
+      context: .
+      dockerfile: Dockerfile
     container_name: flashcards_manager
     restart: unless-stopped
     ports:
@@ -24,9 +25,9 @@ services:
     depends_on:
       - mongodb
     volumes:
-      # Bind mount per il codice client
+      # Bind mount per il codice client (per hot-reloading)
       - ./client:/app/client
-      # Bind mount per il codice server
+      # Bind mount per il codice server (per hot-reloading)
       - ./server:/app/server
       - server-data:/app/server/data
       - client-data:/app/client/data
@@ -34,4 +35,4 @@ services:
 volumes:
   mongo_data:
   server-data:
-  client-data: # TODO da verificare se toglierne uno dei due
+  client-data:
