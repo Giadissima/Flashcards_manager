@@ -12,27 +12,27 @@ services:
       # per fare inizializzare il db alla prima scrittura
       - MONGO_INITDB_DATABASE=flashcard_db
 
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: flashcards_manager
+  server:
+    build: ./server
     restart: unless-stopped
+    container_name: flashcards_server
     ports:
       - "3000:3000"
     environment:
       - MONGO_URL=mongodb://mongodb:27017/flashcard_db
+      - enableSwagger=true # per il development lasciare a true, altrimenti mettere a false
+      - appName=Flashcards_Manager
     depends_on:
       - mongodb
-    volumes:
-      # Bind mount per il codice client (per hot-reloading)
-      - ./client:/app/client
-      # Bind mount per il codice server (per hot-reloading)
-      - ./server:/app/server
-      - server-data:/app/server/data
-      - client-data:/app/client/data
+
+  client:
+    build: ./client
+    restart: unless-stopped
+    container_name: flashcards_client
+    ports:
+      - "4200:4200"
+    depends_on:
+      - server
 
 volumes:
   mongo_data:
-  server-data:
-  client-data:
