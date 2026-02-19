@@ -1,4 +1,4 @@
-export const baseUrlAPI = 'http://localhost:3000/'
+export const baseUrlAPI = '/api/' 
 
 
 // form data limits

@@ -4,6 +4,7 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 
 import { Router } from '@angular/router';
+import { baseUrlAPI } from '../../config/config';
 import { firstValueFrom } from 'rxjs';
 
 /**
@@ -13,7 +14,6 @@ import { firstValueFrom } from 'rxjs';
   providedIn: 'root'
 })
 export class RestClientService {
-  private url: string = '/api'; // ? /api è in realtà la base url che possiamo trovare nel file angular-proxy.conf.json nella root del progetto
 
   public offlineException: EventEmitter<HttpErrorResponse> = new EventEmitter();
   public serverErrorException: EventEmitter<HttpErrorResponse> = new EventEmitter();
@@ -22,7 +22,7 @@ export class RestClientService {
     private http: HttpClient,
     private router: Router,
   ) { }
-
+  url = baseUrlAPI
   async get<T>(endpoint: string, params?: any, reqOpts?: any): Promise<T> {
   
     if (!reqOpts || reqOpts == null) {
