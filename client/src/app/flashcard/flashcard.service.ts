@@ -11,7 +11,7 @@ import { baseUrlAPI } from '../../config/config';
   providedIn: 'root'
 })
 export class FlashcardService {
-private baseUrl = baseUrlAPI + 'flashcards/';
+  private baseUrl = 'flashcards/';
 
   constructor(private http: HttpClient, private restClient: RestClientService) {}
 

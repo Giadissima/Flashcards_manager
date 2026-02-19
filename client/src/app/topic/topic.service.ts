@@ -8,7 +8,7 @@ import { baseUrlAPI } from '../../config/config';
   providedIn: 'root',
 })
 export class TopicService {
-  private baseUrl = baseUrlAPI + 'topic/';
+  private baseUrl = 'topic/';
 
   constructor(private restClient: RestClientService) {}
 

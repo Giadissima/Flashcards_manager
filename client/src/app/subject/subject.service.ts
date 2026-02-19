@@ -8,7 +8,7 @@ import { Subject } from '../models/subject.dto';
   providedIn: 'root'
 })
 export class SubjectService {
-  private baseUrl = baseUrlAPI + 'subject/';
+  private baseUrl = 'subject/';
 
   constructor(private restClient: RestClientService) {}
 
