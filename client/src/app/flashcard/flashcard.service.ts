@@ -11,14 +11,14 @@ import { baseUrlAPI } from '../../config/config';
   providedIn: 'root'
 })
 export class FlashcardService {
-  private baseUrl = 'flashcards/';
+  private baseUrl = 'flashcards';
 
   constructor(private http: HttpClient, private restClient: RestClientService) {}
 
   // Legge tutte le flashcard
   getAll(filter: CardFilter): Promise<PaginatedResponse<Flashcard>> {
       return this.restClient.get<PaginatedResponse<Flashcard>>(
-        this.baseUrl + 'all/',
+        this.baseUrl + '/all',
         filter
       );
     }
@@ -26,7 +26,7 @@ export class FlashcardService {
     // Legge tutte le flashcard
   getRandom(filter: RandomCardFIlter): Promise<{_id: string}[]> {
       return this.restClient.get<{_id: string}[]>(
-        this.baseUrl + 'random/',
+        this.baseUrl + '/random',
         filter
       );
     }
@@ -34,7 +34,7 @@ export class FlashcardService {
 
   // Legge una singola flashcard
   getById(id: string): Promise<Flashcard> {
-    return this.restClient.get<Flashcard>(this.baseUrl + id);
+    return this.restClient.get<Flashcard>(this.baseUrl + '/' + id);
   }
 
   // Crea una flashcard
@@ -44,11 +44,11 @@ export class FlashcardService {
 
   // Modifica una flashcard
   update(id: string, card: Flashcard): Promise<void> {
-    return this.restClient.patch(this.baseUrl + id, card);
+    return this.restClient.patch(this.baseUrl + '/' + id, card);
   }
 
   // Elimina una flashcard
   delete(id: string): Promise<void>{
-    return this.restClient.delete<void>(this.baseUrl + id)
+    return this.restClient.delete<void>(this.baseUrl + '/' + id)
   }
 }

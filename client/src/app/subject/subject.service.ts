@@ -8,19 +8,19 @@ import { Subject } from '../models/subject.dto';
   providedIn: 'root'
 })
 export class SubjectService {
-  private baseUrl = 'subject/';
+  private baseUrl = 'subject';
 
   constructor(private restClient: RestClientService) {}
 
   getAllSubjects(filter: SimplePaginatedResponse): Promise<PaginatedResponse<Subject>> {
     return this.restClient.get<PaginatedResponse<Subject>>(
-      this.baseUrl + 'all/',
+      this.baseUrl + '/all',
       filter
     );
   }
 
   getSubjectById(id: string): Promise<Subject> {
-    return this.restClient.get<Subject>(this.baseUrl + id);
+    return this.restClient.get<Subject>(this.baseUrl + '/' + id);
   }
 
   createSubject(subject: FormData): Promise<void> {
@@ -28,10 +28,10 @@ export class SubjectService {
   }
 
   updateSubject(id: string, subject: Partial<Subject>): Promise<void> {
-    return this.restClient.patch(this.baseUrl + id, subject);
+    return this.restClient.patch(this.baseUrl + '/' + id, subject);
   }
 
   deleteSubject(id: string): Promise<void> {
-    return this.restClient.delete<void>(this.baseUrl + id);
+    return this.restClient.delete<void>(this.baseUrl + '/' + id);
   }
 }

@@ -8,7 +8,7 @@ import { baseUrlAPI } from '../../config/config';
   providedIn: 'root',
 })
 export class TopicService {
-  private baseUrl = 'topic/';
+  private baseUrl = 'topic';
 
   constructor(private restClient: RestClientService) {}
 
@@ -20,7 +20,7 @@ export class TopicService {
   }
 
   getTopicById(id: string): Promise<Topic> {
-    return this.restClient.get<Topic>(this.baseUrl + id);
+    return this.restClient.get<Topic>(this.baseUrl + '/' + id);
   }
 
   createTopic(topic: Topic): Promise<void> {
@@ -28,10 +28,10 @@ export class TopicService {
   }
 
   updateTopic(id: string, topic: Partial<Topic>): Promise<void> {
-    return this.restClient.patch(this.baseUrl + id, topic);
+    return this.restClient.patch(this.baseUrl + '/' + id, topic);
   }
 
   deleteTopic(id: string): Promise<void> {
-    return this.restClient.delete(this.baseUrl + id);
+    return this.restClient.delete(this.baseUrl + '/' + id);
   }
 }
