@@ -2,21 +2,27 @@
 
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { QuillModule, QuillModules } from 'ngx-quill'
 import { answerMaxLength, charMinLength, idLength, questionMaxLength, titleMaxLength } from '../../../config/config';
 
 import { CommonModule } from '@angular/common';
 import { FlashcardService } from '../flashcard.service';
-import { Topic } from '../../models/topic.dto';
-import { TopicService } from '../../topic/topic.service';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
 import { Toast } from "../../toast/toast";
 import { ToastService } from '../../toast/toast.service';
+import { Topic } from '../../models/topic.dto';
+import { TopicService } from '../../topic/topic.service';
 
 @Component({
   selector: 'app-create-card',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, Toast],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    Toast,
+    QuillModule
+  ],
   templateUrl: './create-flashcard.html',
   styleUrls: ['./create-flashcard.scss']
 })
@@ -24,6 +30,7 @@ export class CreateFlashcard implements OnInit {
   cardForm!: FormGroup;
   topics: Topic[] = [];
   subjects: Subject[] = [];
+quillModules!: QuillModules;
 
   constructor(
     private fb: FormBuilder,
@@ -34,6 +41,12 @@ export class CreateFlashcard implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.quillModules = {
+  toolbar: [
+    ['bold', 'italic'],
+    ['formula']
+  ]
+};
     this.cardForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(titleMaxLength)]],
       question: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(questionMaxLength)]],
