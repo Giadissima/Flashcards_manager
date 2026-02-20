@@ -25,6 +25,8 @@
             "inlineStyleLanguage": "scss",
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "node_modules/quill/dist/quill.snow.css",
+              "node_modules/katex/dist/katex.min.css",
               "src/styles.scss"
             ],
             "assets": [
@@ -35,7 +37,8 @@
               }
             ],
             "scripts": [
-              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
+              "node_modules/katex/dist/katex.min.js"
             ]
           },
           "configurations": {
@@ -44,7 +47,7 @@
                 {
                   "type": "initial",
                   "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumError": "1.5MB"
                 },
                 {
                   "type": "anyComponentStyle",

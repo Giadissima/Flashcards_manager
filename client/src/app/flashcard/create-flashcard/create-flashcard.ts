@@ -30,7 +30,11 @@ export class CreateFlashcard implements OnInit {
   cardForm!: FormGroup;
   topics: Topic[] = [];
   subjects: Subject[] = [];
-quillModules!: QuillModules;
+  questionQuillModules: QuillModules = {
+    toolbar: [
+      ['formula', 'image']
+    ]
+  };
 
   constructor(
     private fb: FormBuilder,
@@ -41,12 +45,6 @@ quillModules!: QuillModules;
   ) {}
 
   ngOnInit(): void {
-    this.quillModules = {
-  toolbar: [
-    ['bold', 'italic'],
-    ['formula']
-  ]
-};
     this.cardForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(titleMaxLength)]],
       question: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(questionMaxLength)]],

@@ -23,44 +23,54 @@
       }
     </div>
 
-    <div class="input-group mb-3">
-      <span class="input-group-text">Question</span>
-      <input type="text" formControlName="question" class="form-control" [class.is-invalid]="cardForm.get('question')?.invalid && cardForm.get('question')?.touched">
+    <div class="mb-3">
+      <label for="question-editor" class="form-label">Question</label>
+      <quill-editor
+        id="question-editor"
+        formControlName="question"
+        [modules]="questionQuillModules"
+        [class.is-invalid]="cardForm.get('question')?.invalid && cardForm.get('question')?.touched"
+        style="height: 150px;">
+      </quill-editor>
       @if(cardForm.get('question')?.hasError('minlength')){
-        <div class="invalid-feedback">
+        <div class="invalid-feedback d-block">
           Question should have min 2 characters.
         </div>
       } @else {
         @if(cardForm.get('question')?.hasError('maxlength')){
-            <div class="invalid-feedback">
-              Question's max characters reached.
-            </div>
+          <div class="invalid-feedback d-block">
+            Question's max characters reached.
+          </div>
+        } @else {
+          @if(cardForm.get('question')?.touched && cardForm.get('question')?.hasError('required')){
+            <div class="invalid-feedback d-block">Please insert a question.</div>
           }
-        @else {
-          @if(cardForm.get('question')?.touched){
-          <div class="invalid-feedback">Please insert a question.</div>
-        }
         }
       }
     </div>
 
-    <div class="input-group mb-3">
-      <span class="input-group-text">Answer</span>
-      <textarea formControlName="answer" class="form-control" rows="1" (input)="textAreaAutoResize($event)" [class.is-invalid]="cardForm.get('answer')?.invalid && cardForm.get('answer')?.touched"></textarea>
+    <div class="mb-3">
+      <label for="answer-editor" class="form-label">Answer</label>
+      <quill-editor
+        id="answer-editor"
+        formControlName="answer"
+        [class.is-invalid]="cardForm.get('answer')?.invalid && cardForm.get('answer')?.touched"
+        style="height: 150px;">
+      </quill-editor>
       @if(cardForm.get('answer')?.hasError('minlength')){
-        <div class="invalid-feedback">
+        <div class="invalid-feedback d-block">
           Answer should have min 2 characters.
         </div>
       } @else {
         @if(cardForm.get('answer')?.hasError('maxlength')){
-            <div class="invalid-feedback">
+            <div class="invalid-feedback d-block">
               Answer's max characters reached.
             </div>
           }
         @else {
-          @if(cardForm.get('answer')?.touched){
-          <div class="invalid-feedback">Please insert a answer.</div>
-        }
+          @if(cardForm.get('answer')?.touched && cardForm.get('answer')?.hasError('required')){
+            <div class="invalid-feedback d-block">Please insert an answer.</div>
+          }
         }
       }
     </div>
@@ -86,11 +96,6 @@
     <div class="d-flex justify-content-center mt-3">
       <button type="submit" class="btn btn-success">Add new card</button>
     </div>
-    <quill-editor
-  formControlName="question"
-  [modules]="quillModules"
-  style="height: 200px;">
-</quill-editor>
   </form>
 </div>
 <app-toast></app-toast>
