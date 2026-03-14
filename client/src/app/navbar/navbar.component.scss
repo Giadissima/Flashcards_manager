@@ -2,9 +2,9 @@ nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: var(--white-color);
+  background-color: var(--component-background);
   padding: var(--spacing-unit) calc(var(--spacing-unit) * 3);
-  border-bottom: 1px solid var(--secondary-color);
+  border-bottom: 1px solid var(--border-color);
   box-shadow: var(--box-shadow-sm);
 }
 
@@ -68,14 +68,14 @@ nav {
   top: 100%;
   left: 50%;
   transform: translateX(-50%);
-  background-color: var(--white-color);
+  background-color: var(--component-background);
   box-shadow: var(--box-shadow-md);
   padding: var(--spacing-unit);
   border-radius: var(--border-radius-md);
   z-index: 10;
   white-space: nowrap;
   margin-top: var(--spacing-unit);
-  border: 1px solid var(--secondary-color);
+  border: 1px solid var(--border-color);
 }
 
 .dropdown:hover .dropdown-content {
@@ -95,4 +95,26 @@ nav {
 .dropdown-content a:hover {
   background-color: var(--secondary-color);
   color: var(--primary-color);
+}
+
+.actions-container {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--spacing-unit) * 2);
+}
+
+.theme-switch-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-color);
+}
+
+.theme-switch-btn:hover {
+  background-color: var(--secondary-color);
 }

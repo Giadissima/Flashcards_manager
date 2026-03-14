@@ -12,3 +12,4 @@ bootstrapApplication(App, {
     provideHttpClient(withInterceptorsFromDi()) // <- sostituisce HttpClientModule, registra HttpClient nel DI system standalone.
   ]
 }).catch(err => console.error(err));
+

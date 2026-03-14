@@ -1,101 +1,77 @@
 <div class="container-md">
-  <h1 class="text-center">Create a new card</h1>
-
-  <form [formGroup]="cardForm" (ngSubmit)="addCard()" class="needs-validation" novalidate>
-    <div class="input-group mb-3">
-      <span class="input-group-text">Title</span>
-      <input type="text" formControlName="title" class="form-control" [class.is-invalid]="cardForm.get('title')?.invalid && cardForm.get('title')?.touched">
-      @if(cardForm.get('title')?.hasError('minlength')){
+  <div class="card">
+    <div class="card-header">
+      <h1 class="text-center">Create a New Flashcard</h1>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="cardForm" (ngSubmit)="addCard()" novalidate>
+        
+        <div class="form-group">
+          <label for="title" class="form-label">Title</label>
+          <input type="text" id="title" formControlName="title" class="form-control" placeholder="e.g., Photosynthesis">
+        @if(cardForm.get('title')?.hasError('minlength')){
         <div class="invalid-feedback">
           Title should have min 2 characters.
         </div>
-      } @else {
-        @if(cardForm.get('title')?.hasError('maxlength')){
+      } @else if (cardForm.get('title')?.hasError('maxlength')) {
             <div class="invalid-feedback">
               Title's max characters reached.
             </div>
           }
-        @else {
-          @if(cardForm.get('title')?.touched){
+        @else if (cardForm.get('title')?.touched && cardForm.get('title')?.hasError('required')) {
           <div class="invalid-feedback">Please insert a title.</div>
         }
-        }
-      }
-    </div>
-
-    <div class="mb-3">
-      <label for="question-editor" class="form-label">Question</label>
-      <quill-editor
-        id="question-editor"
-        formControlName="question"
-        [modules]="questionQuillModules"
-        [class.is-invalid]="cardForm.get('question')?.invalid && cardForm.get('question')?.touched"
-        style="height: 150px;">
-      </quill-editor>
-      @if(cardForm.get('question')?.hasError('minlength')){
-        <div class="invalid-feedback d-block">
-          Question should have min 2 characters.
         </div>
-      } @else {
-        @if(cardForm.get('question')?.hasError('maxlength')){
-          <div class="invalid-feedback d-block">
-            Question's max characters reached.
+
+        <div class="form-group">
+          <label for="question-editor" class="form-label">Question</label>
+          <div class="editor-toolbar">
+            <button (click)="questionEditor.chain().focus().toggleBold().run()" [class.is-active]="questionEditor.isActive('bold')">bold</button>
+            <button (click)="questionEditor.chain().focus().toggleItalic().run()" [class.is-active]="questionEditor.isActive('italic')">italic</button>
+            <button (click)="questionEditor.chain().focus().toggleStrike().run()" [class.is-active]="questionEditor.isActive('strike')">strike</button>
+            <button type="button" (click)="questionEditor.commands.insertContent('$')">Add Inline Math</button>
           </div>
-        } @else {
-          @if(cardForm.get('question')?.touched && cardForm.get('question')?.hasError('required')){
-            <div class="invalid-feedback d-block">Please insert a question.</div>
-          }
-        }
-      }
-    </div>
-
-    <div class="mb-3">
-      <label for="answer-editor" class="form-label">Answer</label>
-      <quill-editor
-        id="answer-editor"
-        formControlName="answer"
-        [class.is-invalid]="cardForm.get('answer')?.invalid && cardForm.get('answer')?.touched"
-        style="height: 150px;">
-      </quill-editor>
-      @if(cardForm.get('answer')?.hasError('minlength')){
-        <div class="invalid-feedback d-block">
-          Answer should have min 2 characters.
+          <tiptap-editor [editor]="questionEditor"></tiptap-editor>
         </div>
-      } @else {
-        @if(cardForm.get('answer')?.hasError('maxlength')){
-            <div class="invalid-feedback d-block">
-              Answer's max characters reached.
+
+        <div class="form-group">
+          <label for="answer-editor" class="form-label">Answer</label>
+          <div class="editor-toolbar">
+            <button (click)="answerEditor.chain().focus().toggleBold().run()" [class.is-active]="answerEditor.isActive('bold')">bold</button>
+            <button (click)="answerEditor.chain().focus().toggleItalic().run()" [class.is-active]="answerEditor.isActive('italic')">italic</button>
+            <button (click)="answerEditor.chain().focus().toggleStrike().run()" [class.is-active]="answerEditor.isActive('strike')">strike</button>
+            <button type="button" (click)="answerEditor.commands.insertContent('$')">Add Inline Math</button>
+          </div>
+          <tiptap-editor [editor]="answerEditor"></tiptap-editor>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+              <label for="subject" class="form-label">Subject</label>
+              <select id="subject" formControlName="subject_id" class="form-select">
+                <option value="" disabled>Choose a subject</option>
+                @for (s of subjects; track s._id) {
+                  <option [value]="s._id">{{ s.name }}</option>
+                }
+              </select>
             </div>
-          }
-        @else {
-          @if(cardForm.get('answer')?.touched && cardForm.get('answer')?.hasError('required')){
-            <div class="invalid-feedback d-block">Please insert an answer.</div>
-          }
-        }
-      }
-    </div>
     
-        <div class="input-group mb-3">
-          <span class="input-group-text">Subject</span>
-          <select formControlName="subject_id" class="form-select">
-            <option value="">Choose the subject</option>
-            <option *ngFor="let s of subjects" [value]="s._id">{{ s.name }}</option>
-          </select>
+            <div class="form-group">
+              <label for="topic" class="form-label">Topic</label>
+              <select id="topic" formControlName="topic_id" class="form-select">
+                <option value="" disabled>Choose a topic</option>
+                @for (t of topics; track t._id) {
+                  <option [value]="t._id">{{ t.name }}</option>
+                }
+              </select>
+            </div>
         </div>
 
-    <div class="input-group mb-3">
-        <span class="input-group-text">Topic</span>
-        <select formControlName="topic_id" class="form-select">
-          <option value="">Choose the topic</option>
-          @for (t of topics; track t._id) {
-            <option [value]="t._id">{{ t.name }}</option>
-          }
-        </select>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" [disabled]="cardForm.invalid">Add New Card</button>
+        </div>
+      </form>
     </div>
-
-    <div class="d-flex justify-content-center mt-3">
-      <button type="submit" class="btn btn-success">Add new card</button>
-    </div>
-  </form>
+  </div>
 </div>
 <app-toast></app-toast>

@@ -11,11 +11,12 @@ import { Subject } from '../models/subject.dto';
 import { SubjectService } from '../subject/subject.service';
 import { Toast } from '../toast/toast';
 import { ToastService } from '../toast/toast.service';
+import { KatexRendererPipe } from '../pipes/katex-renderer.pipe';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, Toast, FormsModule],
+  imports: [CommonModule, Toast, FormsModule, KatexRendererPipe],
   templateUrl: './home.html',
   styleUrl: './home.scss'
 })

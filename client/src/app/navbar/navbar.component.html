@@ -10,7 +10,7 @@
     <div class="dropdown">
       <span class="menu-item">
         Topics
-        <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#6b4c3b"><path d="M480-360 280-560h400L480-360Z"/></svg>
+        <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M480-360 280-560h400L480-360Z"/></svg>
       </span>
       <div class="dropdown-content">
         <a routerLink="/create-topic">Create Topic</a>
@@ -20,7 +20,7 @@
     <div class="dropdown">
       <span class="menu-item">
         Subjects
-        <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#6b4c3b"><path d="M480-360 280-560h400L480-360Z"/></svg>
+        <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M480-360 280-560h400L480-360Z"/></svg>
       </span>
       <div class="dropdown-content">
         <a routerLink="/create-subject">New Subject</a>
@@ -30,7 +30,7 @@
     <div class="dropdown">
       <span class="menu-item">
         Test
-        <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#344054"><path d="M480-360 280-560h400L480-360Z"/></svg>
+        <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M480-360 280-560h400L480-360Z"/></svg>
       </span>
       <div class="dropdown-content">
         <a routerLink="/setup-test">Start Test</a>
@@ -39,8 +39,14 @@
     </div>
   </div>
 
-  <!-- Destra: Pulsante crea card -->
-  <button routerLink="/create-card" class="create-card-btn">
-    Create Card
-  </button>
+  <!-- Destra: Pulsante crea card e switch tema -->
+  <div class="actions-container">
+    <button routerLink="/create-card" class="create-card-btn">
+      Create Card
+    </button>
+    <button (click)="toggleTheme()" class="theme-switch-btn">
+      <svg *ngIf="isDarkMode" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M480-360q50 0 85-35t35-85q0-50-35-85t-85-35q-50 0-85 35t-35 85q0 50 35 85t85 35Zm0 80q-83 0-141.5-58.5T280-480q0-83 58.5-141.5T480-680q83 0 141.5 58.5T680-480q0 83-58.5 141.5T480-280ZM80-440q-17 0-28.5-11.5T40-480q0-17 11.5-28.5T80-520h80q17 0 28.5 11.5T200-480q0 17-11.5 28.5T160-440H80Zm720 0q-17 0-28.5-11.5T760-480q0-17 11.5-28.5T800-520h80q17 0 28.5 11.5T920-480q0 17-11.5 28.5T880-440h-80ZM480-800q-17 0-28.5-11.5T440-840v-80q0-17 11.5-28.5T480-960q17 0 28.5 11.5T520-920v80q0 17-11.5 28.5T480-800Zm0 720q-17 0-28.5-11.5T440-120v-80q0-17 11.5-28.5T480-240q17 0 28.5 11.5T520-200v80q0 17-11.5 28.5T480-80Zm-280 80q-12-12-12-28.5T200-60l56-56q12-12 28.5-12t28.5 12q12 12 12 28.5T296-20l-56 56q-12 12-28.5 12T200-0Zm480 0q-12-12-12-28.5T680-60l56-56q12-12 28.5-12t28.5 12q12 12 12 28.5T796-20l-56 56q-12 12-28.5 12T680-0ZM256-680q-12-12-12-28.5T256-736l56-56q12-12 28.5-12t28.5 12q12 12 12 28.5T352-736l-56 56q-12 12-28.5 12T256-680Zm480 0q-12-12-12-28.5T736-736l56-56q12-12 28.5-12t28.5 12q12 12 12 28.5T796-736l-56 56q-12 12-28.5 12T736-680Z"/></svg>
+      <svg *ngIf="!isDarkMode" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M480-120q-150 0-255-105T120-480q0-150 105-255t255-105q14 0 27.5 1t26.5 3q-41 29-65.5 75.5T444-660q0 90 63 153t153 63q54 0 99-24.5t75-65.5q2 13 3 26.5t1 27.5q0 150-105 255T480-120Zm0-80q88 0 158-48.5T740-375q-20 5-40 8t-40 3q-123 0-209.5-86.5T364-660q0-20 3-40t8-40q-78 32-125.5 102T200-480q0 116 82 198t198 82Zm-60-250Z"/></svg>
+    </button>
+  </div>
 </nav>

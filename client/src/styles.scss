@@ -1,19 +1,10 @@
+@import 'https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/katex.min.css';
+
 /* ---------------------------------- */
 /*         1. Design System         */
 /* ---------------------------------- */
 :root {
   --font-family: 'Nunito', sans-serif;
-
-  /* Colors */
-  --primary-color: #7F56D9;
-  --secondary-color: #E0CFFC;
-  --background-color: #F9F5FF;
-  --text-color: #344054;
-  --text-light-color: #667085;
-  --white-color: #FFFFFF;
-  --success-color: #12B76A;
-  --danger-color: #F04438;
-  --warning-color: #F79009;
 
   /* Spacing & Radius */
   --spacing-unit: 8px;
@@ -24,6 +15,38 @@
   /* Shadows */
   --box-shadow-sm: 0 1px 2px 0 rgba(16, 24, 40, 0.05);
   --box-shadow-md: 0 4px 8px -2px rgba(16, 24, 40, 0.1), 0 2px 4px -2px rgba(16, 24, 40, 0.06);
+
+  --white-color: #FFFFFF;
+}
+
+[data-theme='light'] {
+  --primary-color: #7F56D9;
+  --secondary-color: #E0CFFC;
+  --background-color: #F9F5FF;
+  --component-background: #FFFFFF;
+  --border-color: #E0CFFC;
+  --text-color: #344054;
+  --text-light-color: #667085;
+  --success-color: #12B76A;
+  --danger-color: #F04438;
+  --warning-color: #F79009;
+  --disabled-background: #E0E0E0; /* Slightly darker for light theme disabled state */
+  --disabled-border: #B0B0B0; /* Slightly darker border for light theme disabled state */
+}
+
+[data-theme='dark'] {
+  --primary-color: #BB86FC;
+  --secondary-color: #03DAC6;
+  --background-color: #121212;
+  --component-background: #1E1E1E;
+  --border-color: rgba(255, 255, 255, 0.12);
+  --text-color: #ffffff !important;
+  --text-light-color: rgba(255, 255, 255, 0.7) !important;
+  --success-color: #12B76A;
+  --danger-color: #F04438;
+  --warning-color: #F79009;
+  --disabled-background: #282828; /* Slightly lighter for dark theme disabled state */
+  --disabled-border: rgba(255, 255, 255, 0.2); /* More prominent border for dark theme disabled state */
 }
 
 /* ---------------------------------- */
@@ -149,8 +172,8 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Cards */
 .card {
-  background-color: var(--white-color);
-  border: 1px solid var(--secondary-color);
+  background-color: var(--component-background);
+  border: 1px solid var(--border-color);
   border-radius: var(--border-radius-lg);
   box-shadow: var(--box-shadow-md);
   overflow: hidden; /* Ensures content respects border-radius */
@@ -165,17 +188,38 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 600;
     margin-bottom: var(--spacing-unit);
     display: block;
+    color: var(--text-color) !important;
 }
 
 .form-control, .form-select {
     width: 100%;
     padding: calc(var(--spacing-unit) * 1.25) calc(var(--spacing-unit) * 1.5);
     border-radius: var(--border-radius-md);
-    border: 1px solid var(--secondary-color);
-    background-color: var(--white-color);
+    border: 1px solid var(--border-color);
+    background-color: var(--component-background);
     color: var(--text-color);
     font-family: var(--font-family);
     transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-select:disabled {
+  background-color: var(--disabled-background) !important;
+  color: var(--text-light-color) !important;
+  border: 1px solid var(--disabled-border) !important;
+  opacity: 1 !important; /* Ensure it's not faded */
+}
+
+.form-control::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: var(--text-light-color);
+  opacity: 1; /* Firefox */
+}
+
+.form-control:-ms-input-placeholder { /* Internet Explorer 10-11 */
+  color: var(--text-light-color);
+}
+
+.form-control::-ms-input-placeholder { /* Microsoft Edge */
+  color: var(--text-light-color);
 }
 
 .form-control:focus, .form-select:focus {
@@ -190,12 +234,13 @@ h1, h2, h3, h4, h5, h6 {
 
 .input-group-text {
     background-color: var(--secondary-color);
-    border: 1px solid var(--secondary-color);
+    border: 1px solid var(--border-color);
     border-right: none;
     padding: calc(var(--spacing-unit) * 1.25) calc(var(--spacing-unit) * 1.5);
     border-radius: var(--border-radius-md) 0 0 var(--border-radius-md);
     font-weight: 600;
     transition: border-color 0.2s, box-shadow 0.2s;
+    color: var(--text-light-color);
 }
 
 .input-group .form-control {
@@ -246,4 +291,53 @@ h1, h2, h3, h4, h5, h6 {
 
 .text-center {
     text-align: center;
+}
+
+.btn-primary:disabled {
+  opacity: 0.7 !important; /* Adjust opacity for disabled primary button */
+}
+
+.tiptap {
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  padding: calc(var(--spacing-unit) * 1.25) calc(var(--spacing-unit) * 1.5);
+}
+
+.tiptap:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px var(--secondary-color);
+}
+/* ---------------------------------- */
+/*         KaTeX Overrides          */
+/* ---------------------------------- */
+.flashcard-text .katex {
+  font-size: 1em; // Ensure font size is relative to parent
+  line-height: 0.2 !important; // User requested 0.2, now with !important
+  white-space: normal; // Override pre-wrap for KaTeX content
+  overflow: visible !important; // Ensure content is not clipped
+}
+
+.flashcard-text {
+  overflow: visible !important; // Ensure content is not clipped
+}
+
+/* Additional overrides for scrollable KaTeX box */
+.flashcard-body {
+  height: auto !important;
+  max-height: none !important;
+}
+
+.flashcard-text {
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important; /* Re-affirm this */
+}
+
+/* Override pre tag within flashcard-text */
+.flashcard-text pre {
+  overflow: visible !important;
+  height: auto !important;
+  max-height: none !important;
+  white-space: pre-wrap !important; /* Ensure content wraps */
 }

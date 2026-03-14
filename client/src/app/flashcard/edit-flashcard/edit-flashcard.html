@@ -23,46 +23,26 @@
       }
     </div>
 
-    <div class="input-group mb-3">
-      <span class="input-group-text">Question</span>
-      <input type="text" formControlName="question" class="form-control" [class.is-invalid]="editForm.get('question')?.invalid && editForm.get('question')?.touched">
-      @if(editForm.get('question')?.hasError('minlength')){
-        <div class="invalid-feedback">
-          Question should have min 2 characters.
-        </div>
-      } @else {
-        @if(editForm.get('question')?.hasError('maxlength')){
-            <div class="invalid-feedback">
-              Question's max characters reached.
-            </div>
-          }
-        @else {
-          @if(editForm.get('question')?.touched){
-          <div class="invalid-feedback">Please insert a question.</div>
-        }
-        }
-      }
+    <div class="form-group">
+      <label for="question-editor" class="form-label">Question</label>
+      <div class="editor-toolbar">
+        <button (click)="questionEditor.chain().focus().toggleBold().run()" [class.is-active]="questionEditor.isActive('bold')">bold</button>
+        <button (click)="questionEditor.chain().focus().toggleItalic().run()" [class.is-active]="questionEditor.isActive('italic')">italic</button>
+        <button (click)="questionEditor.chain().focus().toggleStrike().run()" [class.is-active]="questionEditor.isActive('strike')">strike</button>
+        <button type="button" (click)="questionEditor.commands.insertContent('$')">Add Inline Math</button>
+      </div>
+      <tiptap-editor [editor]="questionEditor"></tiptap-editor>
     </div>
 
-    <div class="input-group mb-3">
-      <span class="input-group-text">Answer</span>
-      <textarea formControlName="answer" class="form-control" rows="1" (input)="textAreaAutoResize($event)" [class.is-invalid]="editForm.get('answer')?.invalid && editForm.get('answer')?.touched"></textarea>
-      @if(editForm.get('answer')?.hasError('minlength')){
-        <div class="invalid-feedback">
-          Answer should have min 2 characters.
-        </div>
-      } @else {
-        @if(editForm.get('answer')?.hasError('maxlength')){
-            <div class="invalid-feedback">
-              Answer's max characters reached.
-            </div>
-          }
-        @else {
-          @if(editForm.get('answer')?.touched){
-          <div class="invalid-feedback">Please insert a answer.</div>
-        }
-        }
-      }
+    <div class="form-group">
+      <label for="answer-editor" class="form-label">Answer</label>
+      <div class="editor-toolbar">
+        <button (click)="answerEditor.chain().focus().toggleBold().run()" [class.is-active]="answerEditor.isActive('bold')">bold</button>
+        <button (click)="answerEditor.chain().focus().toggleItalic().run()" [class.is-active]="answerEditor.isActive('italic')">italic</button>
+        <button (click)="answerEditor.chain().focus().toggleStrike().run()" [class.is-active]="answerEditor.isActive('strike')">strike</button>
+        <button type="button" (click)="answerEditor.commands.insertContent('$')">Add Inline Math</button>
+      </div>
+      <tiptap-editor [editor]="answerEditor"></tiptap-editor>
     </div>
 
     <div class="d-flex justify-content-center mt-3">

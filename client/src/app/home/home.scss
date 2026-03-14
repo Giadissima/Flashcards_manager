@@ -1,5 +1,5 @@
 .filter-bar {
-  background-color: var(--white-color);
+  background-color: var(--component-background);
   padding: calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 3);
   border-radius: var(--border-radius-lg);
   box-shadow: var(--box-shadow-sm);
@@ -26,6 +26,7 @@
     margin: 0;
     font-size: 18px;
     font-weight: 700;
+    color: var(--text-color) !important;
   }
 }
 
@@ -40,6 +41,7 @@
   flex-grow: 1;
   white-space: pre-wrap;
   margin-bottom: calc(var(--spacing-unit) * 2);
+  color: var(--text-light-color) !important;
 }
 
 .flashcard-actions {
@@ -58,7 +60,7 @@
   }
 }
 .border-bootstrap-btn-custom{
-  border: 1px solid var(--secondary-color); // variable took by bootstrap
+  border: 1px solid var(--border-color); // variable took by bootstrap
   &.active{
     background-color: var(--secondary-color); // variable took by bootstrap
   }

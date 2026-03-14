@@ -1,10 +1,9 @@
-// create-card.component.ts
-
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { QuillModule, QuillModules } from 'ngx-quill'
-import { answerMaxLength, charMinLength, idLength, questionMaxLength, titleMaxLength } from '../../../config/config';
-
+import { Editor } from '@tiptap/core';
+import StarterKit from '@tiptap/starter-kit';
+import { TiptapEditorDirective } from 'ngx-tiptap';
+import { MathExtension } from '@aarkue/tiptap-math-extension';
 import { CommonModule } from '@angular/common';
 import { FlashcardService } from '../flashcard.service';
 import { Subject } from '../../models/subject.dto';
@@ -13,6 +12,7 @@ import { Toast } from "../../toast/toast";
 import { ToastService } from '../../toast/toast.service';
 import { Topic } from '../../models/topic.dto';
 import { TopicService } from '../../topic/topic.service';
+import { charMinLength, titleMaxLength } from '../../../config/config';
 
 @Component({
   selector: 'app-create-card',
@@ -21,20 +21,18 @@ import { TopicService } from '../../topic/topic.service';
     CommonModule,
     ReactiveFormsModule,
     Toast,
-    QuillModule
+    TiptapEditorDirective
   ],
   templateUrl: './create-flashcard.html',
   styleUrls: ['./create-flashcard.scss']
 })
-export class CreateFlashcard implements OnInit {
+export class CreateFlashcard implements OnInit, OnDestroy {
   cardForm!: FormGroup;
   topics: Topic[] = [];
   subjects: Subject[] = [];
-  questionQuillModules: QuillModules = {
-    toolbar: [
-      ['formula', 'image']
-    ]
-  };
+
+  questionEditor: Editor;
+  answerEditor: Editor;
 
   constructor(
     private fb: FormBuilder,
@@ -42,13 +40,18 @@ export class CreateFlashcard implements OnInit {
     private toastService: ToastService,
     private topicService: TopicService,
     private subjectService: SubjectService
-  ) {}
+  ) {
+    this.questionEditor = new Editor({
+      extensions: [StarterKit, MathExtension.configure({ evaluation: false })],
+    });
+    this.answerEditor = new Editor({
+      extensions: [StarterKit, MathExtension.configure({ evaluation: false })],
+    });
+  }
 
   ngOnInit(): void {
     this.cardForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(titleMaxLength)]],
-      question: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(questionMaxLength)]],
-      answer: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(answerMaxLength)]],
       topic_id: [{ value: '', disabled: true }],
       subject_id: ['']
     });
@@ -63,6 +66,11 @@ export class CreateFlashcard implements OnInit {
         this.loadTopicsBySubject(subjectId);
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.questionEditor.destroy();
+    this.answerEditor.destroy();
   }
 
   async loadTopicsBySubject(subjectId: string) {
@@ -109,12 +117,18 @@ export class CreateFlashcard implements OnInit {
       return;
     }
 
-    const newCard = this.cardForm.value;
+    const newCard = {
+      ...this.cardForm.value,
+      question: this.questionEditor.getHTML(),
+      answer: this.answerEditor.getHTML()
+    };
 
     try {
       await this.flashcardService.create(newCard);
       this.toastService.show("Card successfully added", 'success')
       this.cardForm.reset();
+      this.questionEditor.commands.clearContent();
+      this.answerEditor.commands.clearContent();
     } catch (err: any) {
       console.error(err);
       this.toastService.show("Error", 'error')
