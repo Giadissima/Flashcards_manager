@@ -1,57 +1,59 @@
-<div class="filter-bar mb-4">
-  <div class="row">
-    <div class="col-md-6">
-      <label for="subjectFilter" class="form-label">Filtra per Materia:</label>
-      <select id="subjectFilter" class="form-select" [(ngModel)]="selectedSubjectId" (ngModelChange)="onFilterChange()">
-        <option [ngValue]="null">Tutte le materie</option>
-        @for (subject of subjects; track subject._id) {
-          <option [ngValue]="subject._id">{{ subject.name }}</option>
-        }
-      </select>
+<div class="container md">
+  <div class="card">
+    <div class="card-header" class="custom-card-header">
+      <h1 class="text-center">Manage Topics</h1>
+    </div>
+    <div class="card-body">
+
+      <div class="d-flex justify-content-center align-items-center gap-3">
+        <div class="input-group w-auto">
+          <span class="input-group-text">Subject</span>
+          <select class="form-select" [style.width.ch]="selectedSubjectId!=null ? getLength() : 15"
+            [(ngModel)]="selectedSubjectId" (ngModelChange)="onFilterChange()">
+            <option [ngValue]="null">All Subjects</option>
+            @for (subject of subjects; track subject._id) {
+            <option [value]="subject._id">{{ subject.name }}</option>
+            }
+          </select>
+        </div>
+        <button class="btn btn-primary" (click)="createTopic()">Create New Topic</button>
+      </div>
+
+      <table class="table table-striped mt-3">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Color</th>
+            <th>Subject</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (topic of topics; track topic._id) {
+          <tr>
+            <td>{{ topic.name }}</td>
+            <td>
+              <span [style.backgroundColor]="topic.color" class="color-preview"></span>
+              {{ topic.color }}
+            </td>
+            <td>{{ getSubjectName(topic.subject_id) }}</td>
+            <td>
+              <button type="button" class="btn btn btn-light" (click)="editTopic(topic._id)">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="orange">
+                  <path d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-527q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z"/>
+                </svg>
+              </button>
+              <button type="button" class="btn btn btn-light" (click)="deleteTopic(topic._id)">
+              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="red">
+                <path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/>
+              </svg>
+            </button>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
     </div>
   </div>
-</div>
-<div class="container mt-4">
-  <h1>Manage Topics</h1>
-  <button class="btn btn-primary" (click)="createTopic()">Create New Topic</button>
-
-  <div class="mt-3">
-    <div class="input-group mb-3">
-      <span class="input-group-text">Subject</span>
-      <select class="form-select" [(ngModel)]="selectedSubjectId" (ngModelChange)="onFilterChange()">
-        <option [ngValue]="null">All Subjects</option>
-        @for (subject of subjects; track subject._id) {
-          <option [value]="subject._id">{{ subject.name }}</option>
-        }
-      </select>
-    </div>
-  </div>
-
-  <table class="table table-striped mt-3">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Color</th>
-        <th>Subject</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (topic of topics; track topic._id) {
-        <tr>
-          <td>{{ topic.name }}</td>
-          <td>
-            <span [style.backgroundColor]="topic.color" class="color-preview"></span>
-            {{ topic.color }}
-          </td>
-          <td>{{ getSubjectName(topic.subject_id) }}</td>
-          <td>
-            <button class="btn btn-sm btn-warning me-2" (click)="editTopic(topic._id)">Edit</button>
-            <button class="btn btn-sm btn-danger" (click)="deleteTopic(topic._id)">Delete</button>
-          </td>
-        </tr>
-      }
-    </tbody>
-  </table>
 </div>
 <app-toast></app-toast>

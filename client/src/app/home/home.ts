@@ -106,7 +106,7 @@ export class Home implements OnInit {
 
   getCardBody(card: Flashcard): string {
     if (!card._id) return card.question;
-    return this.showAnswerMap[card._id] ? card.answer : card.question;
+    return '<p>'+(this.showAnswerMap[card._id] ? card.answer : card.question)+'</p>';
   }
 
   // cambia da 'Vedi risposta' a 'Vedi domanda'

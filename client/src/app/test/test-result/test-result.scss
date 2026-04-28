@@ -36,14 +36,14 @@
     span {
       font-size: 24px;
       font-weight: 500;
-      color: var(--text-light-color);
+      color: var(--text-color);
     }
   }
 
   .percentage {
     font-size: 20px;
     font-weight: 600;
-    color: var(--text-color);
+    color: var(--header-color);
     margin-top: var(--spacing-unit);
   }
 }
@@ -86,7 +86,7 @@
     h4 {
       margin-bottom: var(--spacing-unit);
       font-size: 16px;
-      color: var(--text-light-color);
+      color: var(--text-color);
     }
     p {
       font-size: 20px;
@@ -96,7 +96,7 @@
 
   &--correct .icon { background-color: var(--success-color); }
   &--wrong .icon { background-color: var(--danger-color); }
-  &--blank .icon { background-color: var(--text-light-color); }
+  &--blank .icon { background-color: var(--text-color); }
   &--time .icon { background-color: var(--warning-color); }
 }
 
@@ -125,7 +125,7 @@
   .question-text {
     font-weight: 600;
     margin-bottom: calc(var(--spacing-unit) * 2);
-    color: var(--text-color);
+    color: var(--header-color);
   }
 
   .answer-block {
@@ -133,11 +133,11 @@
       margin: 0 0 calc(var(--spacing-unit) * 0.5) 0;
       font-size: 14px;
       font-weight: 600;
-      color: var(--text-light-color);
+      color: var(--text-color);
     }
     .answer {
       font-style: italic;
-      color: var(--text-color);
+      color: var(--header-color);
       padding: var(--spacing-unit) calc(var(--spacing-unit) * 1.5);
       background-color: rgba(255, 255, 255, 0.6);
       border-radius: var(--border-radius-md);

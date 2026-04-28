@@ -12,7 +12,7 @@
   svg {
     width: 24px;
     height: 24px;
-    fill: var(--text-light-color);
+    fill: var(--text-color);
   }
 
   &:hover {
@@ -34,7 +34,7 @@ input[type="radio"]:checked + svg {
 
 
 #results {
-    background-color: var(--white-color);
+    background-color: var(--component-background);
     padding: calc(var(--spacing-unit) * 4);
     border-radius: var(--border-radius-lg);
     box-shadow: var(--box-shadow-md);

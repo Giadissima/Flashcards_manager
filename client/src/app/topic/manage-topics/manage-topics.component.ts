@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+
 import { CommonModule } from '@angular/common';
-import { Topic } from '../../models/topic.dto';
-import { TopicService } from '../topic.service';
-import { ToastService } from '../../toast/toast.service';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
 import { Toast } from '../../toast/toast';
-import { FormsModule } from '@angular/forms';
+import { ToastService } from '../../toast/toast.service';
+import { Topic } from '../../models/topic.dto';
+import { TopicService } from '../topic.service';
 
 @Component({
   selector: 'app-manage-topics',
@@ -89,4 +90,20 @@ export class ManageTopicsComponent implements OnInit {
       }
     }
   }
+
+  getLength(): number {
+    console.log(this.selectedSubjectId)
+  // 1. Cerchiamo l'oggetto materia che ha lo stesso _id di quello selezionato
+  const selectedSubject = this.subjects.find(s => s._id === this.selectedSubjectId);
+
+  // 2. Se abbiamo trovato la materia, restituiamo la lunghezza del suo nome
+  if (selectedSubject) {
+    // Aggiungiamo un piccolo "bonus" (+3 o +5) per dare respiro al testo 
+    // e non farlo sbattere contro la freccina
+    return selectedSubject.name.length + 5;
+  }
+
+  // 3. Valore di default se non c'è selezione o se è "All Subjects"
+  return 15; 
+}
 }

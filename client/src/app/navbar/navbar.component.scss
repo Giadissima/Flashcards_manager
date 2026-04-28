@@ -4,7 +4,7 @@ nav {
   align-items: center;
   background-color: var(--component-background);
   padding: var(--spacing-unit) calc(var(--spacing-unit) * 3);
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--bs-btn-border-color);
   box-shadow: var(--box-shadow-sm);
 }
 
@@ -15,15 +15,6 @@ nav {
   gap: var(--spacing-unit);
 }
 
-.create-card-btn{
-  border-radius: 0.4rem;
-  width:7rem;
-  padding: 6px;
-  background-color: var(--secondary-color);
-  color: var(--text-color);
-  border: 0px solid var(--text-light-color);
-}
-
 .logo {
   height: 40px;
 }
@@ -31,7 +22,7 @@ nav {
 .project-name {
   font-size: 20px;
   font-weight: 700;
-  color: var(--text-color);
+  color: var(--header-color);
 }
 
 .menu-container {
@@ -40,7 +31,7 @@ nav {
 }
 
 .menu-item {
-  color: var(--text-light-color);
+  color: var(--text-color);
   font-weight: 600;
   cursor: pointer;
   position: relative;
@@ -50,12 +41,6 @@ nav {
 
 .menu-item:hover {
     color: var(--primary-color);
-}
-
-.arrow-icon {
-    // This can be removed if we use a better dropdown indicator
-    // For now, let's keep it simple
-    display: none;
 }
 
 .dropdown {
@@ -75,7 +60,7 @@ nav {
   z-index: 10;
   white-space: nowrap;
   margin-top: var(--spacing-unit);
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--bs-btn-border-color);
 }
 
 .dropdown:hover .dropdown-content {
@@ -86,7 +71,7 @@ nav {
   display: block;
   padding: var(--spacing-unit) calc(var(--spacing-unit) * 1.5);
   text-decoration: none;
-  color: var(--text-light-color);
+  color: var(--text-color);
   font-weight: 600;
   border-radius: var(--border-radius-sm);
   transition: all 0.2s ease;
@@ -112,7 +97,7 @@ nav {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-color);
+  color: var(--header-color);
 }
 
 .theme-switch-btn:hover {
