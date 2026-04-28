@@ -4,14 +4,14 @@ import { CommonModule } from '@angular/common';
 import { Flashcard } from '../models/flashcard.dto';
 import { FlashcardService } from '../flashcard/flashcard.service';
 import { FormsModule } from '@angular/forms'; // Import FormsModule for ngModel
-import { Topic } from '../models/topic.dto';
-import { TopicService } from '../topic/topic.service';
+import { KatexRendererPipe } from '../pipes/katex-renderer.pipe';
 import { Router } from '@angular/router';
 import { Subject } from '../models/subject.dto';
 import { SubjectService } from '../subject/subject.service';
 import { Toast } from '../toast/toast';
 import { ToastService } from '../toast/toast.service';
-import { KatexRendererPipe } from '../pipes/katex-renderer.pipe';
+import { Topic } from '../models/topic.dto';
+import { TopicService } from '../topic/topic.service';
 
 @Component({
   selector: 'app-home',
@@ -153,8 +153,54 @@ export class Home implements OnInit {
   }
 
   copyCard(card: Flashcard): void {
-    // esempio: copi solo il testo
-    navigator.clipboard.writeText(`${card.title}\nQuestion: ${card.question}\nAnswer: ${card.answer}`);
-    alert('Card copiata negli appunti!');
+  // 1. Prepariamo la stringa da copiare
+  const textToCopy = `${card.title}\nQuestion: ${card.question}\nAnswer: ${card.answer}`;
+
+  // 2. Proviamo la via moderna (Clipboard API)
+  // Controlliamo se esiste l'oggetto e se siamo in un contesto sicuro (HTTPS/Localhost)
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(textToCopy)
+      .then(() => {
+        alert('Card succesfully copied!');
+      })
+      .catch(err => {
+        // Se per qualche motivo l'API moderna fallisce, proviamo il fallback
+        this.executeFallbackCopy(textToCopy);
+      });
+  } else {
+    // 3. Se l'API moderna non esiste (es. rete privata HTTP), usiamo il fallback
+    this.executeFallbackCopy(textToCopy);
   }
+}
+
+private executeFallbackCopy(text: string): void {
+  // Creiamo un elemento "invisibile" per contenere il testo
+  const textArea = document.createElement("textarea");
+  textArea.value = text;
+
+  // Lo posizioniamo fuori dallo schermo per non disturbare l'utente
+  textArea.style.position = "fixed";
+  textArea.style.left = "-9999px";
+  textArea.style.top = "0";
+  document.body.appendChild(textArea);
+
+  // Selezioniamo il contenuto
+  textArea.focus();
+  textArea.select();
+
+  try {
+    // Il vecchio comando in caso di url con http
+    const successful = document.execCommand('copy');
+    if (successful) {
+      alert('Card succesfully copied!');
+    } else {
+      console.error('ERR: Il comando copy ha restituito false');
+    }
+  } catch (err) {
+    console.error('ERR: Errore durante il fallback di copia:', err);
+  }
+
+  // Pulizia: rimuoviamo l'elemento creato
+  document.body.removeChild(textArea);
+}
 }

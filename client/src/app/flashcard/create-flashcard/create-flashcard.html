@@ -5,66 +5,104 @@
     </div>
     <div class="card-body">
       <form [formGroup]="cardForm" (ngSubmit)="addCard()" novalidate>
-        
+
         <div class="form-group">
           <label for="title" class="form-label">Title</label>
           <input type="text" id="title" formControlName="title" class="form-control" placeholder="e.g., Photosynthesis">
-        @if(cardForm.get('title')?.hasError('minlength')){
-        <div class="invalid-feedback">
-          Title should have min 2 characters.
-        </div>
-      } @else if (cardForm.get('title')?.hasError('maxlength')) {
-            <div class="invalid-feedback">
-              Title's max characters reached.
-            </div>
+          @if(cardForm.get('title')?.hasError('minlength')){
+          <div class="invalid-feedback">
+            Title should have min 2 characters.
+          </div>
+          } @else if (cardForm.get('title')?.hasError('maxlength')) {
+          <div class="invalid-feedback">
+            Title's max characters reached.
+          </div>
           }
-        @else if (cardForm.get('title')?.touched && cardForm.get('title')?.hasError('required')) {
+          @else if (cardForm.get('title')?.touched && cardForm.get('title')?.hasError('required')) {
           <div class="invalid-feedback">Please insert a title.</div>
-        }
+          }
         </div>
 
         <div class="form-group">
           <label for="question-editor" class="form-label">Question</label>
           <div class="editor-toolbar">
-            <button (click)="questionEditor.chain().focus().toggleBold().run()" [class.is-active]="questionEditor.isActive('bold')">bold</button>
-            <button (click)="questionEditor.chain().focus().toggleItalic().run()" [class.is-active]="questionEditor.isActive('italic')">italic</button>
-            <button (click)="questionEditor.chain().focus().toggleStrike().run()" [class.is-active]="questionEditor.isActive('strike')">strike</button>
-            <button type="button" (click)="questionEditor.commands.insertContent('$')">Add Inline Math</button>
+            <button (click)="questionEditor.chain().focus().toggleBold().run()"
+              [class.btn-outline-secondary]="!questionEditor.isActive('bold')"
+              [class.btn-secondary]="questionEditor.isActive('bold')"
+              class="btn"
+              type="button"><i class="bi bi-type-bold"></i></button>
+            <button (click)="questionEditor.chain().focus().toggleItalic().run()"
+              [class.btn-outline-secondary]="!questionEditor.isActive('italic')"
+              [class.btn-secondary]="questionEditor.isActive('italic')"
+              class="btn"
+              type="button"><i class="bi bi-type-italic" ></i></button>
+            <button (click)="questionEditor.chain().focus().toggleStrike().run()"
+              [class.btn-outline-secondary]="!questionEditor.isActive('strike')"
+              [class.btn-secondary]="questionEditor.isActive('strike')"
+              class="btn"
+              type="button"><i class="bi bi-type-strikethrough"></i></button>
+            <button 
+              (click)="questionEditor.commands.insertContent('$')"
+              class="btn btn-outline-secondary"
+              type="button"><i class="bi bi-calculator-fill"></i>Inline equation</button>
+            <button 
+              (click)="questionEditor.commands.insertContent('$$')"
+              class="btn btn-outline-secondary"
+              type="button"><i class="bi bi-calculator-fill"></i>Outline equation</button>
           </div>
-          <tiptap-editor [editor]="questionEditor"></tiptap-editor>
+          <tiptap-editor [editor]="questionEditor" class="editorCustom"></tiptap-editor>
         </div>
 
         <div class="form-group">
           <label for="answer-editor" class="form-label">Answer</label>
           <div class="editor-toolbar">
-            <button (click)="answerEditor.chain().focus().toggleBold().run()" [class.is-active]="answerEditor.isActive('bold')">bold</button>
-            <button (click)="answerEditor.chain().focus().toggleItalic().run()" [class.is-active]="answerEditor.isActive('italic')">italic</button>
-            <button (click)="answerEditor.chain().focus().toggleStrike().run()" [class.is-active]="answerEditor.isActive('strike')">strike</button>
-            <button type="button" (click)="answerEditor.commands.insertContent('$')">Add Inline Math</button>
+            <button (click)="answerEditor.chain().focus().toggleBold().run()"
+              [class.btn-outline-secondary]="!answerEditor.isActive('bold')"
+              [class.btn-secondary]="answerEditor.isActive('bold')"
+              class="btn"
+              type="button"><i class="bi bi-type-bold"></i></button>
+            <button (click)="answerEditor.chain().focus().toggleItalic().run()"
+              [class.btn-outline-secondary]="!answerEditor.isActive('italic')"
+              [class.btn-secondary]="answerEditor.isActive('italic')"
+              class="btn"
+              type="button"><i class="bi bi-type-italic" ></i></button>
+            <button (click)="answerEditor.chain().focus().toggleStrike().run()"
+              [class.btn-outline-secondary]="!answerEditor.isActive('strike')"
+              [class.btn-secondary]="answerEditor.isActive('strike')"
+              class="btn"
+              type="button"><i class="bi bi-type-strikethrough"></i></button>
+            <button 
+              (click)="answerEditor.commands.insertContent('$')"
+              class="btn btn-outline-secondary"
+              type="button"><i class="bi bi-calculator-fill"></i>Inline equation</button>
+            <button 
+              (click)="answerEditor.commands.insertContent('$$')"
+              class="btn btn-outline-secondary"
+              type="button"><i class="bi bi-calculator-fill"></i>Outline equation</button>
           </div>
-          <tiptap-editor [editor]="answerEditor"></tiptap-editor>
+          <tiptap-editor [editor]="answerEditor" class="editorCustom"></tiptap-editor>
         </div>
 
         <div class="form-row">
-            <div class="form-group">
-              <label for="subject" class="form-label">Subject</label>
-              <select id="subject" formControlName="subject_id" class="form-select">
-                <option value="" disabled>Choose a subject</option>
-                @for (s of subjects; track s._id) {
-                  <option [value]="s._id">{{ s.name }}</option>
-                }
-              </select>
-            </div>
-    
-            <div class="form-group">
-              <label for="topic" class="form-label">Topic</label>
-              <select id="topic" formControlName="topic_id" class="form-select">
-                <option value="" disabled>Choose a topic</option>
-                @for (t of topics; track t._id) {
-                  <option [value]="t._id">{{ t.name }}</option>
-                }
-              </select>
-            </div>
+          <div class="form-group">
+            <label for="subject" class="form-label">Subject</label>
+            <select id="subject" formControlName="subject_id" class="form-select">
+              <option value="" disabled>Choose a subject</option>
+              @for (s of subjects; track s._id) {
+              <option [value]="s._id">{{ s.name }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="topic" class="form-label">Topic</label>
+            <select id="topic" formControlName="topic_id" class="form-select">
+              <option value="" disabled>Choose a topic</option>
+              @for (t of topics; track t._id) {
+              <option [value]="t._id">{{ t.name }}</option>
+              }
+            </select>
+          </div>
         </div>
 
         <div class="form-actions">

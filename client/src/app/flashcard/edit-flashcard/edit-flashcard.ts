@@ -1,16 +1,21 @@
 import { ActivatedRoute, Router } from '@angular/router';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Editor } from '@tiptap/core';
-import StarterKit from '@tiptap/starter-kit';
-import { TiptapEditorDirective } from 'ngx-tiptap';
-import { MathExtension } from '@aarkue/tiptap-math-extension';
+import { charMinLength, titleMaxLength } from '../../../config/config';
+
 import { CommonModule } from '@angular/common';
+import { Editor } from '@tiptap/core';
 import { Flashcard } from '../../models/flashcard.dto';
 import { FlashcardService } from '../flashcard.service';
+import { MathExtension } from '@aarkue/tiptap-math-extension';
+import StarterKit from '@tiptap/starter-kit';
+import { Subject } from '../../models/subject.dto';
+import { SubjectService } from '../../subject/subject.service';
+import { TiptapEditorDirective } from 'ngx-tiptap';
 import { Toast } from '../../toast/toast';
 import { ToastService } from '../../toast/toast.service';
-import { charMinLength, titleMaxLength } from '../../../config/config';
+import { Topic } from '../../models/topic.dto';
+import { TopicService } from '../../topic/topic.service';
 
 @Component({
   selector: 'app-edit-flashcard',
@@ -23,6 +28,9 @@ export class EditFlashcard implements OnInit, OnDestroy {
   editForm!: FormGroup;
   cardId?: string;
 
+  topics: Topic[] = [];
+  subjects: Subject[] = [];
+
   questionEditor: Editor;
   answerEditor: Editor;
 
@@ -31,7 +39,9 @@ export class EditFlashcard implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private flashcardService: FlashcardService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private topicService: TopicService,
+    private subjectService: SubjectService
   ) {
     this.questionEditor = new Editor({
       extensions: [StarterKit, MathExtension.configure({ evaluation: false })],
@@ -44,7 +54,8 @@ export class EditFlashcard implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.editForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(titleMaxLength)]],
-      topic_id: ['']
+      subject_id: ['', Validators.required],
+      topic_id: [{ value: '', disabled: true }, Validators.required]
     });
 
     this.route.paramMap.subscribe(params => {
@@ -52,6 +63,17 @@ export class EditFlashcard implements OnInit, OnDestroy {
       if (id) {
         this.cardId = id;
         this.loadCardData(id);
+      }
+    });
+
+    this.loadSubjects();
+
+    this.editForm.get('subject_id')?.valueChanges.subscribe(subjectId => {
+      this.topics = [];
+      this.editForm.get('topic_id')?.reset({ value: '', disabled: !subjectId });
+      
+      if (subjectId) {
+        this.loadTopicsBySubject(subjectId);
       }
     });
   }
@@ -64,10 +86,30 @@ export class EditFlashcard implements OnInit, OnDestroy {
   async loadCardData(id: string): Promise<void> {
     try {
       const card = await this.flashcardService.getById(id);
-      this.editForm.patchValue(card);
+
+      if (this.subjects.length === 0) {
+        await this.loadSubjects();
+      }
+
+      // Estraiamo gli ID stringa (potrebbero essere oggetti se popolati dal backend)
+      const subjectId = typeof card.subject_id === 'object' ? (card.subject_id as any)?._id : card.subject_id;
+      const topicId = typeof card.topic_id === 'object' ? (card.topic_id as any)?._id : card.topic_id;
+
+      if (subjectId) {
+        await this.loadTopicsBySubject(subjectId);
+      }
+
+      this.editForm.patchValue({
+        title: card.title,
+        subject_id: subjectId,
+        topic_id: topicId
+      });
+
       this.questionEditor.commands.setContent(card.question);
       this.answerEditor.commands.setContent(card.answer);
+
     } catch (error) {
+      console.error('Error loading card data', error);
       this.toastService.show('Failed to load card data', 'error');
     }
   }
@@ -78,12 +120,12 @@ export class EditFlashcard implements OnInit, OnDestroy {
       return;
     }
 
-    const { _id, title, topic_id } = this.editForm.value;
+    const { title, topic_id, subject_id } = this.editForm.value;
 
     const card: Flashcard = {
-      _id,
-      topic_id: topic_id?._id ?? undefined,
-      subject_id: topic_id?.subject_id._id,
+      _id: this.cardId,
+      topic_id,
+      subject_id,
       title,
       question: this.questionEditor.getHTML(),
       answer: this.answerEditor.getHTML(),
@@ -94,6 +136,7 @@ export class EditFlashcard implements OnInit, OnDestroy {
       this.toastService.show('Card updated successfully', 'success');
       this.router.navigate(['/home']);
     } catch (error) {
+      console.error('Error updating card', error);
       this.toastService.show('Failed to update card', 'error');
     }
   }
@@ -102,5 +145,37 @@ export class EditFlashcard implements OnInit, OnDestroy {
     const textarea = event.target as HTMLTextAreaElement;
     textarea.style.height = 'auto';
     textarea.style.height = textarea.scrollHeight + 'px';
+  }
+
+  async loadTopicsBySubject(subjectId: string) {
+    try {
+      const response = await this.topicService.getAllTopics({
+        skip: 0,
+        limit: 50,
+        sortField: 'name',
+        sortDirection: 'asc',
+        subject_id: subjectId
+      });
+      this.topics = response.data;
+      this.editForm.get('topic_id')?.enable();
+    } catch (err) {
+      console.error('Error loading topics for subject ' + subjectId, err);
+      this.toastService.show('Failed to load topics for the selected subject', 'error');
+    }
+  }
+
+  async loadSubjects() {
+    try {
+      const response = await this.subjectService.getAllSubjects({
+        skip: 0,
+        limit: 50,
+        sortField: 'name',
+        sortDirection: 'asc'
+      });
+      this.subjects = response.data;
+    } catch (err) {
+      console.error('Error loading subjects', err);
+      this.toastService.show('Failed to load subjects', 'error');
+    }
   }
 }
