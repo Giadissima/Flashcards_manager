@@ -1,6 +1,30 @@
 /* ---------------------------------- */
 /* 1. Design System                   */
 /* ---------------------------------- */
+[data-theme='light'] {
+  --accent-color: #6941C6;
+  --primary-color: #A294F9;
+  --secondary-color: #CDC1FF;
+  --background-color: #F5EFFF;
+  --border-color: #E0CFFC;
+  --header-color: #344054;
+  --sub-title-color: #344054af;
+  --text-color: #667085;
+  --component-background: #f8f9fa;
+}
+
+[data-theme='dark'] {
+  --accent-color: #328E6E;
+  --primary-color: #67AE6E;
+  --secondary-color: #90C67C;
+  --background-color: #121212;
+  --border-color: #606f62;
+  --header-color: #f8f9fa;
+  --sub-title-color: #f8f9faaf;
+  --text-color: rgba(255, 255, 255, 0.7);
+  --component-background: #1E1E1E;
+}
+
 :root {
   --font-family: 'Nunito', sans-serif;
 
@@ -11,44 +35,23 @@
   --border-radius-lg: 16px;
 
   /* Shadows */
-  --box-shadow-sm: 0 1px 2px 0 rgba(16, 24, 40, 0.05);
-  --box-shadow-md: 0 4px 8px -2px rgba(16, 24, 40, 0.1), 0 2px 4px -2px rgba(16, 24, 40, 0.06);
-}
+  --box-shadow-sm: 0 1px 2px 0 var(--border-color);
+  --box-shadow-md: 0 4px 8px -2px var(--border-color), 0 2px 4px -2px var(--border-color);
 
-[data-theme='light'] {
-  --accent-color: #6941C6;
-  --primary-color: #A294F9;
-  --secondary-color: #CDC1FF;
-  --background-color: #F5EFFF;
-  --border-color: #E0CFFC;
-  --header-color: #344054;
-  --text-color: #667085;
-  --component-background: #f8f9fa;
-}
-
-[data-theme='dark'] {
-  --accent-color: #328E6E;
-  --primary-color: #67AE6E;
-  --secondary-color: #90C67C;
-  --background-color: #121212;
-  --border-color: #4A4A4A;
-  --header-color: #f8f9fa;
-  --text-color: rgba(255, 255, 255, 0.7);
-  --component-background: #1E1E1E;
-}
-
-/* ---------------------------------- */
-/* 2. Global Styles                   */
-/* ---------------------------------- */
-html, 
-body {
-  width: 100%;
-  min-height: 100vh;
   /* Syncing Bootstrap core variables with the design system */
   --bs-primary: var(--primary-color);
   --bs-secondary: var(--secondary-color);
   --bs-body-bg: var(--background-color);
   --bs-body-color: var(--text-color);
+}
+
+/* ---------------------------------- */
+/* 2. Global Styles                   */
+/* ---------------------------------- */
+html,
+body {
+  width: 100%;
+  min-height: 100vh;
 }
 
 body {
@@ -59,7 +62,12 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-weight: 700;
   margin-bottom: calc(var(--spacing-unit) * 2);
   color: var(--header-color);
@@ -76,15 +84,22 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .card {
-  background-color: var(--component-background);
-  border: 1px solid var(--border-color);
   border-radius: var(--border-radius-lg);
   box-shadow: var(--box-shadow-md);
-  overflow: hidden;
+  padding-top: 10px;
+
+  //Override bootstrap color
+  --bs-card-title-color: var(--header-color);
+  --bs-secondary-color: var(--sub-title-color);
+  --bs-card-color: var(--text-color);
+  --bs-body-color: var(--text-color);
+  --bs-card-bg: var(--component-background);
+  --bs-card-border-color: var(--border-color);
+  --bs-card-cap-bg: var(--component-background);
 }
 
-.card-title {
-  color: var(--header-color);
+.card-header{
+  border-bottom: 1.4px solid var(--primary-color);
 }
 
 /* ---------------------------------- */
@@ -92,8 +107,8 @@ h1, h2, h3, h4, h5, h6 {
 /* ---------------------------------- */
 
 /* Shared styles for Inputs, Selects, and TipTap Editor */
-.form-control, 
-.form-select, 
+.form-control,
+.form-select,
 .tiptap,
 .input-group-text {
   padding: calc(var(--spacing-unit) * 1.25) calc(var(--spacing-unit) * 1.5);
@@ -105,18 +120,6 @@ h1, h2, h3, h4, h5, h6 {
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-/* Unified Focus State */
-.form-control:focus, 
-.form-select:focus, 
-.tiptap:focus,
-.input-group:focus-within .form-control,
-.input-group:focus-within .input-group-text {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px var(--secondary-color);
-  z-index: 3;
-}
-
 .form-label {
   font-weight: 600;
   margin-bottom: var(--spacing-unit);
@@ -124,27 +127,55 @@ h1, h2, h3, h4, h5, h6 {
   display: block;
 }
 
-/* Placeholder Styling */
-.form-control::placeholder {
-  color: var(--text-color);
-  opacity: 0.6;
+::placeholder {
+  color: var(--text-color) !important;
+  opacity: 1;
+  /* Firefox */
 }
+
+::-ms-input-placeholder {
+  /* Edge 12 -18 */
+  color: var(--text-color) !important;
+}
+
+/* Unified Focus State*/
+.form-control:focus,
+.form-select:focus,
+.tiptap:focus,
+.input-group:focus-within .form-control,
+.input-group:focus-within .input-group-text {
+  outline: none;
+  border: 1.4px solid var(--primary-color);
+  /* Added 8px blur and used a slightly transparent version of the secondary color */
+  box-shadow: 0 0 8px 2px var(--border-color);
+  z-index: 3;
+}
+
+
 
 /* ---------------------------------- */
 /* 5. Bootstrap Overrides             */
 /* ---------------------------------- */
 
-/* Custom Zebra Striping for Tables */
-.table-striped > tbody > tr:nth-of-type(odd) > * {
-  background-color: rgba(0, 0, 0, 0.02) !important;
+.table{
+  --bs-body-bg: var(--component-background);
+  --bs-table-color: var(--text-color);
+  --bs-table-border-color: var(--border-color);
 }
 
 /* Button Refinement */
 .btn {
   border-radius: var(--border-radius-md);
   transition: all 0.2s;
-  outline: none !important;
-  box-shadow: none !important;
+  transition: all 0.2s ease-in-out;
+  /* Smooth transition for shadow and lift */
+  outline: none;
+  box-shadow: none;
+}
+
+.btn:hover:not(:disabled) {
+  /* Subtle lift effect and soft shadow */
+  box-shadow: 0 4px 12px var(--border-color) !important;
 }
 
 .btn-primary {
@@ -167,12 +198,12 @@ h1, h2, h3, h4, h5, h6 {
   /* Default State */
   --bs-btn-color: var(--primary-color);
   --bs-btn-border-color: var(--primary-color);
-  
+
   /* Hover State */
   --bs-btn-hover-bg: var(--accent-color);
   --bs-btn-hover-border-color: var(--accent-color);
   --bs-btn-hover-color: var(--component-background);
-  
+
   /* Active State (When clicked or toggled) */
   --bs-btn-active-bg: var(--primary-color);
   --bs-btn-active-border-color: var(--primary-color);
@@ -190,12 +221,21 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Flashcards */
 .flashcard {
-  border-top: 5px solid var(--primary-color);
   display: flex;
   flex-direction: column;
   height: 100%;
-  background-color: var(--component-background);
-  border-radius: var(--border-radius-md);
+}
+
+/* Questa parte è per il colore del topic mostrato sulla cima della card */
+.flashcard-topic-color {
+  /* Aumentiamo lo spessore per renderlo più visibile*/
+  border-top: 6px solid var(--primary-color);
+
+  /* Usa il raggio grande per angoli più "morbidi" */
+  border-radius: var(--border-radius-lg) !important;
+
+  /* impedisce al bordo superiore di restare rettangolare */
+  overflow: hidden;
 }
 
 .flashcard-title {
@@ -206,6 +246,7 @@ h1, h2, h3, h4, h5, h6 {
   margin: 0;
   font-size: 18px;
   font-weight: 700;
+  border-bottom: 0px;
 }
 
 .flashcard-body {
@@ -226,5 +267,10 @@ h1, h2, h3, h4, h5, h6 {
   background-color: var(--component-background);
   padding: calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 3);
   border-radius: var(--border-radius-lg);
-  box-shadow: var(--box-shadow-sm);
+}
+
+/* Search bar */
+.search-icon{
+  background-color: var(--secondary-color);
+  border-right: 0px;
 }
