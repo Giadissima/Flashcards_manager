@@ -7,17 +7,3 @@
   margin-right: var(--spacing-unit);
   border: 1px solid var(--header-color);
 }
-
-/* Contenitore per l'icona circolare nell'header */
-.header-icon-container {
-  background-color: var(--background-color); /* Colore di sfondo leggero */
-  width: 48px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%; /* Rende il contenitore tondo */
-  border: 1px solid var(--border-color);
-}
-
-// TODO perché sono spariti gli svg copiabili da google material? aggiungere icone salvataggio e modifica

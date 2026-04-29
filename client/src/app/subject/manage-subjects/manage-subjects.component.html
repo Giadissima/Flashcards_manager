@@ -1,29 +1,68 @@
-<div class="container mt-4">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1>Manage Subjects</h1>
-    <button class="btn btn-primary" (click)="createSubject()">Create New Subject</button>
-  </div>
+<div class="container md">
+  <div class="card">
+    <div class="card-header p-4 d-flex justify-content-between align-items-center">
+      <div class="d-flex align-items-center">
+        <div class="header-icon-container me-3">
+          <span class="material-symbols-outlined">
+            book_2
+          </span>
+        </div>
+        <div>
+          <h2 class="card-title">Manage Subjects</h2>
+          <h6 class="card-subtitle mb-2 text-body-secondary">Organizza le materie che stai studiando</h6>
+        </div>
+      </div>
+      <button class="btn btn-primary d-flex align-items-center gap-2" (click)="createSubject()">
+        <span>+</span> New Subject
+      </button>
+    </div>
+    <div class="card-body">
+      <div class="filter-bar mb-4 align-items-center">
+        <div class="col-md-4">
+          <div class="input-group">
+            <input type="text" id="searchFilter" class="form-control" placeholder="Search subjects...">
+            <span class="input-group-text search-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px"
+                fill="currentColor">
+                <path
+                  d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z" />
+              </svg>
+            </span>
+          </div>
+        </div>
+      </div>
 
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Icon</th>
-        <th>Name</th>
-        <th>Description</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let subject of subjects">
-        <td><img [src]="subject.icon || 'assets/logo3.png'" alt="icon" class="subject-icon"></td>
-        <td>{{ subject.name }}</td>
-        <td>{{ subject.desc }}</td>
-        <td>
-          <button class="btn btn-sm btn-outline-danger me-2" (click)="editSubject(subject._id)">Edit</button>
-          <button class="btn btn-sm btn-outline-warning" (click)="deleteSubject(subject._id)">Delete</button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-<app-toast></app-toast>
+      <table class="table mt-3">
+        <thead>
+          <tr>
+            <th>Icon</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (subject of subjects; track subject._id) {
+          <tr>
+            <td><img [src]="subject.icon || 'assets/logo3.png'" alt="icon" class="subject-icon"></td>
+            <td>{{ subject.name }}</td>
+            <td>{{ subject.desc }}</td>
+            <td>
+              <button class="btn btn-outline-danger mx-1" (click)="editSubject(subject._id)">
+                <span class="material-symbols-outlined">
+                edit
+                </span>
+              </button>
+              <button class="btn btn-outline-warning mx-1" (click)="deleteSubject(subject._id)">
+                <span class="material-symbols-outlined">
+                delete
+                </span>
+              </button>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    </div>
+    <app-toast></app-toast>

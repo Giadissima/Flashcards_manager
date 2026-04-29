@@ -21,7 +21,7 @@ export class ManageTopicsComponent implements OnInit {
   topics: Topic[] = [];
   subjects: Subject[] = [];
   selectedSubjectId: string | null = null;
-
+// TODO far funzionare la search
   constructor(
     private topicService: TopicService,
     private router: Router,
