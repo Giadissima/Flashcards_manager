@@ -162,6 +162,28 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--header-color);
 }
 
+/* Outline Button Refinement */
+.btn-outline-primary {
+  /* Default State */
+  --bs-btn-color: var(--primary-color);
+  --bs-btn-border-color: var(--primary-color);
+  
+  /* Hover State */
+  --bs-btn-hover-bg: var(--accent-color);
+  --bs-btn-hover-border-color: var(--accent-color);
+  --bs-btn-hover-color: var(--component-background);
+  
+  /* Active State (When clicked or toggled) */
+  --bs-btn-active-bg: var(--primary-color);
+  --bs-btn-active-border-color: var(--primary-color);
+  --bs-btn-active-color: var(--component-background);
+}
+
+.btn-outline-primary:hover:not(:disabled) {
+  background-color: var(--accent-color);
+  color: var(--component-background);
+}
+
 /* ---------------------------------- */
 /* 6. Feature Specific Components     */
 /* ---------------------------------- */
