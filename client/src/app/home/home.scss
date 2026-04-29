@@ -1,47 +1,7 @@
-.filter-bar {
-  background-color: var(--component-background);
-  padding: calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 3);
-  border-radius: var(--border-radius-lg);
-  box-shadow: var(--box-shadow-sm);
-}
-
 .flashcard-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: calc(var(--spacing-unit) * 3);
-}
-
-.flashcard {
-  // TODO The global .card style is already applied
-  // We add the colored border here
-  border-top: 5px solid;
-  display: flex;
-  flex-direction: column;
-  height: 100%; // Make cards in the same row have the same height
-}
-
-.flashcard-title {
-  padding: calc(var(--spacing-unit) * 2);
-  h5 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--header-color) !important;
-  }
-}
-
-.flashcard-body {
-  padding: 0 calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 2);
-  flex-grow: 1; /* Allows this area to grow and push the footer down */
-  display: flex;
-  flex-direction: column;
-}
-
-.flashcard-text {
-  flex-grow: 1;
-  white-space: pre-wrap;
-  margin-bottom: calc(var(--spacing-unit) * 2);
-  color: var(--text-color) !important;
 }
 
 .flashcard-actions {
@@ -59,25 +19,8 @@
     }
   }
 }
-.border-bootstrap-btn-custom{
-  border: 1px solid var(--bs-btn-border-color); // variable took by bootstrap
-  &.active{
-    background-color: var(--secondary-color); // variable took by bootstrap
-  }
-  color: var(--header-color); // variable took by bootstrap
-}
-.border-bootstrap-btn-custom:hover{
-    background-color: var(--secondary-color); // variable took by bootstrap
-}
 
-.input-group:focus-within .input-group-text {
-  bs-btn-border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px var(--secondary-color);
-  z-index: 3;
-}
-
-.input-group:focus-within .form-control {
-  bs-btn-border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px var(--secondary-color);
-  z-index: 3;
+.search-icon{
+  background-color: var(--secondary-color);
+  border-right: 0px;
 }
