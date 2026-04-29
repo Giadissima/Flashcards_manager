@@ -1,5 +1,5 @@
 /* ---------------------------------- */
-/*         1. Design System         */
+/* 1. Design System                   */
 /* ---------------------------------- */
 :root {
   --font-family: 'Nunito', sans-serif;
@@ -15,8 +15,6 @@
   --box-shadow-md: 0 4px 8px -2px rgba(16, 24, 40, 0.1), 0 2px 4px -2px rgba(16, 24, 40, 0.06);
 }
 
-
-
 [data-theme='light'] {
   --accent-color: #6941C6;
   --primary-color: #A294F9;
@@ -25,7 +23,7 @@
   --border-color: #E0CFFC;
   --header-color: #344054;
   --text-color: #667085;
-  --component-background: #f8f9fa; // colore simile allo sfondo per i componenti o per un contrasto nel colore dei testi
+  --component-background: #f8f9fa;
 }
 
 [data-theme='dark'] {
@@ -33,66 +31,42 @@
   --primary-color: #67AE6E;
   --secondary-color: #90C67C;
   --background-color: #121212;
-  --border-color: #E1EEBC;
+  --border-color: #4A4A4A;
   --header-color: #f8f9fa;
-  --text-color: #ffffffb3;
-  --component-background: #1E1E1E; // colore simile allo sfondo per i componenti o per un contrasto nel colore dei testi
+  --text-color: rgba(255, 255, 255, 0.7);
+  --component-background: #1E1E1E;
 }
 
 /* ---------------------------------- */
-/*         2. Global Styles         */
+/* 2. Global Styles                   */
 /* ---------------------------------- */
-
-html,
+html, 
 body {
   width: 100%;
   min-height: 100vh;
-  // overriding bootstrap color
+  /* Syncing Bootstrap core variables with the design system */
   --bs-primary: var(--primary-color);
   --bs-secondary: var(--secondary-color);
+  --bs-body-bg: var(--background-color);
+  --bs-body-color: var(--text-color);
 }
 
 body {
   font-family: var(--font-family);
-  background-color: var(--background-color);
-  color: var(--text-color);
+  background-color: var(--bs-body-bg);
+  color: var(--bs-body-color);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+h1, h2, h3, h4, h5, h6 {
   font-weight: 700;
   margin-bottom: calc(var(--spacing-unit) * 2);
-  color: var(--header-color)
+  color: var(--header-color);
 }
 
 /* ---------------------------------- */
-/*         Components            */
-/* ---------------------------------- */
-
-/* Cards */
-.card {
-  background-color: var(--component-background);
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-lg);
-  box-shadow: var(--box-shadow-md);
-  overflow: hidden;
-  --bs-body-color: var(--text-color);
-}
-
-.card-title {
-  --bs-card-title-color: var(--header-color)
-}
-
-
-
-/* ---------------------------------- */
-/*         4. TipTap Classes         */
+/* 3. Common Layout & Components      */
 /* ---------------------------------- */
 .container {
   width: 100%;
@@ -101,85 +75,27 @@ h6 {
   padding: 0 calc(var(--spacing-unit) * 2);
 }
 
-.tiptap {
+.card {
+  background-color: var(--component-background);
   border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-md);
-  padding: calc(var(--spacing-unit) * 1.25) calc(var(--spacing-unit) * 1.5);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--box-shadow-md);
+  overflow: hidden;
 }
 
-.tiptap:focus {
-  outline: none; // rimuove bordo nero interno tipico dei browser per gli elementi selezionati
-  border: 1px solid var(--primary-color);
-  box-shadow: 0 0 0 3px var(--secondary-color);
-}
-
-
-/* ---------------------------------- */
-/*        Bootstrap Overrides         */
-/* ---------------------------------- */
-
-/* Custom bootstrap odd row in tables */
-.table-striped>tbody>tr:nth-of-type(odd)>* {
-  background-color: var(--background-color) !important;
-}
-
-.btn:hover:not(:disabled),
-.btn:focus,
-.btn:active {
-  outline: none; // rimuove bordo nero interno tipico dei browser per gli elementi selezionati
-  border: 1px solid var(--border-color) !important;
-  box-shadow: none !important; // sembrerebbe che bootstrap mette una piccola ombra blu che rompe le scatole, TODO levarlo anche con gli input
-}
-
-.btn-primary {
-  // bootrap's variables ovverride
-  --bs-btn-bg: var(--primary-color) !important;
-  --bs-btn-hover-bg: var(--accent-color) !important;
-}
-
-.btn-primary:hover:not(:disabled),
-.btn-secondary:hover:not(:disabled),
-.btn-outline-primary:hover:not(:disabled) {
-  background-color: var(--accent-color);
-  color: var(--component-background);
-}
-
-.btn-secondary {
-  // bootrap's variables ovverride
-  --bs-btn-bg: var(--secondary-color) !important;
-  --bs-btn-hover-bg: var(--primary-color) !important;
-}
-
-.btn-secondary,
-.btn-primary {
-  // bootrap's variables ovverride
-  --bs-btn-hover-border-color: var(--custom-border) !important;
-  --bs-btn-active-border-color: var(--custom-border) !important;
-  --bs-btn-border-color: var(--custom-border) !important;
+.card-title {
   color: var(--header-color);
 }
 
-.btn-outline-primary{
-  --bs-btn-border-color: var(--primary-color);
-  --bs-btn-color: var(--primary-color);
-  --bs-btn-active-border-color: var(--primary-color);
-  --bs-btn-active-color: var(--header-color);
-  --bs-btn-active-bg: var(--primary-color);
-}
+/* ---------------------------------- */
+/* 4. Form Elements & Editor          */
+/* ---------------------------------- */
 
-/* Forms */
-// per i label
-.form-label {
-  font-weight: 600;
-  margin-bottom: var(--spacing-unit);
-  color: var(--text-color);
-  display: block;
-}
-
-// per le select
-.form-control,
-.form-select {
-  width: 100%;
+/* Shared styles for Inputs, Selects, and TipTap Editor */
+.form-control, 
+.form-select, 
+.tiptap,
+.input-group-text {
   padding: calc(var(--spacing-unit) * 1.25) calc(var(--spacing-unit) * 1.5);
   border-radius: var(--border-radius-md);
   border: 1.4px solid var(--border-color);
@@ -189,86 +105,90 @@ h6 {
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.form-select:disabled { // TODO le variabili disabilitate non esistono più, rivedere i colori
-  // background-color: var(--disabled-background) !important;
-  // color: var(--text-color) !important;
-  // border: 1px solid var(--disabled-border) !important;
-  // opacity: 1 !important;
-  /* Ensure it's not faded */
-}
-
-/* placeholder custom */
-
-.form-control::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
-  color: var(--text-color);
-  opacity: 1; /* Firefox */
-}
-
-.form-control:-ms-input-placeholder { /* Internet Explorer 10-11 */
-  color: var(--text-color);
-}
-
-.form-control::-ms-input-placeholder { /* Microsoft Edge */
-  color: var(--text-color);
-}
-
-
-// per le select quando vengono selezionate
-.form-control:focus,
-.form-select:focus {
-  outline: none; // rimuove bordo nero interno tipico dei browser per gli elementi selezionati
-  border: 1px solid var(--primary-color);
-  box-shadow: 0 0 0 3px var(--secondary-color);
-  transition: bs-btn-border-color 0.2s, box-shadow 0.2s;
-}
-
-
-// input - for example "search bar" component
-.input-group-text {
-  background-color: var(--component-background);
-  border: 1.4px solid var(--border-color);
-  padding: calc(var(--spacing-unit) * 1.25) calc(var(--spacing-unit) * 1.5);
-  border-radius: var(--border-radius-md);
-  font-weight: 600;
-  transition: bs-btn-border-color 0.2s, box-shadow 0.2s;
-  color: var(--text-color);
-}
-
-.input-group:focus-within .input-group-text,
-.input-group:focus-within .form-control {
-  outline: none; // rimuove bordo nero interno tipico dei browser per gli elementi selezionati
-  border: 1px solid var(--primary-color);
+/* Unified Focus State */
+.form-control:focus, 
+.form-select:focus, 
+.tiptap:focus,
+.input-group:focus-within .form-control,
+.input-group:focus-within .input-group-text {
+  outline: none;
+  border-color: var(--primary-color);
   box-shadow: 0 0 0 3px var(--secondary-color);
   z-index: 3;
 }
 
+.form-label {
+  font-weight: 600;
+  margin-bottom: var(--spacing-unit);
+  color: var(--text-color);
+  display: block;
+}
+
+/* Placeholder Styling */
+.form-control::placeholder {
+  color: var(--text-color);
+  opacity: 0.6;
+}
 
 /* ---------------------------------- */
-/*             Flashcards             */
+/* 5. Bootstrap Overrides             */
 /* ---------------------------------- */
 
+/* Custom Zebra Striping for Tables */
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+  background-color: rgba(0, 0, 0, 0.02) !important;
+}
+
+/* Button Refinement */
+.btn {
+  border-radius: var(--border-radius-md);
+  transition: all 0.2s;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.btn-primary {
+  --bs-btn-bg: var(--primary-color);
+  --bs-btn-border-color: var(--primary-color);
+  --bs-btn-hover-bg: var(--accent-color);
+  --bs-btn-hover-border-color: var(--accent-color);
+  color: #fff;
+}
+
+.btn-secondary {
+  --bs-btn-bg: var(--secondary-color);
+  --bs-btn-border-color: var(--secondary-color);
+  --bs-btn-hover-bg: var(--primary-color);
+  color: var(--header-color);
+}
+
+/* ---------------------------------- */
+/* 6. Feature Specific Components     */
+/* ---------------------------------- */
+
+/* Flashcards */
 .flashcard {
-  // We add the colored border here
-  border-top: 5px solid;
+  border-top: 5px solid var(--primary-color);
   display: flex;
   flex-direction: column;
-  height: 100%; // Make cards in the same row have the same height
+  height: 100%;
+  background-color: var(--component-background);
+  border-radius: var(--border-radius-md);
 }
 
 .flashcard-title {
   padding: calc(var(--spacing-unit) * 2);
+}
 
-  h5 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 700;
-  }
+.flashcard-title h5 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
 }
 
 .flashcard-body {
   padding: 0 calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 2);
   flex-grow: 1;
-  /* Allows this area to grow and push the footer down */
   display: flex;
   flex-direction: column;
 }
@@ -279,10 +199,7 @@ h6 {
   margin-bottom: calc(var(--spacing-unit) * 2);
 }
 
-/* ---------------------------------- */
-/*            Filter bar              */
-/* ---------------------------------- */
-
+/* Filter bar */
 .filter-bar {
   background-color: var(--component-background);
   padding: calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 3);
