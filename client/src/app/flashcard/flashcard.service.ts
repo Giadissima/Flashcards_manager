@@ -3,9 +3,7 @@ import { CardFilter, PaginatedResponse, RandomCardFIlter, SimplePaginatedRespons
 import { Flashcard } from '../models/flashcard.dto';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
 import { RestClientService } from '../api/rest-api.service';
-import { baseUrlAPI } from '../../config/config';
 
 @Injectable({
   providedIn: 'root'
