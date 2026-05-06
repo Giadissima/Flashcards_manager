@@ -3,11 +3,12 @@ import {
   Get,
   Post,
   Res,
+  Query,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBody, ApiConsumes, ApiOperation } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiQuery, ApiOperation } from '@nestjs/swagger';
 import { ImportExportService } from './import-export.service';
 import { Writable } from 'stream';
 import { Response } from 'express';
@@ -46,8 +47,14 @@ export class ImportExportController {
   @ApiOperation({
     description: 'it allows to upload a file contains topics on db',
   })
-  async exportFlashcards(@Res() res: Response): Promise<void> {
-    const stream = await this.importService.exportFlashcardsToFileStream();
+  @ApiQuery({
+    name: 'subject_id',
+    required: false,
+    type: String,
+    description: 'L\'ID della materia per filtrare i risultati (opzionale)',
+  })
+  async exportFlashcards(@Res() res: Response, @Query('subject_id') subject_id?: string): Promise<void> {
+    const stream = await this.importService.exportFlashcardsToFileStream(subject_id);
     res.setHeader('Content-Type', 'application/json');
     res.setHeader(
       'Content-Disposition',

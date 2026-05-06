@@ -80,6 +80,7 @@ export class ImportExportService {
           .exec();
       }
 
+      // TODO: se esiste già uguale, lasciarla, altrimenti, crearla
       // ? flashcard creation
       await this.flashcardModel.create({
         title: item.title?.trim(),
@@ -91,18 +92,22 @@ export class ImportExportService {
     }
   }
 
-  async exportFlashcardsToFileStream(): Promise<ReadStream> {
+  async exportFlashcardsToFileStream(
+    subject_id: undefined | string,
+  ): Promise<ReadStream> {
     const filePath = join(__dirname, '..', 'tmp', 'flashcards_export.json');
     const dir = dirname(filePath);
     if (!existsSync(dir)) {
       mkdirSync(dir, { recursive: true }); // crea la cartella tmp e tutte le eventuali sottocartelle mancanti
     }
     const writeStream = createWriteStream(filePath);
+    const filter = subject_id ? { subject_id } : {};
 
     const cursor = this.flashcardModel
-      .find()
+      .find(filter)
       .populate({
-                  path: 'topic_id',        populate: { path: 'subject_id' },
+        path: 'topic_id',
+        populate: { path: 'subject_id' },
       })
       .populate('subject_id')
       .lean() // questo comando converte in oggetto puro il risultato e non più in un oggetto di mongoose, permettendo nel caso di export di risparmiare memoria
