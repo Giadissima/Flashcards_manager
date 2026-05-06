@@ -286,3 +286,49 @@ h6 {
   border-radius: 50%; /* Rende il contenitore tondo */
   border: 1px solid var(--border-color);
 }
+
+/* DROPDOWN*/
+
+.dropdown {
+  position: relative;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--component-background);
+  box-shadow: var(--box-shadow-md);
+  padding: var(--spacing-unit);
+  border-radius: var(--border-radius-md);
+  z-index: 10;
+  white-space: nowrap;
+  margin-top: var(--spacing-unit);
+  border: 1px solid var(--bs-btn-border-color);
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.dropdown-content a {
+  display: block;
+  padding: var(--spacing-unit) calc(var(--spacing-unit) * 1.5);
+  text-decoration: none;
+  color: var(--text-color);
+  font-weight: 600;
+  border-radius: var(--border-radius-sm);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.dropdown-content a:hover {
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+}
+
+.dropdown-content.show {
+  display: block;
+}

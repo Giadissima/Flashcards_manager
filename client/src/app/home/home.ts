@@ -18,17 +18,19 @@ import { TopicService } from '../topic/topic.service';
   standalone: true,
   imports: [CommonModule, Toast, FormsModule, KatexRendererPipe],
   templateUrl: './home.html',
-  styleUrl: './home.scss'
+  styleUrl: './home.scss',
 })
 export class Home implements OnInit {
   flashcards: Flashcard[] = [];
   subjects: Subject[] = [];
   topics: Topic[] = [];
-  selectedSubjectId: string | null = null;
+  selectedSubjectId: string | null | undefined = null;
   selectedTopicId: string | null = null;
   searchTerm: string = '';
   sortBy: 'title' | 'createdAt' = 'title';
   sortDirection: 'asc' | 'desc' = 'asc';
+  // Variabile per gestire la visibilità della dropdown
+  isDropdownOpen = false;
 
   // mappa _id -> boolean (true = mostra risposta)
   showAnswerMap: Record<string, boolean> = {};
@@ -38,36 +40,42 @@ export class Home implements OnInit {
     private toast: ToastService,
     private router: Router,
     private subjectService: SubjectService,
-    private topicService: TopicService
+    private topicService: TopicService,
   ) {}
-// TODO mettere dei valori di default, non deve essere obbligatorio il filter né mettere tutti i parametri dentro filter
+  // TODO mettere dei valori di default, non deve essere obbligatorio il filter né mettere tutti i parametri dentro filter
   ngOnInit(): void {
-    this.subjectService.getAllSubjects({
-      sortField: '_id',
-      sortDirection: 'asc',
-      skip: 0,
-      limit: 50
-    }).then((data) => this.subjects = data.data);
+    this.subjectService
+      .getAllSubjects({
+        sortField: '_id',
+        sortDirection: 'asc',
+        skip: 0,
+        limit: 50,
+      })
+      .then((data) => (this.subjects = data.data));
 
-    this.topicService.getAllTopics({
-      sortField: '_id',
-      sortDirection: 'asc',
-      skip: 0,
-      limit: 50
-    }).then((data) => this.topics = data.data);
+    this.topicService
+      .getAllTopics({
+        sortField: '_id',
+        sortDirection: 'asc',
+        skip: 0,
+        limit: 50,
+      })
+      .then((data) => (this.topics = data.data));
     this.loadFlashcards();
   }
 
   loadFlashcards(): void {
-    this.flashcardsService.getAll({
-      sortField: this.sortBy,
-      sortDirection: this.sortDirection,
-      skip: 0,
-      limit: 50,
-      subject_id: this.selectedSubjectId || undefined,
-      topic_id: this.selectedTopicId || undefined,
-      title: this.searchTerm || undefined
-    }).then((data) => this.flashcards = data.data);
+    this.flashcardsService
+      .getAll({
+        sortField: this.sortBy,
+        sortDirection: this.sortDirection,
+        skip: 0,
+        limit: 50,
+        subject_id: this.selectedSubjectId || undefined,
+        topic_id: this.selectedTopicId || undefined,
+        title: this.searchTerm || undefined,
+      })
+      .then((data) => (this.flashcards = data.data));
   }
 
   onFilterChange(): void {
@@ -97,7 +105,11 @@ export class Home implements OnInit {
 
   getCardColor(card: Flashcard): string {
     // se topic_id è un oggetto Topic, usa il suo colore
-    if (card.topic_id && typeof card.topic_id !== 'string' && card.topic_id.color) {
+    if (
+      card.topic_id &&
+      typeof card.topic_id !== 'string' &&
+      card.topic_id.color
+    ) {
       return card.topic_id.color;
     }
     // fallback
@@ -106,7 +118,11 @@ export class Home implements OnInit {
 
   getCardBody(card: Flashcard): string {
     if (!card._id) return card.question;
-    return '<p>'+(this.showAnswerMap[card._id] ? card.answer : card.question)+'</p>';
+    return (
+      '<p>' +
+      (this.showAnswerMap[card._id] ? card.answer : card.question) +
+      '</p>'
+    );
   }
 
   // cambia da 'Vedi risposta' a 'Vedi domanda'
@@ -123,10 +139,10 @@ export class Home implements OnInit {
     if (!card._id) return;
     try {
       await this.flashcardsService.delete(card._id);
-      this.toast.show("Card succesfully deleted", 'success');
-      this.flashcards = this.flashcards.filter(c => c._id !== card._id);
+      this.toast.show('Card succesfully deleted', 'success');
+      this.flashcards = this.flashcards.filter((c) => c._id !== card._id);
     } catch (error: any) {
-      this.toast.show("Error", 'error');
+      this.toast.show('Error', 'error');
     }
   }
 
@@ -137,12 +153,15 @@ export class Home implements OnInit {
         limit: 50,
         sortField: 'name',
         sortDirection: 'asc',
-        subject_id: subjectId
+        subject_id: subjectId,
       });
       this.topics = response.data;
     } catch (err) {
       console.error('Error loading topics for subject ' + subjectId, err);
-      this.toast.show('Failed to load topics for the selected subject', 'error');
+      this.toast.show(
+        'Failed to load topics for the selected subject',
+        'error',
+      );
     }
   }
 
@@ -153,54 +172,72 @@ export class Home implements OnInit {
   }
 
   copyCard(card: Flashcard): void {
-  // 1. Prepariamo la stringa da copiare
-  const textToCopy = `${card.title}\nQuestion: ${card.question}\nAnswer: ${card.answer}`;
+    // 1. Prepariamo la stringa da copiare
+    const textToCopy = `${card.title}\nQuestion: ${card.question}\nAnswer: ${card.answer}`;
 
-  // 2. Proviamo la via moderna (Clipboard API)
-  // Controlliamo se esiste l'oggetto e se siamo in un contesto sicuro (HTTPS/Localhost)
-  if (navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard.writeText(textToCopy)
-      .then(() => {
-        alert('Card succesfully copied!');
-      })
-      .catch(err => {
-        // Se per qualche motivo l'API moderna fallisce, proviamo il fallback
-        this.executeFallbackCopy(textToCopy);
-      });
-  } else {
-    // 3. Se l'API moderna non esiste (es. rete privata HTTP), usiamo il fallback
-    this.executeFallbackCopy(textToCopy);
-  }
-}
-
-private executeFallbackCopy(text: string): void {
-  // Creiamo un elemento "invisibile" per contenere il testo
-  const textArea = document.createElement("textarea");
-  textArea.value = text;
-
-  // Lo posizioniamo fuori dallo schermo per non disturbare l'utente
-  textArea.style.position = "fixed";
-  textArea.style.left = "-9999px";
-  textArea.style.top = "0";
-  document.body.appendChild(textArea);
-
-  // Selezioniamo il contenuto
-  textArea.focus();
-  textArea.select();
-
-  try {
-    // Il vecchio comando in caso di url con http
-    const successful = document.execCommand('copy');
-    if (successful) {
-      alert('Card succesfully copied!');
+    // 2. Proviamo la via moderna (Clipboard API)
+    // Controlliamo se esiste l'oggetto e se siamo in un contesto sicuro (HTTPS/Localhost)
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard
+        .writeText(textToCopy)
+        .then(() => {
+          this.toast.show('Card copied successfully', 'success');
+        })
+        .catch((err) => {
+          // Se per qualche motivo l'API moderna fallisce, proviamo il fallback
+          this.executeFallbackCopy(textToCopy);
+        });
     } else {
-      console.error('ERR: Il comando copy ha restituito false');
+      // 3. Se l'API moderna non esiste (es. rete privata HTTP), usiamo il fallback
+      this.executeFallbackCopy(textToCopy);
     }
-  } catch (err) {
-    console.error('ERR: Errore durante il fallback di copia:', err);
   }
 
-  // Pulizia: rimuoviamo l'elemento creato
-  document.body.removeChild(textArea);
-}
+  private executeFallbackCopy(text: string): void {
+    // Creiamo un elemento "invisibile" per contenere il testo
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+
+    // Lo posizioniamo fuori dallo schermo per non disturbare l'utente
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-9999px';
+    textArea.style.top = '0';
+    document.body.appendChild(textArea);
+
+    // Selezioniamo il contenuto
+    textArea.focus();
+    textArea.select();
+
+    try {
+      // Il vecchio comando in caso di url con http
+      const successful = document.execCommand('copy');
+      if (successful) {
+        this.toast.show('Card copied successfully', 'success');
+      } else {
+        console.error('ERR: Il comando copy ha restituito false');
+        this.toast.show('Copy error', 'error');
+      }
+    } catch (err) {
+      console.error('ERR: Errore durante il fallback di copia:', err);
+      this.toast.show('Copy error', 'error');
+    }
+
+    // Pulizia: rimuoviamo l'elemento creato
+    document.body.removeChild(textArea);
+  }
+
+  selectSubject(id: string | undefined | null) {
+    this.selectedSubjectId = id;
+    this.isDropdownOpen = false;
+    this.onFilterChange(); //?
+  }
+
+  getSelectedSubjectName(): string | undefined {
+    // Trova il nome della materia corrispondente all'ID selezionato
+    return this.subjects.find((s) => s._id === this.selectedSubjectId)?.name;
+  }
+
+  toggleDropdown() {
+    this.isDropdownOpen = !this.isDropdownOpen;
+  }
 }

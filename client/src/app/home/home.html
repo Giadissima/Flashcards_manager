@@ -1,15 +1,26 @@
 <div class="container">
   <div class="filter-bar mb-4">
     <div class="row gy-2 gx-3 align-items-center">
+      <!-- TODO: per il futuro, aggiungere che le select hanno le option colorate come nella navbar. P.S. per farlo, dobbiamo cambiare la select e le option in un for di link, perché le option sono un elemento nativo non customizzabile. Inoltre va poi cambiata la logica nel .ts perché non si potrà più usare ngvalue. Ricordarsi anche che non si può usare lo stile della navbar puro, perché la navbar è un menù a scomparsa e non un menù normale -->
       <div class="col-auto">
-        <label for="subjectFilter" class="visually-hidden">Subject</label>
-        <select id="subjectFilter" class="form-select" [(ngModel)]="selectedSubjectId"
-          (ngModelChange)="onFilterChange()">
-          <option [ngValue]="null">All Subjects</option>
-          @for (subject of subjects; track subject._id) {
-          <option [ngValue]="subject._id">{{ subject.name }}</option>
-          }
-        </select>
+        <label class="visually-hidden">Subject</label>
+
+        <!-- Usiamo la stessa struttura della navbar per coerenza -->
+        <div class="dropdown">
+          <button class="form-select text-start" type="button" (click)="toggleDropdown()">
+            <!-- Mostriamo il nome della materia selezionata o un placeholder -->
+            {{ getSelectedSubjectName() || 'All Subjects' }}
+          </button>
+
+          <div class="dropdown-content" [class.show]="isDropdownOpen">
+            <a (click)="selectSubject(null)">All Subjects</a>
+            @for (subject of subjects; track subject._id) {
+            <a (click)="selectSubject(subject._id)">
+              {{ subject.name }}
+            </a>
+            }
+          </div>
+        </div>
       </div>
       <div class="col-auto">
         <label for="topicFilter" class="visually-hidden">Topic</label>
