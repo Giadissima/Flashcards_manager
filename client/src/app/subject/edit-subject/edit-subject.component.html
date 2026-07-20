@@ -12,7 +12,14 @@
       <textarea id="desc" formControlName="desc" class="form-control"></textarea>
     </div>
 
-    <!-- Icon editing is not implemented in this version -->
+    <div class="mb-3">
+      <label class="form-label">Current icon</label>
+      <div>
+        <img [src]="getIconUrl()" alt="current icon" class="current-icon mb-2">
+      </div>
+      <label for="icon" class="form-label">Replace icon</label>
+      <input type="file" id="icon" accept="image/*" (change)="onFileSelected($event)" class="form-control">
+    </div>
 
     <button type="submit" class="btn btn-primary">Save Changes</button>
   </form>

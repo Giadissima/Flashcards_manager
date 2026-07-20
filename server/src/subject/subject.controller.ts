@@ -65,8 +65,28 @@ export class SubjectController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSubjectDto: ModifySubjectDto) {
-    return this.subjectService.update(id, updateSubjectDto);
+  @UseInterceptors(FileInterceptor('icon'))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', example: 'Matematica' },
+        desc: { type: 'string', example: 'Materia scientifica di base' },
+        icon: {
+          type: 'string',
+          format: 'binary',
+          description: 'New image file for the subject icon (optional)',
+        },
+      },
+    },
+  })
+  update(
+    @Param('id') id: string,
+    @Body() updateSubjectDto: ModifySubjectDto,
+    @UploadedFile() icon?: Express.Multer.File,
+  ) {
+    return this.subjectService.update(id, updateSubjectDto, icon);
   }
 
   @ApiOperation({ description: 'Delete one subject from db' })

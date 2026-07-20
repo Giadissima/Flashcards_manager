@@ -69,16 +69,34 @@ export class SubjectService {
   async update(
     id: string,
     updateObj: ModifySubjectDto,
+    icon?: Express.Multer.File,
   ): Promise<void | NotFoundException> {
     if (!validateObjectIdParam(id))
       throw new BadRequestException('The id does not satisfy requirements');
 
+    const existing = await this.subjectModel.findById(id).exec();
+    if (!existing) {
+      throw new NotFoundException(`Subject with id ${id} not found`);
+    }
+
+    const newIconId = icon ? (await this.fileService.create([icon]))._id : undefined;
+    const previousIconId = existing.icon;
+
     const result = await this.subjectModel
-      .findByIdAndUpdate({ _id: id }, updateObj, { new: true })
+      .findByIdAndUpdate(
+        { _id: id },
+        { ...updateObj, ...(newIconId ? { icon: newIconId } : {}) },
+        { new: true },
+      )
       .exec();
 
     if (!result) {
-      throw new NotFoundException('Subject with id ${id} not found');
+      throw new NotFoundException(`Subject with id ${id} not found`);
+    }
+
+    // cancella la vecchia icona solo dopo che l'update è andato a buon fine
+    if (newIconId && previousIconId) {
+      await this.fileService.delete(previousIconId.toString());
     }
   }
 }

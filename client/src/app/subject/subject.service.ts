@@ -27,7 +27,7 @@ export class SubjectService {
     return this.restClient.post(this.baseUrl, subject);
   }
 
-  updateSubject(id: string, subject: Partial<Subject>): Promise<void> {
+  updateSubject(id: string, subject: FormData): Promise<void> {
     return this.restClient.patch(this.baseUrl + '/' + id, subject);
   }
 
