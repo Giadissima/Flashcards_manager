@@ -24,12 +24,13 @@
           <div class="col-md-6">
             <div class="input-group">
               <span class="input-group-text">Subject</span>
-              <select class="form-select" [(ngModel)]="selectedSubjectId" (ngModelChange)="onFilterChange()">
-                <option [ngValue]="null">All Subjects</option>
-                @for (subject of subjects; track subject._id) {
-                <option [value]="subject._id">{{ subject.name }}</option>
-                }
-              </select>
+              <app-searchable-select
+                [options]="subjectOptions"
+                [value]="selectedSubjectId"
+                allOptionLabel="All Subjects"
+                placeholder="All Subjects"
+                (valueChange)="onSubjectSelected($event)"
+              ></app-searchable-select>
             </div>
           </div>
 

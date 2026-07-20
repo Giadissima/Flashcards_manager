@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { SearchableSelectComponent, SelectOption } from '../../shared/searchable-select/searchable-select.component';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
 import { Toast } from '../../toast/toast';
@@ -13,7 +14,7 @@ import { TopicService } from '../topic.service';
 @Component({
   selector: 'app-manage-topics',
   standalone: true,
-  imports: [CommonModule, Toast, FormsModule],
+  imports: [CommonModule, Toast, FormsModule, SearchableSelectComponent],
   templateUrl: './manage-topics.component.html',
   styleUrls: ['./manage-topics.component.scss']
 })
@@ -22,6 +23,10 @@ export class ManageTopicsComponent implements OnInit {
   subjects: Subject[] = [];
   selectedSubjectId: string | null = null;
 // TODO far funzionare la search
+
+  get subjectOptions(): SelectOption[] {
+    return this.subjects.map((s) => ({ value: s._id!, label: s.name }));
+  }
   constructor(
     private topicService: TopicService,
     private router: Router,
@@ -46,6 +51,11 @@ export class ManageTopicsComponent implements OnInit {
 
   onFilterChange() {
     this.loadTopics();
+  }
+
+  onSubjectSelected(id: string | null | undefined): void {
+    this.selectedSubjectId = id ?? null;
+    this.onFilterChange();
   }
 
   async loadTopics(): Promise<void> {
@@ -90,20 +100,4 @@ export class ManageTopicsComponent implements OnInit {
       }
     }
   }
-
-  getLength(): number {
-    console.log(this.selectedSubjectId)
-  // 1. Cerchiamo l'oggetto materia che ha lo stesso _id di quello selezionato
-  const selectedSubject = this.subjects.find(s => s._id === this.selectedSubjectId);
-
-  // 2. Se abbiamo trovato la materia, restituiamo la lunghezza del suo nome
-  if (selectedSubject) {
-    // Aggiungiamo un piccolo "bonus" (+3 o +5) per dare respiro al testo 
-    // e non farlo sbattere contro la freccina
-    return selectedSubject.name.length + 5;
-  }
-
-  // 3. Valore di default se non c'è selezione o se è "All Subjects"
-  return 15; 
-}
 }
