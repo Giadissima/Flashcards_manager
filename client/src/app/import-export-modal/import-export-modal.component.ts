@@ -34,7 +34,7 @@ import { ToastService } from '../toast/toast.service';
               </div>
               <button class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2" (click)="onExport()" [disabled]="isLoading">
                 <span class="material-symbols-outlined">download</span>
-                Export to JSON
+                Export to ZIP
               </button>
             </section>
 
@@ -44,12 +44,12 @@ import { ToastService } from '../toast/toast.service';
             <section>
               <h6>Import</h6>
               <div class="mb-3">
-                <label for="importFile" class="form-label">Select JSON File</label>
-                <input type="file" id="importFile" class="form-control" (change)="onFileSelected($event)" accept=".json">
+                <label for="importFile" class="form-label">Select JSON or ZIP File</label>
+                <input type="file" id="importFile" class="form-control" (change)="onFileSelected($event)" accept=".json,.zip">
               </div>
               <button class="btn btn-success w-100 d-flex align-items-center justify-content-center gap-2" (click)="onImport()" [disabled]="isLoading || !selectedFile">
                 <span class="material-symbols-outlined">upload</span>
-                Import from JSON
+                Import
               </button>
             </section>
 
@@ -134,7 +134,7 @@ export class ImportExportModalComponent implements OnInit {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `flashcards_export_${new Date().toISOString().slice(0, 10)}.json`;
+      a.download = `flashcards_export_${new Date().toISOString().slice(0, 10)}.zip`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -158,8 +158,11 @@ export class ImportExportModalComponent implements OnInit {
     if (!this.selectedFile) return;
     this.isLoading = true;
     try {
-      await this.importExportService.import(this.selectedFile);
-      this.toastService.show('Import successful!', 'success');
+      const { imported, skipped } = await this.importExportService.import(this.selectedFile);
+      const message = skipped > 0
+        ? `Import completed: ${imported} added, ${skipped} duplicates skipped.`
+        : `Import successful! ${imported} flashcards added.`;
+      this.toastService.show(message, 'success');
       this.close();
     } catch (error) {
       this.toastService.show('Import failed', 'error');

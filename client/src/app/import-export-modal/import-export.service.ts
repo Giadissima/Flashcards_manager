@@ -26,7 +26,7 @@ export class ImportExportService {
    * Importa flashcard da un file JSON.
    * @param file Il file da caricare.
    */
-  import(file: File): Promise<void> {
+  import(file: File): Promise<{ imported: number; skipped: number }> {
     const formData = new FormData();
     formData.append('file', file);
     return this.restClient.post(this.baseUrl + '/upload-flashcards', formData);

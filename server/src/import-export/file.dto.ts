@@ -19,7 +19,11 @@ export interface TopicFileFormat {
 export interface SubjectFileFormat {
   _id: string;
   name: string;
-  icon: null; // TODO
+  icon: string | null;
+  // presenti solo negli export in zip: percorso dell'icona dentro l'archivio
+  // e il suo mimetype, usati dall'import per ricreare il file sul nuovo db
+  iconFileName?: string;
+  iconMimetype?: string;
   desc: string;
   __v: number;
 }

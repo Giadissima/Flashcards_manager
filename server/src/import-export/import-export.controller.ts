@@ -10,7 +10,6 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiQuery, ApiOperation } from '@nestjs/swagger';
 import { ImportExportService } from './import-export.service';
-import { Writable } from 'stream';
 import { Response } from 'express';
 
 @Controller('import-export')
@@ -36,17 +35,15 @@ export class ImportExportController {
   @UseInterceptors(FileInterceptor('file'))
   uploadFlashcardsJson(
     @UploadedFile() file: Express.Multer.File,
-  ): Promise<void> {
+  ): Promise<{ imported: number; skipped: number }> {
     return this.importService.importFlashcardsFromFile(file);
   }
 
   @ApiOperation({
-    description: 'it allows to upload a file contains topics on db',
+    description:
+      'exports flashcards (and the icons of their subjects) as a zip archive',
   })
   @Get('export-flashcards')
-  @ApiOperation({
-    description: 'it allows to upload a file contains topics on db',
-  })
   @ApiQuery({
     name: 'subject_id',
     required: false,
@@ -54,12 +51,12 @@ export class ImportExportController {
     description: 'L\'ID della materia per filtrare i risultati (opzionale)',
   })
   async exportFlashcards(@Res() res: Response, @Query('subject_id') subject_id?: string): Promise<void> {
-    const stream = await this.importService.exportFlashcardsToFileStream(subject_id);
-    res.setHeader('Content-Type', 'application/json');
+    const zipBuffer = await this.importService.exportFlashcardsAsZip(subject_id);
+    res.setHeader('Content-Type', 'application/zip');
     res.setHeader(
       'Content-Disposition',
-      'attachment; filename="flashcards.json"',
+      'attachment; filename="flashcards_export.zip"',
     );
-    stream.pipe(res as unknown as Writable);
+    res.send(zipBuffer);
   }
 }

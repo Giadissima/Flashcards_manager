@@ -2,6 +2,7 @@ import { Flashcard, FlashcardSchema } from 'src/flashcards/flashcards.schema';
 import { Topic, TopicSchema } from 'src/topic/topic.schema';
 import { Subject, SubjectSchema } from 'src/subject/subject.schema';
 
+import { FileModule } from 'src/file/file.module';
 import { ImportExportController } from './import-export.controller';
 import { ImportExportService } from './import-export.service';
 import { Module } from '@nestjs/common';
@@ -16,6 +17,7 @@ import { MongooseModule } from '@nestjs/mongoose';
       { name: Subject.name, schema: SubjectSchema },
       { name: Topic.name, schema: TopicSchema },
     ]),
+    FileModule,
   ],
 })
 export class ImportExportModule {}
