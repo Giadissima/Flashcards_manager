@@ -44,7 +44,7 @@
         <tbody>
           @for (subject of subjects; track subject._id) {
           <tr>
-            <td><img [src]="subject.icon || 'assets/logo3.png'" alt="icon" class="subject-icon"></td>
+            <td><img [src]="getIconUrl(subject)" alt="icon" class="subject-icon"></td>
             <td>{{ subject.name }}</td>
             <td>{{ subject.desc }}</td>
             <td>

@@ -6,6 +6,7 @@ import { Subject } from '../../models/subject.dto';
 import { SubjectService } from './../subject.service';
 import { Toast } from '../../toast/toast';
 import { ToastService } from '../../toast/toast.service';
+import { baseUrlAPI } from '../../../config/config';
 
 @Component({
   selector: 'app-manage-subjects',
@@ -39,6 +40,13 @@ export class ManageSubjectsComponent implements OnInit {
     } catch (error) {
       this.toastService.show('Failed to load subjects', 'error');
     }
+  }
+
+  // subject.icon è l'id del file salvato su Mongo (GridFS-like), non una URL:
+  // va risolto sull'endpoint che serve i byte del file, altrimenti il browser
+  // prova a caricare l'ObjectId come se fosse un'immagine e fallisce
+  getIconUrl(subject: Subject): string {
+    return subject.icon ? `${baseUrlAPI}file/${subject.icon}` : 'assets/logo3.png';
   }
 
   createSubject(): void {
