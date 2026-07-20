@@ -1,17 +1,18 @@
-import { CommonModule, DatePipe, NgClass } from '@angular/common';
+import { CommonModule, NgClass } from '@angular/common';
 
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Component } from '@angular/core';
 import { DurationExtendedFormatPipe } from '../../../pipes/duration.extended.pipe';
 import { Flashcard } from '../../models/flashcard.dto';
 import { FlashcardService } from '../../flashcard/flashcard.service';
+import { KatexRendererPipe } from '../../pipes/katex-renderer.pipe';
 import { Test } from '../../models/test.dto';
 import { TestService } from '../test.service';
 
 @Component({
   selector: 'app-test-result',
   standalone: true,
-  imports: [CommonModule,DurationExtendedFormatPipe, NgClass],
+  imports: [CommonModule, DurationExtendedFormatPipe, NgClass, KatexRendererPipe, RouterLink],
   templateUrl: './test-result.html',
   styleUrl: './test-result.scss'
 })
@@ -22,8 +23,10 @@ export class TestResult {
   elapsed_time = 0;
   createdAt?: Date;
   completedAt?: Date;
+  showOnlyWrong = false;
   questions: {
         id: string,
+        title: string,
         is_correct: string,
         question: string,
         answer: string
@@ -86,6 +89,7 @@ export class TestResult {
       else res = 'blank';
       return {
         id: flashcard?._id,
+        title: flashcard?.title ?? 'Titolo non disponibile',
         is_correct: res,
         question: flashcard?.question ?? 'Domanda non disponibile',
         answer: flashcard?.answer ?? 'Risposta non disponibile'
@@ -94,6 +98,14 @@ export class TestResult {
     })
   );
 }
- // TODO aggiungere con le pipe il completato at e creato at e il titolo delle card
- // TODO se ci sono troppe domande cambiare la visualizzazione del riepilogo delle domande, magari metterci solo quelle sbagliate di default e metterci una filter
+
+  get filteredQuestions() {
+    return this.showOnlyWrong
+      ? this.questions.filter((q) => q.is_correct === 'false')
+      : this.questions;
+  }
+
+  toggleShowOnlyWrong(): void {
+    this.showOnlyWrong = !this.showOnlyWrong;
+  }
 }

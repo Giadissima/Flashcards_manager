@@ -1,0 +1,67 @@
+<div class="container mt-4">
+  <div class="header d-flex justify-content-between align-items-center mb-4">
+    <h1>Storico Test</h1>
+    <a routerLink="/setup-test" class="btn btn-primary">Nuovo Test</a>
+  </div>
+
+  @if (stats && stats.totalTests > 0) {
+  <div class="stats-summary mb-4">
+    <div class="stat-item">
+      <span class="stat-value">{{ stats.totalTests }}</span>
+      <span class="stat-label">Test svolti</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-value">{{ stats.completedTests }}</span>
+      <span class="stat-label">Completati</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-value">{{ stats.averageScorePercent }}%</span>
+      <span class="stat-label">Media risposte corrette</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-value">{{ stats.totalTimeSpentSeconds | duration }}</span>
+      <span class="stat-label">Tempo totale di studio</span>
+    </div>
+  </div>
+  }
+
+  @if (tests.length === 0) {
+  <p>Nessun test svolto ancora.</p>
+  } @else {
+  <div class="test-list">
+    @for (test of tests; track test._id) {
+    <div class="card test-card">
+      <div class="test-card-main">
+        <div class="test-date">
+          {{ (test.completedAt ?? test.updatedAt ?? test.createdAt) | date:'medium' }}
+          @if (!test.completedAt) {
+          <span class="badge-in-progress">In corso</span>
+          }
+        </div>
+        <div class="test-score">
+          {{ getCorrectCount(test) }} / {{ test.questions.length }} corrette
+          @if (getWrongCount(test) > 0) {
+          <span class="wrong-count">({{ getWrongCount(test) }} errate)</span>
+          }
+        </div>
+        <div class="test-duration">{{ test.elapsed_time | duration }}</div>
+      </div>
+      <div class="test-card-actions">
+        @if (test.completedAt) {
+        <button type="button" class="btn btn-outline-primary" (click)="openTest(test)">Rivedi</button>
+        } @else {
+        <button type="button" class="btn btn-primary" (click)="resumeTest(test)">Continua</button>
+        <button type="button" class="btn btn-outline-danger" (click)="stopTest(test)">Termina</button>
+        }
+      </div>
+    </div>
+    }
+  </div>
+
+  <div class="d-flex justify-content-between align-items-center mt-4">
+    <button type="button" class="btn" (click)="previousPage()" [disabled]="currentPage === 1">Previous</button>
+    <span>Page {{ currentPage }} of {{ totalPages }}</span>
+    <button type="button" class="btn" (click)="nextPage()" [disabled]="currentPage >= totalPages">Next</button>
+  </div>
+  }
+</div>

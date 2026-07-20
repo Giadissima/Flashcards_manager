@@ -7,6 +7,7 @@ import { Flashcard } from '../../models/flashcard.dto';
 import { FlashcardService } from '../../flashcard/flashcard.service';
 import { RandomCardFIlter } from '../../models/http.dto';
 import { Router } from '@angular/router';
+import { SearchableSelectComponent, SelectOption } from '../../shared/searchable-select/searchable-select.component';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
 import { TestService } from '../test.service';
@@ -24,7 +25,7 @@ export function atLeastOneValidator(controls: string[]): ValidatorFn {
 @Component({
   selector: 'app-setup-test',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, SearchableSelectComponent],
   templateUrl: './setup-test.html',
   styleUrls: ['./setup-test.scss']
 })
@@ -33,6 +34,14 @@ export class SetupTest implements OnInit {
   subjects: Subject[] = [];
   topics: Topic[] = [];
   allTopics: Topic[] = [];
+
+  get subjectOptions(): SelectOption[] {
+    return this.subjects.map((s) => ({ value: s._id!, label: s.name }));
+  }
+
+  get topicOptions(): SelectOption[] {
+    return this.topics.map((t) => ({ value: t._id!, label: t.name }));
+  }
 
   constructor(
     private fb: FormBuilder,
@@ -45,7 +54,7 @@ export class SetupTest implements OnInit {
     this.testForm = this.fb.group({
       subject_id: [null],
       topic_id: [null],
-      numFlashcard: [10, [Validators.required, Validators.min(1)]]
+      numFlashcard: [10, [Validators.required, Validators.min(1), Validators.max(50)]]
     }, { validators: atLeastOneValidator(['subject_id', 'topic_id']) });
   }
 
@@ -67,6 +76,14 @@ export class SetupTest implements OnInit {
       }
       this.testForm.get('topic_id')?.setValue(null);
     });
+  }
+
+  onSubjectSelected(id: string | null | undefined): void {
+    this.testForm.get('subject_id')?.setValue(id ?? null);
+  }
+
+  onTopicSelected(id: string | null | undefined): void {
+    this.testForm.get('topic_id')?.setValue(id ?? null);
   }
 
   async startTest(): Promise<void> {

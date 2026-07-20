@@ -14,8 +14,7 @@ import { TestService } from './test.service';
 import { ApiNotFoundResponse, ApiOperation } from '@nestjs/swagger';
 import { BasePaginatedResult } from 'src/common.dto';
 import { TestDocument } from './test.schema';
-import { TestCreateRequest } from './test.dto';
-import { FlashcardFilterDTO } from 'src/flashcards/flashcards.dto';
+import { TestCreateRequest, TestFilterDto, TestStats } from './test.dto';
 
 @Controller('test')
 export class TestController {
@@ -34,9 +33,15 @@ export class TestController {
   @ApiOperation({ description: 'get all test from db with filters' })
   @Get('all')
   findAll(
-    @Query() filters: FlashcardFilterDTO,
+    @Query() filters: TestFilterDto,
   ): Promise<BasePaginatedResult<TestDocument>> {
     return this.testService.findAll(filters);
+  }
+
+  @ApiOperation({ description: 'get aggregate stats across all tests' })
+  @Get('stats')
+  getStats(): Promise<TestStats> {
+    return this.testService.getStats();
   }
 
   @ApiOperation({

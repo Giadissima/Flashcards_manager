@@ -4,16 +4,18 @@ import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule } from '@angular
 import { Subscription, interval } from 'rxjs';
 
 import { CommonModule } from '@angular/common';
+import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
 import { DurationPipe } from '../../../pipes/duration.pipe';
 import { Flashcard } from '../../models/flashcard.dto';
 import { FlashcardService } from '../../flashcard/flashcard.service';
+import { KatexRendererPipe } from '../../pipes/katex-renderer.pipe';
 import { Test } from '../../models/test.dto';
 import { TestService } from '../test.service';
 
 @Component({
   selector: 'app-test-runner',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, DurationPipe],
+  imports: [CommonModule, ReactiveFormsModule, DurationPipe, KatexRendererPipe, ConfirmDialogComponent],
   templateUrl: './test-runner.html',
   styleUrls: ['./test-runner.scss']
 })
@@ -29,6 +31,9 @@ export class TestRunner implements OnInit {
   elapsed_time: number = 0; // in secondi
   timerSub!: Subscription;
   private startTime = 0;
+
+  showLeaveConfirm = false;
+  private pendingDestination: string[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -138,5 +143,34 @@ export class TestRunner implements OnInit {
     this.test.elapsed_time = this.elapsed_time;
     this.testService.update(this.testId, this.test);
     this.router.navigate(['/test-result',this.testId],);
+  }
+
+  // Apre il dialog di conferma prima di uscire dal test senza concluderlo
+  requestPause(): void {
+    this.pendingDestination = ['/test-result'];
+    this.showLeaveConfirm = true;
+  }
+
+  requestGoHome(): void {
+    this.pendingDestination = ['/home'];
+    this.showLeaveConfirm = true;
+  }
+
+  cancelLeave(): void {
+    this.showLeaveConfirm = false;
+  }
+
+  // Salva la risposta corrente e il tempo trascorso, poi esce senza chiudere
+  // il test: rimane "in corso" e potrà essere ripreso in seguito (anche da un
+  // altro dispositivo, dato che lo stato vive sul server, non nel client).
+  async confirmLeave(): Promise<void> {
+    this.showLeaveConfirm = false;
+    await this.updateAnswer();
+    if (this.testId) {
+      await this.testService
+        .updateElapsedTime(this.testId, this.elapsed_time)
+        .catch(err => console.error('Errore salvataggio progressi', err));
+    }
+    this.router.navigate(this.pendingDestination);
   }
 }

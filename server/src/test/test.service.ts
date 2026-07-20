@@ -13,8 +13,7 @@ import {
 import { Flashcard } from 'src/flashcards/flashcards.schema';
 import { Test, TestDocument } from './test.schema';
 import { Model, SortOrder, Types } from 'mongoose';
-import { TestCreateRequest } from './test.dto';
-import { FlashcardFilterDTO } from 'src/flashcards/flashcards.dto';
+import { TestCreateRequest, TestFilterDto, TestStats } from './test.dto';
 import { FlashcardsService } from 'src/flashcards/flashcards.service';
 
 @Injectable()
@@ -76,7 +75,7 @@ export class TestService {
   }
 
   async findAll(
-    filter: FlashcardFilterDTO,
+    filter: TestFilterDto,
   ): Promise<BasePaginatedResult<TestDocument>> {
     const [data, count] = await Promise.all([
       this.testModel
@@ -91,6 +90,50 @@ export class TestService {
       this.testModel.find().countDocuments(),
     ]);
     return { data, count };
+  }
+
+  async getStats(): Promise<TestStats> {
+    const [result] = await this.testModel.aggregate([
+      {
+        $addFields: {
+          totalQuestions: { $size: '$questions' },
+          correctQuestions: {
+            $size: {
+              $filter: {
+                input: '$questions',
+                as: 'q',
+                cond: { $eq: ['$$q.is_correct', true] },
+              },
+            },
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalTests: { $sum: 1 },
+          completedTests: {
+            $sum: { $cond: [{ $ifNull: ['$completedAt', false] }, 1, 0] },
+          },
+          totalTimeSpentSeconds: { $sum: { $ifNull: ['$elapsed_time', 0] } },
+          totalQuestionsAnswered: { $sum: '$totalQuestions' },
+          totalCorrectAnswers: { $sum: '$correctQuestions' },
+        },
+      },
+    ]);
+
+    const totalQuestionsAnswered = result?.totalQuestionsAnswered ?? 0;
+    const totalCorrectAnswers = result?.totalCorrectAnswers ?? 0;
+
+    return {
+      totalTests: result?.totalTests ?? 0,
+      completedTests: result?.completedTests ?? 0,
+      totalTimeSpentSeconds: result?.totalTimeSpentSeconds ?? 0,
+      averageScorePercent:
+        totalQuestionsAnswered > 0
+          ? Math.round((totalCorrectAnswers / totalQuestionsAnswered) * 100)
+          : 0,
+    };
   }
 
   async findOne(id: string): Promise<TestDocument> {

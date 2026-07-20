@@ -9,6 +9,7 @@ import { ManageSubjectsComponent } from './subject/manage-subjects/manage-subjec
 import { ManageTopicsComponent } from './topic/manage-topics/manage-topics.component';
 import { Routes } from '@angular/router';
 import { SetupTest } from './test/setup-test/setup-test';
+import { TestHistory } from './test/test-history/test-history';
 import { TestResult } from './test/test-result/test-result';
 import { TestRunner } from './test/test-runner/test-runner';
 
@@ -19,6 +20,7 @@ export const routes: Routes = [
   { path: 'edit-card/:id', component: EditFlashcard },
   { path: 'setup-test', component: SetupTest },
   { path: 'test/:test_id', component: TestRunner },
+  { path: 'test-result', component: TestHistory },
   { path: 'test-result/:test_id', component: TestResult },
   { path: 'manage-topics', component: ManageTopicsComponent },
   { path: 'create-topic', component: CreateTopicComponent },

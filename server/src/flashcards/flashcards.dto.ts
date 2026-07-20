@@ -102,7 +102,7 @@ export class RandomFlashcardsDTO {
   @Type(() => Number)
   @IsInt()
   @Min(1)
-  @Max(30)
+  @Max(50, { message: 'Non puoi richiedere più di 50 domande in un singolo test.' })
   @ApiProperty({
     description: 'Number of flashcard requested',
     required: false,

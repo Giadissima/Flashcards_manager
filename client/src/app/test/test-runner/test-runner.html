@@ -10,7 +10,7 @@
             <h5 class="card-title">{{ flashcard.title }}</h5>
           </div>
           <div class="flashcard-body">
-            <p class="flashcard-text">{{ showAnswer ? flashcard.answer : flashcard.question }}</p>
+            <div class="flashcard-text" [innerHTML]="(showAnswer ? flashcard.answer : flashcard.question) | katexRenderer"></div>
             <div class="flashcard-actions">
               <button type="button" class="btn btn-primary" (click)="seeAnswer(flashcard)">
                 {{ getCardButtonText(flashcard) }}
@@ -37,10 +37,22 @@
           <button type="button" class="btn" (click)="loadNextFlashcard()" [disabled]="currentIndex === ((test?.questions?.length ?? 1) - 1)">Next</button>
         </div>
 
-        <div class="d-flex justify-content-center mt-4">
+        <div class="d-flex justify-content-center gap-2 mt-4">
+          <button type="button" class="btn btn-outline-primary" (click)="requestGoHome()">Torna alla Home</button>
+          <button type="button" class="btn btn-outline-secondary" (click)="requestPause()">Pause</button>
           <button type="submit" class="btn btn-primary" id="finishTest">End test</button>
         </div>
       </form>
     </div>
   </div>
 </div>
+
+<app-confirm-dialog
+  [isOpen]="showLeaveConfirm"
+  title="Uscire dal test?"
+  message="I tuoi progressi saranno salvati, vuoi continuare?"
+  confirmLabel="Sì"
+  cancelLabel="Annulla"
+  (confirmed)="confirmLeave()"
+  (cancelled)="cancelLeave()"
+></app-confirm-dialog>

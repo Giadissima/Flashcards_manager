@@ -4,7 +4,7 @@ import { PaginatedResponse, TestFilter } from '../models/http.dto';
 import { Flashcard } from '../models/flashcard.dto';
 import { Injectable } from '@angular/core';
 import { RestClientService } from '../api/rest-api.service';
-import { Test } from '../models/test.dto';
+import { Test, TestStats } from '../models/test.dto';
 import { baseUrlAPI } from '../../config/config';
 
 @Injectable({
@@ -26,6 +26,11 @@ private baseUrl = 'test';
   // Legge un singolo test
   getById(id: string): Promise<Test> {
     return this.restClient.get<Test>(this.baseUrl + '/' + id);
+  }
+
+  // Legge le statistiche aggregate su tutti i test
+  getStats(): Promise<TestStats> {
+    return this.restClient.get<TestStats>(this.baseUrl + '/stats');
   }
 
   updateElapsedTime(testId: string, elapsed_time: number): Promise<void> {
