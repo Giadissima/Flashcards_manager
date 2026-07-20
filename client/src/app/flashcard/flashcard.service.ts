@@ -41,7 +41,7 @@ export class FlashcardService {
   }
 
   // Modifica una flashcard
-  update(id: string, card: Flashcard): Promise<void> {
+  update(id: string, card: Omit<Flashcard, '_id'>): Promise<void> {
     return this.restClient.patch(this.baseUrl + '/' + id, card);
   }
 

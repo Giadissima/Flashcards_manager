@@ -122,8 +122,7 @@ export class EditFlashcard implements OnInit, OnDestroy {
 
     const { title, topic_id, subject_id } = this.editForm.value;
 
-    const card: Flashcard = {
-      _id: this.cardId,
+    const card: Omit<Flashcard, '_id'> = {
       topic_id,
       subject_id,
       title,
