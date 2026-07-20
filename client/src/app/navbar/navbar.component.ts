@@ -2,20 +2,34 @@ import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ImportExportModalComponent } from '../import-export-modal/import-export-modal.component';
+import { ClickOutsideDirective } from '../shared/click-outside.directive';
+
+type NavbarDropdown = 'topics' | 'subjects' | 'test';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterLink, CommonModule, ImportExportModalComponent],
+  imports: [RouterLink, CommonModule, ImportExportModalComponent, ClickOutsideDirective],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent implements OnInit {
   isDarkMode = false;
   isImportExportOpen = false;
+  openDropdown: NavbarDropdown | null = null;
 
   ngOnInit() {
     this.loadTheme();
+  }
+
+  toggleDropdown(name: NavbarDropdown): void {
+    this.openDropdown = this.openDropdown === name ? null : name;
+  }
+
+  closeDropdown(name: NavbarDropdown): void {
+    if (this.openDropdown === name) {
+      this.openDropdown = null;
+    }
   }
 
   toggleTheme() {

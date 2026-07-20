@@ -7,43 +7,43 @@
 
   <!-- Centro: Menu -->
   <div class="menu-container">
-    <div class="dropdown">
-      <span class="menu-item">
+    <div class="dropdown" (appClickOutside)="closeDropdown('topics')">
+      <span class="menu-item" (click)="toggleDropdown('topics')">
         Topics
         <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
           fill="currentColor">
           <path d="M480-360 280-560h400L480-360Z" />
         </svg>
       </span>
-      <div class="dropdown-content">
-        <a routerLink="/create-topic">Create Topic</a>
-        <a routerLink="/manage-topics">Manage Topics</a>
+      <div class="dropdown-content" [class.show]="openDropdown === 'topics'">
+        <a routerLink="/create-topic" (click)="closeDropdown('topics')">Create Topic</a>
+        <a routerLink="/manage-topics" (click)="closeDropdown('topics')">Manage Topics</a>
       </div>
     </div>
-    <div class="dropdown">
-      <span class="menu-item">
+    <div class="dropdown" (appClickOutside)="closeDropdown('subjects')">
+      <span class="menu-item" (click)="toggleDropdown('subjects')">
         Subjects
         <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
           fill="currentColor">
           <path d="M480-360 280-560h400L480-360Z" />
         </svg>
       </span>
-      <div class="dropdown-content">
-        <a routerLink="/create-subject">New Subject</a>
-        <a routerLink="/manage-subjects">Manage Subjects</a>
+      <div class="dropdown-content" [class.show]="openDropdown === 'subjects'">
+        <a routerLink="/create-subject" (click)="closeDropdown('subjects')">New Subject</a>
+        <a routerLink="/manage-subjects" (click)="closeDropdown('subjects')">Manage Subjects</a>
       </div>
     </div>
-    <div class="dropdown">
-      <span class="menu-item">
+    <div class="dropdown" (appClickOutside)="closeDropdown('test')">
+      <span class="menu-item" (click)="toggleDropdown('test')">
         Test
         <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
           fill="currentColor">
           <path d="M480-360 280-560h400L480-360Z" />
         </svg>
       </span>
-      <div class="dropdown-content">
-        <a routerLink="/setup-test">Start Test</a>
-        <a routerLink="/test-result">Results</a>
+      <div class="dropdown-content" [class.show]="openDropdown === 'test'">
+        <a routerLink="/setup-test" (click)="closeDropdown('test')">Start Test</a>
+        <a routerLink="/test-result" (click)="closeDropdown('test')">Results</a>
       </div>
     </div>
   </div>

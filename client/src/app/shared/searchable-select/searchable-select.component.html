@@ -1,0 +1,16 @@
+<div class="dropdown" (appClickOutside)="close()" (keydown)="onKeydown($event)">
+  <button class="form-select text-start" type="button" (click)="toggle()">
+    {{ selectedLabel }}
+  </button>
+
+  <div class="dropdown-content" [class.show]="isOpen" #dropdownContent>
+    @if (allOptionLabel) {
+    <a tabindex="-1" (click)="select(null)" (keydown.enter)="select(null)">{{ allOptionLabel }}</a>
+    }
+    @for (option of options; track option.value) {
+    <a tabindex="-1" (click)="select(option.value)" (keydown.enter)="select(option.value)">
+      {{ option.label }}
+    </a>
+    }
+  </div>
+</div>

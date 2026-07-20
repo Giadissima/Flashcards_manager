@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { SearchableSelectComponent, SelectOption } from '../shared/searchable-select/searchable-select.component';
 
 import { CommonModule } from '@angular/common';
 import { Flashcard } from '../models/flashcard.dto';
@@ -16,7 +17,7 @@ import { TopicService } from '../topic/topic.service';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, Toast, FormsModule, KatexRendererPipe],
+  imports: [CommonModule, Toast, FormsModule, KatexRendererPipe, SearchableSelectComponent],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
@@ -25,15 +26,26 @@ export class Home implements OnInit {
   subjects: Subject[] = [];
   topics: Topic[] = [];
   selectedSubjectId: string | null | undefined = null;
-  selectedTopicId: string | null = null;
+  selectedTopicId: string | null | undefined = null;
   searchTerm: string = '';
   sortBy: 'title' | 'createdAt' = 'title';
   sortDirection: 'asc' | 'desc' = 'asc';
-  // Variabile per gestire la visibilità della dropdown
-  isDropdownOpen = false;
+
+  // Paginazione
+  currentPage = 1;
+  pageSize = 21;
+  totalCount = 0;
 
   // mappa _id -> boolean (true = mostra risposta)
   showAnswerMap: Record<string, boolean> = {};
+
+  get subjectOptions(): SelectOption[] {
+    return this.subjects.map((s) => ({ value: s._id!, label: s.name }));
+  }
+
+  get topicOptions(): SelectOption[] {
+    return this.topics.map((t) => ({ value: t._id!, label: t.name }));
+  }
 
   constructor(
     private flashcardsService: FlashcardService,
@@ -46,7 +58,7 @@ export class Home implements OnInit {
   ngOnInit(): void {
     this.subjectService
       .getAllSubjects({
-        sortField: '_id',
+        sortField: 'name',
         sortDirection: 'asc',
         skip: 0,
         limit: 50,
@@ -55,7 +67,7 @@ export class Home implements OnInit {
 
     this.topicService
       .getAllTopics({
-        sortField: '_id',
+        sortField: 'name',
         sortDirection: 'asc',
         skip: 0,
         limit: 50,
@@ -69,13 +81,32 @@ export class Home implements OnInit {
       .getAll({
         sortField: this.sortBy,
         sortDirection: this.sortDirection,
-        skip: 0,
-        limit: 50,
+        skip: (this.currentPage - 1) * this.pageSize,
+        limit: this.pageSize,
         subject_id: this.selectedSubjectId || undefined,
         topic_id: this.selectedTopicId || undefined,
         title: this.searchTerm || undefined,
       })
-      .then((data) => (this.flashcards = data.data));
+      .then((data) => {
+        this.flashcards = data.data;
+        this.totalCount = data.count;
+      });
+  }
+
+  get totalPages(): number {
+    return Math.max(1, Math.ceil(this.totalCount / this.pageSize));
+  }
+
+  nextPage(): void {
+    if (this.currentPage >= this.totalPages) return;
+    this.currentPage++;
+    this.loadFlashcards();
+  }
+
+  previousPage(): void {
+    if (this.currentPage <= 1) return;
+    this.currentPage--;
+    this.loadFlashcards();
   }
 
   onFilterChange(): void {
@@ -86,10 +117,12 @@ export class Home implements OnInit {
     } else {
       this.topics = [];
     }
+    this.currentPage = 1;
     this.loadFlashcards();
   }
 
   onSearchTermChange(): void {
+    this.currentPage = 1;
     this.loadFlashcards();
   }
 
@@ -100,6 +133,7 @@ export class Home implements OnInit {
       this.sortBy = field;
       this.sortDirection = 'asc';
     }
+    this.currentPage = 1;
     this.loadFlashcards();
   }
 
@@ -226,18 +260,13 @@ export class Home implements OnInit {
     document.body.removeChild(textArea);
   }
 
-  selectSubject(id: string | undefined | null) {
+  onSubjectSelected(id: string | null | undefined): void {
     this.selectedSubjectId = id;
-    this.isDropdownOpen = false;
-    this.onFilterChange(); //?
+    this.onFilterChange();
   }
 
-  getSelectedSubjectName(): string | undefined {
-    // Trova il nome della materia corrispondente all'ID selezionato
-    return this.subjects.find((s) => s._id === this.selectedSubjectId)?.name;
-  }
-
-  toggleDropdown() {
-    this.isDropdownOpen = !this.isDropdownOpen;
+  onTopicSelected(id: string | null | undefined): void {
+    this.selectedTopicId = id;
+    this.onFilterChange();
   }
 }

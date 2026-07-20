@@ -11,6 +11,7 @@
   --sub-title-color: #344054af;
   --text-color: #667085;
   --component-background: #f8f9fa;
+  --on-primary-color: #000000;
 }
 
 [data-theme='dark'] {
@@ -23,6 +24,7 @@
   --sub-title-color: #f8f9faaf;
   --text-color: rgba(255, 255, 255, 0.7);
   --component-background: #1E1E1E;
+  --on-primary-color: #ffffff;
 }
 
 :root {
@@ -120,6 +122,13 @@ h6 {
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
+/* Riserva spazio per la freccina del dropdown, altrimenti il testo (se lungo)
+   ci finisce sotto: qui serve padding, non margin, perché la freccina è
+   un background-image dentro il padding-box, non fuori dal box */
+.form-select {
+  padding-right: calc(var(--spacing-unit) * 4.5);
+}
+
 .form-label {
   font-weight: 600;
   margin-bottom: var(--spacing-unit);
@@ -136,6 +145,18 @@ h6 {
 ::-ms-input-placeholder {
   /* Edge 12 -18 */
   color: var(--text-color) !important;
+}
+
+/* Impedisce a Chrome/Edge di forzare uno sfondo bianco quando si seleziona
+   un suggerimento dalla cronologia dell'input o in caso di autofill */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px var(--component-background) inset !important;
+  -webkit-text-fill-color: var(--text-color) !important;
+  caret-color: var(--text-color);
+  transition: background-color 5000s ease-in-out 0s;
 }
 
 /* Unified Focus State*/
@@ -196,7 +217,7 @@ h6 {
 /* Outline Button Refinement */
 .btn-outline-primary {
   /* Default State */
-  --bs-btn-color: var(--primary-color);
+  --bs-btn-color: var(--header-color);
   --bs-btn-border-color: var(--primary-color);
 
   /* Hover State */
@@ -207,7 +228,7 @@ h6 {
   /* Active State (When clicked or toggled) */
   --bs-btn-active-bg: var(--primary-color);
   --bs-btn-active-border-color: var(--primary-color);
-  --bs-btn-active-color: var(--component-background);
+  --bs-btn-active-color: var(--on-primary-color);
 }
 
 .btn-outline-primary:hover:not(:disabled) {
@@ -273,6 +294,7 @@ h6 {
 .search-icon{
   background-color: var(--secondary-color);
   border-right: 0px;
+  color: var(--header-color);
 }
 
 /* Contenitore per l'icona circolare nell'header */
@@ -305,12 +327,9 @@ h6 {
   border-radius: var(--border-radius-md);
   z-index: 10;
   white-space: nowrap;
-  margin-top: var(--spacing-unit);
   border: 1px solid var(--bs-btn-border-color);
-}
-
-.dropdown:hover .dropdown-content {
-  display: block;
+  max-height: 320px;
+  overflow-y: auto;
 }
 
 .dropdown-content a {
@@ -324,9 +343,11 @@ h6 {
   cursor: pointer;
 }
 
-.dropdown-content a:hover {
-  background-color: var(--secondary-color);
-  color: var(--text-color);
+.dropdown-content a:hover,
+.dropdown-content a:focus {
+  background-color: var(--primary-color);
+  color: var(--on-primary-color);
+  outline: none;
 }
 
 .dropdown-content.show {
