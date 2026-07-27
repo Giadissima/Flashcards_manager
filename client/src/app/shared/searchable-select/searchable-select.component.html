@@ -1,6 +1,11 @@
 <div class="dropdown" (appClickOutside)="close()" (keydown)="onKeydown($event)">
-  <button class="form-select text-start" type="button" (click)="toggle()">
-    {{ selectedLabel }}
+  <button class="form-select text-start d-flex align-items-center gap-2" type="button" (click)="toggle()">
+    @if (selectedOption?.iconUrl) {
+    <img [src]="selectedOption!.iconUrl" alt="" class="select-option-icon">
+    } @else if (selectedOption?.color) {
+    <span class="select-option-color" [style.background-color]="selectedOption!.color"></span>
+    }
+    <span class="text-truncate">{{ selectedLabel }}</span>
   </button>
 
   <div class="dropdown-content" [class.show]="isOpen" #dropdownContent>
@@ -8,8 +13,13 @@
     <a tabindex="-1" (click)="select(null)" (keydown.enter)="select(null)">{{ allOptionLabel }}</a>
     }
     @for (option of options; track option.value) {
-    <a tabindex="-1" (click)="select(option.value)" (keydown.enter)="select(option.value)">
-      {{ option.label }}
+    <a tabindex="-1" (click)="select(option.value)" (keydown.enter)="select(option.value)" class="d-flex align-items-center gap-2">
+      @if (option.iconUrl) {
+      <img [src]="option.iconUrl" alt="" class="select-option-icon">
+      } @else if (option.color) {
+      <span class="select-option-color" [style.background-color]="option.color"></span>
+      }
+      <span class="text-truncate">{{ option.label }}</span>
     </a>
     }
   </div>

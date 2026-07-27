@@ -6,6 +6,10 @@ import { ClickOutsideDirective } from '../click-outside.directive';
 export interface SelectOption {
   value: string;
   label: string;
+  iconUrl?: string;
+  // alternativa a iconUrl per opzioni senza immagine ma con un colore
+  // associato (es. i topic), mostrato come pallino invece dell'icona
+  color?: string;
 }
 
 /**
@@ -18,6 +22,7 @@ export interface SelectOption {
   standalone: true,
   imports: [CommonModule, ClickOutsideDirective],
   templateUrl: './searchable-select.component.html',
+  styleUrl: './searchable-select.component.scss',
 })
 export class SearchableSelectComponent {
   @Input() options: SelectOption[] = [];
@@ -36,8 +41,12 @@ export class SearchableSelectComponent {
   private typeaheadBuffer = '';
   private typeaheadTimeout?: ReturnType<typeof setTimeout>;
 
+  get selectedOption(): SelectOption | undefined {
+    return this.options.find((o) => o.value === this.value);
+  }
+
   get selectedLabel(): string {
-    return this.options.find((o) => o.value === this.value)?.label ?? this.placeholder;
+    return this.selectedOption?.label ?? this.placeholder;
   }
 
   toggle(): void {

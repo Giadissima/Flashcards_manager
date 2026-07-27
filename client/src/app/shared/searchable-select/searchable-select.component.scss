@@ -1,0 +1,48 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.dropdown {
+  width: 100%;
+}
+
+.form-select {
+  width: 100%;
+  text-align: left;
+}
+
+/* Il pannello segue sempre la larghezza del pulsante come minimo, ma può
+   allargarsi (fino a un max-width) quando icona+testo non ci stanno: in quel
+   caso resta centrato sul pulsante invece di sporgere solo a destra */
+.dropdown-content {
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 100%;
+  width: max-content;
+  max-width: 280px;
+  white-space: normal;
+}
+
+.dropdown-content a {
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.select-option-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: cover;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.select-option-color {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 1px solid var(--border-color);
+}
