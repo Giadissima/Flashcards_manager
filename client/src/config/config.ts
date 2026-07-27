@@ -8,3 +8,4 @@ export const questionMaxLength = 700;
 export const answerMaxLength = 1000;
 export const idLength = 24;
 export const nameMaxLength = 30;
+export const descMaxLength = 1000;

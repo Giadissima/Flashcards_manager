@@ -18,6 +18,7 @@ import {
 } from 'src/config';
 
 import { BasicFilterRequest } from 'src/common.dto';
+import { IsHtmlTextLength } from 'src/common/validators/html-text-length.validator';
 
 /** The Dto file contains the description of the client requests and the server's responses*/
 export class ModifyFlashcardDto {
@@ -27,12 +28,12 @@ export class ModifyFlashcardDto {
   title: string;
 
   @IsString()
-  @Length(charMinLength, questionMaxLength)
+  @IsHtmlTextLength(charMinLength, questionMaxLength)
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   question: string;
 
   @IsString()
-  @Length(charMinLength, answerMaxLength)
+  @IsHtmlTextLength(charMinLength, answerMaxLength)
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   answer: string;
 

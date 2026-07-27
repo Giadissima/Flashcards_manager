@@ -5,11 +5,37 @@
     <div class="mb-3">
       <label for="name" class="form-label">Name</label>
       <input type="text" id="name" formControlName="name" class="form-control">
+      <div *ngIf="subjectForm.get('name')?.errors?.['maxlength'] && subjectForm.get('name')?.touched" class="alert alert-danger mt-2">
+        Il nome può avere al massimo {{ nameMaxLength }} caratteri. Accorcialo un po'.
+      </div>
+      <div *ngIf="subjectForm.get('name')?.errors?.['minlength'] && subjectForm.get('name')?.touched" class="alert alert-danger mt-2">
+        Il nome deve avere almeno {{ charMinLength }} caratteri.
+      </div>
     </div>
 
     <div class="mb-3">
-      <label for="desc" class="form-label">Description</label>
-      <textarea id="desc" formControlName="desc" class="form-control"></textarea>
+      <label for="desc-editor" class="form-label">Description</label>
+      <div class="editor-toolbar">
+        <button (click)="descEditor.chain().focus().toggleBold().run()"
+          [class.btn-outline-secondary]="!descEditor.isActive('bold')"
+          [class.btn-secondary]="descEditor.isActive('bold')"
+          class="btn"
+          type="button"><i class="bi bi-type-bold"></i></button>
+        <button (click)="descEditor.chain().focus().toggleItalic().run()"
+          [class.btn-outline-secondary]="!descEditor.isActive('italic')"
+          [class.btn-secondary]="descEditor.isActive('italic')"
+          class="btn"
+          type="button"><i class="bi bi-type-italic"></i></button>
+        <button (click)="descEditor.chain().focus().toggleStrike().run()"
+          [class.btn-outline-secondary]="!descEditor.isActive('strike')"
+          [class.btn-secondary]="descEditor.isActive('strike')"
+          class="btn"
+          type="button"><i class="bi bi-type-strikethrough"></i></button>
+      </div>
+      <tiptap-editor [editor]="descEditor" class="editorCustom"></tiptap-editor>
+      <div *ngIf="descLength > descMaxLength" class="alert alert-danger mt-2">
+        La descrizione può avere al massimo {{ descMaxLength }} caratteri (attualmente {{ descLength }}). Accorciala un po'.
+      </div>
     </div>
 
     <div class="mb-3">
