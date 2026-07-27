@@ -147,6 +147,67 @@ h6 {
   color: var(--text-color) !important;
 }
 
+/* Il pulsante "Scegli file" è uno pseudo-elemento nativo del browser,
+   non viene toccato dalle regole generali su .form-control */
+.form-control[type='file']::file-selector-button,
+.form-control[type='file']::-webkit-file-upload-button {
+  background-color: var(--component-background);
+  color: var(--text-color);
+  border: none;
+  border-right: 1.4px solid var(--border-color);
+  padding: calc(var(--spacing-unit) * 1.25) calc(var(--spacing-unit) * 1.5);
+  margin: calc(var(--spacing-unit) * -1.25) calc(var(--spacing-unit) * -1.5);
+  margin-inline-end: calc(var(--spacing-unit) * 1.5);
+}
+
+/* Bootstrap ha una regola :hover:not(:disabled) più specifica della nostra,
+   quindi qui serve !important per vincere il conflitto in ogni ordine di caricamento */
+.form-control[type='file']:hover::file-selector-button,
+.form-control[type='file']:hover::-webkit-file-upload-button,
+.form-control[type='file']::file-selector-button:hover,
+.form-control[type='file']::-webkit-file-upload-button:hover {
+  background-color: var(--secondary-color) !important;
+  color: var(--header-color) !important;
+}
+
+/* L'icona della X di Bootstrap è un SVG a tratto nero fisso: sul tema scuro
+   va invertita per restare visibile (stessa tecnica di .btn-close-white) */
+[data-theme='dark'] .btn-close {
+  filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+/* Bootstrap disegna lo switch con un bordo quasi trasparente e il pallino
+   via background-image (SVG): qui si forza un bordo nero sempre visibile e
+   il pallino nero in light / bianco in dark per un contrasto leggibile */
+.form-switch .form-check-input {
+  width: 2.5em;
+  height: 1.25em;
+  background-color: var(--background-color);
+  border: 1.5px solid #000;
+  --bs-form-switch-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23000'/%3e%3c/svg%3e");
+}
+
+.form-switch .form-check-input:checked {
+  background-color: var(--primary-color);
+  border-color: #000;
+}
+
+/* Bootstrap ha una regola dedicata a :focus che ridefinisce --bs-form-switch-bg
+   in blu chiaro (#86b7fe) con specificità più alta della regola base sopra:
+   va sovrascritta esplicitamente qui, altrimenti il pallino torna blu appena
+   il campo ha il focus (cioè subito dopo il click) */
+.form-switch .form-check-input:focus {
+  --bs-form-switch-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23000'/%3e%3c/svg%3e") !important;
+  border-color: #000 !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+[data-theme='dark'] .form-switch .form-check-input,
+[data-theme='dark'] .form-switch .form-check-input:focus {
+  --bs-form-switch-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e") !important;
+}
+
 /* Impedisce a Chrome/Edge di forzare uno sfondo bianco quando si seleziona
    un suggerimento dalla cronologia dell'input o in caso di autofill */
 input:-webkit-autofill,
@@ -330,6 +391,25 @@ input:-webkit-autofill:active {
   border: 1px solid var(--bs-btn-border-color);
   max-height: 320px;
   overflow-y: auto;
+
+  /* Le variabili --component-background/--border-color cambiano già col
+     tema, quindi la scrollbar si adatta automaticamente senza bisogno di
+     una regola separata per il dark mode */
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) var(--component-background);
+}
+
+.dropdown-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dropdown-content::-webkit-scrollbar-track {
+  background-color: var(--component-background);
+}
+
+.dropdown-content::-webkit-scrollbar-thumb {
+  background-color: var(--border-color);
+  border-radius: var(--border-radius-sm);
 }
 
 .dropdown-content a {
