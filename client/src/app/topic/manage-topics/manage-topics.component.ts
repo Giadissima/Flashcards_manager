@@ -10,6 +10,7 @@ import { Toast } from '../../toast/toast';
 import { ToastService } from '../../toast/toast.service';
 import { Topic } from '../../models/topic.dto';
 import { TopicService } from '../topic.service';
+import { getSubjectIconUrl } from '../../subject/subject-icon.util';
 
 @Component({
   selector: 'app-manage-topics',
@@ -24,8 +25,12 @@ export class ManageTopicsComponent implements OnInit {
   selectedSubjectId: string | null = null;
 // TODO far funzionare la search
 
+  currentPage = 1;
+  pageSize = 10;
+  totalCount = 0;
+
   get subjectOptions(): SelectOption[] {
-    return this.subjects.map((s) => ({ value: s._id!, label: s.name }));
+    return this.subjects.map((s) => ({ value: s._id!, label: s.name, iconUrl: getSubjectIconUrl(s) }));
   }
   constructor(
     private topicService: TopicService,
@@ -50,6 +55,7 @@ export class ManageTopicsComponent implements OnInit {
   }
 
   onFilterChange() {
+    this.currentPage = 1;
     this.loadTopics();
   }
 
@@ -61,16 +67,33 @@ export class ManageTopicsComponent implements OnInit {
   async loadTopics(): Promise<void> {
     try {
       const response = await this.topicService.getAllTopics({
-        limit: 50,
-        skip: 0,
+        limit: this.pageSize,
+        skip: (this.currentPage - 1) * this.pageSize,
         sortDirection: 'asc',
         sortField: 'name',
         subject_id: this.selectedSubjectId || undefined
       });
       this.topics = response.data;
+      this.totalCount = response.count;
     } catch (error) {
       this.toastService.show('Failed to load topics', 'error');
     }
+  }
+
+  get totalPages(): number {
+    return Math.max(1, Math.ceil(this.totalCount / this.pageSize));
+  }
+
+  nextPage(): void {
+    if (this.currentPage >= this.totalPages) return;
+    this.currentPage++;
+    this.loadTopics();
+  }
+
+  previousPage(): void {
+    if (this.currentPage <= 1) return;
+    this.currentPage--;
+    this.loadTopics();
   }
 
   getSubjectName(subjectId: any): string {
@@ -93,7 +116,9 @@ export class ManageTopicsComponent implements OnInit {
     if (confirm('Are you sure you want to delete this topic?')) {
       try {
         await this.topicService.deleteTopic(id);
-        this.topics = this.topics.filter(t => t._id !== id);
+        // ricarica invece di filtrare in locale: skip/limit sono legati al
+        // server, altrimenti la pagina mostrerebbe un elemento in meno del dovuto
+        await this.loadTopics();
         this.toastService.show('Topic deleted successfully', 'success');
       } catch (error) {
         this.toastService.show('Failed to delete topic', 'error');

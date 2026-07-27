@@ -14,6 +14,7 @@ import { TestService } from '../test.service';
 import { ToastService } from '../../toast/toast.service';
 import { Topic } from '../../models/topic.dto';
 import { TopicService } from '../../topic/topic.service';
+import { getSubjectIconUrl } from '../../subject/subject-icon.util';
 
 export function atLeastOneValidator(controls: string[]): ValidatorFn {
   return (group: AbstractControl): ValidationErrors | null => {
@@ -36,11 +37,11 @@ export class SetupTest implements OnInit {
   allTopics: Topic[] = [];
 
   get subjectOptions(): SelectOption[] {
-    return this.subjects.map((s) => ({ value: s._id!, label: s.name }));
+    return this.subjects.map((s) => ({ value: s._id!, label: s.name, iconUrl: getSubjectIconUrl(s) }));
   }
 
   get topicOptions(): SelectOption[] {
-    return this.topics.map((t) => ({ value: t._id!, label: t.name }));
+    return this.topics.map((t) => ({ value: t._id!, label: t.name, color: t.color }));
   }
 
   constructor(
@@ -84,6 +85,14 @@ export class SetupTest implements OnInit {
 
   onTopicSelected(id: string | null | undefined): void {
     this.testForm.get('topic_id')?.setValue(id ?? null);
+
+    // Seleziona in automatico la materia del topic scelto, senza emettere l'evento:
+    // altrimenti la subscription su subject_id rifiltrerebbe i topic e azzererebbe questa stessa selezione
+    const topic = this.allTopics.find(t => t._id === id);
+    const subjectId = (topic?.subject_id as Subject | undefined)?._id;
+    if (subjectId) {
+      this.testForm.get('subject_id')?.setValue(subjectId, { emitEvent: false });
+    }
   }
 
   async startTest(): Promise<void> {
