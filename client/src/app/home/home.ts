@@ -13,6 +13,7 @@ import { Toast } from '../toast/toast';
 import { ToastService } from '../toast/toast.service';
 import { Topic } from '../models/topic.dto';
 import { TopicService } from '../topic/topic.service';
+import { getSubjectIconUrl } from '../subject/subject-icon.util';
 
 @Component({
   selector: 'app-home',
@@ -40,11 +41,11 @@ export class Home implements OnInit {
   showAnswerMap: Record<string, boolean> = {};
 
   get subjectOptions(): SelectOption[] {
-    return this.subjects.map((s) => ({ value: s._id!, label: s.name }));
+    return this.subjects.map((s) => ({ value: s._id!, label: s.name, iconUrl: getSubjectIconUrl(s) }));
   }
 
   get topicOptions(): SelectOption[] {
-    return this.topics.map((t) => ({ value: t._id!, label: t.name }));
+    return this.topics.map((t) => ({ value: t._id!, label: t.name, color: t.color }));
   }
 
   constructor(
@@ -148,6 +149,19 @@ export class Home implements OnInit {
     }
     // fallback
     return 'blue';
+  }
+
+  getCardSubjectIconUrl(card: Flashcard): string {
+    // subject_id è quasi sempre popolato direttamente sulla flashcard (sia da
+    // create-flashcard che dall'import), ma in caso contrario si risolve
+    // comunque tramite la lista già caricata per il filtro
+    let subject: Subject | undefined;
+    if (card.subject_id && typeof card.subject_id !== 'string') {
+      subject = card.subject_id;
+    } else if (typeof card.subject_id === 'string') {
+      subject = this.subjects.find((s) => s._id === card.subject_id);
+    }
+    return getSubjectIconUrl(subject);
   }
 
   getCardBody(card: Flashcard): string {

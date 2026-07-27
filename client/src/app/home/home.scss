@@ -23,3 +23,11 @@
 .filter-bar{
   box-shadow: var(--box-shadow-sm);
 }
+
+.flashcard-subject-icon {
+  width: 28px;
+  height: 28px;
+  object-fit: cover;
+  border-radius: 50%;
+  flex-shrink: 0;
+}

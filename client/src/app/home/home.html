@@ -79,8 +79,9 @@
   <div class="flashcard-grid">
     @for (card of flashcards; track card._id) {
     <div class="card flashcard flashcard-topic-color" [style.border-top-color]="getCardColor(card)">
-      <div class="flashcard-title">
-        <h5 class="card-title">{{ card.title }}</h5>
+      <div class="flashcard-title d-flex align-items-center gap-2">
+        <img [src]="getCardSubjectIconUrl(card)" alt="" class="flashcard-subject-icon">
+        <h5 class="card-title mb-0">{{ card.title }}</h5>
       </div>
       <div class="flashcard-body">
         <div class="flashcard-text" [innerHTML]="getCardBody(card) | katexRenderer"></div>

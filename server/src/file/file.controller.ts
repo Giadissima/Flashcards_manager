@@ -22,6 +22,9 @@ export class FileController {
       'Content-Type': fileDoc.mimetype,
       'Content-Length': content.length,
       'Content-Disposition': `inline; filename="${fileDoc._id}"`,
+      // ogni edit crea un nuovo file con un nuovo id (vedi SubjectService.update),
+      // quindi il contenuto dietro a questo id non cambierà mai: cache permanente
+      'Cache-Control': 'public, max-age=31536000, immutable',
     });
 
     stream.pipe(res);
