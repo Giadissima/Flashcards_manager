@@ -46,7 +46,18 @@
           <tr>
             <td><img [src]="getIconUrl(subject)" alt="icon" class="subject-icon"></td>
             <td>{{ subject.name }}</td>
-            <td>{{ subject.desc }}</td>
+            <td>
+              @if (hasDescription(subject)) {
+              <button type="button" class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1" (click)="toggleDescription(subject._id)">
+                <span class="material-symbols-outlined">
+                  {{ isDescriptionExpanded(subject._id) ? 'expand_less' : 'expand_more' }}
+                </span>
+                Description
+              </button>
+              } @else {
+              <span class="text-body-secondary fst-italic">No description</span>
+              }
+            </td>
             <td>
               <button class="btn btn-outline-danger mx-1" (click)="editSubject(subject._id)">
                 <span class="material-symbols-outlined">
@@ -60,9 +71,22 @@
               </button>
             </td>
           </tr>
+          @if (isDescriptionExpanded(subject._id)) {
+          <tr>
+            <td colspan="4">
+              <div class="subject-description" [innerHTML]="subject.desc"></div>
+            </td>
+          </tr>
+          }
           }
         </tbody>
       </table>
+
+      <div class="d-flex justify-content-between align-items-center mt-4">
+        <button type="button" class="btn" (click)="previousPage()" [disabled]="currentPage === 1">Previous</button>
+        <span>Page {{ currentPage }} of {{ totalPages }}</span>
+        <button type="button" class="btn" (click)="nextPage()" [disabled]="currentPage >= totalPages">Next</button>
+      </div>
     </div>
     </div>
     <app-toast></app-toast>

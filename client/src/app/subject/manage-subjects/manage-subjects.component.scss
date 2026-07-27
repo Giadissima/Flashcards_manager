@@ -4,3 +4,9 @@
   border-radius: 50%;
   object-fit: cover;
 }
+
+.subject-description {
+  padding: calc(var(--spacing-unit) * 1.5);
+  background-color: var(--background-color);
+  border-radius: var(--border-radius-md);
+}
