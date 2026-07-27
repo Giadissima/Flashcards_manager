@@ -1,22 +1,28 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { ImportExportService } from './import-export.service';
 import { Subject } from '../models/subject.dto';
 import { SubjectService } from '../subject/subject.service';
 import { ToastService } from '../toast/toast.service';
+import { SearchableSelectComponent, SelectOption } from '../shared/searchable-select/searchable-select.component';
+import { getSubjectIconUrl } from '../subject/subject-icon.util';
 
 @Component({
   selector: 'app-import-export-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, SearchableSelectComponent],
   template: `
     <div class="modal fade" [class.show]="isOpen" [style.display]="isOpen ? 'block' : 'none'" tabindex="-1" role="dialog">
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">Import / Export Flashcards</h5>
+            <div class="d-flex align-items-center gap-2">
+              <button type="button" class="icon-btn" (click)="goBack()" aria-label="Back to settings">
+                <span class="material-symbols-outlined">arrow_back</span>
+              </button>
+              <h5 class="modal-title mb-0">Import / Export Flashcards</h5>
+            </div>
             <button type="button" class="btn-close" (click)="close()"></button>
           </div>
           <div class="modal-body">
@@ -24,13 +30,14 @@ import { ToastService } from '../toast/toast.service';
             <section class="mb-4">
               <h6>Export</h6>
               <div class="mb-3">
-                <label for="subjectSelect" class="form-label">Filter by Subject (Optional)</label>
-                <select id="subjectSelect" class="form-select" [(ngModel)]="selectedSubjectId">
-                  <option [ngValue]="null">All Subjects</option>
-                  @for (subject of subjects; track subject._id) {
-                    <option [ngValue]="subject._id">{{ subject.name }}</option>
-                  }
-                </select>
+                <label class="form-label">Filter by Subject (Optional)</label>
+                <app-searchable-select
+                  [options]="subjectOptions"
+                  [value]="selectedSubjectId"
+                  allOptionLabel="All Subjects"
+                  placeholder="All Subjects"
+                  (valueChange)="selectedSubjectId = $event ?? null"
+                ></app-searchable-select>
               </div>
               <button class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2" (click)="onExport()" [disabled]="isLoading">
                 <span class="material-symbols-outlined">download</span>
@@ -87,16 +94,35 @@ import { ToastService } from '../toast/toast.service';
       border: none;
       box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     }
+    .icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--header-color);
+    }
+    .icon-btn:hover {
+      background-color: var(--secondary-color);
+    }
   `]
 })
 export class ImportExportModalComponent implements OnInit {
   @Input() isOpen = false;
   @Output() isOpenChange = new EventEmitter<boolean>();
+  @Output() back = new EventEmitter<void>();
 
   subjects: Subject[] = [];
   selectedSubjectId: string | null = null;
   selectedFile: File | null = null;
   isLoading = false;
+
+  get subjectOptions(): SelectOption[] {
+    return this.subjects.map((s) => ({ value: s._id!, label: s.name, iconUrl: getSubjectIconUrl(s) }));
+  }
 
   constructor(
     private importExportService: ImportExportService,
@@ -125,6 +151,12 @@ export class ImportExportModalComponent implements OnInit {
   close() {
     this.isOpen = false;
     this.isOpenChange.emit(false);
+  }
+
+  goBack() {
+    this.isOpen = false;
+    this.isOpenChange.emit(false);
+    this.back.emit();
   }
 
   async onExport() {

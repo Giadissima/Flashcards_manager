@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ImportExportModalComponent } from '../import-export-modal/import-export-modal.component';
+import { SettingsModalComponent } from '../settings-modal/settings-modal.component';
 import { ClickOutsideDirective } from '../shared/click-outside.directive';
 
 type NavbarDropdown = 'topics' | 'subjects' | 'test';
@@ -9,18 +10,14 @@ type NavbarDropdown = 'topics' | 'subjects' | 'test';
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterLink, CommonModule, ImportExportModalComponent, ClickOutsideDirective],
+  imports: [RouterLink, CommonModule, ImportExportModalComponent, SettingsModalComponent, ClickOutsideDirective],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss']
 })
-export class NavbarComponent implements OnInit {
-  isDarkMode = false;
+export class NavbarComponent {
+  isSettingsOpen = false;
   isImportExportOpen = false;
   openDropdown: NavbarDropdown | null = null;
-
-  ngOnInit() {
-    this.loadTheme();
-  }
 
   toggleDropdown(name: NavbarDropdown): void {
     this.openDropdown = this.openDropdown === name ? null : name;
@@ -32,25 +29,17 @@ export class NavbarComponent implements OnInit {
     }
   }
 
-  toggleTheme() {
-    this.isDarkMode = !this.isDarkMode;
-    const theme = this.isDarkMode ? 'dark' : 'light';
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
+  openSettings(): void {
+    this.isSettingsOpen = true;
   }
 
-  toggleImportExport() {
-    this.isImportExportOpen = !this.isImportExportOpen;
+  onOpenImportExportFromSettings(): void {
+    this.isSettingsOpen = false;
+    this.isImportExportOpen = true;
   }
 
-  private loadTheme() {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) {
-      this.isDarkMode = savedTheme === 'dark';
-    } else {
-      this.isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    }
-    const theme = this.isDarkMode ? 'dark' : 'light';
-    document.documentElement.setAttribute('data-theme', theme);
+  onImportExportBack(): void {
+    this.isImportExportOpen = false;
+    this.isSettingsOpen = true;
   }
 }
