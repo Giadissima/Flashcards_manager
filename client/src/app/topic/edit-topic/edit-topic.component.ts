@@ -8,11 +8,12 @@ import { SubjectService } from '../../subject/subject.service';
 import { Subject } from '../../models/subject.dto';
 
 import { Toast } from '../../toast/toast';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-edit-topic',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, Toast],
+  imports: [ReactiveFormsModule, CommonModule, Toast, TranslocoModule],
   templateUrl: './edit-topic.component.html',
   styleUrls: ['./edit-topic.component.scss']
 })
@@ -27,7 +28,8 @@ export class EditTopicComponent implements OnInit {
     private topicService: TopicService,
     private router: Router,
     private toastService: ToastService,
-    private subjectService: SubjectService
+    private subjectService: SubjectService,
+    private transloco: TranslocoService
   ) { }
 
   ngOnInit(): void {
@@ -53,7 +55,7 @@ export class EditTopicComponent implements OnInit {
       this.subjects = response.data;
     } catch (err) {
       console.error('Error loading subjects', err);
-      this.toastService.show('Failed to load subjects', 'error');
+      this.toastService.show(this.transloco.translate('topic.toast.subjectsLoadError'), 'error');
     }
   }
 
@@ -67,7 +69,7 @@ export class EditTopicComponent implements OnInit {
         subject_id: typeof topic.subject_id === 'string' ? '' : topic.subject_id._id
       });
     } catch (error) {
-      this.toastService.show('Failed to load topic data', 'error');
+      this.toastService.show(this.transloco.translate('topic.toast.loadError'), 'error');
     }
   }
 
@@ -78,10 +80,10 @@ export class EditTopicComponent implements OnInit {
     }
     try {
       await this.topicService.updateTopic(this.topicId, this.editForm.value);
-      this.toastService.show('Topic updated successfully', 'success');
+      this.toastService.show(this.transloco.translate('topic.toast.updated'), 'success');
       this.router.navigate(['/manage-topics']);
     } catch (error) {
-      this.toastService.show('Failed to update topic', 'error');
+      this.toastService.show(this.transloco.translate('topic.toast.updateError'), 'error');
     }
   }
 }

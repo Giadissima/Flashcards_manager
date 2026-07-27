@@ -1,4 +1,4 @@
-<div class="container md">
+<div class="container md" *transloco="let t">
   <div class="card">
     <div class="card-header p-4 d-flex justify-content-between align-items-center">
       <div class="d-flex align-items-center">
@@ -8,19 +8,19 @@
           </span>
         </div>
         <div>
-          <h2 class="card-title">Manage Subjects</h2>
-          <h6 class="card-subtitle mb-2 text-body-secondary">Organizza le materie che stai studiando</h6>
+          <h2 class="card-title">{{ 'subject.manage.title' | transloco }}</h2>
+          <h6 class="card-subtitle mb-2 text-body-secondary">{{ 'subject.manage.subtitle' | transloco }}</h6>
         </div>
       </div>
       <button class="btn btn-primary d-flex align-items-center gap-2" (click)="createSubject()">
-        <span>+</span> New Subject
+        <span>+</span> {{ 'subject.manage.newSubjectButton' | transloco }}
       </button>
     </div>
     <div class="card-body">
       <div class="filter-bar mb-4 align-items-center">
         <div class="col-md-4">
           <div class="input-group">
-            <input type="text" id="searchFilter" class="form-control" placeholder="Search subjects...">
+            <input type="text" id="searchFilter" class="form-control" [placeholder]="t('subject.manage.searchPlaceholder')">
             <span class="input-group-text search-icon">
               <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px"
                 fill="currentColor">
@@ -35,10 +35,10 @@
       <table class="table mt-3">
         <thead>
           <tr>
-            <th>Icon</th>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Actions</th>
+            <th>{{ 'common.icon' | transloco }}</th>
+            <th>{{ 'common.name' | transloco }}</th>
+            <th>{{ 'subject.manage.tableDescription' | transloco }}</th>
+            <th>{{ 'common.actions' | transloco }}</th>
           </tr>
         </thead>
         <tbody>
@@ -52,10 +52,10 @@
                 <span class="material-symbols-outlined">
                   {{ isDescriptionExpanded(subject._id) ? 'expand_less' : 'expand_more' }}
                 </span>
-                Description
+                {{ 'subject.manage.tableDescription' | transloco }}
               </button>
               } @else {
-              <span class="text-body-secondary fst-italic">No description</span>
+              <span class="text-body-secondary fst-italic">{{ 'subject.manage.noDescription' | transloco }}</span>
               }
             </td>
             <td>
@@ -83,9 +83,9 @@
       </table>
 
       <div class="d-flex justify-content-between align-items-center mt-4">
-        <button type="button" class="btn" (click)="previousPage()" [disabled]="currentPage === 1">Previous</button>
-        <span>Page {{ currentPage }} of {{ totalPages }}</span>
-        <button type="button" class="btn" (click)="nextPage()" [disabled]="currentPage >= totalPages">Next</button>
+        <button type="button" class="btn" (click)="previousPage()" [disabled]="currentPage === 1">{{ 'common.previous' | transloco }}</button>
+        <span>{{ 'common.pageOf' | transloco:{ current: currentPage, total: totalPages } }}</span>
+        <button type="button" class="btn" (click)="nextPage()" [disabled]="currentPage >= totalPages">{{ 'common.next' | transloco }}</button>
       </div>
     </div>
     </div>

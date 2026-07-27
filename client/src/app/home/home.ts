@@ -13,12 +13,13 @@ import { Toast } from '../toast/toast';
 import { ToastService } from '../toast/toast.service';
 import { Topic } from '../models/topic.dto';
 import { TopicService } from '../topic/topic.service';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { getSubjectIconUrl } from '../subject/subject-icon.util';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, Toast, FormsModule, KatexRendererPipe, SearchableSelectComponent],
+  imports: [CommonModule, Toast, FormsModule, KatexRendererPipe, SearchableSelectComponent, TranslocoModule],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
@@ -54,6 +55,7 @@ export class Home implements OnInit {
     private router: Router,
     private subjectService: SubjectService,
     private topicService: TopicService,
+    private transloco: TranslocoService,
   ) {}
   // TODO mettere dei valori di default, non deve essere obbligatorio il filter né mettere tutti i parametri dentro filter
   ngOnInit(): void {
@@ -175,7 +177,7 @@ export class Home implements OnInit {
 
   // cambia da 'Vedi risposta' a 'Vedi domanda'
   getCardButtonText(card: Flashcard): string {
-    return this.showAnswerMap[card._id] ? 'Vedi domanda' : 'Vedi risposta';
+    return this.transloco.translate(this.showAnswerMap[card._id] ? 'home.seeQuestion' : 'home.seeAnswer');
   }
 
   seeAnswer(card: Flashcard): void {
@@ -187,10 +189,10 @@ export class Home implements OnInit {
     if (!card._id) return;
     try {
       await this.flashcardsService.delete(card._id);
-      this.toast.show('Card succesfully deleted', 'success');
+      this.toast.show(this.transloco.translate('home.toast.cardDeleted'), 'success');
       this.flashcards = this.flashcards.filter((c) => c._id !== card._id);
     } catch (error: any) {
-      this.toast.show('Error', 'error');
+      this.toast.show(this.transloco.translate('home.toast.deleteError'), 'error');
     }
   }
 
@@ -207,7 +209,7 @@ export class Home implements OnInit {
     } catch (err) {
       console.error('Error loading topics for subject ' + subjectId, err);
       this.toast.show(
-        'Failed to load topics for the selected subject',
+        this.transloco.translate('home.toast.topicsLoadError'),
         'error',
       );
     }
@@ -229,7 +231,7 @@ export class Home implements OnInit {
       navigator.clipboard
         .writeText(textToCopy)
         .then(() => {
-          this.toast.show('Card copied successfully', 'success');
+          this.toast.show(this.transloco.translate('home.toast.cardCopied'), 'success');
         })
         .catch((err) => {
           // Se per qualche motivo l'API moderna fallisce, proviamo il fallback
@@ -260,14 +262,14 @@ export class Home implements OnInit {
       // Il vecchio comando in caso di url con http
       const successful = document.execCommand('copy');
       if (successful) {
-        this.toast.show('Card copied successfully', 'success');
+        this.toast.show(this.transloco.translate('home.toast.cardCopied'), 'success');
       } else {
         console.error('ERR: Il comando copy ha restituito false');
-        this.toast.show('Copy error', 'error');
+        this.toast.show(this.transloco.translate('home.toast.copyError'), 'error');
       }
     } catch (err) {
       console.error('ERR: Errore durante il fallback di copia:', err);
-      this.toast.show('Copy error', 'error');
+      this.toast.show(this.transloco.translate('home.toast.copyError'), 'error');
     }
 
     // Pulizia: rimuoviamo l'elemento creato

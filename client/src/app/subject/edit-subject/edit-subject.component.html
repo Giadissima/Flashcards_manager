@@ -1,20 +1,20 @@
 <div class="container mt-4">
-  <h1>Edit Subject</h1>
+  <h1>{{ 'subject.edit.title' | transloco }}</h1>
 
   <form [formGroup]="editForm" (ngSubmit)="updateSubject()">
     <div class="mb-3">
-      <label for="name" class="form-label">Name</label>
+      <label for="name" class="form-label">{{ 'common.name' | transloco }}</label>
       <input type="text" id="name" formControlName="name" class="form-control">
       <div *ngIf="editForm.get('name')?.errors?.['maxlength'] && editForm.get('name')?.touched" class="alert alert-danger mt-2">
-        Il nome può avere al massimo {{ nameMaxLength }} caratteri. Accorcialo un po'.
+        {{ 'subject.create.nameMaxError' | transloco:{ max: nameMaxLength } }}
       </div>
       <div *ngIf="editForm.get('name')?.errors?.['minlength'] && editForm.get('name')?.touched" class="alert alert-danger mt-2">
-        Il nome deve avere almeno {{ charMinLength }} caratteri.
+        {{ 'subject.create.nameMinError' | transloco:{ min: charMinLength } }}
       </div>
     </div>
 
     <div class="mb-3">
-      <label for="desc-editor" class="form-label">Description</label>
+      <label for="desc-editor" class="form-label">{{ 'common.description' | transloco }}</label>
       <div class="editor-toolbar">
         <button (click)="descEditor.chain().focus().toggleBold().run()"
           [class.btn-outline-secondary]="!descEditor.isActive('bold')"
@@ -34,20 +34,20 @@
       </div>
       <tiptap-editor [editor]="descEditor" class="editorCustom"></tiptap-editor>
       <div *ngIf="descLength > descMaxLength" class="alert alert-danger mt-2">
-        La descrizione può avere al massimo {{ descMaxLength }} caratteri (attualmente {{ descLength }}). Accorciala un po'.
+        {{ 'subject.create.descMaxError' | transloco:{ max: descMaxLength, current: descLength } }}
       </div>
     </div>
 
     <div class="mb-3">
-      <label class="form-label">Current icon</label>
+      <label class="form-label">{{ 'subject.edit.currentIcon' | transloco }}</label>
       <div>
         <img [src]="getIconUrl()" alt="current icon" class="current-icon mb-2">
       </div>
-      <label for="icon" class="form-label">Replace icon</label>
+      <label for="icon" class="form-label">{{ 'subject.edit.replaceIcon' | transloco }}</label>
       <input type="file" id="icon" accept="image/*" (change)="onFileSelected($event)" class="form-control">
     </div>
 
-    <button type="submit" class="btn btn-primary">Save Changes</button>
+    <button type="submit" class="btn btn-primary">{{ 'subject.edit.saveChanges' | transloco }}</button>
   </form>
 </div>
 <app-toast></app-toast>

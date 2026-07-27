@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { TranslocoModule } from '@jsverse/transloco';
 import { ImportExportModalComponent } from '../import-export-modal/import-export-modal.component';
 import { SettingsModalComponent } from '../settings-modal/settings-modal.component';
 import { ClickOutsideDirective } from '../shared/click-outside.directive';
@@ -10,7 +11,7 @@ type NavbarDropdown = 'topics' | 'subjects' | 'test';
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterLink, CommonModule, ImportExportModalComponent, SettingsModalComponent, ClickOutsideDirective],
+  imports: [RouterLink, CommonModule, ImportExportModalComponent, SettingsModalComponent, ClickOutsideDirective, TranslocoModule],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss']
 })

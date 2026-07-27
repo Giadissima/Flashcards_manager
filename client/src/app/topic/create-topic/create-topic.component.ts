@@ -8,11 +8,12 @@ import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
 import { Toast } from '../../toast/toast';
 import { ToastService } from '../../toast/toast.service';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-create-topic',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, Toast],
+  imports: [CommonModule, ReactiveFormsModule, Toast, TranslocoModule],
   templateUrl: './create-topic.component.html',
   styleUrls: ['./create-topic.component.scss']
 })
@@ -25,7 +26,8 @@ export class CreateTopicComponent implements OnInit {
     private router: Router,
     private topicService: TopicService,
     private toastService: ToastService,
-    private subjectService: SubjectService
+    private subjectService: SubjectService,
+    private transloco: TranslocoService
   ) {}
 
   ngOnInit(): void {
@@ -45,10 +47,10 @@ export class CreateTopicComponent implements OnInit {
 
     try {
       await this.topicService.createTopic(this.topicForm.value);
-      this.toastService.show('Topic created successfully', 'success');
+      this.toastService.show(this.transloco.translate('topic.toast.created'), 'success');
       this.router.navigate(['/manage-topics']);
     } catch (error) {
-      this.toastService.show('Failed to create topic', 'error');
+      this.toastService.show(this.transloco.translate('topic.toast.createError'), 'error');
     }
   }
 
@@ -63,7 +65,7 @@ export class CreateTopicComponent implements OnInit {
       this.subjects = response.data;
     } catch (err) {
       console.error('Error loading subjects', err);
-      this.toastService.show('Failed to load subjects', 'error');
+      this.toastService.show(this.transloco.translate('topic.toast.subjectsLoadError'), 'error');
     }
   }
 }

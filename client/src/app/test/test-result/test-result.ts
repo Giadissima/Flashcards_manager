@@ -8,11 +8,12 @@ import { FlashcardService } from '../../flashcard/flashcard.service';
 import { KatexRendererPipe } from '../../pipes/katex-renderer.pipe';
 import { Test } from '../../models/test.dto';
 import { TestService } from '../test.service';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-test-result',
   standalone: true,
-  imports: [CommonModule, DurationExtendedFormatPipe, NgClass, KatexRendererPipe, RouterLink],
+  imports: [CommonModule, DurationExtendedFormatPipe, NgClass, KatexRendererPipe, RouterLink, TranslocoModule],
   templateUrl: './test-result.html',
   styleUrl: './test-result.scss'
 })
@@ -35,7 +36,8 @@ export class TestResult {
   constructor(
     private route: ActivatedRoute,
     private testService: TestService,
-    private flashcardService: FlashcardService
+    private flashcardService: FlashcardService,
+    private transloco: TranslocoService
   ){}
 
   ngOnInit(): void {
@@ -45,7 +47,7 @@ export class TestResult {
           this.testId = id;
           this.viewTest();
         }else {
-          alert("non è stato possibile prendere il test");
+          alert(this.transloco.translate('test.result.getTestError'));
         }
       });
     }
@@ -55,7 +57,7 @@ export class TestResult {
     if(!this.testId) return;
     this.test = await this.testService.getById(this.testId);
     if(!this.test) {
-      alert("error getting test");
+      alert(this.transloco.translate('test.result.getTestError'));
       return;
     }
 
@@ -89,10 +91,10 @@ export class TestResult {
       else res = 'blank';
       return {
         id: flashcard?._id,
-        title: flashcard?.title ?? 'Titolo non disponibile',
+        title: flashcard?.title ?? this.transloco.translate('test.result.titleNotAvailable'),
         is_correct: res,
-        question: flashcard?.question ?? 'Domanda non disponibile',
-        answer: flashcard?.answer ?? 'Risposta non disponibile'
+        question: flashcard?.question ?? this.transloco.translate('test.result.questionNotAvailable'),
+        answer: flashcard?.answer ?? this.transloco.translate('test.result.answerNotAvailable')
 
       };
     })

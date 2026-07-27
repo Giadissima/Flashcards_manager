@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { SearchableSelectComponent, SelectOption } from '../shared/searchable-select/searchable-select.component';
 
 export type AppLanguage = 'it' | 'en';
@@ -8,13 +9,13 @@ export type AppLanguage = 'it' | 'en';
 @Component({
   selector: 'app-settings-modal',
   standalone: true,
-  imports: [CommonModule, SearchableSelectComponent],
+  imports: [CommonModule, SearchableSelectComponent, TranslocoModule],
   template: `
     <div class="modal fade" [class.show]="isOpen" [style.display]="isOpen ? 'block' : 'none'" tabindex="-1" role="dialog">
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">Impostazioni</h5>
+            <h5 class="modal-title">{{ 'settings.title' | transloco }}</h5>
             <button type="button" class="btn-close" (click)="cancel()"></button>
           </div>
           <div class="modal-body">
@@ -22,7 +23,7 @@ export type AppLanguage = 'it' | 'en';
             <div class="settings-section">
               <div class="settings-section-title">
                 <span class="material-symbols-outlined">language</span>
-                Lingua
+                {{ 'settings.language' | transloco }}
               </div>
               <app-searchable-select
                 [options]="languageOptions"
@@ -34,32 +35,32 @@ export type AppLanguage = 'it' | 'en';
             <div class="settings-section">
               <div class="settings-section-title">
                 <span class="material-symbols-outlined">dark_mode</span>
-                Modalità Scura
+                {{ 'settings.darkMode' | transloco }}
               </div>
               <div class="d-flex align-items-center gap-2">
                 <div class="form-check form-switch mb-0">
                   <input class="form-check-input" type="checkbox" role="switch" id="darkModeSwitch"
                     [checked]="isDarkMode" (change)="toggleTheme()">
                 </div>
-                <span class="settings-section-desc">Attiva o disattiva il tema scuro</span>
+                <span class="settings-section-desc">{{ 'settings.darkModeDesc' | transloco }}</span>
               </div>
             </div>
 
             <div class="settings-section">
               <div class="settings-section-title">
                 <span class="material-symbols-outlined">compare_arrows</span>
-                Import / Export
+                {{ 'settings.importExport' | transloco }}
               </div>
               <button class="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-2" (click)="openImportExport.emit()">
                 <span class="material-symbols-outlined">upload_file</span>
-                Importa / Esporta Flashcard
+                {{ 'settings.importExportButton' | transloco }}
               </button>
             </div>
 
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-outline-secondary" (click)="cancel()">Annulla</button>
-            <button type="button" class="btn btn-primary" (click)="save()">Salva Modifiche</button>
+            <button type="button" class="btn btn-outline-secondary" (click)="cancel()">{{ 'settings.cancel' | transloco }}</button>
+            <button type="button" class="btn btn-primary" (click)="save()">{{ 'settings.save' | transloco }}</button>
           </div>
         </div>
       </div>
@@ -121,6 +122,8 @@ export class SettingsModalComponent implements OnInit, OnChanges {
   private originalDarkMode = false;
   private originalLanguage: AppLanguage = 'it';
 
+  constructor(private transloco: TranslocoService) {}
+
   ngOnInit(): void {
     this.loadTheme();
     this.loadLanguage();
@@ -144,6 +147,7 @@ export class SettingsModalComponent implements OnInit, OnChanges {
     this.isDarkMode = this.originalDarkMode;
     this.language = this.originalLanguage;
     document.documentElement.setAttribute('data-theme', this.isDarkMode ? 'dark' : 'light');
+    this.transloco.setActiveLang(this.originalLanguage);
     this.closeModal();
   }
 
@@ -156,6 +160,7 @@ export class SettingsModalComponent implements OnInit, OnChanges {
 
   setLanguage(value: string | null | undefined): void {
     this.language = value === 'en' ? 'en' : 'it';
+    this.transloco.setActiveLang(this.language);
   }
 
   private closeModal(): void {
@@ -174,7 +179,6 @@ export class SettingsModalComponent implements OnInit, OnChanges {
   }
 
   private loadLanguage(): void {
-    const saved = localStorage.getItem('language');
-    this.language = saved === 'en' ? 'en' : 'it';
+    this.language = this.transloco.getActiveLang() === 'en' ? 'en' : 'it';
   }
 }

@@ -1,35 +1,35 @@
-<div class="container-md">
+<div class="container-md" *transloco="let t">
   <div class="card">
     <div class="card-header">
-      <h1 class="text-center">Edit Flashcard</h1>
+      <h1 class="text-center">{{ 'flashcard.edit.title' | transloco }}</h1>
     </div>
     <div class="card-body">
 
       <form [formGroup]="editForm" (ngSubmit)="updateCard()" novalidate> <!-- TODO informarsi sul no validate -->
         <div class="form-group">
-          <label for="title" class="form-label">Title</label>
+          <label for="title" class="form-label">{{ 'flashcard.create.titleLabel' | transloco }}</label>
           <input type="text" formControlName="title" class="form-control"
             [class.is-invalid]="editForm.get('title')?.invalid && editForm.get('title')?.touched">
           @if(editForm.get('title')?.hasError('minlength')){
           <div class="invalid-feedback">
-            Title should have min 2 characters.
+            {{ 'flashcard.create.titleMinError' | transloco }}
           </div>
           } @else {
           @if(editForm.get('title')?.hasError('maxlength')){
           <div class="invalid-feedback">
-            Title's max characters reached.
+            {{ 'flashcard.create.titleMaxError' | transloco }}
           </div>
           }
           @else {
           @if(editForm.get('title')?.touched){
-          <div class="invalid-feedback">Please insert a title.</div>
+          <div class="invalid-feedback">{{ 'flashcard.create.titleRequiredError' | transloco }}</div>
           }
           }
           }
         </div>
 
         <div class="form-group">
-          <label for="question-editor" class="form-label">Question</label>
+          <label for="question-editor" class="form-label">{{ 'flashcard.create.questionLabel' | transloco }}</label>
           <div class="editor-toolbar">
             <button (click)="questionEditor.chain().focus().toggleBold().run()"
               [class.btn-outline-secondary]="!questionEditor.isActive('bold')"
@@ -49,17 +49,17 @@
             <button 
               (click)="questionEditor.commands.insertContent('$')"
               class="btn btn-outline-secondary"
-              type="button"><i class="bi bi-calculator-fill"></i>Inline equation</button>
-            <button 
+              type="button"><i class="bi bi-calculator-fill"></i>{{ 'flashcard.create.inlineEquation' | transloco }}</button>
+            <button
               (click)="questionEditor.commands.insertContent('$$')"
               class="btn btn-outline-secondary"
-              type="button"><i class="bi bi-calculator-fill"></i>Outline equation</button>
+              type="button"><i class="bi bi-calculator-fill"></i>{{ 'flashcard.create.outlineEquation' | transloco }}</button>
           </div>
           <tiptap-editor [editor]="questionEditor" class="editorCustom"></tiptap-editor>
         </div>
 
         <div class="form-group">
-          <label for="answer-editor" class="form-label">Answer</label>
+          <label for="answer-editor" class="form-label">{{ 'flashcard.create.answerLabel' | transloco }}</label>
           <div class="editor-toolbar">
             <button (click)="answerEditor.chain().focus().toggleBold().run()"
               [class.btn-outline-secondary]="!answerEditor.isActive('bold')"
@@ -76,23 +76,23 @@
               [class.btn-secondary]="answerEditor.isActive('strike')"
               class="btn"
               type="button"><i class="bi bi-type-strikethrough"></i></button>
-            <button 
+            <button
               (click)="answerEditor.commands.insertContent('$')"
               class="btn btn-outline-secondary"
-              type="button"><i class="bi bi-calculator-fill"></i>Inline equation</button>
-            <button 
+              type="button"><i class="bi bi-calculator-fill"></i>{{ 'flashcard.create.inlineEquation' | transloco }}</button>
+            <button
               (click)="answerEditor.commands.insertContent('$$')"
               class="btn btn-outline-secondary"
-              type="button"><i class="bi bi-calculator-fill"></i>Outline equation</button>
+              type="button"><i class="bi bi-calculator-fill"></i>{{ 'flashcard.create.outlineEquation' | transloco }}</button>
           </div>
           <tiptap-editor [editor]="answerEditor" class="editorCustom"></tiptap-editor>
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label for="subject" class="form-label">Subject</label>
+            <label for="subject" class="form-label">{{ 'flashcard.create.subjectLabel' | transloco }}</label>
             <select id="subject" formControlName="subject_id" class="form-select">
-              <option value="" disabled>Choose a subject</option>
+              <option value="" disabled>{{ 'common.chooseSubject' | transloco }}</option>
               @for (s of subjects; track s._id) {
               <option [value]="s._id">{{ s.name }}</option>
               }
@@ -100,9 +100,9 @@
           </div>
 
           <div class="form-group">
-            <label for="topic" class="form-label">Topic</label>
+            <label for="topic" class="form-label">{{ 'flashcard.create.topicLabel' | transloco }}</label>
             <select id="topic" formControlName="topic_id" class="form-select">
-              <option value="" disabled>Choose a topic</option>
+              <option value="" disabled>{{ 'common.chooseTopic' | transloco }}</option>
               @for (t of topics; track t._id) {
               <option [value]="t._id">{{ t.name }}</option>
               }
@@ -111,7 +111,7 @@
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="btn btn-primary" [disabled]="editForm.invalid">Save changes</button>
+          <button type="submit" class="btn btn-primary" [disabled]="editForm.invalid">{{ 'flashcard.edit.saveChanges' | transloco }}</button>
         </div>
       </form>
     </div>

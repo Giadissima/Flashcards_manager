@@ -12,6 +12,7 @@ import { Toast } from "../../toast/toast";
 import { ToastService } from '../../toast/toast.service';
 import { Topic } from '../../models/topic.dto';
 import { TopicService } from '../../topic/topic.service';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { charMinLength, titleMaxLength } from '../../../config/config';
 
 @Component({
@@ -21,7 +22,8 @@ import { charMinLength, titleMaxLength } from '../../../config/config';
     CommonModule,
     ReactiveFormsModule,
     Toast,
-    TiptapEditorDirective
+    TiptapEditorDirective,
+    TranslocoModule
   ],
   templateUrl: './create-flashcard.html',
   styleUrls: ['./create-flashcard.scss']
@@ -39,7 +41,8 @@ export class CreateFlashcard implements OnInit, OnDestroy {
     private flashcardService: FlashcardService,
     private toastService: ToastService,
     private topicService: TopicService,
-    private subjectService: SubjectService
+    private subjectService: SubjectService,
+    private transloco: TranslocoService
   ) {
     this.questionEditor = new Editor({
       extensions: [StarterKit, MathExtension.configure({ evaluation: false })],
@@ -86,7 +89,7 @@ export class CreateFlashcard implements OnInit, OnDestroy {
       this.cardForm.get('topic_id')?.enable();
     } catch (err) {
       console.error('Error loading topics for subject ' + subjectId, err);
-      this.toastService.show('Failed to load topics for the selected subject', 'error');
+      this.toastService.show(this.transloco.translate('flashcard.toast.topicsLoadError'), 'error');
     }
   }
 
@@ -101,7 +104,7 @@ export class CreateFlashcard implements OnInit, OnDestroy {
       this.subjects = response.data;
     } catch (err) {
       console.error('Error loading subjects', err);
-      this.toastService.show('Failed to load subjects', 'error');
+      this.toastService.show(this.transloco.translate('flashcard.toast.subjectsLoadError'), 'error');
     }
   }
 
@@ -125,13 +128,13 @@ export class CreateFlashcard implements OnInit, OnDestroy {
 
     try {
       await this.flashcardService.create(newCard);
-      this.toastService.show("Card successfully added", 'success')
+      this.toastService.show(this.transloco.translate('flashcard.toast.cardAdded'), 'success')
       this.cardForm.reset();
       this.questionEditor.commands.clearContent();
       this.answerEditor.commands.clearContent();
     } catch (err: any) {
       console.error(err);
-      this.toastService.show("Error", 'error')
+      this.toastService.show(this.transloco.translate('flashcard.toast.addError'), 'error')
     }
   }
 }

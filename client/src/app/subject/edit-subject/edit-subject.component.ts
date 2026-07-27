@@ -11,12 +11,13 @@ import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../subject.service';
 import { Toast } from '../../toast/toast';
 import { ToastService } from '../../toast/toast.service';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { baseUrlAPI, charMinLength, nameMaxLength, descMaxLength } from '../../../config/config';
 
 @Component({
   selector: 'app-edit-subject',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, Toast, TiptapEditorDirective],
+  imports: [CommonModule, ReactiveFormsModule, Toast, TiptapEditorDirective, TranslocoModule],
   templateUrl: './edit-subject.component.html',
   styleUrls: ['./edit-subject.component.scss']
 })
@@ -37,7 +38,8 @@ export class EditSubjectComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private subjectService: SubjectService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private transloco: TranslocoService
   ) {
     this.descEditor = new Editor({
       extensions: [StarterKit, MathExtension.configure({ evaluation: false })],
@@ -72,7 +74,7 @@ export class EditSubjectComponent implements OnInit, OnDestroy {
       this.descEditor.commands.setContent(this.subject.desc ?? '');
       this.descLength = this.descEditor.getText().length;
     } catch (error) {
-      this.toastService.show('Failed to load subject data', 'error');
+      this.toastService.show(this.transloco.translate('subject.toast.loadOneError'), 'error');
     }
   }
 
@@ -105,10 +107,10 @@ export class EditSubjectComponent implements OnInit, OnDestroy {
 
     try {
       await this.subjectService.updateSubject(this.subjectId, formData);
-      this.toastService.show('Subject updated successfully', 'success');
+      this.toastService.show(this.transloco.translate('subject.toast.updated'), 'success');
       this.router.navigate(['/manage-subjects']);
     } catch (error) {
-      this.toastService.show('Failed to update subject', 'error');
+      this.toastService.show(this.transloco.translate('subject.toast.updateError'), 'error');
     }
   }
 }

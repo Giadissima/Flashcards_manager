@@ -1,18 +1,18 @@
-<div class="container mt-4">
+<div class="container mt-4" *transloco="let t">
 
   <!-- Header -->
   <div class="header">
     <div>
-      <h1>Risultati del Test</h1>
+      <h1>{{ 'test.result.title' | transloco }}</h1>
       @if (completedAt || createdAt) {
       <p class="test-meta">
-        {{ completedAt ? 'Completato' : 'Iniziato' }} il {{ (completedAt ?? createdAt) | date:'medium' }}
+        {{ completedAt ? t('test.result.completed') : t('test.result.started') }} {{ t('test.result.onDate') }} {{ (completedAt ?? createdAt) | date:'medium' }}
       </p>
       }
     </div>
     <a routerLink="/" class="btn btn-primary">
       <i class="fas fa-home"></i>
-      Torna alla Home
+      {{ 'test.result.backHome' | transloco }}
     </a>
   </div>
 
@@ -25,7 +25,7 @@
         {{ stats.correct }} <span>/ {{ test.questions.length }}</span>
       </div>
       <div class="percentage">
-        {{ (stats.correct / test.questions.length) * 100 | number:'1.0-0' }}% di risposte corrette
+        {{ (stats.correct / test.questions.length) * 100 | number:'1.0-0' }}% {{ 'test.result.correctPercent' | transloco }}
       </div>
       <div class="progress-bar">
         <div class="progress-bar-inner" [style.width.%]="(stats.correct / test.questions.length) * 100"></div>
@@ -36,7 +36,7 @@
     <div class="card stat-card stat-card--correct">
       <div class="icon"><i class="fas fa-check"></i></div>
       <div class="details">
-        <h4>Corrette</h4>
+        <h4>{{ 'test.result.correct' | transloco }}</h4>
         <p>{{ stats.correct }}</p>
       </div>
     </div>
@@ -45,7 +45,7 @@
     <div class="card stat-card stat-card--wrong">
       <div class="icon"><i class="fas fa-times"></i></div>
       <div class="details">
-        <h4>Errate</h4>
+        <h4>{{ 'test.result.wrong' | transloco }}</h4>
         <p>{{ stats.wrong }}</p>
       </div>
     </div>
@@ -54,7 +54,7 @@
     <div class="card stat-card stat-card--blank">
       <div class="icon"><i class="fas fa-minus"></i></div>
       <div class="details">
-        <h4>Non date</h4>
+        <h4>{{ 'test.result.blank' | transloco }}</h4>
         <p>{{ stats.blank }}</p>
       </div>
     </div>
@@ -63,7 +63,7 @@
     <div class="card stat-card stat-card--time">
       <div class="icon"><i class="fas fa-clock"></i></div>
       <div class="details">
-        <h4>Durata</h4>
+        <h4>{{ 'test.result.duration' | transloco }}</h4>
         <p>{{ elapsed_time | duration }}</p>
       </div>
     </div>
@@ -73,10 +73,10 @@
   @if(questions && questions.length){
     <div class="questions-review" >
     <div class="questions-review-header">
-      <h2>Riepilogo Domande</h2>
+      <h2>{{ 'test.result.questionsReview' | transloco }}</h2>
       @if (stats.wrong > 0) {
       <button type="button" class="btn btn-outline-primary" (click)="toggleShowOnlyWrong()">
-        {{ showOnlyWrong ? 'Mostra tutte' : 'Mostra solo errate' }}
+        {{ (showOnlyWrong ? 'test.result.showAll' : 'test.result.showOnlyWrong') | transloco }}
       </button>
       }
     </div>
@@ -92,13 +92,13 @@
         <div class="question-text" [innerHTML]="q.question | katexRenderer"></div>
 
         <div class="answer-block correct-answer">
-          <p>Risposta corretta</p>
+          <p>{{ 'test.result.correctAnswerLabel' | transloco }}</p>
           <div class="answer" [innerHTML]="q.answer | katexRenderer"></div>
         </div>
       </div>
     </div>
     } @empty {
-    <p>Nessuna domanda errata in questo test.</p>
+    <p>{{ 'test.result.noWrongQuestions' | transloco }}</p>
     }
     </div>
   }

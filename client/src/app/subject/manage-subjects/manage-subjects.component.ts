@@ -6,12 +6,13 @@ import { Subject } from '../../models/subject.dto';
 import { SubjectService } from './../subject.service';
 import { Toast } from '../../toast/toast';
 import { ToastService } from '../../toast/toast.service';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { getSubjectIconUrl } from '../subject-icon.util';
 
 @Component({
   selector: 'app-manage-subjects',
   standalone: true,
-  imports: [CommonModule, Toast],
+  imports: [CommonModule, Toast, TranslocoModule],
   templateUrl: './manage-subjects.component.html',
   styleUrls: ['./manage-subjects.component.scss']
 })
@@ -26,7 +27,8 @@ export class ManageSubjectsComponent implements OnInit {
   constructor(
     private subjectService: SubjectService,
     private router: Router,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private transloco: TranslocoService
   ) {}
 
   ngOnInit(): void {
@@ -44,7 +46,7 @@ export class ManageSubjectsComponent implements OnInit {
       this.subjects = response.data;
       this.totalCount = response.count;
     } catch (error) {
-      this.toastService.show('Failed to load subjects', 'error');
+      this.toastService.show(this.transloco.translate('subject.toast.loadError'), 'error');
     }
   }
 
@@ -103,15 +105,15 @@ export class ManageSubjectsComponent implements OnInit {
 
   async deleteSubject(id?: string): Promise<void> {
     if (!id) return;
-    if (confirm('Are you sure you want to delete this subject?')) {
+    if (confirm(this.transloco.translate('subject.manage.deleteConfirm'))) {
       try {
         await this.subjectService.deleteSubject(id);
         // ricarica invece di filtrare in locale: skip/limit sono legati al
         // server, altrimenti la pagina mostrerebbe un elemento in meno del dovuto
         await this.loadSubjects();
-        this.toastService.show('Subject deleted successfully', 'success');
+        this.toastService.show(this.transloco.translate('subject.toast.deleted'), 'success');
       } catch (error) {
-        this.toastService.show('Failed to delete subject', 'error');
+        this.toastService.show(this.transloco.translate('subject.toast.deleteError'), 'error');
       }
     }
   }

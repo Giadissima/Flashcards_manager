@@ -14,6 +14,7 @@ import { TestService } from '../test.service';
 import { ToastService } from '../../toast/toast.service';
 import { Topic } from '../../models/topic.dto';
 import { TopicService } from '../../topic/topic.service';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { getSubjectIconUrl } from '../../subject/subject-icon.util';
 
 export function atLeastOneValidator(controls: string[]): ValidatorFn {
@@ -26,7 +27,7 @@ export function atLeastOneValidator(controls: string[]): ValidatorFn {
 @Component({
   selector: 'app-setup-test',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, SearchableSelectComponent],
+  imports: [ReactiveFormsModule, CommonModule, SearchableSelectComponent, TranslocoModule],
   templateUrl: './setup-test.html',
   styleUrls: ['./setup-test.scss']
 })
@@ -50,7 +51,8 @@ export class SetupTest implements OnInit {
     private testService: TestService,
     private flashcardService: FlashcardService,
     private topicService: TopicService,
-    private router: Router
+    private router: Router,
+    private transloco: TranslocoService
   ) {
     this.testForm = this.fb.group({
       subject_id: [null],
@@ -115,7 +117,7 @@ export class SetupTest implements OnInit {
 
     } catch (err: any) {
       console.error(err);
-      window.alert("Unable to create the test"); // TODO change in toast
+      window.alert(this.transloco.translate('test.setup.createError')); // TODO change in toast
       this.router.navigate(['']);
         }
       }

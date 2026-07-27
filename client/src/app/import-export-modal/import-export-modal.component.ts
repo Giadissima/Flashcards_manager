@@ -6,42 +6,43 @@ import { Subject } from '../models/subject.dto';
 import { SubjectService } from '../subject/subject.service';
 import { ToastService } from '../toast/toast.service';
 import { SearchableSelectComponent, SelectOption } from '../shared/searchable-select/searchable-select.component';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { getSubjectIconUrl } from '../subject/subject-icon.util';
 
 @Component({
   selector: 'app-import-export-modal',
   standalone: true,
-  imports: [CommonModule, SearchableSelectComponent],
+  imports: [CommonModule, SearchableSelectComponent, TranslocoModule],
   template: `
-    <div class="modal fade" [class.show]="isOpen" [style.display]="isOpen ? 'block' : 'none'" tabindex="-1" role="dialog">
+    <div class="modal fade" [class.show]="isOpen" [style.display]="isOpen ? 'block' : 'none'" tabindex="-1" role="dialog" *transloco="let t">
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <div class="d-flex align-items-center gap-2">
-              <button type="button" class="icon-btn" (click)="goBack()" aria-label="Back to settings">
+              <button type="button" class="icon-btn" (click)="goBack()" [attr.aria-label]="t('importExport.backToSettings')">
                 <span class="material-symbols-outlined">arrow_back</span>
               </button>
-              <h5 class="modal-title mb-0">Import / Export Flashcards</h5>
+              <h5 class="modal-title mb-0">{{ 'importExport.title' | transloco }}</h5>
             </div>
             <button type="button" class="btn-close" (click)="close()"></button>
           </div>
           <div class="modal-body">
             <!-- Export Section -->
             <section class="mb-4">
-              <h6>Export</h6>
+              <h6>{{ 'importExport.exportHeader' | transloco }}</h6>
               <div class="mb-3">
-                <label class="form-label">Filter by Subject (Optional)</label>
+                <label class="form-label">{{ 'importExport.filterBySubject' | transloco }}</label>
                 <app-searchable-select
                   [options]="subjectOptions"
                   [value]="selectedSubjectId"
-                  allOptionLabel="All Subjects"
-                  placeholder="All Subjects"
+                  [allOptionLabel]="t('common.allSubjects')"
+                  [placeholder]="t('common.allSubjects')"
                   (valueChange)="selectedSubjectId = $event ?? null"
                 ></app-searchable-select>
               </div>
               <button class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2" (click)="onExport()" [disabled]="isLoading">
                 <span class="material-symbols-outlined">download</span>
-                Export to ZIP
+                {{ 'importExport.exportButton' | transloco }}
               </button>
             </section>
 
@@ -49,20 +50,20 @@ import { getSubjectIconUrl } from '../subject/subject-icon.util';
 
             <!-- Import Section -->
             <section>
-              <h6>Import</h6>
+              <h6>{{ 'importExport.importHeader' | transloco }}</h6>
               <div class="mb-3">
-                <label for="importFile" class="form-label">Select JSON or ZIP File</label>
+                <label for="importFile" class="form-label">{{ 'importExport.selectFile' | transloco }}</label>
                 <input type="file" id="importFile" class="form-control" (change)="onFileSelected($event)" accept=".json,.zip">
               </div>
               <button class="btn btn-success w-100 d-flex align-items-center justify-content-center gap-2" (click)="onImport()" [disabled]="isLoading || !selectedFile">
                 <span class="material-symbols-outlined">upload</span>
-                Import
+                {{ 'importExport.importButton' | transloco }}
               </button>
             </section>
 
             <div *ngIf="isLoading" class="text-center mt-3">
               <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading...</span>
+                <span class="visually-hidden">{{ 'common.loading' | transloco }}</span>
               </div>
             </div>
           </div>
@@ -127,7 +128,8 @@ export class ImportExportModalComponent implements OnInit {
   constructor(
     private importExportService: ImportExportService,
     private subjectService: SubjectService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private transloco: TranslocoService
   ) {}
 
   ngOnInit() {
@@ -171,9 +173,9 @@ export class ImportExportModalComponent implements OnInit {
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-      this.toastService.show('Export successful!', 'success');
+      this.toastService.show(this.transloco.translate('importExport.toast.exportSuccess'), 'success');
     } catch (error) {
-      this.toastService.show('Export failed', 'error');
+      this.toastService.show(this.transloco.translate('importExport.toast.exportFailed'), 'error');
     } finally {
       this.isLoading = false;
     }
@@ -192,12 +194,12 @@ export class ImportExportModalComponent implements OnInit {
     try {
       const { imported, skipped } = await this.importExportService.import(this.selectedFile);
       const message = skipped > 0
-        ? `Import completed: ${imported} added, ${skipped} duplicates skipped.`
-        : `Import successful! ${imported} flashcards added.`;
+        ? this.transloco.translate('importExport.toast.importCompleted', { imported, skipped })
+        : this.transloco.translate('importExport.toast.importSuccess', { count: imported });
       this.toastService.show(message, 'success');
       this.close();
     } catch (error) {
-      this.toastService.show('Import failed', 'error');
+      this.toastService.show(this.transloco.translate('importExport.toast.importFailed'), 'error');
     } finally {
       this.isLoading = false;
     }

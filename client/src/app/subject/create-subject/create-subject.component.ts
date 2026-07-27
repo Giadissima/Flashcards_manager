@@ -10,12 +10,13 @@ import { Router } from '@angular/router';
 import { SubjectService } from '../subject.service';
 import { Toast } from '../../toast/toast';
 import { ToastService } from '../../toast/toast.service';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { charMinLength, nameMaxLength, descMaxLength } from '../../../config/config';
 
 @Component({
   selector: 'app-create-subject',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, Toast, TiptapEditorDirective],
+  imports: [CommonModule, ReactiveFormsModule, Toast, TiptapEditorDirective, TranslocoModule],
   templateUrl: './create-subject.component.html',
   styleUrls: ['./create-subject.component.scss']
 })
@@ -33,7 +34,8 @@ export class CreateSubjectComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private router: Router,
     private subjectService: SubjectService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private transloco: TranslocoService
   ) {
     this.descEditor = new Editor({
       extensions: [StarterKit, MathExtension.configure({ evaluation: false })],
@@ -76,10 +78,10 @@ export class CreateSubjectComponent implements OnInit, OnDestroy {
 
     try {
       await this.subjectService.createSubject(formData);
-      this.toastService.show('Subject created successfully', 'success');
+      this.toastService.show(this.transloco.translate('subject.toast.created'), 'success');
       this.router.navigate(['/manage-subjects']);
     } catch (error) {
-      this.toastService.show('Failed to create subject', 'error');
+      this.toastService.show(this.transloco.translate('subject.toast.createError'), 'error');
     }
   }
 }

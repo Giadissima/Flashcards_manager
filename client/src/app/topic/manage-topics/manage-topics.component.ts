@@ -10,12 +10,13 @@ import { Toast } from '../../toast/toast';
 import { ToastService } from '../../toast/toast.service';
 import { Topic } from '../../models/topic.dto';
 import { TopicService } from '../topic.service';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { getSubjectIconUrl } from '../../subject/subject-icon.util';
 
 @Component({
   selector: 'app-manage-topics',
   standalone: true,
-  imports: [CommonModule, Toast, FormsModule, SearchableSelectComponent],
+  imports: [CommonModule, Toast, FormsModule, SearchableSelectComponent, TranslocoModule],
   templateUrl: './manage-topics.component.html',
   styleUrls: ['./manage-topics.component.scss']
 })
@@ -36,7 +37,8 @@ export class ManageTopicsComponent implements OnInit {
     private topicService: TopicService,
     private router: Router,
     private toastService: ToastService,
-    private subjectService: SubjectService
+    private subjectService: SubjectService,
+    private transloco: TranslocoService
   ) { }
 
   ngOnInit(): void {
@@ -50,7 +52,7 @@ export class ManageTopicsComponent implements OnInit {
       this.subjects = response.data;
     } catch (err) {
       console.error('Error loading subjects', err);
-      this.toastService.show('Failed to load subjects', 'error');
+      this.toastService.show(this.transloco.translate('topic.toast.subjectsLoadError'), 'error');
     }
   }
 
@@ -76,7 +78,7 @@ export class ManageTopicsComponent implements OnInit {
       this.topics = response.data;
       this.totalCount = response.count;
     } catch (error) {
-      this.toastService.show('Failed to load topics', 'error');
+      this.toastService.show(this.transloco.translate('topic.toast.topicsLoadError'), 'error');
     }
   }
 
@@ -113,15 +115,15 @@ export class ManageTopicsComponent implements OnInit {
 
   async deleteTopic(id?: string): Promise<void> {
     if (!id) return;
-    if (confirm('Are you sure you want to delete this topic?')) {
+    if (confirm(this.transloco.translate('topic.manage.deleteConfirm'))) {
       try {
         await this.topicService.deleteTopic(id);
         // ricarica invece di filtrare in locale: skip/limit sono legati al
         // server, altrimenti la pagina mostrerebbe un elemento in meno del dovuto
         await this.loadTopics();
-        this.toastService.show('Topic deleted successfully', 'success');
+        this.toastService.show(this.transloco.translate('topic.toast.deleted'), 'success');
       } catch (error) {
-        this.toastService.show('Failed to delete topic', 'error');
+        this.toastService.show(this.transloco.translate('topic.toast.deleteError'), 'error');
       }
     }
   }

@@ -6,11 +6,12 @@ import { Router, RouterLink } from '@angular/router';
 import { Test, TestStats } from '../../models/test.dto';
 import { TestService } from '../test.service';
 import { ToastService } from '../../toast/toast.service';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-test-history',
   standalone: true,
-  imports: [CommonModule, RouterLink, DurationPipe],
+  imports: [CommonModule, RouterLink, DurationPipe, TranslocoModule],
   templateUrl: './test-history.html',
   styleUrl: './test-history.scss',
 })
@@ -25,6 +26,7 @@ export class TestHistory implements OnInit {
     private testService: TestService,
     private router: Router,
     private toast: ToastService,
+    private transloco: TranslocoService,
   ) {}
 
   ngOnInit(): void {
@@ -92,12 +94,12 @@ export class TestHistory implements OnInit {
     if (!test._id) return;
     try {
       await this.testService.update(test._id, { ...test, completedAt: new Date() });
-      this.toast.show('Test terminato', 'success');
+      this.toast.show(this.transloco.translate('test.history.toast.terminated'), 'success');
       this.loadTests();
       this.loadStats();
     } catch (err) {
       console.error('Error stopping test', err);
-      this.toast.show('Impossibile terminare il test', 'error');
+      this.toast.show(this.transloco.translate('test.history.toast.terminateError'), 'error');
     }
   }
 }

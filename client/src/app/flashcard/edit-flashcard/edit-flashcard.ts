@@ -16,11 +16,12 @@ import { Toast } from '../../toast/toast';
 import { ToastService } from '../../toast/toast.service';
 import { Topic } from '../../models/topic.dto';
 import { TopicService } from '../../topic/topic.service';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-edit-flashcard',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, Toast, TiptapEditorDirective],
+  imports: [CommonModule, ReactiveFormsModule, Toast, TiptapEditorDirective, TranslocoModule],
   templateUrl: './edit-flashcard.html',
   styleUrls: ['./edit-flashcard.scss']
 })
@@ -41,7 +42,8 @@ export class EditFlashcard implements OnInit, OnDestroy {
     private flashcardService: FlashcardService,
     private toastService: ToastService,
     private topicService: TopicService,
-    private subjectService: SubjectService
+    private subjectService: SubjectService,
+    private transloco: TranslocoService
   ) {
     this.questionEditor = new Editor({
       extensions: [StarterKit, MathExtension.configure({ evaluation: false })],
@@ -110,7 +112,7 @@ export class EditFlashcard implements OnInit, OnDestroy {
 
     } catch (error) {
       console.error('Error loading card data', error);
-      this.toastService.show('Failed to load card data', 'error');
+      this.toastService.show(this.transloco.translate('flashcard.toast.loadError'), 'error');
     }
   }
 
@@ -132,11 +134,11 @@ export class EditFlashcard implements OnInit, OnDestroy {
     
     try {
       await this.flashcardService.update(this.cardId, card);
-      this.toastService.show('Card updated successfully', 'success');
+      this.toastService.show(this.transloco.translate('flashcard.toast.cardUpdated'), 'success');
       this.router.navigate(['/home']);
     } catch (error) {
       console.error('Error updating card', error);
-      this.toastService.show('Failed to update card', 'error');
+      this.toastService.show(this.transloco.translate('flashcard.toast.updateError'), 'error');
     }
   }
 
@@ -159,7 +161,7 @@ export class EditFlashcard implements OnInit, OnDestroy {
       this.editForm.get('topic_id')?.enable();
     } catch (err) {
       console.error('Error loading topics for subject ' + subjectId, err);
-      this.toastService.show('Failed to load topics for the selected subject', 'error');
+      this.toastService.show(this.transloco.translate('flashcard.toast.topicsLoadError'), 'error');
     }
   }
 
@@ -174,7 +176,7 @@ export class EditFlashcard implements OnInit, OnDestroy {
       this.subjects = response.data;
     } catch (err) {
       console.error('Error loading subjects', err);
-      this.toastService.show('Failed to load subjects', 'error');
+      this.toastService.show(this.transloco.translate('flashcard.toast.subjectsLoadError'), 'error');
     }
   }
 }

@@ -11,11 +11,12 @@ import { FlashcardService } from '../../flashcard/flashcard.service';
 import { KatexRendererPipe } from '../../pipes/katex-renderer.pipe';
 import { Test } from '../../models/test.dto';
 import { TestService } from '../test.service';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-test-runner',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, DurationPipe, KatexRendererPipe, ConfirmDialogComponent],
+  imports: [CommonModule, ReactiveFormsModule, DurationPipe, KatexRendererPipe, ConfirmDialogComponent, TranslocoModule],
   templateUrl: './test-runner.html',
   styleUrls: ['./test-runner.scss']
 })
@@ -40,7 +41,8 @@ export class TestRunner implements OnInit {
     private route: ActivatedRoute,
     private flashcardService: FlashcardService,
     private testService: TestService,
-    private router: Router
+    private router: Router,
+    private transloco: TranslocoService
   ) {
     this.testForm = this.fb.group({
       isCorrect: [null]
@@ -56,7 +58,7 @@ export class TestRunner implements OnInit {
         // imposto un timer da aggiornare ogni 30 secondi
         this.timerSub = interval(1000).subscribe(() => this.updateTimer());
       }else {
-        alert("non è stato possibile prendere il test");
+        alert(this.transloco.translate('test.runner.getTestError'));
       }
     });
   }
@@ -132,7 +134,7 @@ export class TestRunner implements OnInit {
 
   getCardButtonText(card: Flashcard): string {
     if (!card._id) return '';
-    return this.showAnswer ? 'Vedi domanda' : 'Vedi risposta';
+    return this.transloco.translate(this.showAnswer ? 'test.runner.seeQuestion' : 'test.runner.seeAnswer');
   }
 
   async finishTest() {

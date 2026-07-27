@@ -1,28 +1,28 @@
-<div class="container">
+<div class="container" *transloco="let t">
   <div class="filter-bar mb-4">
     <div class="row gy-2 gx-3 align-items-center">
       <div class="col-auto">
-        <label class="visually-hidden">Subject</label>
+        <label class="visually-hidden">{{ 'common.subject' | transloco }}</label>
         <app-searchable-select
           [options]="subjectOptions"
           [value]="selectedSubjectId"
-          allOptionLabel="All Subjects"
-          placeholder="All Subjects"
+          [allOptionLabel]="t('common.allSubjects')"
+          [placeholder]="t('common.allSubjects')"
           (valueChange)="onSubjectSelected($event)"
         ></app-searchable-select>
       </div>
       <div class="col-auto">
-        <label class="visually-hidden">Topic</label>
+        <label class="visually-hidden">{{ 'common.topic' | transloco }}</label>
         <app-searchable-select
           [options]="topicOptions"
           [value]="selectedTopicId"
-          allOptionLabel="All Topics"
-          placeholder="All Topics"
+          [allOptionLabel]="t('common.allTopics')"
+          [placeholder]="t('common.allTopics')"
           (valueChange)="onTopicSelected($event)"
         ></app-searchable-select>
       </div>
       <div class="col-sm-4">
-        <label for="searchFilter" class="visually-hidden">Search</label>
+        <label for="searchFilter" class="visually-hidden">{{ 'common.search' | transloco }}</label>
         <div class="input-group">
           <span class="input-group-text search-icon">
             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
@@ -31,7 +31,7 @@
                 d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z" />
             </svg>
           </span>
-          <input type="text" id="searchFilter" class="input-group-text" placeholder="Search flashcards..."
+          <input type="text" id="searchFilter" class="input-group-text" [placeholder]="t('home.searchPlaceholder')"
             [(ngModel)]="searchTerm" (input)="onSearchTermChange()">
         </div>
       </div>
@@ -39,7 +39,7 @@
         <div class="btn-group" role="group">
           <button type="button" class="btn btn-outline-primary border-bootstrap-btn-custom" (click)="setSortBy('title')"
             [class.active]="sortBy === 'title'">
-            Name
+            {{ 'home.sortName' | transloco }}
             @if (sortBy === 'title') {
             @if (sortDirection === 'desc') {
             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
@@ -56,7 +56,7 @@
           </button>
           <button type="button" class="btn btn-outline-primary border-bootstrap-btn-custom"
             (click)="setSortBy('createdAt')" [class.active]="sortBy === 'createdAt'">
-            Date
+            {{ 'home.sortDate' | transloco }}
             @if (sortBy === 'createdAt') {
             @if (sortDirection === 'desc') {
             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
@@ -117,9 +117,9 @@
   </div>
 
   <div class="d-flex justify-content-between align-items-center mt-4">
-    <button type="button" class="btn" (click)="previousPage()" [disabled]="currentPage === 1">Previous</button>
-    <span>Page {{ currentPage }} of {{ totalPages }}</span>
-    <button type="button" class="btn" (click)="nextPage()" [disabled]="currentPage >= totalPages">Next</button>
+    <button type="button" class="btn" (click)="previousPage()" [disabled]="currentPage === 1">{{ 'common.previous' | transloco }}</button>
+    <span>{{ 'common.pageOf' | transloco:{ current: currentPage, total: totalPages } }}</span>
+    <button type="button" class="btn" (click)="nextPage()" [disabled]="currentPage >= totalPages">{{ 'common.next' | transloco }}</button>
   </div>
 </div>
 

@@ -32,27 +32,29 @@
           </div>
         </div>
 
-        <div class="d-flex justify-content-between mt-4">
-          <button type="button" class="btn" (click)="loadPreviousFlashcard()" [disabled]="currentIndex === 0">Previous</button>
-          <button type="button" class="btn" (click)="loadNextFlashcard()" [disabled]="currentIndex === ((test?.questions?.length ?? 1) - 1)">Next</button>
+        <div class="d-flex justify-content-between mt-4" *transloco="let t">
+          <button type="button" class="btn" (click)="loadPreviousFlashcard()" [disabled]="currentIndex === 0">{{ 'common.previous' | transloco }}</button>
+          <button type="button" class="btn" (click)="loadNextFlashcard()" [disabled]="currentIndex === ((test?.questions?.length ?? 1) - 1)">{{ 'common.next' | transloco }}</button>
         </div>
 
         <div class="d-flex justify-content-center gap-2 mt-4">
-          <button type="button" class="btn btn-outline-primary" (click)="requestGoHome()">Torna alla Home</button>
-          <button type="button" class="btn btn-outline-secondary" (click)="requestPause()">Pause</button>
-          <button type="submit" class="btn btn-primary" id="finishTest">End test</button>
+          <button type="button" class="btn btn-outline-primary" (click)="requestGoHome()">{{ 'test.runner.backHome' | transloco }}</button>
+          <button type="button" class="btn btn-outline-secondary" (click)="requestPause()">{{ 'test.runner.pause' | transloco }}</button>
+          <button type="submit" class="btn btn-primary" id="finishTest">{{ 'test.runner.endTest' | transloco }}</button>
         </div>
       </form>
     </div>
   </div>
 </div>
 
+<ng-container *transloco="let t">
 <app-confirm-dialog
   [isOpen]="showLeaveConfirm"
-  title="Uscire dal test?"
-  message="I tuoi progressi saranno salvati, vuoi continuare?"
-  confirmLabel="Sì"
-  cancelLabel="Annulla"
+  [title]="t('test.runner.leaveConfirmTitle')"
+  [message]="t('test.runner.leaveConfirmMessage')"
+  [confirmLabel]="t('common.yes')"
+  [cancelLabel]="t('common.cancel')"
   (confirmed)="confirmLeave()"
   (cancelled)="cancelLeave()"
 ></app-confirm-dialog>
+</ng-container>

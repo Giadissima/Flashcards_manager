@@ -1,0 +1,242 @@
+{
+  "navbar": {
+    "topics": "Argomenti",
+    "createTopic": "Crea Argomento",
+    "manageTopics": "Gestisci Argomenti",
+    "subjects": "Materie",
+    "createSubject": "Nuova Materia",
+    "manageSubjects": "Gestisci Materie",
+    "test": "Test",
+    "startTest": "Avvia Test",
+    "results": "Risultati",
+    "createCard": "Crea Card"
+  },
+  "settings": {
+    "title": "Impostazioni",
+    "language": "Lingua",
+    "darkMode": "Modalità Scura",
+    "darkModeDesc": "Attiva o disattiva il tema scuro",
+    "importExport": "Import / Export",
+    "importExportButton": "Importa / Esporta Flashcard",
+    "cancel": "Annulla",
+    "save": "Salva Modifiche"
+  },
+  "common": {
+    "previous": "Precedente",
+    "next": "Successivo",
+    "pageOf": "Pagina {{current}} di {{total}}",
+    "saveChanges": "Salva Modifiche",
+    "cancel": "Annulla",
+    "yes": "Sì",
+    "name": "Nome",
+    "color": "Colore",
+    "subject": "Materia",
+    "topic": "Argomento",
+    "description": "Descrizione",
+    "actions": "Azioni",
+    "icon": "Icona",
+    "search": "Cerca",
+    "allSubjects": "Tutte le Materie",
+    "allTopics": "Tutti gli Argomenti",
+    "chooseSubject": "Scegli una materia",
+    "chooseTopic": "Scegli un argomento",
+    "error": "Errore",
+    "loading": "Caricamento...",
+    "testNotFoundError": "Non è stato possibile recuperare il test"
+  },
+  "home": {
+    "searchPlaceholder": "Cerca flashcard...",
+    "sortName": "Nome",
+    "sortDate": "Data",
+    "seeAnswer": "Vedi risposta",
+    "seeQuestion": "Vedi domanda",
+    "toast": {
+      "cardDeleted": "Card eliminata con successo",
+      "deleteError": "Errore durante l'eliminazione",
+      "cardCopied": "Card copiata con successo",
+      "copyError": "Errore durante la copia",
+      "topicsLoadError": "Impossibile caricare gli argomenti per la materia selezionata"
+    }
+  },
+  "flashcard": {
+    "create": {
+      "title": "Crea una Nuova Flashcard",
+      "titleLabel": "Titolo",
+      "titlePlaceholder": "es. Fotosintesi",
+      "titleMinError": "Il titolo deve avere almeno 2 caratteri.",
+      "titleMaxError": "Numero massimo di caratteri per il titolo raggiunto.",
+      "titleRequiredError": "Inserisci un titolo.",
+      "questionLabel": "Domanda",
+      "answerLabel": "Risposta",
+      "inlineEquation": "Equazione inline",
+      "outlineEquation": "Equazione a blocco",
+      "subjectLabel": "Materia",
+      "topicLabel": "Argomento",
+      "addButton": "Aggiungi Nuova Card"
+    },
+    "edit": {
+      "title": "Modifica Flashcard",
+      "saveChanges": "Salva Modifiche"
+    },
+    "toast": {
+      "cardAdded": "Card aggiunta con successo",
+      "addError": "Errore durante l'aggiunta",
+      "cardUpdated": "Card aggiornata con successo",
+      "updateError": "Errore durante l'aggiornamento",
+      "loadError": "Impossibile caricare i dati della card",
+      "subjectsLoadError": "Impossibile caricare le materie",
+      "topicsLoadError": "Impossibile caricare gli argomenti per la materia selezionata"
+    }
+  },
+  "topic": {
+    "create": {
+      "title": "Crea Nuovo Topic",
+      "nameLabel": "Nome",
+      "nameRequiredError": "Il nome è obbligatorio.",
+      "colorLabel": "Colore",
+      "colorTitle": "Scegli il tuo colore",
+      "createButton": "Crea Topic"
+    },
+    "edit": {
+      "title": "Modifica Topic",
+      "saveChanges": "Salva Modifiche"
+    },
+    "manage": {
+      "title": "Gestisci Topics",
+      "subtitle": "Organizza gli argomenti delle materie",
+      "newTopicButton": "Nuovo argomento",
+      "searchPlaceholder": "Cerca argomenti...",
+      "deleteConfirm": "Sei sicuro di voler eliminare questo argomento?"
+    },
+    "toast": {
+      "created": "Topic creato con successo",
+      "createError": "Errore nella creazione del topic",
+      "updated": "Topic aggiornato con successo",
+      "updateError": "Errore nell'aggiornamento del topic",
+      "deleted": "Topic eliminato con successo",
+      "deleteError": "Errore nell'eliminazione del topic",
+      "loadError": "Impossibile caricare i dati del topic",
+      "subjectsLoadError": "Impossibile caricare le materie",
+      "topicsLoadError": "Impossibile caricare gli argomenti"
+    }
+  },
+  "subject": {
+    "create": {
+      "title": "Crea Nuova Materia",
+      "nameLabel": "Nome",
+      "nameMaxError": "Il nome può avere al massimo {{max}} caratteri. Accorcialo un po'.",
+      "nameMinError": "Il nome deve avere almeno {{min}} caratteri.",
+      "descLabel": "Descrizione",
+      "descMaxError": "La descrizione può avere al massimo {{max}} caratteri (attualmente {{current}}). Accorciala un po'.",
+      "iconLabel": "Icona",
+      "createButton": "Crea Materia"
+    },
+    "edit": {
+      "title": "Modifica Materia",
+      "currentIcon": "Icona attuale",
+      "replaceIcon": "Sostituisci icona",
+      "saveChanges": "Salva Modifiche"
+    },
+    "manage": {
+      "title": "Gestisci Materie",
+      "subtitle": "Organizza le materie che stai studiando",
+      "newSubjectButton": "Nuova Materia",
+      "searchPlaceholder": "Cerca materie...",
+      "tableDescription": "Descrizione",
+      "noDescription": "Nessuna descrizione",
+      "deleteConfirm": "Sei sicuro di voler eliminare questa materia?"
+    },
+    "toast": {
+      "created": "Materia creata con successo",
+      "createError": "Errore nella creazione della materia",
+      "updated": "Materia aggiornata con successo",
+      "updateError": "Errore nell'aggiornamento della materia",
+      "deleted": "Materia eliminata con successo",
+      "deleteError": "Errore nell'eliminazione della materia",
+      "loadError": "Impossibile caricare le materie",
+      "loadOneError": "Impossibile caricare i dati della materia"
+    }
+  },
+  "test": {
+    "setup": {
+      "title": "Nuovo Test",
+      "subtitle": "Scegli materia, argomento e numero di domande",
+      "subjectLabel": "Materia",
+      "anySubject": "Qualsiasi materia",
+      "topicLabel": "Argomento",
+      "anyTopic": "Qualsiasi argomento",
+      "numQuestionsLabel": "Numero di domande",
+      "maxQuestionsError": "Puoi richiedere al massimo 50 domande. Inserisci un numero più basso.",
+      "atLeastOneError": "Seleziona almeno una materia o un argomento.",
+      "startButton": "Avvia Test",
+      "createError": "Impossibile creare il test"
+    },
+    "history": {
+      "title": "Storico Test",
+      "newTestButton": "Nuovo Test",
+      "statsTestsDone": "Test svolti",
+      "statsCompleted": "Completati",
+      "statsAvgScore": "Media risposte corrette",
+      "statsTotalTime": "Tempo totale di studio",
+      "noTests": "Nessun test svolto ancora.",
+      "inProgress": "In corso",
+      "correctSuffix": "corrette",
+      "wrongSuffix": "errate",
+      "review": "Rivedi",
+      "resume": "Continua",
+      "terminate": "Termina",
+      "toast": {
+        "terminated": "Test terminato",
+        "terminateError": "Impossibile terminare il test"
+      }
+    },
+    "result": {
+      "title": "Risultati del Test",
+      "completed": "Completato",
+      "started": "Iniziato",
+      "onDate": "il",
+      "backHome": "Torna alla Home",
+      "correctPercent": "di risposte corrette",
+      "correct": "Corrette",
+      "wrong": "Errate",
+      "blank": "Non date",
+      "duration": "Durata",
+      "questionsReview": "Riepilogo Domande",
+      "showAll": "Mostra tutte",
+      "showOnlyWrong": "Mostra solo errate",
+      "correctAnswerLabel": "Risposta corretta",
+      "noWrongQuestions": "Nessuna domanda errata in questo test.",
+      "getTestError": "Non è stato possibile recuperare il test",
+      "titleNotAvailable": "Titolo non disponibile",
+      "questionNotAvailable": "Domanda non disponibile",
+      "answerNotAvailable": "Risposta non disponibile"
+    },
+    "runner": {
+      "seeAnswer": "Vedi risposta",
+      "seeQuestion": "Vedi domanda",
+      "backHome": "Torna alla Home",
+      "pause": "Pausa",
+      "endTest": "Termina Test",
+      "leaveConfirmTitle": "Uscire dal test?",
+      "leaveConfirmMessage": "I tuoi progressi saranno salvati, vuoi continuare?",
+      "getTestError": "Non è stato possibile recuperare il test"
+    }
+  },
+  "importExport": {
+    "title": "Import / Export Flashcard",
+    "backToSettings": "Torna alle impostazioni",
+    "exportHeader": "Esporta",
+    "filterBySubject": "Filtra per Materia (opzionale)",
+    "exportButton": "Esporta in ZIP",
+    "importHeader": "Importa",
+    "selectFile": "Seleziona file JSON o ZIP",
+    "importButton": "Importa",
+    "toast": {
+      "exportSuccess": "Esportazione completata!",
+      "exportFailed": "Esportazione fallita",
+      "importSuccess": "Importazione completata! {{count}} flashcard aggiunte.",
+      "importCompleted": "Importazione completata: {{imported}} aggiunte, {{skipped}} duplicati saltati.",
+      "importFailed": "Importazione fallita"
+    }
+  }
+}

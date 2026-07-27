@@ -1,0 +1,242 @@
+{
+  "navbar": {
+    "topics": "Topics",
+    "createTopic": "Create Topic",
+    "manageTopics": "Manage Topics",
+    "subjects": "Subjects",
+    "createSubject": "New Subject",
+    "manageSubjects": "Manage Subjects",
+    "test": "Test",
+    "startTest": "Start Test",
+    "results": "Results",
+    "createCard": "Create Card"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "darkMode": "Dark Mode",
+    "darkModeDesc": "Turn dark theme on or off",
+    "importExport": "Import / Export",
+    "importExportButton": "Import / Export Flashcards",
+    "cancel": "Cancel",
+    "save": "Save Changes"
+  },
+  "common": {
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "Page {{current}} of {{total}}",
+    "saveChanges": "Save Changes",
+    "cancel": "Cancel",
+    "yes": "Yes",
+    "name": "Name",
+    "color": "Color",
+    "subject": "Subject",
+    "topic": "Topic",
+    "description": "Description",
+    "actions": "Actions",
+    "icon": "Icon",
+    "search": "Search",
+    "allSubjects": "All Subjects",
+    "allTopics": "All Topics",
+    "chooseSubject": "Choose a subject",
+    "chooseTopic": "Choose a topic",
+    "error": "Error",
+    "loading": "Loading...",
+    "testNotFoundError": "Unable to retrieve the test"
+  },
+  "home": {
+    "searchPlaceholder": "Search flashcards...",
+    "sortName": "Name",
+    "sortDate": "Date",
+    "seeAnswer": "See answer",
+    "seeQuestion": "See question",
+    "toast": {
+      "cardDeleted": "Card successfully deleted",
+      "deleteError": "Error deleting card",
+      "cardCopied": "Card copied successfully",
+      "copyError": "Copy error",
+      "topicsLoadError": "Failed to load topics for the selected subject"
+    }
+  },
+  "flashcard": {
+    "create": {
+      "title": "Create a New Flashcard",
+      "titleLabel": "Title",
+      "titlePlaceholder": "e.g., Photosynthesis",
+      "titleMinError": "Title should have min 2 characters.",
+      "titleMaxError": "Title's max characters reached.",
+      "titleRequiredError": "Please insert a title.",
+      "questionLabel": "Question",
+      "answerLabel": "Answer",
+      "inlineEquation": "Inline equation",
+      "outlineEquation": "Outline equation",
+      "subjectLabel": "Subject",
+      "topicLabel": "Topic",
+      "addButton": "Add New Card"
+    },
+    "edit": {
+      "title": "Edit Flashcard",
+      "saveChanges": "Save changes"
+    },
+    "toast": {
+      "cardAdded": "Card successfully added",
+      "addError": "Error adding card",
+      "cardUpdated": "Card updated successfully",
+      "updateError": "Failed to update card",
+      "loadError": "Failed to load card data",
+      "subjectsLoadError": "Failed to load subjects",
+      "topicsLoadError": "Failed to load topics for the selected subject"
+    }
+  },
+  "topic": {
+    "create": {
+      "title": "Create New Topic",
+      "nameLabel": "Name",
+      "nameRequiredError": "Name is required.",
+      "colorLabel": "Color",
+      "colorTitle": "Choose your color",
+      "createButton": "Create Topic"
+    },
+    "edit": {
+      "title": "Edit Topic",
+      "saveChanges": "Save Changes"
+    },
+    "manage": {
+      "title": "Manage Topics",
+      "subtitle": "Organize the topics of your subjects",
+      "newTopicButton": "New Topic",
+      "searchPlaceholder": "Search topics...",
+      "deleteConfirm": "Are you sure you want to delete this topic?"
+    },
+    "toast": {
+      "created": "Topic created successfully",
+      "createError": "Failed to create topic",
+      "updated": "Topic updated successfully",
+      "updateError": "Failed to update topic",
+      "deleted": "Topic deleted successfully",
+      "deleteError": "Failed to delete topic",
+      "loadError": "Failed to load topic data",
+      "subjectsLoadError": "Failed to load subjects",
+      "topicsLoadError": "Failed to load topics"
+    }
+  },
+  "subject": {
+    "create": {
+      "title": "Create New Subject",
+      "nameLabel": "Name",
+      "nameMaxError": "Name can have at most {{max}} characters. Please shorten it.",
+      "nameMinError": "Name must have at least {{min}} characters.",
+      "descLabel": "Description",
+      "descMaxError": "Description can have at most {{max}} characters (currently {{current}}). Please shorten it.",
+      "iconLabel": "Icon",
+      "createButton": "Create Subject"
+    },
+    "edit": {
+      "title": "Edit Subject",
+      "currentIcon": "Current icon",
+      "replaceIcon": "Replace icon",
+      "saveChanges": "Save Changes"
+    },
+    "manage": {
+      "title": "Manage Subjects",
+      "subtitle": "Organize the subjects you are studying",
+      "newSubjectButton": "New Subject",
+      "searchPlaceholder": "Search subjects...",
+      "tableDescription": "Description",
+      "noDescription": "No description",
+      "deleteConfirm": "Are you sure you want to delete this subject?"
+    },
+    "toast": {
+      "created": "Subject created successfully",
+      "createError": "Failed to create subject",
+      "updated": "Subject updated successfully",
+      "updateError": "Failed to update subject",
+      "deleted": "Subject deleted successfully",
+      "deleteError": "Failed to delete subject",
+      "loadError": "Failed to load subjects",
+      "loadOneError": "Failed to load subject data"
+    }
+  },
+  "test": {
+    "setup": {
+      "title": "New Test",
+      "subtitle": "Choose subject, topic and number of questions",
+      "subjectLabel": "Subject",
+      "anySubject": "Any subject",
+      "topicLabel": "Topic",
+      "anyTopic": "Any topic",
+      "numQuestionsLabel": "Number of questions",
+      "maxQuestionsError": "You can request at most 50 questions. Please enter a lower number.",
+      "atLeastOneError": "Please select at least a subject or a topic.",
+      "startButton": "Start Test",
+      "createError": "Unable to create the test"
+    },
+    "history": {
+      "title": "Test History",
+      "newTestButton": "New Test",
+      "statsTestsDone": "Tests taken",
+      "statsCompleted": "Completed",
+      "statsAvgScore": "Average correct answers",
+      "statsTotalTime": "Total study time",
+      "noTests": "No tests taken yet.",
+      "inProgress": "In progress",
+      "correctSuffix": "correct",
+      "wrongSuffix": "wrong",
+      "review": "Review",
+      "resume": "Resume",
+      "terminate": "End",
+      "toast": {
+        "terminated": "Test ended",
+        "terminateError": "Unable to end the test"
+      }
+    },
+    "result": {
+      "title": "Test Results",
+      "completed": "Completed",
+      "started": "Started",
+      "onDate": "on",
+      "backHome": "Back to Home",
+      "correctPercent": "correct answers",
+      "correct": "Correct",
+      "wrong": "Wrong",
+      "blank": "Unanswered",
+      "duration": "Duration",
+      "questionsReview": "Questions Review",
+      "showAll": "Show all",
+      "showOnlyWrong": "Show only wrong",
+      "correctAnswerLabel": "Correct answer",
+      "noWrongQuestions": "No wrong questions in this test.",
+      "getTestError": "Unable to retrieve the test",
+      "titleNotAvailable": "Title not available",
+      "questionNotAvailable": "Question not available",
+      "answerNotAvailable": "Answer not available"
+    },
+    "runner": {
+      "seeAnswer": "See answer",
+      "seeQuestion": "See question",
+      "backHome": "Back to Home",
+      "pause": "Pause",
+      "endTest": "End test",
+      "leaveConfirmTitle": "Leave the test?",
+      "leaveConfirmMessage": "Your progress will be saved, do you want to continue?",
+      "getTestError": "Unable to retrieve the test"
+    }
+  },
+  "importExport": {
+    "title": "Import / Export Flashcards",
+    "backToSettings": "Back to settings",
+    "exportHeader": "Export",
+    "filterBySubject": "Filter by Subject (Optional)",
+    "exportButton": "Export to ZIP",
+    "importHeader": "Import",
+    "selectFile": "Select JSON or ZIP File",
+    "importButton": "Import",
+    "toast": {
+      "exportSuccess": "Export successful!",
+      "exportFailed": "Export failed",
+      "importSuccess": "Import successful! {{count}} flashcards added.",
+      "importCompleted": "Import completed: {{imported}} added, {{skipped}} duplicates skipped.",
+      "importFailed": "Import failed"
+    }
+  }
+}

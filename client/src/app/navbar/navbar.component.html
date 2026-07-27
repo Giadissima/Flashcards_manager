@@ -9,41 +9,41 @@
   <div class="menu-container">
     <div class="dropdown" (appClickOutside)="closeDropdown('topics')">
       <span class="menu-item" (click)="toggleDropdown('topics')">
-        Topics
+        {{ 'navbar.topics' | transloco }}
         <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
           fill="currentColor">
           <path d="M480-360 280-560h400L480-360Z" />
         </svg>
       </span>
       <div class="dropdown-content" [class.show]="openDropdown === 'topics'">
-        <a routerLink="/create-topic" (click)="closeDropdown('topics')">Create Topic</a>
-        <a routerLink="/manage-topics" (click)="closeDropdown('topics')">Manage Topics</a>
+        <a routerLink="/create-topic" (click)="closeDropdown('topics')">{{ 'navbar.createTopic' | transloco }}</a>
+        <a routerLink="/manage-topics" (click)="closeDropdown('topics')">{{ 'navbar.manageTopics' | transloco }}</a>
       </div>
     </div>
     <div class="dropdown" (appClickOutside)="closeDropdown('subjects')">
       <span class="menu-item" (click)="toggleDropdown('subjects')">
-        Subjects
+        {{ 'navbar.subjects' | transloco }}
         <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
           fill="currentColor">
           <path d="M480-360 280-560h400L480-360Z" />
         </svg>
       </span>
       <div class="dropdown-content" [class.show]="openDropdown === 'subjects'">
-        <a routerLink="/create-subject" (click)="closeDropdown('subjects')">New Subject</a>
-        <a routerLink="/manage-subjects" (click)="closeDropdown('subjects')">Manage Subjects</a>
+        <a routerLink="/create-subject" (click)="closeDropdown('subjects')">{{ 'navbar.createSubject' | transloco }}</a>
+        <a routerLink="/manage-subjects" (click)="closeDropdown('subjects')">{{ 'navbar.manageSubjects' | transloco }}</a>
       </div>
     </div>
     <div class="dropdown" (appClickOutside)="closeDropdown('test')">
       <span class="menu-item" (click)="toggleDropdown('test')">
-        Test
+        {{ 'navbar.test' | transloco }}
         <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
           fill="currentColor">
           <path d="M480-360 280-560h400L480-360Z" />
         </svg>
       </span>
       <div class="dropdown-content" [class.show]="openDropdown === 'test'">
-        <a routerLink="/setup-test" (click)="closeDropdown('test')">Start Test</a>
-        <a routerLink="/test-result" (click)="closeDropdown('test')">Results</a>
+        <a routerLink="/setup-test" (click)="closeDropdown('test')">{{ 'navbar.startTest' | transloco }}</a>
+        <a routerLink="/test-result" (click)="closeDropdown('test')">{{ 'navbar.results' | transloco }}</a>
       </div>
     </div>
   </div>
@@ -52,9 +52,9 @@
   <div class="actions-container">
     <button routerLink="/create-card" type="button" class="btn btn-primary">
       <span>+</span>
-      Create Card
+      {{ 'navbar.createCard' | transloco }}
     </button>
-    <button (click)="openSettings()" class="theme-switch-btn" type="button" aria-label="Settings">
+    <button (click)="openSettings()" class="theme-switch-btn" type="button" [attr.aria-label]="'settings.title' | transloco">
       <span class="material-symbols-outlined">settings</span>
     </button>
   </div>
