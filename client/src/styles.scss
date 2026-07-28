@@ -344,6 +344,84 @@ input:-webkit-autofill:active {
   margin-bottom: calc(var(--spacing-unit) * 2);
 }
 
+/* Una formula in display mode ($$...$$) è un blocco a larghezza propria e non va
+   a capo (KaTeX mette white-space: nowrap sulla .base): dentro una card stretta
+   deve scorrere in orizzontale invece di sfondare la griglia. Il padding lascia
+   spazio ai tratti discendenti, che l'overflow altrimenti taglierebbe. */
+.flashcard-text,
+.question-text,
+.answer {
+  .katex-display {
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 2px 0;
+    margin: calc(var(--spacing-unit) * 1.5) 0;
+
+    /* Stessa scrollbar "a tema" usata in .dropdown-content: le variabili
+       --border-color/--component-background cambiano già con [data-theme],
+       quindi non serve una regola separata per il dark mode.
+       Su Chromium/Opera, se scrollbar-color è impostata sullo stesso elemento,
+       le regole ::-webkit-scrollbar-* (hover incluso) vengono ignorate del
+       tutto: qui si riserva scrollbar-width/-color solo ai browser che NON
+       supportano lo pseudo-elemento webkit (cioè Firefox). */
+    @supports not selector(::-webkit-scrollbar) {
+      scrollbar-width: thin;
+      scrollbar-color: var(--border-color) var(--component-background);
+    }
+
+    &::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background-color: var(--component-background);
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--border-color);
+      border-radius: var(--border-radius-sm);
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background-color: var(--primary-color);
+    }
+
+    /* Le freccine ai due capi: gli pseudo-elementi delle scrollbar non
+       supportano clip-path/transform (rendering interno del browser, non
+       la normale pipeline CSS), quindi la freccia va disegnata come
+       background-image SVG, stessa tecnica già usata per il pallino dello
+       .form-switch qui sopra: variante nera di default, bianca in dark mode */
+    &::-webkit-scrollbar-button {
+      background-color: transparent;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: 8px 8px;
+      width: 12px;
+      height: 8px;
+    }
+
+    &::-webkit-scrollbar-button:horizontal:decrement {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3e%3cpath d='M2 5L8 1.5V8.5Z' fill='%23000'/%3e%3c/svg%3e");
+    }
+
+    &::-webkit-scrollbar-button:horizontal:increment {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3e%3cpath d='M8 5L2 1.5V8.5Z' fill='%23000'/%3e%3c/svg%3e");
+    }
+  }
+}
+
+[data-theme='dark'] .flashcard-text .katex-display::-webkit-scrollbar-button:horizontal:decrement,
+[data-theme='dark'] .question-text .katex-display::-webkit-scrollbar-button:horizontal:decrement,
+[data-theme='dark'] .answer .katex-display::-webkit-scrollbar-button:horizontal:decrement {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3e%3cpath d='M2 5L8 1.5V8.5Z' fill='%23fff'/%3e%3c/svg%3e");
+}
+
+[data-theme='dark'] .flashcard-text .katex-display::-webkit-scrollbar-button:horizontal:increment,
+[data-theme='dark'] .question-text .katex-display::-webkit-scrollbar-button:horizontal:increment,
+[data-theme='dark'] .answer .katex-display::-webkit-scrollbar-button:horizontal:increment {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3e%3cpath d='M8 5L2 1.5V8.5Z' fill='%23fff'/%3e%3c/svg%3e");
+}
+
 /* Filter bar */
 .filter-bar {
   background-color: var(--component-background);
@@ -394,9 +472,15 @@ input:-webkit-autofill:active {
 
   /* Le variabili --component-background/--border-color cambiano già col
      tema, quindi la scrollbar si adatta automaticamente senza bisogno di
-     una regola separata per il dark mode */
-  scrollbar-width: thin;
-  scrollbar-color: var(--border-color) var(--component-background);
+     una regola separata per il dark mode.
+     Su Chromium/Opera, se scrollbar-color è impostata sullo stesso elemento,
+     le regole ::-webkit-scrollbar-* (hover incluso) vengono ignorate del
+     tutto: qui si riserva scrollbar-width/-color solo ai browser che NON
+     supportano lo pseudo-elemento webkit (cioè Firefox). */
+  @supports not selector(::-webkit-scrollbar) {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) var(--component-background);
+  }
 }
 
 .dropdown-content::-webkit-scrollbar {
@@ -410,6 +494,40 @@ input:-webkit-autofill:active {
 .dropdown-content::-webkit-scrollbar-thumb {
   background-color: var(--border-color);
   border-radius: var(--border-radius-sm);
+}
+
+.dropdown-content::-webkit-scrollbar-thumb:hover {
+  background-color: var(--primary-color);
+}
+
+/* Le freccine ai due capi: gli pseudo-elementi delle scrollbar non
+   supportano clip-path/transform (rendering interno del browser, non la
+   normale pipeline CSS), quindi la freccia va disegnata come background-image
+   SVG, stessa tecnica già usata per il pallino dello .form-switch qui sopra:
+   variante nera di default, bianca in dark mode */
+.dropdown-content::-webkit-scrollbar-button {
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 8px 8px;
+  width: 8px;
+  height: 12px;
+}
+
+.dropdown-content::-webkit-scrollbar-button:vertical:decrement {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3e%3cpath d='M5 2L8.5 8H1.5Z' fill='%23000'/%3e%3c/svg%3e");
+}
+
+.dropdown-content::-webkit-scrollbar-button:vertical:increment {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3e%3cpath d='M5 8L1.5 2H8.5Z' fill='%23000'/%3e%3c/svg%3e");
+}
+
+[data-theme='dark'] .dropdown-content::-webkit-scrollbar-button:vertical:decrement {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3e%3cpath d='M5 2L8.5 8H1.5Z' fill='%23fff'/%3e%3c/svg%3e");
+}
+
+[data-theme='dark'] .dropdown-content::-webkit-scrollbar-button:vertical:increment {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3e%3cpath d='M5 8L1.5 2H8.5Z' fill='%23fff'/%3e%3c/svg%3e");
 }
 
 .dropdown-content a {

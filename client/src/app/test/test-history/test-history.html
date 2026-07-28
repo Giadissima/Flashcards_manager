@@ -1,67 +1,128 @@
-<div class="container mt-4">
-  <div class="header d-flex justify-content-between align-items-center mb-4">
-    <h1>{{ 'test.history.title' | transloco }}</h1>
-    <a routerLink="/setup-test" class="btn btn-primary">{{ 'test.history.newTestButton' | transloco }}</a>
-  </div>
-
-  @if (stats && stats.totalTests > 0) {
-  <div class="stats-summary mb-4">
-    <div class="stat-item">
-      <span class="stat-value">{{ stats.totalTests }}</span>
-      <span class="stat-label">{{ 'test.history.statsTestsDone' | transloco }}</span>
-    </div>
-    <div class="stat-item">
-      <span class="stat-value">{{ stats.completedTests }}</span>
-      <span class="stat-label">{{ 'test.history.statsCompleted' | transloco }}</span>
-    </div>
-    <div class="stat-item">
-      <span class="stat-value">{{ stats.averageScorePercent }}%</span>
-      <span class="stat-label">{{ 'test.history.statsAvgScore' | transloco }}</span>
-    </div>
-    <div class="stat-item">
-      <span class="stat-value">{{ stats.totalTimeSpentSeconds | duration }}</span>
-      <span class="stat-label">{{ 'test.history.statsTotalTime' | transloco }}</span>
-    </div>
-  </div>
-  }
-
-  @if (tests.length === 0) {
-  <p>{{ 'test.history.noTests' | transloco }}</p>
-  } @else {
-  <div class="test-list">
-    @for (test of tests; track test._id) {
-    <div class="card test-card">
-      <div class="test-card-main">
-        <div class="test-date">
-          {{ (test.completedAt ?? test.updatedAt ?? test.createdAt) | date:'medium' }}
-          @if (!test.completedAt) {
-          <span class="badge-in-progress">{{ 'test.history.inProgress' | transloco }}</span>
-          }
+<div class="container md" *transloco="let t">
+  <div class="card">
+    <div class="card-header p-4 d-flex justify-content-between align-items-center">
+      <div class="d-flex align-items-center">
+        <div class="header-icon-container me-3">
+          <span class="material-symbols-outlined">
+            history
+          </span>
         </div>
-        <div class="test-score">
-          {{ getCorrectCount(test) }} / {{ test.questions.length }} {{ 'test.history.correctSuffix' | transloco }}
-          @if (getWrongCount(test) > 0) {
-          <span class="wrong-count">({{ getWrongCount(test) }} {{ 'test.history.wrongSuffix' | transloco }})</span>
-          }
+        <div>
+          <h2 class="card-title">{{ 'test.history.title' | transloco }}</h2>
+          <h6 class="card-subtitle mb-0 text-body-secondary">{{ 'test.history.subtitle' | transloco }}</h6>
         </div>
-        <div class="test-duration">{{ test.elapsed_time | duration }}</div>
       </div>
-      <div class="test-card-actions">
-        @if (test.completedAt) {
-        <button type="button" class="btn btn-outline-primary" (click)="openTest(test)">{{ 'test.history.review' | transloco }}</button>
-        } @else {
-        <button type="button" class="btn btn-primary" (click)="resumeTest(test)">{{ 'test.history.resume' | transloco }}</button>
-        <button type="button" class="btn btn-outline-danger" (click)="stopTest(test)">{{ 'test.history.terminate' | transloco }}</button>
+      <a routerLink="/setup-test" class="btn btn-primary d-flex align-items-center gap-2">
+        <span>+</span> {{ 'test.history.newTestButton' | transloco }}
+      </a>
+    </div>
+    <div class="card-body p-4">
+
+      <div class="filter-bar mb-4">
+        <div class="row align-items-center justify-content-between row-gap-3">
+          <div class="col-md-3 subject-filter-col">
+            <app-searchable-select
+              [options]="subjectOptions"
+              [value]="selectedSubjectId"
+              [allOptionLabel]="t('common.allSubjects')"
+              [placeholder]="t('common.allSubjects')"
+              (valueChange)="onSubjectSelected($event)"
+            ></app-searchable-select>
+          </div>
+
+          <div class="col-md-3 subject-filter-col">
+            <app-searchable-select
+              [options]="topicOptions"
+              [value]="selectedTopicId"
+              [allOptionLabel]="t('common.allTopics')"
+              [placeholder]="t('common.allTopics')"
+              (valueChange)="onTopicSelected($event)"
+            ></app-searchable-select>
+          </div>
+
+          <div class="col-md-3 subject-filter-col">
+            <select class="form-select" [(ngModel)]="selectedStatus" (ngModelChange)="onStatusChange()">
+              <option value="all">{{ 'test.history.statusAll' | transloco }}</option>
+              <option value="completed">{{ 'test.history.statusCompleted' | transloco }}</option>
+              <option value="inProgress">{{ 'test.history.statusToComplete' | transloco }}</option>
+            </select>
+          </div>
+
+          <div class="col-md-3 d-flex align-items-center">
+            <div class="form-check mb-0">
+              <input
+                type="checkbox"
+                class="form-check-input"
+                id="onlyWrongFilter"
+                [checked]="onlyWrong"
+                (change)="onOnlyWrongChange($any($event.target).checked)"
+              >
+              <label class="form-check-label" for="onlyWrongFilter">{{ 'test.history.onlyWrongLabel' | transloco }}</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      @if (stats && stats.totalTests > 0) {
+      <div class="stats-summary mb-4">
+        <div class="stat-item">
+          <span class="stat-value">{{ stats.totalTests }}</span>
+          <span class="stat-label">{{ 'test.history.statsTestsDone' | transloco }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">{{ stats.completedTests }}</span>
+          <span class="stat-label">{{ 'test.history.statsCompleted' | transloco }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">{{ stats.averageScorePercent }}%</span>
+          <span class="stat-label">{{ 'test.history.statsAvgScore' | transloco }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">{{ stats.totalTimeSpentSeconds | duration }}</span>
+          <span class="stat-label">{{ 'test.history.statsTotalTime' | transloco }}</span>
+        </div>
+      </div>
+      }
+
+      @if (tests.length === 0) {
+      <p>{{ 'test.history.noTests' | transloco }}</p>
+      } @else {
+      <div class="test-list">
+        @for (test of tests; track test._id) {
+        <div class="card test-card">
+          <div class="test-card-main">
+            <div class="test-date">
+              {{ (test.completedAt ?? test.updatedAt ?? test.createdAt) | date:'medium' }}
+              @if (!test.completedAt) {
+              <span class="badge-in-progress">{{ 'test.history.inProgress' | transloco }}</span>
+              }
+            </div>
+            <div class="test-score">
+              {{ getCorrectCount(test) }} / {{ test.questions.length }} {{ 'test.history.correctSuffix' | transloco }}
+              @if (getWrongCount(test) > 0) {
+              <span class="wrong-count">({{ getWrongCount(test) }} {{ 'test.history.wrongSuffix' | transloco }})</span>
+              }
+            </div>
+            <div class="test-duration">{{ test.elapsed_time | duration }}</div>
+          </div>
+          <div class="test-card-actions">
+            @if (test.completedAt) {
+            <button type="button" class="btn btn-outline-primary" (click)="openTest(test)">{{ 'test.history.review' | transloco }}</button>
+            } @else {
+            <button type="button" class="btn btn-primary" (click)="resumeTest(test)">{{ 'test.history.resume' | transloco }}</button>
+            <button type="button" class="btn btn-outline-danger" (click)="stopTest(test)">{{ 'test.history.terminate' | transloco }}</button>
+            }
+          </div>
+        </div>
         }
       </div>
-    </div>
-    }
-  </div>
 
-  <div class="d-flex justify-content-between align-items-center mt-4">
-    <button type="button" class="btn" (click)="previousPage()" [disabled]="currentPage === 1">{{ 'common.previous' | transloco }}</button>
-    <span>{{ 'common.pageOf' | transloco:{ current: currentPage, total: totalPages } }}</span>
-    <button type="button" class="btn" (click)="nextPage()" [disabled]="currentPage >= totalPages">{{ 'common.next' | transloco }}</button>
+      <div class="d-flex justify-content-between align-items-center mt-4">
+        <button type="button" class="btn" (click)="previousPage()" [disabled]="currentPage === 1">{{ 'common.previous' | transloco }}</button>
+        <span>{{ 'common.pageOf' | transloco:{ current: currentPage, total: totalPages } }}</span>
+        <button type="button" class="btn" (click)="nextPage()" [disabled]="currentPage >= totalPages">{{ 'common.next' | transloco }}</button>
+      </div>
+      }
+    </div>
   </div>
-  }
 </div>

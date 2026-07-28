@@ -48,6 +48,9 @@ export type RandomCardFIlter = Pick<CardFilter, 'subject_id' | 'topic_id'> & {
   numFlashcard?: number;
 };
 
-// ha gli stessi attributi di cardfilter tranne il titolo
-export type TestFilter = Omit<CardFilter, 'title'>;
+// ha gli stessi attributi di cardfilter tranne il titolo, più i filtri sulle risposte sbagliate e sullo stato
+export type TestFilter = Omit<CardFilter, 'title'> & {
+  onlyWrong?: boolean;
+  completed?: boolean;
+};
 

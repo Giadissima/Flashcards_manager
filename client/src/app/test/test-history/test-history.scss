@@ -1,3 +1,7 @@
+.subject-filter-col {
+  max-width: 320px;
+}
+
 .stats-summary {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));

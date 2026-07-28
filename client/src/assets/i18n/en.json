@@ -173,7 +173,12 @@
     },
     "history": {
       "title": "Test History",
+      "subtitle": "Review your past tests and progress",
       "newTestButton": "New Test",
+      "onlyWrongLabel": "Show only tests with wrong answers",
+      "statusAll": "All statuses",
+      "statusCompleted": "Completed",
+      "statusToComplete": "To complete",
       "statsTestsDone": "Tests taken",
       "statsCompleted": "Completed",
       "statsAvgScore": "Average correct answers",
