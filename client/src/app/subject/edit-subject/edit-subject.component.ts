@@ -89,7 +89,7 @@ export class EditSubjectComponent implements OnInit, OnDestroy {
   // subject.icon è l'id del file salvato su Mongo, non una URL: va risolto
   // sull'endpoint che serve i byte del file (stessa logica di manage-subjects)
   getIconUrl(): string {
-    return this.subject?.icon ? `${baseUrlAPI}file/${this.subject.icon}` : 'assets/logo3.png';
+    return this.subject?.icon ? `${baseUrlAPI}file/${this.subject.icon}` : 'assets/favicon.png';
   }
 
   async updateSubject(): Promise<void> {

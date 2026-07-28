@@ -3,7 +3,7 @@
 Flashcard Manager è un sito web progettato per aiutarti a studiare in modo più efficace tramite la creazione di flashcard personalizzate e test su misura. Grazie a funzionalità avanzate, puoi organizzare il tuo apprendimento in base a materie e argomenti specifici.
 
 <p align="center">
-  <img src="client/assets/logo-with-name.png" width="150" alt="SortImages Logo" />
+  <img src="client/src/assets/favicon.png" width="150" alt="Flashcards' Logo" />
 </p>
 
 ## Funzionalità principali
