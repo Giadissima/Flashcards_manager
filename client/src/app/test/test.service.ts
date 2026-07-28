@@ -28,9 +28,9 @@ private baseUrl = 'test';
     return this.restClient.get<Test>(this.baseUrl + '/' + id);
   }
 
-  // Legge le statistiche aggregate su tutti i test
-  getStats(): Promise<TestStats> {
-    return this.restClient.get<TestStats>(this.baseUrl + '/stats');
+  // Legge le statistiche aggregate sui test, filtrabili come getAll
+  getStats(filter?: Pick<TestFilter, 'subject_id' | 'topic_id' | 'onlyWrong' | 'completed'>): Promise<TestStats> {
+    return this.restClient.get<TestStats>(this.baseUrl + '/stats', filter);
   }
 
   updateElapsedTime(testId: string, elapsed_time: number): Promise<void> {

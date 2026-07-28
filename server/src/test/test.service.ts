@@ -12,8 +12,13 @@ import {
 
 import { Flashcard } from 'src/flashcards/flashcards.schema';
 import { Test, TestDocument } from './test.schema';
-import { Model, SortOrder, Types } from 'mongoose';
-import { TestCreateRequest, TestFilterDto, TestStats } from './test.dto';
+import { Model, PipelineStage, Types } from 'mongoose';
+import {
+  TestCreateRequest,
+  TestFilterDto,
+  TestStats,
+  TestStatsFilterDto,
+} from './test.dto';
 import { FlashcardsService } from 'src/flashcards/flashcards.service';
 
 @Injectable()
@@ -74,26 +79,104 @@ export class TestService {
     );
   }
 
+  // Condiviso tra findAll e getStats: entrambi devono rispettare gli stessi
+  // filtri (subject_id/topic_id/onlyWrong/completed) applicati sulla lista dei
+  // test, così che le stats mostrate corrispondano a ciò che è filtrato
+  private buildFilterPipeline(filter: TestStatsFilterDto): PipelineStage[] {
+    const pipeline: PipelineStage[] = [];
+
+    if (filter.onlyWrong) {
+      pipeline.push({ $match: { 'questions.is_correct': false } });
+    }
+
+    if (filter.completed === true) {
+      pipeline.push({ $match: { completedAt: { $exists: true, $ne: null } } });
+    } else if (filter.completed === false) {
+      pipeline.push({
+        $match: {
+          $or: [{ completedAt: { $exists: false } }, { completedAt: null }],
+        },
+      });
+    }
+
+    // subject_id/topic_id non sono salvati sul test: si risale alle flashcard
+    // delle domande per sapere a quale materia/argomento appartiene il test.
+    // questions.flashcard_id in alcuni documenti storici è salvato come stringa
+    // invece che come ObjectId: va convertito esplicitamente prima del $lookup,
+    // altrimenti il confronto con flashcard._id (ObjectId) non troverebbe nulla
+    if (filter.subject_id || filter.topic_id) {
+      pipeline.push({
+        $addFields: {
+          flashcardIds: {
+            $map: {
+              input: '$questions',
+              as: 'q',
+              in: { $toObjectId: '$$q.flashcard_id' },
+            },
+          },
+        },
+      });
+
+      pipeline.push({
+        $lookup: {
+          from: 'flashcard',
+          localField: 'flashcardIds',
+          foreignField: '_id',
+          as: 'matchedFlashcards',
+        },
+      });
+
+      const flashcardMatch: Record<string, any> = {};
+      if (filter.subject_id) {
+        flashcardMatch['matchedFlashcards.subject_id'] = new Types.ObjectId(
+          filter.subject_id,
+        );
+      }
+      if (filter.topic_id) {
+        flashcardMatch['matchedFlashcards.topic_id'] = new Types.ObjectId(
+          filter.topic_id,
+        );
+      }
+      pipeline.push({ $match: flashcardMatch });
+    }
+
+    return pipeline;
+  }
+
   async findAll(
     filter: TestFilterDto,
   ): Promise<BasePaginatedResult<TestDocument>> {
-    const [data, count] = await Promise.all([
-      this.testModel
-        .find()
-        .sort([
-          [filter.sortField, filter.sortDirection as SortOrder],
-          ['_id', 'desc'],
-        ])
-        .skip(filter.skip)
-        .limit(filter.limit)
-        .exec(),
-      this.testModel.find().countDocuments(),
-    ]);
-    return { data, count };
+    const pipeline = this.buildFilterPipeline(filter);
+
+    pipeline.push({
+      $facet: {
+        data: [
+          {
+            $sort: {
+              [filter.sortField]: filter.sortDirection === 'asc' ? 1 : -1,
+              _id: -1,
+            },
+          },
+          { $skip: filter.skip },
+          { $limit: filter.limit },
+          { $project: { matchedFlashcards: 0, flashcardIds: 0 } },
+        ],
+        totalCount: [{ $count: 'count' }],
+      },
+    });
+
+    const [result] = await this.testModel.aggregate(pipeline).exec();
+
+    return {
+      data: result.data,
+      count: result.totalCount[0]?.count ?? 0,
+    };
   }
 
-  async getStats(): Promise<TestStats> {
-    const [result] = await this.testModel.aggregate([
+  async getStats(filter: TestStatsFilterDto = {}): Promise<TestStats> {
+    const pipeline = this.buildFilterPipeline(filter);
+
+    pipeline.push(
       {
         $addFields: {
           totalQuestions: { $size: '$questions' },
@@ -120,7 +203,9 @@ export class TestService {
           totalCorrectAnswers: { $sum: '$correctQuestions' },
         },
       },
-    ]);
+    );
+
+    const [result] = await this.testModel.aggregate(pipeline);
 
     const totalQuestionsAnswered = result?.totalQuestionsAnswered ?? 0;
     const totalCorrectAnswers = result?.totalCorrectAnswers ?? 0;
