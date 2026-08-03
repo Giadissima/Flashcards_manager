@@ -11,6 +11,14 @@ function stripHtmlTags(value: string): string {
   return value.replace(/<[^>]*>/g, '');
 }
 
+// Un'immagine è contenuto a tutti gli effetti (es. una risposta fatta solo
+// del disegno richiesto), ma non ha testo visibile: senza questo controllo
+// il minimo di caratteri bloccherebbe anche una risposta valida fatta di
+// sola immagine.
+function containsImage(value: string): boolean {
+  return /<img\b/i.test(value);
+}
+
 export interface HtmlTextLengthOptions extends ValidationOptions {
   // un editor TipTap "vuoto" produce comunque markup tipo "<p></p>", non una
   // stringa vuota: per i campi opzionali va trattato come nessun contenuto,
@@ -35,8 +43,12 @@ export function IsHtmlTextLength(
         validate(value: unknown) {
           if (typeof value !== 'string') return false;
           const length = stripHtmlTags(value).length;
-          if (allowEmpty && length === 0) return true;
-          return length >= min && length <= max;
+          const hasImage = containsImage(value);
+          if (allowEmpty && length === 0 && !hasImage) return true;
+          if (length > max) return false;
+          if (length >= min) return true;
+          // sotto il minimo di testo: valido comunque se c'è almeno un'immagine
+          return hasImage;
         },
         defaultMessage(args: ValidationArguments) {
           return `${args.property} must contain between ${min} and ${max} characters (formatting tags excluded)`;

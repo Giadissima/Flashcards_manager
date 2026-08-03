@@ -31,3 +31,30 @@
   border-radius: 50%;
   flex-shrink: 0;
 }
+
+.flashcard-meta {
+  font-size: 0.8rem;
+}
+
+.flashcard-text img {
+  cursor: zoom-in;
+}
+
+.image-modal-dialog {
+  max-width: min(90vw, 900px);
+}
+
+.image-modal-content {
+  .modal-body {
+    padding: 0;
+    display: flex;
+    justify-content: center;
+  }
+}
+
+.image-modal-img {
+  max-width: 100%;
+  max-height: 80vh;
+  height: auto;
+  border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);
+}

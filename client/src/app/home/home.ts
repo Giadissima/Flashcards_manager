@@ -15,16 +15,19 @@ import { Topic } from '../models/topic.dto';
 import { TopicService } from '../topic/topic.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { getSubjectIconUrl } from '../subject/subject-icon.util';
+import { ModalComponent } from '../shared/modal/modal.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, Toast, FormsModule, KatexRendererPipe, SearchableSelectComponent, TranslocoModule],
+  imports: [CommonModule, Toast, FormsModule, KatexRendererPipe, SearchableSelectComponent, TranslocoModule, ModalComponent],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
 export class Home implements OnInit {
   flashcards: Flashcard[] = [];
+  isImageModalOpen = false;
+  selectedImageUrl: string | null = null;
   subjects: Subject[] = [];
   topics: Topic[] = [];
   selectedSubjectId: string | null | undefined = null;
@@ -166,6 +169,26 @@ export class Home implements OnInit {
     return getSubjectIconUrl(subject);
   }
 
+  getCardSubjectName(card: Flashcard): string {
+    if (card.subject_id && typeof card.subject_id !== 'string') {
+      return card.subject_id.name;
+    }
+    if (typeof card.subject_id === 'string') {
+      return this.subjects.find((s) => s._id === card.subject_id)?.name ?? '';
+    }
+    return '';
+  }
+
+  getCardTopicName(card: Flashcard): string {
+    if (card.topic_id && typeof card.topic_id !== 'string') {
+      return card.topic_id.name;
+    }
+    if (typeof card.topic_id === 'string') {
+      return this.topics.find((t) => t._id === card.topic_id)?.name ?? '';
+    }
+    return '';
+  }
+
   getCardBody(card: Flashcard): string {
     if (!card._id) return card.question;
     return (
@@ -183,6 +206,14 @@ export class Home implements OnInit {
   seeAnswer(card: Flashcard): void {
     if (!card._id) return;
     this.showAnswerMap[card._id] = !this.showAnswerMap[card._id];
+  }
+
+  onFlashcardTextClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (target.tagName === 'IMG') {
+      this.selectedImageUrl = (target as HTMLImageElement).src;
+      this.isImageModalOpen = true;
+    }
   }
 
   async deleteCard(card: Flashcard): Promise<void> {

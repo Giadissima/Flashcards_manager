@@ -2,10 +2,13 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Editor } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
+import Image from '@tiptap/extension-image';
 import { TiptapEditorDirective } from 'ngx-tiptap';
 import { MathExtension } from '@aarkue/tiptap-math-extension';
 import { CommonModule } from '@angular/common';
 import { FlashcardService } from '../flashcard.service';
+import { FileService } from '../../shared/file/file.service';
+import { getFileUrl } from '../../shared/file/file-url.util';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
 import { Toast } from "../../toast/toast";
@@ -14,6 +17,8 @@ import { Topic } from '../../models/topic.dto';
 import { TopicService } from '../../topic/topic.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { charMinLength, titleMaxLength } from '../../../config/config';
+
+const maxImageSize = 5 * 1024 * 1024;
 
 @Component({
   selector: 'app-create-card',
@@ -39,16 +44,17 @@ export class CreateFlashcard implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private flashcardService: FlashcardService,
+    private fileService: FileService,
     private toastService: ToastService,
     private topicService: TopicService,
     private subjectService: SubjectService,
     private transloco: TranslocoService
   ) {
     this.questionEditor = new Editor({
-      extensions: [StarterKit, MathExtension.configure({ evaluation: false })],
+      extensions: [StarterKit, MathExtension.configure({ evaluation: false }), Image.configure({ inline: false })],
     });
     this.answerEditor = new Editor({
-      extensions: [StarterKit, MathExtension.configure({ evaluation: false })],
+      extensions: [StarterKit, MathExtension.configure({ evaluation: false }), Image.configure({ inline: false })],
     });
   }
 
@@ -112,6 +118,33 @@ export class CreateFlashcard implements OnInit, OnDestroy {
     const textarea = event.target as HTMLTextAreaElement;
     textarea.style.height = 'auto';
     textarea.style.height = textarea.scrollHeight + 'px';
+  }
+
+  async onImageSelected(event: Event, editor: Editor): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      this.toastService.show(this.transloco.translate('flashcard.toast.invalidImageType'), 'error');
+      input.value = '';
+      return;
+    }
+    if (file.size > maxImageSize) {
+      this.toastService.show(this.transloco.translate('flashcard.toast.imageTooLarge'), 'error');
+      input.value = '';
+      return;
+    }
+
+    try {
+      const { _id } = await this.fileService.upload(file);
+      editor.chain().focus().setImage({ src: getFileUrl(_id) }).run();
+    } catch (err) {
+      console.error('Error uploading image', err);
+      this.toastService.show(this.transloco.translate('flashcard.toast.imageUploadError'), 'error');
+    } finally {
+      input.value = '';
+    }
   }
 
   async addCard() {

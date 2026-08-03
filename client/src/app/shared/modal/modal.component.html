@@ -1,0 +1,26 @@
+<div class="modal fade" [class.show]="isOpen" [style.display]="isOpen ? 'block' : 'none'" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered" [class]="dialogClass" role="document">
+    <div class="modal-content" [class]="contentClass">
+      @if (showHeader) {
+      <div class="modal-header">
+        <div class="d-flex align-items-center gap-2">
+          <ng-content select="[modal-header-start]"></ng-content>
+          @if (title) {
+          <h5 class="modal-title mb-0">{{ title }}</h5>
+          }
+        </div>
+        <button type="button" class="btn-close" (click)="close()"></button>
+      </div>
+      }
+      <div class="modal-body">
+        <ng-content></ng-content>
+      </div>
+      @if (showFooter) {
+      <div class="modal-footer">
+        <ng-content select="[modal-footer]"></ng-content>
+      </div>
+      }
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade" [class.show]="isOpen" [style.display]="isOpen ? 'block' : 'none'" (click)="onBackdropClick()"></div>

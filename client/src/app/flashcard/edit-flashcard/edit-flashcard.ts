@@ -5,8 +5,11 @@ import { charMinLength, titleMaxLength } from '../../../config/config';
 
 import { CommonModule } from '@angular/common';
 import { Editor } from '@tiptap/core';
+import Image from '@tiptap/extension-image';
 import { Flashcard } from '../../models/flashcard.dto';
 import { FlashcardService } from '../flashcard.service';
+import { FileService } from '../../shared/file/file.service';
+import { getFileUrl } from '../../shared/file/file-url.util';
 import { MathExtension } from '@aarkue/tiptap-math-extension';
 import StarterKit from '@tiptap/starter-kit';
 import { Subject } from '../../models/subject.dto';
@@ -17,6 +20,8 @@ import { ToastService } from '../../toast/toast.service';
 import { Topic } from '../../models/topic.dto';
 import { TopicService } from '../../topic/topic.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
+
+const maxImageSize = 5 * 1024 * 1024;
 
 @Component({
   selector: 'app-edit-flashcard',
@@ -40,16 +45,17 @@ export class EditFlashcard implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private flashcardService: FlashcardService,
+    private fileService: FileService,
     private toastService: ToastService,
     private topicService: TopicService,
     private subjectService: SubjectService,
     private transloco: TranslocoService
   ) {
     this.questionEditor = new Editor({
-      extensions: [StarterKit, MathExtension.configure({ evaluation: false })],
+      extensions: [StarterKit, MathExtension.configure({ evaluation: false }), Image.configure({ inline: false })],
     });
     this.answerEditor = new Editor({
-      extensions: [StarterKit, MathExtension.configure({ evaluation: false })],
+      extensions: [StarterKit, MathExtension.configure({ evaluation: false }), Image.configure({ inline: false })],
     });
   }
 
@@ -146,6 +152,33 @@ export class EditFlashcard implements OnInit, OnDestroy {
     const textarea = event.target as HTMLTextAreaElement;
     textarea.style.height = 'auto';
     textarea.style.height = textarea.scrollHeight + 'px';
+  }
+
+  async onImageSelected(event: Event, editor: Editor): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      this.toastService.show(this.transloco.translate('flashcard.toast.invalidImageType'), 'error');
+      input.value = '';
+      return;
+    }
+    if (file.size > maxImageSize) {
+      this.toastService.show(this.transloco.translate('flashcard.toast.imageTooLarge'), 'error');
+      input.value = '';
+      return;
+    }
+
+    try {
+      const { _id } = await this.fileService.upload(file);
+      editor.chain().focus().setImage({ src: getFileUrl(_id) }).run();
+    } catch (err) {
+      console.error('Error uploading image', err);
+      this.toastService.show(this.transloco.translate('flashcard.toast.imageUploadError'), 'error');
+    } finally {
+      input.value = '';
+    }
   }
 
   async loadTopicsBySubject(subjectId: string) {

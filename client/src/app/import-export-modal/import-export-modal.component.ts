@@ -8,92 +8,68 @@ import { ToastService } from '../toast/toast.service';
 import { SearchableSelectComponent, SelectOption } from '../shared/searchable-select/searchable-select.component';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { getSubjectIconUrl } from '../subject/subject-icon.util';
+import { ModalComponent } from '../shared/modal/modal.component';
 
 @Component({
   selector: 'app-import-export-modal',
   standalone: true,
-  imports: [CommonModule, SearchableSelectComponent, TranslocoModule],
+  imports: [CommonModule, SearchableSelectComponent, TranslocoModule, ModalComponent],
   template: `
-    <div class="modal fade" [class.show]="isOpen" [style.display]="isOpen ? 'block' : 'none'" tabindex="-1" role="dialog" *transloco="let t">
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <div class="d-flex align-items-center gap-2">
-              <button type="button" class="icon-btn" (click)="goBack()" [attr.aria-label]="t('importExport.backToSettings')">
-                <span class="material-symbols-outlined">arrow_back</span>
-              </button>
-              <h5 class="modal-title mb-0">{{ 'importExport.title' | transloco }}</h5>
-            </div>
-            <button type="button" class="btn-close" (click)="close()"></button>
-          </div>
-          <div class="modal-body">
-            <!-- Export Section -->
-            <section class="mb-4">
-              <h6>{{ 'importExport.exportHeader' | transloco }}</h6>
-              <div class="mb-3">
-                <label class="form-label">{{ 'importExport.filterBySubject' | transloco }}</label>
-                <app-searchable-select
-                  [options]="subjectOptions"
-                  [value]="selectedSubjectId"
-                  [allOptionLabel]="t('common.allSubjects')"
-                  [placeholder]="t('common.allSubjects')"
-                  (valueChange)="selectedSubjectId = $event ?? null"
-                ></app-searchable-select>
-              </div>
-              <button class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2" (click)="onExport()" [disabled]="isLoading">
-                <span class="material-symbols-outlined">download</span>
-                {{ 'importExport.exportButton' | transloco }}
-              </button>
-            </section>
+    <app-modal [isOpen]="isOpen" [title]="'importExport.title' | transloco" (closed)="close()" *transloco="let t">
+      <ng-container modal-header-start>
+        <button type="button" class="icon-btn" (click)="goBack()" [attr.aria-label]="t('importExport.backToSettings')">
+          <span class="material-symbols-outlined">arrow_back</span>
+        </button>
+      </ng-container>
 
-            <hr>
+      <!-- Export Section -->
+      <section class="mb-4">
+        <h6>{{ 'importExport.exportHeader' | transloco }}</h6>
+        <div class="mb-3">
+          <label class="form-label">{{ 'importExport.filterBySubject' | transloco }}</label>
+          <app-searchable-select
+            [options]="subjectOptions"
+            [value]="selectedSubjectId"
+            [allOptionLabel]="t('common.allSubjects')"
+            [placeholder]="t('common.allSubjects')"
+            (valueChange)="selectedSubjectId = $event ?? null"
+          ></app-searchable-select>
+        </div>
+        <button class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2" (click)="onExport()" [disabled]="isLoading">
+          <span class="material-symbols-outlined">download</span>
+          {{ 'importExport.exportButton' | transloco }}
+        </button>
+      </section>
 
-            <!-- Import Section -->
-            <section>
-              <h6>{{ 'importExport.importHeader' | transloco }}</h6>
-              <div class="mb-3">
-                <label for="importFile" class="form-label">{{ 'importExport.selectFile' | transloco }}</label>
-                <input type="file" id="importFile" class="form-control" (change)="onFileSelected($event)" accept=".json,.zip">
-              </div>
-              <button class="btn btn-success w-100 d-flex align-items-center justify-content-center gap-2" (click)="onImport()" [disabled]="isLoading || !selectedFile">
-                <span class="material-symbols-outlined">upload</span>
-                {{ 'importExport.importButton' | transloco }}
-              </button>
-            </section>
+      <hr>
 
-            <div *ngIf="isLoading" class="text-center mt-3">
-              <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">{{ 'common.loading' | transloco }}</span>
-              </div>
-            </div>
-          </div>
+      <!-- Import Section -->
+      <section>
+        <h6>{{ 'importExport.importHeader' | transloco }}</h6>
+        <div class="mb-3">
+          <label for="importFile" class="form-label">{{ 'importExport.selectFile' | transloco }}</label>
+          <input type="file" id="importFile" class="form-control" (change)="onFileSelected($event)" accept=".json,.zip">
+        </div>
+        <button class="btn btn-success w-100 d-flex align-items-center justify-content-center gap-2" (click)="onImport()" [disabled]="isLoading || !selectedFile">
+          <span class="material-symbols-outlined">upload</span>
+          {{ 'importExport.importButton' | transloco }}
+        </button>
+      </section>
+
+      <div *ngIf="isLoading" class="text-center mt-3">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">{{ 'common.loading' | transloco }}</span>
         </div>
       </div>
-    </div>
-    <div class="modal-backdrop fade" [class.show]="isOpen" [style.display]="isOpen ? 'block' : 'none'" (click)="close()"></div>
+    </app-modal>
   `,
   styles: [`
-    .modal {
-      background: rgba(0,0,0,0.5);
-      z-index: 1055;
-    }
-    .modal-backdrop {
-      z-index: 1050;
-    }
-    .modal.show {
-      display: block;
-    }
     .material-symbols-outlined {
       font-size: 20px;
     }
     h6 {
       font-weight: bold;
       margin-bottom: 1rem;
-    }
-    .modal-content {
-      border-radius: 12px;
-      border: none;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     }
     .icon-btn {
       background: none;

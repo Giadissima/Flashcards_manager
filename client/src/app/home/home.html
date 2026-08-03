@@ -81,10 +81,13 @@
     <div class="card flashcard flashcard-topic-color" [style.border-top-color]="getCardColor(card)">
       <div class="flashcard-title d-flex align-items-center gap-2">
         <img [src]="getCardSubjectIconUrl(card)" alt="" class="flashcard-subject-icon">
-        <h5 class="card-title mb-0">{{ card.title }}</h5>
+        <div>
+          <h5 class="card-title mb-0">{{ card.title }}</h5>
+          <div class="flashcard-meta text-muted">{{ getCardSubjectName(card) }} · {{ getCardTopicName(card) }}</div>
+        </div>
       </div>
       <div class="flashcard-body">
-        <div class="flashcard-text" [innerHTML]="getCardBody(card) | katexRenderer"></div>
+        <div class="flashcard-text" [innerHTML]="getCardBody(card) | katexRenderer" (click)="onFlashcardTextClick($event)"></div>
         <div class="flashcard-actions">
           <button class="btn btn-primary" (click)="seeAnswer(card)">
             {{ getCardButtonText(card) }}
@@ -122,5 +125,11 @@
     <button type="button" class="btn" (click)="nextPage()" [disabled]="currentPage >= totalPages">{{ 'common.next' | transloco }}</button>
   </div>
 </div>
+
+<app-modal [(isOpen)]="isImageModalOpen" [dialogClass]="'image-modal-dialog'" [contentClass]="'image-modal-content'">
+  @if (selectedImageUrl) {
+  <img [src]="selectedImageUrl" alt="" class="image-modal-img">
+  }
+</app-modal>
 
 <app-toast></app-toast>

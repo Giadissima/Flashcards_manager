@@ -350,6 +350,18 @@ input:-webkit-autofill:active {
    spazio ai tratti discendenti, che l'overflow altrimenti taglierebbe. */
 .flashcard-text,
 .question-text,
+.answer,
+.tiptap {
+  img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--border-radius-sm);
+    margin: calc(var(--spacing-unit) * 1.5) 0;
+  }
+}
+
+.flashcard-text,
+.question-text,
 .answer {
   .katex-display {
     overflow-x: auto;

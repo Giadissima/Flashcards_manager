@@ -1,12 +1,59 @@
-import { Controller, Get, NotFoundException, Param, Res } from '@nestjs/common';
-import { ApiOperation } from '@nestjs/swagger';
+import {
+  BadRequestException,
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  Post,
+  Res,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
+import { ApiBody, ApiConsumes, ApiOperation } from '@nestjs/swagger';
 import { FileService } from './file.service';
 import { Readable } from 'stream';
 import { Response } from 'express';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('file')
 export class FileController {
   constructor(private readonly fileService: FileService) {}
+
+  @ApiOperation({
+    description:
+      'upload a generic image file and get back its id (used to embed inline images in flashcard question/answer)',
+  })
+  @Post()
+  @UseInterceptors(
+    FileInterceptor('file', { limits: { fileSize: 5 * 1024 * 1024 } }),
+  )
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+          description: 'Image file to upload',
+        },
+      },
+      required: ['file'],
+    },
+  })
+  async upload(
+    @UploadedFile() file?: Express.Multer.File,
+  ): Promise<{ _id: string }> {
+    if (!file) {
+      throw new BadRequestException('Nessun file caricato');
+    }
+    if (!file.mimetype.startsWith('image/')) {
+      throw new BadRequestException("Il file deve essere un'immagine");
+    }
+
+    const doc = await this.fileService.create([file]);
+    return { _id: String(doc._id) };
+  }
 
   @ApiOperation({ description: 'get a specific file from db' })
   @Get(':id') // TODO aggiungere la response di swaggere della NotFoundException

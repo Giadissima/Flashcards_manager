@@ -54,6 +54,10 @@
               (click)="questionEditor.commands.insertContent('$$')"
               class="btn btn-outline-secondary"
               type="button"><i class="bi bi-calculator-fill"></i>{{ 'flashcard.create.outlineEquation' | transloco }}</button>
+            <label for="question-image-input" class="btn btn-outline-secondary mb-0" title="{{ 'flashcard.create.insertImage' | transloco }}">
+              <i class="bi bi-image"></i>{{ 'flashcard.create.insertImage' | transloco }}
+            </label>
+            <input type="file" id="question-image-input" accept="image/*" hidden (change)="onImageSelected($event, questionEditor)">
           </div>
           <tiptap-editor [editor]="questionEditor" class="editorCustom"></tiptap-editor>
         </div>
@@ -84,6 +88,10 @@
               (click)="answerEditor.commands.insertContent('$$')"
               class="btn btn-outline-secondary"
               type="button"><i class="bi bi-calculator-fill"></i>{{ 'flashcard.create.outlineEquation' | transloco }}</button>
+            <label for="answer-image-input" class="btn btn-outline-secondary mb-0" title="{{ 'flashcard.create.insertImage' | transloco }}">
+              <i class="bi bi-image"></i>{{ 'flashcard.create.insertImage' | transloco }}
+            </label>
+            <input type="file" id="answer-image-input" accept="image/*" hidden (change)="onImageSelected($event, answerEditor)">
           </div>
           <tiptap-editor [editor]="answerEditor" class="editorCustom"></tiptap-editor>
         </div>

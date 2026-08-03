@@ -70,6 +70,7 @@
       "answerLabel": "Risposta",
       "inlineEquation": "Equazione inline",
       "outlineEquation": "Equazione a blocco",
+      "insertImage": "Inserisci immagine",
       "subjectLabel": "Materia",
       "topicLabel": "Argomento",
       "addButton": "Aggiungi Nuova Card"
@@ -85,7 +86,10 @@
       "updateError": "Errore durante l'aggiornamento",
       "loadError": "Impossibile caricare i dati della card",
       "subjectsLoadError": "Impossibile caricare le materie",
-      "topicsLoadError": "Impossibile caricare gli argomenti per la materia selezionata"
+      "topicsLoadError": "Impossibile caricare gli argomenti per la materia selezionata",
+      "imageUploadError": "Errore durante il caricamento dell'immagine",
+      "imageTooLarge": "L'immagine non può superare i 5MB",
+      "invalidImageType": "Il file selezionato non è un'immagine"
     }
   },
   "topic": {

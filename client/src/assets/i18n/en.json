@@ -70,6 +70,7 @@
       "answerLabel": "Answer",
       "inlineEquation": "Inline equation",
       "outlineEquation": "Outline equation",
+      "insertImage": "Insert image",
       "subjectLabel": "Subject",
       "topicLabel": "Topic",
       "addButton": "Add New Card"
@@ -85,7 +86,10 @@
       "updateError": "Failed to update card",
       "loadError": "Failed to load card data",
       "subjectsLoadError": "Failed to load subjects",
-      "topicsLoadError": "Failed to load topics for the selected subject"
+      "topicsLoadError": "Failed to load topics for the selected subject",
+      "imageUploadError": "Error uploading image",
+      "imageTooLarge": "Image can't exceed 5MB",
+      "invalidImageType": "Selected file is not an image"
     }
   },
   "topic": {

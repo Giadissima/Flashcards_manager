@@ -3,86 +3,61 @@ import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange
 import { CommonModule } from '@angular/common';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { SearchableSelectComponent, SelectOption } from '../shared/searchable-select/searchable-select.component';
+import { ModalComponent } from '../shared/modal/modal.component';
 
 export type AppLanguage = 'it' | 'en';
 
 @Component({
   selector: 'app-settings-modal',
   standalone: true,
-  imports: [CommonModule, SearchableSelectComponent, TranslocoModule],
+  imports: [CommonModule, SearchableSelectComponent, TranslocoModule, ModalComponent],
   template: `
-    <div class="modal fade" [class.show]="isOpen" [style.display]="isOpen ? 'block' : 'none'" tabindex="-1" role="dialog">
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">{{ 'settings.title' | transloco }}</h5>
-            <button type="button" class="btn-close" (click)="cancel()"></button>
+    <app-modal [isOpen]="isOpen" [title]="'settings.title' | transloco" [showFooter]="true" (closed)="cancel()">
+
+      <div class="settings-section">
+        <div class="settings-section-title">
+          <span class="material-symbols-outlined">language</span>
+          {{ 'settings.language' | transloco }}
+        </div>
+        <app-searchable-select
+          [options]="languageOptions"
+          [value]="language"
+          (valueChange)="setLanguage($event)"
+        ></app-searchable-select>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">
+          <span class="material-symbols-outlined">dark_mode</span>
+          {{ 'settings.darkMode' | transloco }}
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <div class="form-check form-switch mb-0">
+            <input class="form-check-input" type="checkbox" role="switch" id="darkModeSwitch"
+              [checked]="isDarkMode" (change)="toggleTheme()">
           </div>
-          <div class="modal-body">
-
-            <div class="settings-section">
-              <div class="settings-section-title">
-                <span class="material-symbols-outlined">language</span>
-                {{ 'settings.language' | transloco }}
-              </div>
-              <app-searchable-select
-                [options]="languageOptions"
-                [value]="language"
-                (valueChange)="setLanguage($event)"
-              ></app-searchable-select>
-            </div>
-
-            <div class="settings-section">
-              <div class="settings-section-title">
-                <span class="material-symbols-outlined">dark_mode</span>
-                {{ 'settings.darkMode' | transloco }}
-              </div>
-              <div class="d-flex align-items-center gap-2">
-                <div class="form-check form-switch mb-0">
-                  <input class="form-check-input" type="checkbox" role="switch" id="darkModeSwitch"
-                    [checked]="isDarkMode" (change)="toggleTheme()">
-                </div>
-                <span class="settings-section-desc">{{ 'settings.darkModeDesc' | transloco }}</span>
-              </div>
-            </div>
-
-            <div class="settings-section">
-              <div class="settings-section-title">
-                <span class="material-symbols-outlined">compare_arrows</span>
-                {{ 'settings.importExport' | transloco }}
-              </div>
-              <button class="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-2" (click)="openImportExport.emit()">
-                <span class="material-symbols-outlined">upload_file</span>
-                {{ 'settings.importExportButton' | transloco }}
-              </button>
-            </div>
-
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-outline-secondary" (click)="cancel()">{{ 'settings.cancel' | transloco }}</button>
-            <button type="button" class="btn btn-primary" (click)="save()">{{ 'settings.save' | transloco }}</button>
-          </div>
+          <span class="settings-section-desc">{{ 'settings.darkModeDesc' | transloco }}</span>
         </div>
       </div>
-    </div>
-    <div class="modal-backdrop fade" [class.show]="isOpen" [style.display]="isOpen ? 'block' : 'none'" (click)="cancel()"></div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">
+          <span class="material-symbols-outlined">compare_arrows</span>
+          {{ 'settings.importExport' | transloco }}
+        </div>
+        <button class="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-2" (click)="openImportExport.emit()">
+          <span class="material-symbols-outlined">upload_file</span>
+          {{ 'settings.importExportButton' | transloco }}
+        </button>
+      </div>
+
+      <ng-container modal-footer>
+        <button type="button" class="btn btn-outline-secondary" (click)="cancel()">{{ 'settings.cancel' | transloco }}</button>
+        <button type="button" class="btn btn-primary" (click)="save()">{{ 'settings.save' | transloco }}</button>
+      </ng-container>
+    </app-modal>
   `,
   styles: [`
-    .modal {
-      background: rgba(0,0,0,0.5);
-      z-index: 1055;
-    }
-    .modal-backdrop {
-      z-index: 1050;
-    }
-    .modal.show {
-      display: block;
-    }
-    .modal-content {
-      border-radius: 12px;
-      border: none;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    }
     .settings-section {
       border: 1px solid var(--border-color);
       border-radius: var(--border-radius-md);
