@@ -12,38 +12,16 @@ import {
 import { Flashcard, FlashcardDocument } from './flashcards.schema';
 import { Model, SortOrder, Types } from 'mongoose';
 import { BasePaginatedResult, validateObjectIdParam } from 'src/common.dto';
-import { FileService } from 'src/file/file.service';
 
 @Injectable()
 export class FlashcardsService {
   constructor(
     @InjectModel(Flashcard.name)
     private flashcardModel: Model<Flashcard>,
-    private readonly fileService: FileService,
   ) {}
 
-  async create(
-    createFlashcardDto: ModifyFlashcardDto,
-    files: {
-      question_img?: Express.Multer.File[];
-      answer_img?: Express.Multer.File[];
-    },
-  ): Promise<void> {
-    const question_img = files?.question_img;
-    const answer_img = files?.answer_img;
-
-    const question_img_id = question_img
-      ? (await this.fileService.create(question_img))._id
-      : undefined;
-    const answer_img_id = answer_img
-      ? (await this.fileService.create(answer_img))._id
-      : undefined;
-
-    await new this.flashcardModel({
-      ...createFlashcardDto,
-      question_img_id,
-      answer_img_id,
-    }).save();
+  async create(createFlashcardDto: ModifyFlashcardDto): Promise<void> {
+    await new this.flashcardModel(createFlashcardDto).save();
   }
 
   findOne(id: string): Promise<FlashcardDocument | null> {

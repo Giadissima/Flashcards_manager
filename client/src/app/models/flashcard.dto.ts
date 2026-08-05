@@ -10,7 +10,5 @@ export interface Flashcard {
 
   topic_id?: string | Topic;      // ObjectId serializzato come stringa (lato client viene castato sempre a stringa)
   subject_id?: string | Subject;    // ObjectId serializzato come stringa
-  question_img_id?: string; 
-  answer_img_id?: string;
 }
 

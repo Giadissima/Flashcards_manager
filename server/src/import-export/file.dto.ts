@@ -1,3 +1,8 @@
+export interface FlashcardImageMeta {
+  fileName: string;
+  mimetype: string;
+}
+
 export interface FlashcardFileFormat {
   _id: string;
   title: string;
@@ -6,6 +11,10 @@ export interface FlashcardFileFormat {
   topic_id: TopicFileFormat | undefined;
   subject_id: SubjectFileFormat | undefined;
   __v: number;
+  // presente solo negli export in zip: immagini inline referenziate nell'HTML
+  // di question/answer (<img src="/api/file/{id}">), indicizzate per id del
+  // file originale, usate dall'import per ricrearle sul nuovo db
+  images?: Record<string, FlashcardImageMeta>;
 }
 
 export interface TopicFileFormat {

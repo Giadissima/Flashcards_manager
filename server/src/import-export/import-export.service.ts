@@ -6,6 +6,7 @@ import { Flashcard } from 'src/flashcards/flashcards.schema';
 import { Topic, TopicDocument } from 'src/topic/topic.schema';
 import {
   FlashcardFileFormat,
+  FlashcardImageMeta,
   TopicFileFormat,
   SubjectFileFormat,
 } from './file.dto';
@@ -22,6 +23,27 @@ function extensionFromMimetype(mimetype: string): string {
 // Gli zip iniziano sempre con la signature "PK" (0x50 0x4B)
 function looksLikeZip(buffer: Buffer): boolean {
   return buffer.length >= 2 && buffer[0] === 0x50 && buffer[1] === 0x4b;
+}
+
+// Le immagini inline nel question/answer sono referenziate come
+// <img src="/api/file/{id mongo a 24 caratteri hex}">
+const IMAGE_REF_REGEX = /file\/([0-9a-fA-F]{24})/g;
+
+function extractImageFileIds(html: string | undefined): string[] {
+  if (!html) return [];
+  const ids = new Set<string>();
+  for (const match of html.matchAll(IMAGE_REF_REGEX)) {
+    ids.add(match[1]);
+  }
+  return [...ids];
+}
+
+function replaceImageFileIds(html: string, idMap: Map<string, string>): string {
+  if (!html) return html;
+  return html.replace(IMAGE_REF_REGEX, (full, oldId: string) => {
+    const newId = idMap.get(oldId);
+    return newId ? `file/${newId}` : full;
+  });
 }
 
 @Injectable()
@@ -62,6 +84,10 @@ export class ImportExportService {
 
     let imported = 0;
     let skipped = 0;
+
+    // Condivisa tra tutte le flashcard di questo import: se piu' card
+    // referenziano la stessa immagine, viene ricreata sul db una sola volta.
+    const restoredImageIdsByOldId = new Map<string, string>();
 
     for (const item of data) {
       const subject_obj: SubjectFileFormat | undefined =
@@ -111,6 +137,11 @@ export class ImportExportService {
       const question = item.question?.trim();
       const answer = item.answer?.trim();
 
+      // Il confronto duplicati usa il testo così com'era nell'export (con gli
+      // id immagine originali): un re-import dello stesso zip sullo stesso db
+      // deve combaciare esattamente con quanto già salvato. Riscrivere prima
+      // gli id (che cambiano a ogni restore) farebbe fallire il match e
+      // creerebbe un duplicato con un'immagine clonata ad ogni singolo import.
       const duplicateFilter: Record<string, unknown> = {
         title,
         question,
@@ -128,10 +159,19 @@ export class ImportExportService {
         continue;
       }
 
+      let finalQuestion = question;
+      let finalAnswer = answer;
+
+      if (zip && item.images) {
+        await this.restoreFlashcardImages(zip, item.images, restoredImageIdsByOldId);
+        finalQuestion = replaceImageFileIds(question, restoredImageIdsByOldId);
+        finalAnswer = replaceImageFileIds(answer, restoredImageIdsByOldId);
+      }
+
       await this.flashcardModel.create({
         title,
-        question,
-        answer,
+        question: finalQuestion,
+        answer: finalAnswer,
         topic_id: topic_doc?._id,
         subject_id: subject_doc?._id,
       });
@@ -162,6 +202,31 @@ export class ImportExportService {
       },
     ]);
     return String(savedIcon._id);
+  }
+
+  // Ricrea sul db le immagini inline referenziate nel question/answer di una
+  // flashcard appena importata (solo se l'export era uno zip), popolando la
+  // mappa condivisa id-vecchio -> id-nuovo passata dal chiamante. Con un
+  // import di solo JSON le immagini non vengono ricreate: i riferimenti
+  // <img src="/api/file/{id}"> restano quelli originali (potenzialmente rotti
+  // sul nuovo db), come già avviene per l'icona di una materia.
+  private async restoreFlashcardImages(
+    zip: JSZip,
+    images: Record<string, FlashcardImageMeta>,
+    restoredImageIdsByOldId: Map<string, string>,
+  ): Promise<void> {
+    for (const [oldId, meta] of Object.entries(images)) {
+      if (restoredImageIdsByOldId.has(oldId)) continue;
+
+      const entry = zip.file(meta.fileName);
+      if (!entry) continue;
+
+      const buffer = await entry.async('nodebuffer');
+      const savedFile = await this.fileService.create([
+        { buffer, mimetype: meta.mimetype },
+      ]);
+      restoredImageIdsByOldId.set(oldId, String(savedFile._id));
+    }
   }
 
   async exportFlashcardsAsZip(subject_id: undefined | string): Promise<Buffer> {
@@ -211,6 +276,33 @@ export class ImportExportService {
         subjectDoc.iconFileName = meta.iconFileName;
         subjectDoc.iconMimetype = meta.iconMimetype;
       }
+    }
+
+    // 3. raccoglie e allega al zip le immagini inline referenziate in question/answer
+    const imageMetaByFileId = new Map<string, FlashcardImageMeta>();
+
+    for (const doc of flashcards) {
+      const referencedIds = [
+        ...extractImageFileIds(doc.question),
+        ...extractImageFileIds(doc.answer),
+      ];
+      if (referencedIds.length === 0) continue;
+
+      const images: Record<string, FlashcardImageMeta> = {};
+      for (const fileId of referencedIds) {
+        let meta = imageMetaByFileId.get(fileId);
+        if (!meta) {
+          const file = await this.fileService.findOne(fileId);
+          if (!file) continue;
+
+          const fileName = `images/${fileId}.${extensionFromMimetype(file.mimetype)}`;
+          zip.file(fileName, this.fileService.convertBuffer(file.content));
+          meta = { fileName, mimetype: file.mimetype };
+          imageMetaByFileId.set(fileId, meta);
+        }
+        images[fileId] = meta;
+      }
+      doc.images = images;
     }
 
     zip.file('flashcards.json', JSON.stringify(flashcards, null, 2));
