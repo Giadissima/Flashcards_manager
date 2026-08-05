@@ -1,12 +1,12 @@
 <nav>
   <!-- Sinistra: Logo + Nome progetto -->
-  <a routerLink="/home" class="logo-container">
+  <a routerLink="/home" class="logo-container" (click)="closeMobileMenu()">
     <img src="assets/favicon.png" alt="Logo" class="logo">
     <span class="project-name">Flashcards Manager</span>
   </a>
 
-  <!-- Centro: Menu -->
-  <div class="menu-container">
+  <!-- Centro: Menu (sotto i 600px diventa una sidebar apribile dall'hamburger) -->
+  <div class="menu-container" [class.open]="isMobileMenuOpen" [class.no-transition]="isResizing">
     <div class="dropdown" (appClickOutside)="closeDropdown('topics')">
       <span class="menu-item" (click)="toggleDropdown('topics')">
         {{ 'navbar.topics' | transloco }}
@@ -16,8 +16,8 @@
         </svg>
       </span>
       <div class="dropdown-content" [class.show]="openDropdown === 'topics'">
-        <a routerLink="/create-topic" (click)="closeDropdown('topics')">{{ 'navbar.createTopic' | transloco }}</a>
-        <a routerLink="/manage-topics" (click)="closeDropdown('topics')">{{ 'navbar.manageTopics' | transloco }}</a>
+        <a routerLink="/create-topic" (click)="onNavigate('topics')">{{ 'navbar.createTopic' | transloco }}</a>
+        <a routerLink="/manage-topics" (click)="onNavigate('topics')">{{ 'navbar.manageTopics' | transloco }}</a>
       </div>
     </div>
     <div class="dropdown" (appClickOutside)="closeDropdown('subjects')">
@@ -29,8 +29,8 @@
         </svg>
       </span>
       <div class="dropdown-content" [class.show]="openDropdown === 'subjects'">
-        <a routerLink="/create-subject" (click)="closeDropdown('subjects')">{{ 'navbar.createSubject' | transloco }}</a>
-        <a routerLink="/manage-subjects" (click)="closeDropdown('subjects')">{{ 'navbar.manageSubjects' | transloco }}</a>
+        <a routerLink="/create-subject" (click)="onNavigate('subjects')">{{ 'navbar.createSubject' | transloco }}</a>
+        <a routerLink="/manage-subjects" (click)="onNavigate('subjects')">{{ 'navbar.manageSubjects' | transloco }}</a>
       </div>
     </div>
     <div class="dropdown" (appClickOutside)="closeDropdown('test')">
@@ -42,20 +42,36 @@
         </svg>
       </span>
       <div class="dropdown-content" [class.show]="openDropdown === 'test'">
-        <a routerLink="/setup-test" (click)="closeDropdown('test')">{{ 'navbar.startTest' | transloco }}</a>
-        <a routerLink="/test-result" (click)="closeDropdown('test')">{{ 'navbar.results' | transloco }}</a>
+        <a routerLink="/setup-test" (click)="onNavigate('test')">{{ 'navbar.startTest' | transloco }}</a>
+        <a routerLink="/test-result" (click)="onNavigate('test')">{{ 'navbar.results' | transloco }}</a>
       </div>
     </div>
   </div>
 
+  <!-- Sfondo scuro dietro la sidebar mobile: chiude il menu al click -->
+  <div class="mobile-menu-backdrop" [class.show]="isMobileMenuOpen" (click)="closeMobileMenu()"></div>
+
   <!-- Destra: Pulsante crea card e switch tema -->
   <div class="actions-container">
-    <button routerLink="/create-card" type="button" class="btn btn-primary">
+    <button routerLink="/create-card" type="button" class="btn btn-primary create-card-btn">
       <span>+</span>
       {{ 'navbar.createCard' | transloco }}
     </button>
     <button (click)="openSettings()" class="theme-switch-btn" type="button" [attr.aria-label]="'settings.title' | transloco">
       <span class="material-symbols-outlined">settings</span>
+    </button>
+    <!-- Bottone hamburger: visibile solo sotto i 600px, apre il menu come sidebar da destra -->
+    <button
+      type="button"
+      class="hamburger-btn"
+      [class.open]="isMobileMenuOpen"
+      (click)="toggleMobileMenu()"
+      [attr.aria-label]="'navbar.menu' | transloco"
+      [attr.aria-expanded]="isMobileMenuOpen"
+    >
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
     </button>
   </div>
 </nav>

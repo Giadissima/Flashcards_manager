@@ -7,6 +7,7 @@ nav {
   border-bottom: 1px solid var(--bs-btn-border-color);
   box-shadow: var(--box-shadow-sm);
   margin-bottom: 1px;
+  position: relative; // ancora il pulsante "crea card" centrato sotto i 519px
 }
 
 .logo-container {
@@ -14,6 +15,7 @@ nav {
   align-items: center;
   text-decoration: none;
   gap: var(--spacing-unit);
+  flex-shrink: 0; // resta sempre fissato nell'angolo a sinistra, non si comprime
 }
 
 .logo {
@@ -21,6 +23,7 @@ nav {
 }
 
 .project-name {
+  display: flex;
   font-size: 20px;
   font-weight: 700;
   color: var(--header-color);
@@ -64,4 +67,141 @@ nav {
 
 .theme-switch-btn:hover {
   background-color: var(--secondary-color);
+}
+
+.hamburger-btn {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: var(--border-radius-sm);
+  flex-shrink: 0;
+}
+
+.hamburger-btn:hover {
+  background-color: var(--secondary-color);
+}
+
+.hamburger-line {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background-color: var(--header-color);
+  border-radius: 2px;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.hamburger-btn.open .hamburger-line:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.hamburger-btn.open .hamburger-line:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger-btn.open .hamburger-line:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+.mobile-menu-backdrop {
+  display: none;
+}
+
+// Sotto i 600px: il menu centrale collassa in una sidebar laterale off-canvas,
+// apribile/chiudibile con il bottone hamburger (che diventa una X quando aperta).
+@media (max-width: 799px) {
+  .hamburger-btn {
+    display: flex;
+  }
+
+@media (max-width: 519px) {
+  .project-name {
+    display: none;
+  }
+
+  .create-card-btn {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+  .menu-container {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(80vw, 280px);
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    background-color: var(--component-background);
+    box-shadow: var(--box-shadow-md);
+    padding: calc(var(--spacing-unit) * 8) calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 2);
+    margin: 0;
+    transform: translateX(100%);
+    transition: transform 0.25s ease;
+    z-index: 1045;
+    overflow-y: auto;
+  }
+
+  // evita che il primo passaggio in modalità mobile (position: static -> fixed)
+  // venga animato come se la sidebar si aprisse per un istante: durante il
+  // resize la transizione va disattivata, si riattiva subito dopo
+  .menu-container.no-transition {
+    transition: none;
+  }
+
+  .menu-container.open {
+    transform: translateX(0);
+  }
+
+  .menu-container .dropdown {
+    position: static;
+  }
+
+  .menu-container .menu-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: calc(var(--spacing-unit) * 1.5) 0;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .menu-container .dropdown-content {
+    position: static;
+    display: none;
+    transform: none;
+    box-shadow: none;
+    border: none;
+    max-height: none;
+    padding: 0 0 var(--spacing-unit) calc(var(--spacing-unit) * 2);
+  }
+
+  .menu-container .dropdown-content.show {
+    display: block;
+  }
+
+  .mobile-menu-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1040;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .mobile-menu-backdrop.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
 }

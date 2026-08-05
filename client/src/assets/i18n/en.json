@@ -9,7 +9,8 @@
     "test": "Test",
     "startTest": "Start Test",
     "results": "Results",
-    "createCard": "Create Card"
+    "createCard": "Create Card",
+    "menu": "Menu"
   },
   "settings": {
     "title": "Settings",

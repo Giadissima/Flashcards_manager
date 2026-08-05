@@ -9,7 +9,8 @@
     "test": "Test",
     "startTest": "Avvia Test",
     "results": "Risultati",
-    "createCard": "Crea Card"
+    "createCard": "Crea Card",
+    "menu": "Menu"
   },
   "settings": {
     "title": "Impostazioni",
