@@ -181,6 +181,7 @@
       "subtitle": "Rivedi i test svolti e i tuoi progressi",
       "newTestButton": "Nuovo Test",
       "onlyWrongLabel": "Mostra solo test con risposte sbagliate",
+      "statusLabel": "Stato",
       "statusAll": "Tutti gli stati",
       "statusCompleted": "Terminato",
       "statusToComplete": "Da completare",

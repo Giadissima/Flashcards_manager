@@ -45,6 +45,8 @@
   --bs-secondary: var(--secondary-color);
   --bs-body-bg: var(--background-color);
   --bs-body-color: var(--text-color);
+
+  --base-input-size: var(300px);
 }
 
 /* ---------------------------------- */
@@ -78,6 +80,7 @@ h6 {
 /* ---------------------------------- */
 /* 3. Common Layout & Components      */
 /* ---------------------------------- */
+
 .container {
   width: 100%;
   max-width: 1200px;
@@ -100,7 +103,7 @@ h6 {
   --bs-card-cap-bg: var(--component-background);
 }
 
-.card-header{
+.card-header {
   border-bottom: 1.4px solid var(--primary-color);
 }
 
@@ -120,6 +123,8 @@ h6 {
   color: var(--text-color);
   font-family: var(--font-family);
   transition: border-color 0.2s, box-shadow 0.2s;
+
+  .search-input {}
 }
 
 /* Riserva spazio per la freccina del dropdown, altrimenti il testo (se lungo)
@@ -239,7 +244,7 @@ input:-webkit-autofill:active {
 /* 5. Bootstrap Overrides             */
 /* ---------------------------------- */
 
-.table{
+.table {
   --bs-body-bg: var(--component-background);
   --bs-table-color: var(--text-color);
   --bs-table-border-color: var(--border-color);
@@ -360,6 +365,15 @@ input:-webkit-autofill:active {
   }
 }
 
+/* Cliccando un'immagine nella home si apre in una modale (vedi home.ts). Questa
+   regola deve stare qui, nel foglio globale, e non nello style scoped di Home:
+   le <img> arrivano via [innerHTML] quindi non ricevono l'attributo
+   _ngcontent-* di Angular, e un selettore scoped come ".flashcard-text img"
+   nel component style non le vede mai. */
+.flashcard-text img {
+  cursor: zoom-in;
+}
+
 .flashcard-text,
 .question-text,
 .answer {
@@ -441,8 +455,29 @@ input:-webkit-autofill:active {
   border-radius: var(--border-radius-lg);
 }
 
+.filter-bar .row {
+  justify-content: space-between;
+  flex-direction: row;
+  row-gap: 3;
+}
+
+/* Le select (native o app-searchable-select) dentro le filter-bar stanno in
+   colonne .col-auto, larghe quanto il loro contenuto: senza un min-width
+   esplicito il width:100% interno del select non ha nulla su cui risolversi
+   e la colonna collassa quasi al minimo invece di allargarsi fino al
+   max-width (--base-input-size) già impostato sulla regola condivisa dei form.
+   .col-auto di suo non si restringe mai (flex-shrink: 0): un min-width fisso
+   a --base-input-size la farebbe sfondare il contenitore sugli schermi più stretti di
+   --base-input-size. min(--base-input-size, 100%) invece resta --base-input-size quando c'è spazio, ma scende
+   al 100% dello spazio disponibile quando quello spazio è minore di --base-input-size. */
+.filter-bar .col-auto:has(.form-select) {
+  flex: 1 1 auto;
+  min-width: min(--base-input-size, 100%);
+  max-width: --base-input-size;
+}
+
 /* Search bar */
-.search-icon{
+.search-icon {
   background-color: var(--secondary-color);
   border-right: 0px;
   color: var(--header-color);
@@ -450,13 +485,15 @@ input:-webkit-autofill:active {
 
 /* Contenitore per l'icona circolare nell'header */
 .header-icon-container {
-  background-color: var(--background-color); /* Colore di sfondo leggero */
+  background-color: var(--background-color);
+  /* Colore di sfondo leggero */
   width: 48px;
   height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%; /* Rende il contenitore tondo */
+  border-radius: 50%;
+  /* Rende il contenitore tondo */
   border: 1px solid var(--border-color);
 }
 
