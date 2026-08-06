@@ -40,6 +40,11 @@
   --box-shadow-sm: 0 1px 2px 0 var(--border-color);
   --box-shadow-md: 0 4px 8px -2px var(--border-color), 0 2px 4px -2px var(--border-color);
 
+  /* Altezza reale della navbar (misurata): usata per non far mai sconfinare
+     sotto la navbar contenuti in overlay come il lightbox immagine. Se cambia
+     padding/logo della navbar va aggiornata anche qui. */
+  --navbar-height: 56px;
+
   /* Syncing Bootstrap core variables with the design system */
   --bs-primary: var(--primary-color);
   --bs-secondary: var(--secondary-color);
@@ -446,6 +451,48 @@ input:-webkit-autofill:active {
 [data-theme='dark'] .question-text .katex-display::-webkit-scrollbar-button:horizontal:increment,
 [data-theme='dark'] .answer .katex-display::-webkit-scrollbar-button:horizontal:increment {
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3e%3cpath d='M8 5L2 1.5V8.5Z' fill='%23fff'/%3e%3c/svg%3e");
+}
+
+/* Lightbox immagine della home: le classi passate come [dialogClass]/[contentClass]
+   finiscono su elementi del template di ModalComponent (.modal-dialog/.modal-content),
+   non su quello di Home, quindi devono stare qui e non nello style scoped di Home
+   (stesso motivo del cursore delle immagini più sopra).
+   .modal-dialog di Bootstrap ha width:auto ma un max-width fisso (500px): resta
+   quindi sempre alla stessa larghezza a prescindere dall'immagine. width:fit-content
+   invece la fa aderire alle dimensioni reali dell'immagine (piccola = dialog piccola),
+   allargandosi fino al max-width/max-height solo se l'immagine è davvero più grande. */
+/* Niente centratura verticale per il lightbox: va ancorato appena sotto la
+   navbar. .modal-dialog-centered di Bootstrap centrerebbe .modal-content
+   dentro .modal-dialog (che si autoimpone alto via min-height: calc(100% -
+   3.5rem) apposta per avere spazio in cui centrare): qui quel min-height va
+   annullato, e il margin-top di default (1.75rem, per il centraggio) va
+   sostituito con l'altezza esatta della navbar + 1px. */
+.image-modal-dialog {
+  width: fit-content;
+  max-width: 90vw;
+  min-height: 0;
+  margin-top: calc(var(--navbar-height) + 1px);
+  margin-bottom: var(--spacing-unit);
+}
+
+.image-modal-content {
+  .modal-body {
+    padding: 0;
+    display: flex;
+    justify-content: center;
+  }
+}
+
+.image-modal-img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 90vw;
+  /* Oltre a navbar + margine, sottrae anche l'header del modale (~64px, il
+     bottone di chiusura): altrimenti l'immagine da sola potrebbe restare
+     dentro i limiti ma header+immagine insieme sconfinerebbero comunque. */
+  max-height: calc(100vh - var(--navbar-height) - 32px - 64px);
+  border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);
 }
 
 /* Filter bar */

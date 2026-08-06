@@ -1,9 +1,13 @@
 .modal {
-  background: rgba(0, 0, 0, 0.5);
   z-index: 1055;
 }
 
 .modal-backdrop {
+  /* Solo questo elemento scurisce lo sfondo: niente background anche su
+     .modal, altrimenti i due si sommano e il risultato è troppo scuro.
+     Il colore è già la tinta finale (leggermente scuro): l'animazione va da
+     opacity 0 a 1 su QUESTO rgba, non su un nero pieno. */
+  background-color: rgba(0, 0, 0, 0.35);
   z-index: 1050;
 }
 
@@ -15,4 +19,62 @@
   border-radius: 12px;
   border: none;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Apertura/chiusura: il componente tiene l'elemento nel DOM (display:block)
+   per tutta la durata dell'animazione "-out" tramite lo stato "closing",
+   altrimenti passare subito a display:none la interromperebbe a metà. La
+   durata qui (0.2s) deve combaciare con CLOSE_ANIMATION_MS nel component TS. */
+@keyframes modal-backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modal-backdrop-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes modal-dialog-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes modal-dialog-out {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.96) translateY(-8px);
+  }
+}
+
+.modal-backdrop.show {
+  animation: modal-backdrop-in 0.2s ease forwards;
+}
+
+.modal-backdrop.closing {
+  animation: modal-backdrop-out 0.2s ease forwards;
+}
+
+.modal-dialog {
+  /* Stato prima che l'animazione parta: evita un flash del contenuto a piena
+     opacità nel fotogramma tra display:block e l'inizio della keyframe. */
+  opacity: 0;
+}
+
+.modal.show .modal-dialog {
+  animation: modal-dialog-in 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.modal.closing .modal-dialog {
+  animation: modal-dialog-out 0.2s ease forwards;
 }

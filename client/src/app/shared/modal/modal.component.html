@@ -1,4 +1,4 @@
-<div class="modal fade" [class.show]="isOpen" [style.display]="isOpen ? 'block' : 'none'" tabindex="-1" role="dialog">
+<div class="modal" [class.show]="isOpen" [class.closing]="closing" [style.display]="visible ? 'block' : 'none'" tabindex="-1" role="dialog">
   <div class="modal-dialog modal-dialog-centered" [class]="dialogClass" role="document">
     <div class="modal-content" [class]="contentClass">
       @if (showHeader) {
@@ -23,4 +23,4 @@
     </div>
   </div>
 </div>
-<div class="modal-backdrop fade" [class.show]="isOpen" [style.display]="isOpen ? 'block' : 'none'" (click)="onBackdropClick()"></div>
+<div class="modal-backdrop" [class.show]="isOpen" [class.closing]="closing" [style.display]="visible ? 'block' : 'none'" (click)="onBackdropClick()"></div>
