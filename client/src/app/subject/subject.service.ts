@@ -1,8 +1,9 @@
+import { PaginatedResponse, SimplePaginatedResponse } from '../models/http.dto';
+
 import { Injectable } from '@angular/core';
 import { RestClientService } from '../api/rest-api.service';
-import { baseUrlAPI } from '../../config/config';
-import { PaginatedResponse, SimplePaginatedResponse } from '../models/http.dto';
 import { Subject } from '../models/subject.dto';
+import { baseUrlAPI } from '../../config/config';
 
 @Injectable({
   providedIn: 'root'
