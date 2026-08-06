@@ -1,22 +1,28 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Editor } from '@tiptap/core';
-import StarterKit from '@tiptap/starter-kit';
-import Image from '@tiptap/extension-image';
-import { TiptapEditorDirective } from 'ngx-tiptap';
-import { MathExtension } from '@aarkue/tiptap-math-extension';
+import {
+  SearchableSelectComponent,
+  SelectOption,
+} from '../../shared/searchable-select/searchable-select.component';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
+import { charMinLength, titleMaxLength } from '../../../config/config';
+
 import { CommonModule } from '@angular/common';
-import { FlashcardService } from '../flashcard.service';
+import { Editor } from '@tiptap/core';
 import { FileService } from '../../shared/file/file.service';
-import { getFileUrl } from '../../shared/file/file-url.util';
+import { FlashcardService } from '../flashcard.service';
+import Image from '@tiptap/extension-image';
+import { MathExtension } from '@aarkue/tiptap-math-extension';
+import StarterKit from '@tiptap/starter-kit';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
+import { TiptapEditorDirective } from 'ngx-tiptap';
 import { Toast } from "../../toast/toast";
 import { ToastService } from '../../toast/toast.service';
 import { Topic } from '../../models/topic.dto';
 import { TopicService } from '../../topic/topic.service';
-import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
-import { charMinLength, titleMaxLength } from '../../../config/config';
+import { getFileUrl } from '../../shared/file/file-url.util';
+import { getSubjectIconUrl } from '../../subject/subject-icon.util';
 
 const maxImageSize = 5 * 1024 * 1024;
 
@@ -28,7 +34,8 @@ const maxImageSize = 5 * 1024 * 1024;
     ReactiveFormsModule,
     Toast,
     TiptapEditorDirective,
-    TranslocoModule
+    TranslocoModule,
+    SearchableSelectComponent
   ],
   templateUrl: './create-flashcard.html',
   styleUrls: ['./create-flashcard.scss']
@@ -37,6 +44,8 @@ export class CreateFlashcard implements OnInit, OnDestroy {
   cardForm!: FormGroup;
   topics: Topic[] = [];
   subjects: Subject[] = [];
+  selectedSubjectId: string | null = null;
+  selectedTopicId: string | null = null;
 
   questionEditor: Editor;
   answerEditor: Editor;
@@ -61,20 +70,12 @@ export class CreateFlashcard implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.cardForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(titleMaxLength)]],
-      topic_id: [{ value: '', disabled: true }],
+      topic_id: [''],
       subject_id: ['']
     });
 
     this.loadSubjects();
-
-    this.cardForm.get('subject_id')?.valueChanges.subscribe(subjectId => {
-      this.topics = [];
-      this.cardForm.get('topic_id')?.reset({ value: '', disabled: !subjectId });
-      
-      if (subjectId) {
-        this.loadTopicsBySubject(subjectId);
-      }
-    });
+    this.loadTopicsBySubject(undefined);
   }
 
   ngOnDestroy(): void {
@@ -82,7 +83,7 @@ export class CreateFlashcard implements OnInit, OnDestroy {
     this.answerEditor.destroy();
   }
 
-  async loadTopicsBySubject(subjectId: string) {
+  async loadTopicsBySubject(subjectId: string | undefined) {
     try {
       const response = await this.topicService.getAllTopics({
         skip: 0,
@@ -92,7 +93,6 @@ export class CreateFlashcard implements OnInit, OnDestroy {
         subject_id: subjectId
       });
       this.topics = response.data;
-      this.cardForm.get('topic_id')?.enable();
     } catch (err) {
       console.error('Error loading topics for subject ' + subjectId, err);
       this.toastService.show(this.transloco.translate('flashcard.toast.topicsLoadError'), 'error');
@@ -113,6 +113,22 @@ export class CreateFlashcard implements OnInit, OnDestroy {
       this.toastService.show(this.transloco.translate('flashcard.toast.subjectsLoadError'), 'error');
     }
   }
+
+  get subjectOptions(): SelectOption[] {
+      return this.subjects.map((s) => ({
+        value: s._id!,
+        label: s.name,
+        iconUrl: getSubjectIconUrl(s),
+      }));
+    }
+  
+    get topicOptions(): SelectOption[] {
+      return this.topics.map((t) => ({
+        value: t._id!,
+        label: t.name,
+        color: t.color,
+      }));
+    }
 
   textAreaAutoResize(event: Event) {
     const textarea = event.target as HTMLTextAreaElement;
@@ -168,6 +184,33 @@ export class CreateFlashcard implements OnInit, OnDestroy {
     } catch (err: any) {
       console.error(err);
       this.toastService.show(this.transloco.translate('flashcard.toast.addError'), 'error')
+    }
+  }
+
+  onSubjectSelected(id: string | null | undefined): void {
+    this.selectedSubjectId = id ?? null;
+    this.topics = [];
+    this.loadTopicsBySubject(this.selectedSubjectId ?? undefined);
+
+    if (
+      this.selectedTopicId &&
+      !this.topics.some((t) => t._id === this.selectedTopicId)
+    ) {
+      this.selectedTopicId = null;
+    }
+  }
+
+  onTopicSelected(id: string | null | undefined): void {
+    this.selectedTopicId = id ?? null;
+
+    // Seleziona in automatico la materia dell'argomento scelto, come in setup-test
+    const topic = this.topics.find((t) => t._id === this.selectedTopicId);
+    const subjectId = (topic?.subject_id as Subject | undefined)?._id;
+    if (subjectId && subjectId !== this.selectedSubjectId) {
+      this.selectedSubjectId = subjectId;
+      this.topics = this.topics.filter(
+        (t) => (t.subject_id as Subject)?._id === subjectId,
+      );
     }
   }
 }

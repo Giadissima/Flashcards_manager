@@ -17,12 +17,9 @@
 
   <div class="input-group mb-3">
     <span class="input-group-text">{{ 'common.subject' | transloco }}</span>
-    <select class="form-select" formControlName="subject_id">
-      <option value="">{{ 'common.chooseSubject' | transloco }}</option>
-      @for (subject of subjects; track subject._id) {
-        <option [value]="subject._id">{{ subject.name }}</option>
-      }
-    </select>
+    <app-searchable-select [options]="subjectOptions" [value]="topicForm.get('subject_id')?.value"
+      [placeholder]="t('common.chooseSubject')"
+      (valueChange)="topicForm.get('subject_id')?.setValue($event)"></app-searchable-select>
   </div>
 
   <button type="submit" class="btn btn-primary">{{ 'topic.create.createButton' | transloco }}</button>

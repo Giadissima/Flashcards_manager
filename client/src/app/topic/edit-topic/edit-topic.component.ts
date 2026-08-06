@@ -9,11 +9,13 @@ import { Subject } from '../../models/subject.dto';
 
 import { Toast } from '../../toast/toast';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
+import { SearchableSelectComponent, SelectOption } from '../../shared/searchable-select/searchable-select.component';
+import { getSubjectIconUrl } from '../../subject/subject-icon.util';
 
 @Component({
   selector: 'app-edit-topic',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, Toast, TranslocoModule],
+  imports: [ReactiveFormsModule, CommonModule, Toast, TranslocoModule, SearchableSelectComponent],
   templateUrl: './edit-topic.component.html',
   styleUrls: ['./edit-topic.component.scss']
 })
@@ -21,6 +23,14 @@ export class EditTopicComponent implements OnInit {
   editForm!: FormGroup;
   topicId?: string;
   subjects: Subject[] = [];
+
+  get subjectOptions(): SelectOption[] {
+    return this.subjects.map((s) => ({
+      value: s._id!,
+      label: s.name,
+      iconUrl: getSubjectIconUrl(s),
+    }));
+  }
 
   constructor(
     private fb: FormBuilder,

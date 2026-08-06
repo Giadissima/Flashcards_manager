@@ -9,17 +9,27 @@ import { SubjectService } from '../../subject/subject.service';
 import { Toast } from '../../toast/toast';
 import { ToastService } from '../../toast/toast.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
+import { SearchableSelectComponent, SelectOption } from '../../shared/searchable-select/searchable-select.component';
+import { getSubjectIconUrl } from '../../subject/subject-icon.util';
 
 @Component({
   selector: 'app-create-topic',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, Toast, TranslocoModule],
+  imports: [CommonModule, ReactiveFormsModule, Toast, TranslocoModule, SearchableSelectComponent],
   templateUrl: './create-topic.component.html',
   styleUrls: ['./create-topic.component.scss']
 })
 export class CreateTopicComponent implements OnInit {
   topicForm!: FormGroup;
   subjects: Subject[] = [];
+
+  get subjectOptions(): SelectOption[] {
+    return this.subjects.map((s) => ({
+      value: s._id!,
+      label: s.name,
+      iconUrl: getSubjectIconUrl(s),
+    }));
+  }
 
   constructor(
     private fb: FormBuilder,

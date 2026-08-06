@@ -36,11 +36,10 @@
 
           <div class="col-auto">
             <label for="statusFilter" class="visually-hidden">{{ 'test.history.statusLabel' | transloco }}</label>
-            <select id="statusFilter" class="form-select" [(ngModel)]="selectedStatus" (ngModelChange)="onStatusChange()">
-              <option value="all">{{ 'test.history.statusAll' | transloco }}</option>
-              <option value="completed">{{ 'test.history.statusCompleted' | transloco }}</option>
-              <option value="inProgress">{{ 'test.history.statusToComplete' | transloco }}</option>
-            </select>
+            <app-searchable-select [options]="statusOptions" [value]="selectedStatus"
+              [allOptionLabel]="t('test.history.statusAll')" [placeholder]="t('test.history.statusAll')"
+              (valueChange)="onStatusChange($event)"></app-searchable-select>
+
           </div>
 
           <div class="col-auto">

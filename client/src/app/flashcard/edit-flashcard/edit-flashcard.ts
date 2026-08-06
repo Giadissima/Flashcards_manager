@@ -20,13 +20,15 @@ import { ToastService } from '../../toast/toast.service';
 import { Topic } from '../../models/topic.dto';
 import { TopicService } from '../../topic/topic.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
+import { SearchableSelectComponent, SelectOption } from '../../shared/searchable-select/searchable-select.component';
+import { getSubjectIconUrl } from '../../subject/subject-icon.util';
 
 const maxImageSize = 5 * 1024 * 1024;
 
 @Component({
   selector: 'app-edit-flashcard',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, Toast, TiptapEditorDirective, TranslocoModule],
+  imports: [CommonModule, ReactiveFormsModule, Toast, TiptapEditorDirective, TranslocoModule, SearchableSelectComponent],
   templateUrl: './edit-flashcard.html',
   styleUrls: ['./edit-flashcard.scss']
 })
@@ -36,6 +38,22 @@ export class EditFlashcard implements OnInit, OnDestroy {
 
   topics: Topic[] = [];
   subjects: Subject[] = [];
+
+  get subjectOptions(): SelectOption[] {
+    return this.subjects.map((s) => ({
+      value: s._id!,
+      label: s.name,
+      iconUrl: getSubjectIconUrl(s),
+    }));
+  }
+
+  get topicOptions(): SelectOption[] {
+    return this.topics.map((t) => ({
+      value: t._id!,
+      label: t.name,
+      color: t.color,
+    }));
+  }
 
   questionEditor: Editor;
   answerEditor: Editor;
@@ -63,7 +81,7 @@ export class EditFlashcard implements OnInit, OnDestroy {
     this.editForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(titleMaxLength)]],
       subject_id: ['', Validators.required],
-      topic_id: [{ value: '', disabled: true }, Validators.required]
+      topic_id: ['', Validators.required]
     });
 
     this.route.paramMap.subscribe(params => {
@@ -75,14 +93,12 @@ export class EditFlashcard implements OnInit, OnDestroy {
     });
 
     this.loadSubjects();
+    this.loadTopicsBySubject(undefined);
 
     this.editForm.get('subject_id')?.valueChanges.subscribe(subjectId => {
       this.topics = [];
-      this.editForm.get('topic_id')?.reset({ value: '', disabled: !subjectId });
-      
-      if (subjectId) {
-        this.loadTopicsBySubject(subjectId);
-      }
+      this.editForm.get('topic_id')?.reset('');
+      this.loadTopicsBySubject(subjectId);
     });
   }
 
@@ -181,7 +197,7 @@ export class EditFlashcard implements OnInit, OnDestroy {
     }
   }
 
-  async loadTopicsBySubject(subjectId: string) {
+  async loadTopicsBySubject(subjectId: string | undefined) {
     try {
       const response = await this.topicService.getAllTopics({
         skip: 0,
@@ -191,7 +207,6 @@ export class EditFlashcard implements OnInit, OnDestroy {
         subject_id: subjectId
       });
       this.topics = response.data;
-      this.editForm.get('topic_id')?.enable();
     } catch (err) {
       console.error('Error loading topics for subject ' + subjectId, err);
       this.toastService.show(this.transloco.translate('flashcard.toast.topicsLoadError'), 'error');

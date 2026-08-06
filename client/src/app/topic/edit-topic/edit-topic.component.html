@@ -1,4 +1,4 @@
-<div class="container mt-4">
+<div class="container mt-4" *transloco="let t">
   <h1>{{ 'topic.edit.title' | transloco }}</h1>
 
   <form [formGroup]="editForm" (ngSubmit)="updateTopic()">
@@ -14,10 +14,9 @@
 
     <div class="input-group mb-3">
       <span class="input-group-text">{{ 'common.subject' | transloco }}</span>
-      <select formControlName="subject_id" class="form-select">
-        <option value="">{{ 'common.chooseSubject' | transloco }}</option>
-        <option *ngFor="let s of subjects" [value]="s._id">{{ s.name }}</option>
-      </select>
+      <app-searchable-select [options]="subjectOptions" [value]="editForm.get('subject_id')?.value"
+        [placeholder]="t('common.chooseSubject')"
+        (valueChange)="editForm.get('subject_id')?.setValue($event)"></app-searchable-select>
     </div>
 
     <button type="submit" class="btn btn-primary">{{ 'topic.edit.saveChanges' | transloco }}</button>

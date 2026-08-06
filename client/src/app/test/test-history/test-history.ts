@@ -1,28 +1,47 @@
 import { Component, OnInit } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
+import {
+  SearchableSelectComponent,
+  SelectOption,
+} from '../../shared/searchable-select/searchable-select.component';
+import { Test, TestStats } from '../../models/test.dto';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 
 import { CommonModule } from '@angular/common';
 import { DurationPipe } from '../../../pipes/duration.pipe';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
-import { SearchableSelectComponent, SelectOption } from '../../shared/searchable-select/searchable-select.component';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
-import { Test, TestStats } from '../../models/test.dto';
 import { TestService } from '../test.service';
 import { ToastService } from '../../toast/toast.service';
 import { Topic } from '../../models/topic.dto';
 import { TopicService } from '../../topic/topic.service';
-import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { getSubjectIconUrl } from '../../subject/subject-icon.util';
 
 @Component({
   selector: 'app-test-history',
   standalone: true,
-  imports: [CommonModule, RouterLink, DurationPipe, FormsModule, SearchableSelectComponent, TranslocoModule],
+  imports: [
+    CommonModule,
+    RouterLink,
+    DurationPipe,
+    FormsModule,
+    SearchableSelectComponent,
+    TranslocoModule,
+  ],
   templateUrl: './test-history.html',
   styleUrl: './test-history.scss',
 })
 export class TestHistory implements OnInit {
+  constructor(
+    private testService: TestService,
+    private subjectService: SubjectService,
+    private topicService: TopicService,
+    private router: Router,
+    private toast: ToastService,
+    private transloco: TranslocoService,
+  ) {}
+
   tests: Test[] = [];
   totalCount = 0;
   currentPage = 1;
@@ -35,24 +54,23 @@ export class TestHistory implements OnInit {
   selectedSubjectId: string | null = null;
   selectedTopicId: string | null = null;
   onlyWrong = false;
-  selectedStatus: 'all' | 'completed' | 'inProgress' = 'all';
+  selectedStatus: string | null = null;
 
   get subjectOptions(): SelectOption[] {
-    return this.subjects.map((s) => ({ value: s._id!, label: s.name, iconUrl: getSubjectIconUrl(s) }));
+    return this.subjects.map((s) => ({
+      value: s._id!,
+      label: s.name,
+      iconUrl: getSubjectIconUrl(s),
+    }));
   }
 
   get topicOptions(): SelectOption[] {
-    return this.topics.map((t) => ({ value: t._id!, label: t.name, color: t.color }));
+    return this.topics.map((t) => ({
+      value: t._id!,
+      label: t.name,
+      color: t.color,
+    }));
   }
-
-  constructor(
-    private testService: TestService,
-    private subjectService: SubjectService,
-    private topicService: TopicService,
-    private router: Router,
-    private toast: ToastService,
-    private transloco: TranslocoService,
-  ) {}
 
   ngOnInit(): void {
     this.loadTests();
@@ -60,14 +78,36 @@ export class TestHistory implements OnInit {
     this.loadSubjects();
     this.loadTopics();
   }
+  get statusOptions(): SelectOption[] {
+    return [
+      {
+        value: 'completed',
+        label: this.transloco.translate('test.history.statusCompleted'),
+      },
+      {
+        value: 'inProgress',
+        label: this.transloco.translate('test.history.statusToComplete'),
+      },
+    ];
+  }
 
   async loadSubjects(): Promise<void> {
-    const response = await this.subjectService.getAllSubjects({ limit: 50, skip: 0, sortDirection: 'asc', sortField: 'name' });
+    const response = await this.subjectService.getAllSubjects({
+      limit: 50,
+      skip: 0,
+      sortDirection: 'asc',
+      sortField: 'name',
+    });
     this.subjects = response.data;
   }
 
   async loadTopics(): Promise<void> {
-    const response = await this.topicService.getAllTopics({ limit: 50, skip: 0, sortDirection: 'asc', sortField: 'name' });
+    const response = await this.topicService.getAllTopics({
+      limit: 50,
+      skip: 0,
+      sortDirection: 'asc',
+      sortField: 'name',
+    });
     this.allTopics = response.data;
     this.topics = response.data;
   }
@@ -75,10 +115,15 @@ export class TestHistory implements OnInit {
   onSubjectSelected(id: string | null | undefined): void {
     this.selectedSubjectId = id ?? null;
     this.topics = this.selectedSubjectId
-      ? this.allTopics.filter((t) => (t.subject_id as Subject)?._id === this.selectedSubjectId)
+      ? this.allTopics.filter(
+          (t) => (t.subject_id as Subject)?._id === this.selectedSubjectId,
+        )
       : this.allTopics;
 
-    if (this.selectedTopicId && !this.topics.some((t) => t._id === this.selectedTopicId)) {
+    if (
+      this.selectedTopicId &&
+      !this.topics.some((t) => t._id === this.selectedTopicId)
+    ) {
       this.selectedTopicId = null;
     }
     this.onFilterChange();
@@ -92,7 +137,9 @@ export class TestHistory implements OnInit {
     const subjectId = (topic?.subject_id as Subject | undefined)?._id;
     if (subjectId && subjectId !== this.selectedSubjectId) {
       this.selectedSubjectId = subjectId;
-      this.topics = this.allTopics.filter((t) => (t.subject_id as Subject)?._id === subjectId);
+      this.topics = this.allTopics.filter(
+        (t) => (t.subject_id as Subject)?._id === subjectId,
+      );
     }
     this.onFilterChange();
   }
@@ -102,7 +149,8 @@ export class TestHistory implements OnInit {
     this.onFilterChange();
   }
 
-  onStatusChange(): void {
+  onStatusChange(statusFilter: string | null | undefined): void {
+    this.selectedStatus = statusFilter ?? 'all';
     this.onFilterChange();
   }
 
@@ -112,7 +160,11 @@ export class TestHistory implements OnInit {
       topic_id: this.selectedTopicId || undefined,
       onlyWrong: this.onlyWrong || undefined,
       completed:
-        this.selectedStatus === 'completed' ? true : this.selectedStatus === 'inProgress' ? false : undefined,
+        this.selectedStatus === 'completed'
+          ? true
+          : this.selectedStatus === 'inProgress'
+            ? false
+            : undefined,
     };
   }
 
@@ -123,7 +175,9 @@ export class TestHistory implements OnInit {
   }
 
   loadStats(): void {
-    this.testService.getStats(this.activeFilters).then((stats) => (this.stats = stats));
+    this.testService
+      .getStats(this.activeFilters)
+      .then((stats) => (this.stats = stats));
   }
 
   loadTests(): void {
@@ -182,13 +236,22 @@ export class TestHistory implements OnInit {
   async stopTest(test: Test): Promise<void> {
     if (!test._id) return;
     try {
-      await this.testService.update(test._id, { ...test, completedAt: new Date() });
-      this.toast.show(this.transloco.translate('test.history.toast.terminated'), 'success');
+      await this.testService.update(test._id, {
+        ...test,
+        completedAt: new Date(),
+      });
+      this.toast.show(
+        this.transloco.translate('test.history.toast.terminated'),
+        'success',
+      );
       this.loadTests();
       this.loadStats();
     } catch (err) {
       console.error('Error stopping test', err);
-      this.toast.show(this.transloco.translate('test.history.toast.terminateError'), 'error');
+      this.toast.show(
+        this.transloco.translate('test.history.toast.terminateError'),
+        'error',
+      );
     }
   }
 }
