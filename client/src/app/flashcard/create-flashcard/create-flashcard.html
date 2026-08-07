@@ -1,7 +1,13 @@
 <div class="container-md" *transloco="let t">
   <div class="card">
-    <div class="card-header">
-      <h1 class="text-center">{{ 'flashcard.create.title' | transloco }}</h1>
+    <div class="card-header p-4 d-flex align-items-center">
+      <div class="header-icon-container me-3">
+        <span class="material-symbols-outlined">add_box</span>
+      </div>
+      <div>
+        <h2 class="card-title">{{ 'flashcard.create.title' | transloco }}</h2>
+        <h6 class="card-subtitle mb-2 text-body-secondary">{{ 'flashcard.create.subtitle' | transloco }}</h6>
+      </div>
     </div>
     <div class="card-body">
       <form [formGroup]="cardForm" (ngSubmit)="addCard()" novalidate>
@@ -54,7 +60,7 @@
             </label>
             <input type="file" id="question-image-input" accept="image/*" hidden (change)="onImageSelected($event, questionEditor)">
           </div>
-          <tiptap-editor [editor]="questionEditor" class="editorCustom"></tiptap-editor>
+          <tiptap-editor [editor]="questionEditor" class="tiptap-editor-custom"></tiptap-editor>
         </div>
 
         <div class="form-group">
@@ -88,7 +94,7 @@
             </label>
             <input type="file" id="answer-image-input" accept="image/*" hidden (change)="onImageSelected($event, answerEditor)">
           </div>
-          <tiptap-editor [editor]="answerEditor" class="editorCustom"></tiptap-editor>
+          <tiptap-editor [editor]="answerEditor" class="tiptap-editor-custom"></tiptap-editor>
         </div>
 
         <div class="form-row">

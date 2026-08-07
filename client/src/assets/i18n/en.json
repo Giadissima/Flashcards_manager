@@ -62,6 +62,7 @@
   "flashcard": {
     "create": {
       "title": "Create a New Flashcard",
+      "subtitle": "Add a new card to your deck",
       "titleLabel": "Title",
       "titlePlaceholder": "e.g., Photosynthesis",
       "titleMinError": "Title should have min 2 characters.",
@@ -78,6 +79,7 @@
     },
     "edit": {
       "title": "Edit Flashcard",
+      "subtitle": "Update the card's question and answer",
       "saveChanges": "Save changes"
     },
     "toast": {
@@ -96,6 +98,7 @@
   "topic": {
     "create": {
       "title": "Create New Topic",
+      "subtitle": "Add a new topic to study",
       "nameLabel": "Name",
       "nameRequiredError": "Name is required.",
       "colorLabel": "Color",
@@ -104,6 +107,7 @@
     },
     "edit": {
       "title": "Edit Topic",
+      "subtitle": "Update the topic details",
       "saveChanges": "Save Changes"
     },
     "manage": {
@@ -128,6 +132,7 @@
   "subject": {
     "create": {
       "title": "Create New Subject",
+      "subtitle": "Add a new subject to study",
       "nameLabel": "Name",
       "nameMaxError": "Name can have at most {{max}} characters. Please shorten it.",
       "nameMinError": "Name must have at least {{min}} characters.",
@@ -138,6 +143,7 @@
     },
     "edit": {
       "title": "Edit Subject",
+      "subtitle": "Update the subject details",
       "currentIcon": "Current icon",
       "replaceIcon": "Replace icon",
       "saveChanges": "Save Changes"

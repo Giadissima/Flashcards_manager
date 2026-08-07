@@ -1,25 +1,42 @@
-<div class="container mt-4" *transloco="let t">
-  <h1>{{ 'topic.edit.title' | transloco }}</h1>
-
-  <form [formGroup]="editForm" (ngSubmit)="updateTopic()">
-    <div class="mb-3">
-      <label for="name" class="form-label">{{ 'common.name' | transloco }}</label>
-      <input type="text" id="name" formControlName="name" class="form-control">
+<div class="container-md" *transloco="let t">
+  <div class="card">
+    <div class="card-header p-4 d-flex align-items-center">
+      <div class="header-icon-container me-3">
+        <span class="material-symbols-outlined">edit</span>
+      </div>
+      <div>
+        <h2 class="card-title">{{ 'topic.edit.title' | transloco }}</h2>
+        <h6 class="card-subtitle mb-2 text-body-secondary">{{ 'topic.edit.subtitle' | transloco }}</h6>
+      </div>
     </div>
+    <div class="card-body">
+      <form [formGroup]="editForm" (ngSubmit)="updateTopic()" novalidate>
 
-    <div class="mb-3">
-      <label for="color" class="form-label">{{ 'common.color' | transloco }}</label>
-      <input type="color" id="color" formControlName="color" class="form-control">
+        <div class="form-group">
+          <label for="name" class="form-label">{{ 'common.name' | transloco }}</label>
+          <input type="text" id="name" formControlName="name" class="form-control">
+          @if (editForm.get('name')?.touched && editForm.get('name')?.hasError('required')) {
+          <div class="invalid-feedback">{{ 'topic.create.nameRequiredError' | transloco }}</div>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="color" class="form-label">{{ 'common.color' | transloco }}</label>
+          <input type="color" id="color" formControlName="color" class="form-control">
+        </div>
+
+        <div class="form-group">
+          <label for="subject" class="form-label">{{ 'common.subject' | transloco }}</label>
+          <app-searchable-select [options]="subjectOptions" [value]="editForm.get('subject_id')?.value"
+            [placeholder]="t('common.chooseSubject')"
+            (valueChange)="editForm.get('subject_id')?.setValue($event)"></app-searchable-select>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" [disabled]="editForm.invalid">{{ 'topic.edit.saveChanges' | transloco }}</button>
+        </div>
+      </form>
     </div>
-
-    <div class="input-group mb-3">
-      <span class="input-group-text">{{ 'common.subject' | transloco }}</span>
-      <app-searchable-select [options]="subjectOptions" [value]="editForm.get('subject_id')?.value"
-        [placeholder]="t('common.chooseSubject')"
-        (valueChange)="editForm.get('subject_id')?.setValue($event)"></app-searchable-select>
-    </div>
-
-    <button type="submit" class="btn btn-primary">{{ 'topic.edit.saveChanges' | transloco }}</button>
-  </form>
+  </div>
 </div>
 <app-toast></app-toast>

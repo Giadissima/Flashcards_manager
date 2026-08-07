@@ -186,7 +186,7 @@ h6 {
   filter: invert(1) grayscale(100%) brightness(200%);
 }
 
-/* Bootstrap disegna lo switch con un bordo quasi trasparente e il pallino
+/* Bootstrap disegna lo switch con un bordo quasi trasparente e il pallino del colore degli argomenti
    via background-image (SVG): qui si forza un bordo nero sempre visibile e
    il pallino nero in light / bianco in dark per un contrasto leggibile */
 .form-switch .form-check-input {
@@ -646,4 +646,30 @@ input:-webkit-autofill:active {
 
 .dropdown-content.show {
   display: block;
+}
+
+/* PATTERN GRAFICO GLOBALE PER AGGIUNTA O MODIFICA DI CONTENUTI
+usato in create, modify flashcards, create, modify, manage topics e subjects */
+
+.form-group {
+  margin-bottom: calc(var(--spacing-unit) * 3);
+}
+
+.form-row {
+  display: flex;
+  gap: calc(var(--spacing-unit) * 2);
+  
+  .form-group {
+    flex: 1;
+  }
+}
+
+.tiptap-editor-custom{
+  color: var(--header-color) !important;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: calc(var(--spacing-unit) * 4);
 }

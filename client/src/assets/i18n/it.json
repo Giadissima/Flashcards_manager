@@ -4,12 +4,12 @@
     "createTopic": "Crea Argomento",
     "manageTopics": "Gestisci Argomenti",
     "subjects": "Materie",
-    "createSubject": "Nuova Materia",
+    "createSubject": "Nuova materia",
     "manageSubjects": "Gestisci Materie",
     "test": "Test",
     "startTest": "Avvia Test",
     "results": "Risultati",
-    "createCard": "Crea Card",
+    "createCard": "Crea Flashcard",
     "menu": "Menu"
   },
   "settings": {
@@ -52,9 +52,9 @@
     "seeAnswer": "Vedi risposta",
     "seeQuestion": "Vedi domanda",
     "toast": {
-      "cardDeleted": "Card eliminata con successo",
+      "cardDeleted": "Flashcard eliminata con successo",
       "deleteError": "Errore durante l'eliminazione",
-      "cardCopied": "Card copiata con successo",
+      "cardCopied": "Flashcard copiata con successo",
       "copyError": "Errore durante la copia",
       "topicsLoadError": "Impossibile caricare gli argomenti per la materia selezionata"
     }
@@ -62,6 +62,7 @@
   "flashcard": {
     "create": {
       "title": "Crea una Nuova Flashcard",
+      "subtitle": "Aggiungi una nuova Flashcard al tuo mazzo",
       "titleLabel": "Titolo",
       "titlePlaceholder": "es. Fotosintesi",
       "titleMinError": "Il titolo deve avere almeno 2 caratteri.",
@@ -74,18 +75,19 @@
       "insertImage": "Inserisci immagine",
       "subjectLabel": "Materia",
       "topicLabel": "Argomento",
-      "addButton": "Aggiungi Nuova Card"
+      "addButton": "Aggiungi nuova Flashcard"
     },
     "edit": {
       "title": "Modifica Flashcard",
+      "subtitle": "Aggiorna la domanda e la risposta della Flashcard",
       "saveChanges": "Salva Modifiche"
     },
     "toast": {
-      "cardAdded": "Card aggiunta con successo",
+      "cardAdded": "Flashcard aggiunta con successo",
       "addError": "Errore durante l'aggiunta",
-      "cardUpdated": "Card aggiornata con successo",
+      "cardUpdated": "Flashcard aggiornata con successo",
       "updateError": "Errore durante l'aggiornamento",
-      "loadError": "Impossibile caricare i dati della card",
+      "loadError": "Impossibile caricare i dati della Flashcard",
       "subjectsLoadError": "Impossibile caricare le materie",
       "topicsLoadError": "Impossibile caricare gli argomenti per la materia selezionata",
       "imageUploadError": "Errore durante il caricamento dell'immagine",
@@ -95,15 +97,17 @@
   },
   "topic": {
     "create": {
-      "title": "Crea Nuovo Topic",
+      "title": "Crea nuovo argomento",
+      "subtitle": "Aggiungi un nuovo argomento di studio",
       "nameLabel": "Nome",
       "nameRequiredError": "Il nome è obbligatorio.",
       "colorLabel": "Colore",
       "colorTitle": "Scegli il tuo colore",
-      "createButton": "Crea Topic"
+      "createButton": "Crea argomento"
     },
     "edit": {
-      "title": "Modifica Topic",
+      "title": "Modifica argomento",
+      "subtitle": "Aggiorna i dettagli dell'argomento",
       "saveChanges": "Salva Modifiche"
     },
     "manage": {
@@ -114,30 +118,32 @@
       "deleteConfirm": "Sei sicuro di voler eliminare questo argomento?"
     },
     "toast": {
-      "created": "Topic creato con successo",
-      "createError": "Errore nella creazione del topic",
-      "updated": "Topic aggiornato con successo",
-      "updateError": "Errore nell'aggiornamento del topic",
-      "deleted": "Topic eliminato con successo",
-      "deleteError": "Errore nell'eliminazione del topic",
-      "loadError": "Impossibile caricare i dati del topic",
+      "created": "argomento creato con successo",
+      "createError": "Errore nella creazione dell'argomento",
+      "updated": "argomento aggiornato con successo",
+      "updateError": "Errore nell'aggiornamento dell'argomento",
+      "deleted": "argomento eliminato con successo",
+      "deleteError": "Errore nell'eliminazione dell'argomento",
+      "loadError": "Impossibile caricare i dati dell'argomento",
       "subjectsLoadError": "Impossibile caricare le materie",
       "topicsLoadError": "Impossibile caricare gli argomenti"
     }
   },
   "subject": {
     "create": {
-      "title": "Crea Nuova Materia",
+      "title": "Crea nuova materia",
+      "subtitle": "Aggiungi una nuova materia di studio",
       "nameLabel": "Nome",
       "nameMaxError": "Il nome può avere al massimo {{max}} caratteri. Accorcialo un po'.",
       "nameMinError": "Il nome deve avere almeno {{min}} caratteri.",
       "descLabel": "Descrizione",
       "descMaxError": "La descrizione può avere al massimo {{max}} caratteri (attualmente {{current}}). Accorciala un po'.",
       "iconLabel": "Icona",
-      "createButton": "Crea Materia"
+      "createButton": "Crea materia"
     },
     "edit": {
-      "title": "Modifica Materia",
+      "title": "Modifica materia",
+      "subtitle": "Aggiorna i dettagli della materia",
       "currentIcon": "Icona attuale",
       "replaceIcon": "Sostituisci icona",
       "saveChanges": "Salva Modifiche"
@@ -145,18 +151,18 @@
     "manage": {
       "title": "Gestisci Materie",
       "subtitle": "Organizza le materie che stai studiando",
-      "newSubjectButton": "Nuova Materia",
+      "newSubjectButton": "Nuova materia",
       "searchPlaceholder": "Cerca materie...",
       "tableDescription": "Descrizione",
       "noDescription": "Nessuna descrizione",
       "deleteConfirm": "Sei sicuro di voler eliminare questa materia?"
     },
     "toast": {
-      "created": "Materia creata con successo",
+      "created": "materia creata con successo",
       "createError": "Errore nella creazione della materia",
-      "updated": "Materia aggiornata con successo",
+      "updated": "materia aggiornata con successo",
       "updateError": "Errore nell'aggiornamento della materia",
-      "deleted": "Materia eliminata con successo",
+      "deleted": "materia eliminata con successo",
       "deleteError": "Errore nell'eliminazione della materia",
       "loadError": "Impossibile caricare le materie",
       "loadOneError": "Impossibile caricare i dati della materia"
@@ -166,7 +172,7 @@
     "setup": {
       "title": "Nuovo Test",
       "subtitle": "Scegli materia, argomento e numero di domande",
-      "subjectLabel": "Materia",
+      "subjectLabel": "materia",
       "anySubject": "Qualsiasi materia",
       "topicLabel": "Argomento",
       "anyTopic": "Qualsiasi argomento",
@@ -237,7 +243,7 @@
     "title": "Import / Export Flashcard",
     "backToSettings": "Torna alle impostazioni",
     "exportHeader": "Esporta",
-    "filterBySubject": "Filtra per Materia (opzionale)",
+    "filterBySubject": "Filtra per materia (opzionale)",
     "exportButton": "Esporta in ZIP",
     "importHeader": "Importa",
     "selectFile": "Seleziona file JSON o ZIP",
