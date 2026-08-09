@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { SearchInputComponent } from '../../shared/search-input/search-input.component';
 import { SearchableSelectComponent, SelectOption } from '../../shared/searchable-select/searchable-select.component';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
@@ -16,7 +16,7 @@ import { getSubjectIconUrl } from '../../subject/subject-icon.util';
 @Component({
   selector: 'app-manage-topics',
   standalone: true,
-  imports: [CommonModule, Toast, FormsModule, SearchableSelectComponent, TranslocoModule],
+  imports: [CommonModule, Toast, SearchInputComponent, SearchableSelectComponent, TranslocoModule],
   templateUrl: './manage-topics.component.html',
   styleUrls: ['./manage-topics.component.scss']
 })
@@ -59,6 +59,11 @@ export class ManageTopicsComponent implements OnInit {
   onFilterChange() {
     this.currentPage = 1;
     this.loadTopics();
+  }
+
+  onSearchTermChange(term: string): void {
+    this.searchTerm = term;
+    this.onFilterChange();
   }
 
   onSubjectSelected(id: string | null | undefined): void {

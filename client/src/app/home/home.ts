@@ -1,10 +1,10 @@
 import { AfterViewChecked, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { SearchableSelectComponent, SelectOption } from '../shared/searchable-select/searchable-select.component';
+import { SearchInputComponent } from '../shared/search-input/search-input.component';
 
 import { CommonModule } from '@angular/common';
 import { Flashcard } from '../models/flashcard.dto';
 import { FlashcardService } from '../flashcard/flashcard.service';
-import { FormsModule } from '@angular/forms'; // Import FormsModule for ngModel
 import { KatexRendererPipe } from '../pipes/katex-renderer.pipe';
 import Panzoom, { PanzoomObject } from '@panzoom/panzoom';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -21,7 +21,7 @@ import { ModalComponent } from '../shared/modal/modal.component';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, Toast, FormsModule, KatexRendererPipe, SearchableSelectComponent, TranslocoModule, ModalComponent],
+  imports: [CommonModule, Toast, KatexRendererPipe, SearchableSelectComponent, SearchInputComponent, TranslocoModule, ModalComponent],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
@@ -157,7 +157,8 @@ export class Home implements OnInit, AfterViewChecked, OnDestroy {
     this.loadFlashcards();
   }
 
-  onSearchTermChange(): void {
+  onSearchTermChange(term: string): void {
+    this.searchTerm = term;
     this.currentPage = 1;
     this.updateQueryParams();
     this.loadFlashcards();

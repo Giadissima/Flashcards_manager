@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { SearchInputComponent } from '../../shared/search-input/search-input.component';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from './../subject.service';
 import { Toast } from '../../toast/toast';
@@ -13,7 +13,7 @@ import { getSubjectIconUrl } from '../subject-icon.util';
 @Component({
   selector: 'app-manage-subjects',
   standalone: true,
-  imports: [CommonModule, Toast, FormsModule, TranslocoModule],
+  imports: [CommonModule, Toast, SearchInputComponent, TranslocoModule],
   templateUrl: './manage-subjects.component.html',
   styleUrls: ['./manage-subjects.component.scss']
 })
@@ -56,6 +56,11 @@ export class ManageSubjectsComponent implements OnInit {
   onFilterChange(): void {
     this.currentPage = 1;
     this.loadSubjects();
+  }
+
+  onSearchTermChange(term: string): void {
+    this.searchTerm = term;
+    this.onFilterChange();
   }
 
   get totalPages(): number {

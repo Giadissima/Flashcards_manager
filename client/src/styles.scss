@@ -561,11 +561,51 @@ ngx-colors {
   max-width: --base-input-size;
 }
 
-/* Search bar */
+/* Search bar: icona sempre a destra, fusa con l'input in un unico componente.
+   L'input vive dentro un wrapper (per poterci sovrapporre la "X"), quindi non è
+   più figlio diretto di .input-group e le regole di Bootstrap che smussano solo
+   gli angoli esterni (:first-child/:last-child) non lo raggiungono più: gli
+   angoli lato-icona vanno quindi azzerati esplicitamente qui invece di
+   affidarsi a Bootstrap. */
 .search-icon {
   background-color: var(--secondary-color);
-  border-right: 0px;
+  border-left: 0px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
   color: var(--header-color);
+}
+
+/* Pulsante "X" per svuotare rapidamente una search bar: sovrapposto all'input
+   (non un input-group-text a sé) per non alterare la larghezza del campo */
+.search-input-wrapper {
+  position: relative;
+  flex: 1 1 auto;
+}
+
+.search-input-wrapper input {
+  padding-right: calc(var(--spacing-unit) * 4);
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.search-clear-btn {
+  position: absolute;
+  top: 50%;
+  right: calc(var(--spacing-unit) * 1.5);
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--text-color);
+  opacity: 0.6;
+  cursor: pointer;
+}
+
+.search-clear-btn:hover {
+  opacity: 1;
 }
 
 /* Contenitore per l'icona circolare nell'header */
