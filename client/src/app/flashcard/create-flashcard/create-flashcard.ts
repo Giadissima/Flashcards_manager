@@ -65,7 +65,10 @@ export class CreateFlashcard implements OnInit, OnDestroy {
         StarterKit,
         MathExtension.configure({ evaluation: false }),
         Image.configure({ inline: false }),
-        Placeholder.configure({ placeholder: this.transloco.translate('flashcard.create.questionPlaceholder') }),
+        Placeholder.configure({
+          placeholder: ({ editor }) =>
+            editor.isEmpty ? this.transloco.translate('flashcard.create.questionPlaceholder') : '',
+        }),
       ],
       onUpdate: ({ editor }) => {
         this.cardForm.get('question')?.setValue(editor.getText());
@@ -79,7 +82,10 @@ export class CreateFlashcard implements OnInit, OnDestroy {
         StarterKit,
         MathExtension.configure({ evaluation: false }),
         Image.configure({ inline: false }),
-        Placeholder.configure({ placeholder: this.transloco.translate('flashcard.create.answerPlaceholder') }),
+        Placeholder.configure({
+          placeholder: ({ editor }) =>
+            editor.isEmpty ? this.transloco.translate('flashcard.create.answerPlaceholder') : '',
+        }),
       ],
       onUpdate: ({ editor }) => {
         this.cardForm.get('answer')?.setValue(editor.getText());

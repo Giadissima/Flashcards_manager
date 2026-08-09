@@ -11,6 +11,7 @@ import { FlashcardService } from '../flashcard.service';
 import { FileService } from '../../shared/file/file.service';
 import { getFileUrl } from '../../shared/file/file-url.util';
 import { MathExtension } from '@aarkue/tiptap-math-extension';
+import Placeholder from '@tiptap/extension-placeholder';
 import StarterKit from '@tiptap/starter-kit';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
@@ -70,7 +71,15 @@ export class EditFlashcard implements OnInit, OnDestroy {
     private transloco: TranslocoService
   ) {
     this.questionEditor = new Editor({
-      extensions: [StarterKit, MathExtension.configure({ evaluation: false }), Image.configure({ inline: false })],
+      extensions: [
+        StarterKit,
+        MathExtension.configure({ evaluation: false }),
+        Image.configure({ inline: false }),
+        Placeholder.configure({
+          placeholder: ({ editor }) =>
+            editor.isEmpty ? this.transloco.translate('flashcard.create.questionPlaceholder') : '',
+        }),
+      ],
       onUpdate: ({ editor }) => {
         this.editForm.get('question')?.setValue(editor.getText());
       },
@@ -79,7 +88,15 @@ export class EditFlashcard implements OnInit, OnDestroy {
       },
     });
     this.answerEditor = new Editor({
-      extensions: [StarterKit, MathExtension.configure({ evaluation: false }), Image.configure({ inline: false })],
+      extensions: [
+        StarterKit,
+        MathExtension.configure({ evaluation: false }),
+        Image.configure({ inline: false }),
+        Placeholder.configure({
+          placeholder: ({ editor }) =>
+            editor.isEmpty ? this.transloco.translate('flashcard.create.answerPlaceholder') : '',
+        }),
+      ],
       onUpdate: ({ editor }) => {
         this.editForm.get('answer')?.setValue(editor.getText());
       },

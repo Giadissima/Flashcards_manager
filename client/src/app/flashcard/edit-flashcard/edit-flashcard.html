@@ -15,6 +15,7 @@
         <div class="form-group">
           <label for="title" class="form-label">{{ 'flashcard.create.titleLabel' | transloco }}</label>
           <input type="text" formControlName="title" class="form-control"
+            [placeholder]="t('flashcard.create.titlePlaceholder')"
             [class.is-invalid]="editForm.get('title')?.invalid && editForm.get('title')?.touched">
           @if(editForm.get('title')?.hasError('minlength')){
           <div class="invalid-feedback d-block">
