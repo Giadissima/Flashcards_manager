@@ -51,9 +51,15 @@
     "sortDate": "Date",
     "seeAnswer": "See answer",
     "seeQuestion": "See question",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "zoomReset": "Reset zoom",
     "toast": {
       "cardDeleted": "Card successfully deleted",
       "deleteError": "Error deleting card",
+      "undo": "Undo",
+      "cardRestored": "Card restored",
+      "restoreError": "Error restoring card",
       "cardCopied": "Card copied successfully",
       "copyError": "Copy error",
       "topicsLoadError": "Failed to load topics for the selected subject"

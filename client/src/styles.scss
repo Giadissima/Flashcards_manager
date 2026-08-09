@@ -496,10 +496,13 @@ ngx-colors {
 }
 
 .image-modal-content {
+  position: relative;
+
   .modal-body {
     padding: 0;
     display: flex;
     justify-content: center;
+    overflow: hidden;
   }
 }
 
@@ -513,6 +516,21 @@ ngx-colors {
      dentro i limiti ma header+immagine insieme sconfinerebbero comunque. */
   max-height: calc(100vh - var(--navbar-height) - 32px - 64px);
   border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);
+  touch-action: none;
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.image-modal-zoom-controls {
+  position: absolute;
+  bottom: calc(var(--spacing-unit) * 2);
+  right: calc(var(--spacing-unit) * 2);
+  display: flex;
+  gap: calc(var(--spacing-unit) * 1);
+  z-index: 5;
 }
 
 /* Filter bar */

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewChecked, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { SearchableSelectComponent, SelectOption } from '../shared/searchable-select/searchable-select.component';
 
 import { CommonModule } from '@angular/common';
@@ -6,7 +6,8 @@ import { Flashcard } from '../models/flashcard.dto';
 import { FlashcardService } from '../flashcard/flashcard.service';
 import { FormsModule } from '@angular/forms'; // Import FormsModule for ngModel
 import { KatexRendererPipe } from '../pipes/katex-renderer.pipe';
-import { Router } from '@angular/router';
+import Panzoom, { PanzoomObject } from '@panzoom/panzoom';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from '../models/subject.dto';
 import { SubjectService } from '../subject/subject.service';
 import { Toast } from '../toast/toast';
@@ -24,10 +25,18 @@ import { ModalComponent } from '../shared/modal/modal.component';
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
-export class Home implements OnInit {
+export class Home implements OnInit, AfterViewChecked, OnDestroy {
+  @ViewChild('imageModalImg') imageModalImgRef?: ElementRef<HTMLImageElement>;
+
   flashcards: Flashcard[] = [];
   isImageModalOpen = false;
   selectedImageUrl: string | null = null;
+  private panzoomInstance: PanzoomObject | null = null;
+  private imageZoomNeedsInit = false;
+  private readonly onImageWheel = (event: WheelEvent): void => {
+    event.preventDefault();
+    this.panzoomInstance?.zoomWithWheel(event);
+  };
   subjects: Subject[] = [];
   topics: Topic[] = [];
   selectedSubjectId: string | null | undefined = null;
@@ -56,12 +65,21 @@ export class Home implements OnInit {
     private flashcardsService: FlashcardService,
     private toast: ToastService,
     private router: Router,
+    private activatedRoute: ActivatedRoute,
     private subjectService: SubjectService,
     private topicService: TopicService,
     private transloco: TranslocoService,
   ) {}
-  // TODO mettere dei valori di default, non deve essere obbligatorio il filter né mettere tutti i parametri dentro filter
+
   ngOnInit(): void {
+    const qp = this.activatedRoute.snapshot.queryParamMap;
+    this.selectedSubjectId = qp.get('subject_id') || null;
+    this.selectedTopicId = qp.get('topic_id') || null;
+    this.searchTerm = qp.get('search') || '';
+    this.sortBy = (qp.get('sortBy') as 'title' | 'createdAt') || 'title';
+    this.sortDirection = (qp.get('sortDirection') as 'asc' | 'desc') || 'asc';
+    this.currentPage = Number(qp.get('page')) || 1;
+
     this.subjectService
       .getAllSubjects({
         sortField: 'name',
@@ -71,15 +89,24 @@ export class Home implements OnInit {
       })
       .then((data) => (this.subjects = data.data));
 
-    this.topicService
-      .getAllTopics({
-        sortField: 'name',
-        sortDirection: 'asc',
-        skip: 0,
-        limit: 50,
-      })
-      .then((data) => (this.topics = data.data));
+    this.loadTopicsBySubject(this.selectedSubjectId || undefined);
     this.loadFlashcards();
+  }
+
+  private updateQueryParams(): void {
+    this.router.navigate([], {
+      relativeTo: this.activatedRoute,
+      queryParams: {
+        subject_id: this.selectedSubjectId || null,
+        topic_id: this.selectedTopicId || null,
+        search: this.searchTerm || null,
+        sortBy: this.sortBy,
+        sortDirection: this.sortDirection,
+        page: this.currentPage,
+      },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
   }
 
   loadFlashcards(): void {
@@ -106,12 +133,14 @@ export class Home implements OnInit {
   nextPage(): void {
     if (this.currentPage >= this.totalPages) return;
     this.currentPage++;
+    this.updateQueryParams();
     this.loadFlashcards();
   }
 
   previousPage(): void {
     if (this.currentPage <= 1) return;
     this.currentPage--;
+    this.updateQueryParams();
     this.loadFlashcards();
   }
 
@@ -124,11 +153,13 @@ export class Home implements OnInit {
       this.topics = [];
     }
     this.currentPage = 1;
+    this.updateQueryParams();
     this.loadFlashcards();
   }
 
   onSearchTermChange(): void {
     this.currentPage = 1;
+    this.updateQueryParams();
     this.loadFlashcards();
   }
 
@@ -140,6 +171,7 @@ export class Home implements OnInit {
       this.sortDirection = 'asc';
     }
     this.currentPage = 1;
+    this.updateQueryParams();
     this.loadFlashcards();
   }
 
@@ -213,17 +245,88 @@ export class Home implements OnInit {
     if (target.tagName === 'IMG') {
       this.selectedImageUrl = (target as HTMLImageElement).src;
       this.isImageModalOpen = true;
+      this.imageZoomNeedsInit = true;
     }
+  }
+
+  ngAfterViewChecked(): void {
+    if (this.imageZoomNeedsInit && this.imageModalImgRef) {
+      this.imageZoomNeedsInit = false;
+      this.initImageZoom();
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.destroyImageZoom();
+  }
+
+  onImageModalClosed(): void {
+    this.destroyImageZoom();
+  }
+
+  zoomIn(): void {
+    this.panzoomInstance?.zoomIn();
+  }
+
+  zoomOut(): void {
+    this.panzoomInstance?.zoomOut();
+  }
+
+  resetZoom(): void {
+    this.panzoomInstance?.reset();
+  }
+
+  private initImageZoom(): void {
+    const el = this.imageModalImgRef?.nativeElement;
+    if (!el) return;
+    this.destroyImageZoom();
+    this.panzoomInstance = Panzoom(el, {
+      maxScale: 5,
+      minScale: 1,
+      contain: 'outside',
+      step: 0.5,
+    });
+    el.addEventListener('wheel', this.onImageWheel, { passive: false });
+  }
+
+  private destroyImageZoom(): void {
+    const el = this.imageModalImgRef?.nativeElement;
+    el?.removeEventListener('wheel', this.onImageWheel);
+    this.panzoomInstance?.destroy();
+    this.panzoomInstance = null;
   }
 
   async deleteCard(card: Flashcard): Promise<void> {
     if (!card._id) return;
     try {
       await this.flashcardsService.delete(card._id);
-      this.toast.show(this.transloco.translate('home.toast.cardDeleted'), 'success');
       this.flashcards = this.flashcards.filter((c) => c._id !== card._id);
+      this.toast.show(this.transloco.translate('home.toast.cardDeleted'), 'success', {
+        actionLabel: this.transloco.translate('home.toast.undo'),
+        onAction: () => this.undoDeleteCard(card),
+        duration: 5000,
+      });
     } catch (error: any) {
       this.toast.show(this.transloco.translate('home.toast.deleteError'), 'error');
+    }
+  }
+
+  private async undoDeleteCard(card: Flashcard): Promise<void> {
+    const subjectId = typeof card.subject_id === 'string' ? card.subject_id : card.subject_id?._id;
+    const topicId = typeof card.topic_id === 'string' ? card.topic_id : card.topic_id?._id;
+    const restoredCard = {
+      title: card.title,
+      question: card.question,
+      answer: card.answer,
+      subject_id: subjectId,
+      topic_id: topicId,
+    } as Flashcard;
+    try {
+      await this.flashcardsService.create(restoredCard);
+      this.toast.show(this.transloco.translate('home.toast.cardRestored'), 'success');
+      this.loadFlashcards();
+    } catch (error: any) {
+      this.toast.show(this.transloco.translate('home.toast.restoreError'), 'error');
     }
   }
 

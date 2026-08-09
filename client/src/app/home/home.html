@@ -126,9 +126,25 @@
   </div>
 </div>
 
-<app-modal [(isOpen)]="isImageModalOpen" [dialogClass]="'image-modal-dialog'" [contentClass]="'image-modal-content'">
+<app-modal
+  [(isOpen)]="isImageModalOpen"
+  [dialogClass]="'image-modal-dialog'"
+  [contentClass]="'image-modal-content'"
+  (closed)="onImageModalClosed()"
+>
   @if (selectedImageUrl) {
-  <img [src]="selectedImageUrl" alt="" class="image-modal-img">
+  <img #imageModalImg [src]="selectedImageUrl" alt="" class="image-modal-img">
+  <div class="image-modal-zoom-controls">
+    <button type="button" class="btn btn-light btn-sm" (click)="zoomOut()" [attr.aria-label]="'home.zoomOut' | transloco">
+      <i class="bi bi-zoom-out"></i>
+    </button>
+    <button type="button" class="btn btn-light btn-sm" (click)="resetZoom()" [attr.aria-label]="'home.zoomReset' | transloco">
+      <i class="bi bi-aspect-ratio"></i>
+    </button>
+    <button type="button" class="btn btn-light btn-sm" (click)="zoomIn()" [attr.aria-label]="'home.zoomIn' | transloco">
+      <i class="bi bi-zoom-in"></i>
+    </button>
+  </div>
   }
 </app-modal>
 

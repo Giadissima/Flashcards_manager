@@ -13,15 +13,24 @@ import { Component } from '@angular/core';
 export class Toast {
   message: string | null = null;
   type: ToastType = 'success';
+  actionLabel: string | null = null;
+  private onAction: (() => void) | null = null;
 
   constructor(private toastService: ToastService) {
     this.toastService.toastMessage$.subscribe(toast => {
       this.message = toast?.message ?? null;
       this.type = toast?.type ?? 'success';
+      this.actionLabel = toast?.actionLabel ?? null;
+      this.onAction = toast?.onAction ?? null;
     });
   }
 
   close() {
+    this.toastService.hide();
+  }
+
+  triggerAction() {
+    this.onAction?.();
     this.toastService.hide();
   }
 }
