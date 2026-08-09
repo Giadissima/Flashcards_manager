@@ -1,7 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 
 import { CommonModule } from '@angular/common';
+import { NgxColorsComponent, NgxColorsTriggerDirective } from 'ngx-colors';
 import { TopicService } from '../topic.service';
 import { Router } from '@angular/router';
 import { Subject } from '../../models/subject.dto';
@@ -9,16 +15,27 @@ import { SubjectService } from '../../subject/subject.service';
 import { Toast } from '../../toast/toast';
 import { ToastService } from '../../toast/toast.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
-import { SearchableSelectComponent, SelectOption } from '../../shared/searchable-select/searchable-select.component';
+import {
+  SearchableSelectComponent,
+  SelectOption,
+} from '../../shared/searchable-select/searchable-select.component';
 import { getSubjectIconUrl } from '../../subject/subject-icon.util';
 import { charMinLength, nameMaxLength } from '../../../config/config';
 
 @Component({
   selector: 'app-create-topic',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, Toast, TranslocoModule, SearchableSelectComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    Toast,
+    TranslocoModule,
+    SearchableSelectComponent,
+    NgxColorsComponent,
+    NgxColorsTriggerDirective,
+  ],
   templateUrl: './create-topic.component.html',
-  styleUrls: ['./create-topic.component.scss']
+  styleUrls: ['./create-topic.component.scss'],
 })
 export class CreateTopicComponent implements OnInit {
   topicForm!: FormGroup;
@@ -38,14 +55,21 @@ export class CreateTopicComponent implements OnInit {
     private topicService: TopicService,
     private toastService: ToastService,
     private subjectService: SubjectService,
-    private transloco: TranslocoService
+    private transloco: TranslocoService,
   ) {}
 
   ngOnInit(): void {
     this.topicForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(nameMaxLength)]],
+      name: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(charMinLength),
+          Validators.maxLength(nameMaxLength),
+        ],
+      ],
       color: ['#75d2cb', Validators.required], // Default to black
-      subject_id: [null] // Assuming subject_id is required
+      subject_id: [null], // Assuming subject_id is required
     });
     this.loadSubjects();
   }
@@ -58,10 +82,16 @@ export class CreateTopicComponent implements OnInit {
 
     try {
       await this.topicService.createTopic(this.topicForm.value);
-      this.toastService.show(this.transloco.translate('topic.toast.created'), 'success');
+      this.toastService.show(
+        this.transloco.translate('topic.toast.created'),
+        'success',
+      );
       this.router.navigate(['/manage-topics']);
     } catch (error) {
-      this.toastService.show(this.transloco.translate('topic.toast.createError'), 'error');
+      this.toastService.show(
+        this.transloco.translate('topic.toast.createError'),
+        'error',
+      );
     }
   }
 
@@ -71,12 +101,15 @@ export class CreateTopicComponent implements OnInit {
         skip: 0,
         limit: 50,
         sortField: 'name',
-        sortDirection: 'asc'
+        sortDirection: 'asc',
       });
       this.subjects = response.data;
     } catch (err) {
       console.error('Error loading subjects', err);
-      this.toastService.show(this.transloco.translate('topic.toast.subjectsLoadError'), 'error');
+      this.toastService.show(
+        this.transloco.translate('topic.toast.subjectsLoadError'),
+        'error',
+      );
     }
   }
 }

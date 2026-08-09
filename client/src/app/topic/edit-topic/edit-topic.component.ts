@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { NgxColorsComponent, NgxColorsTriggerDirective } from 'ngx-colors';
 import { TopicService } from './../topic.service';
 import { ToastService } from '../../toast/toast.service';
 import { SubjectService } from '../../subject/subject.service';
@@ -16,7 +17,7 @@ import { charMinLength, nameMaxLength } from '../../../config/config';
 @Component({
   selector: 'app-edit-topic',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, Toast, TranslocoModule, SearchableSelectComponent],
+  imports: [ReactiveFormsModule, CommonModule, Toast, TranslocoModule, SearchableSelectComponent, NgxColorsComponent, NgxColorsTriggerDirective],
   templateUrl: './edit-topic.component.html',
   styleUrls: ['./edit-topic.component.scss']
 })

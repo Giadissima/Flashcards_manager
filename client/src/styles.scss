@@ -381,6 +381,15 @@ input:-webkit-autofill:active {
   pointer-events: none;
 }
 
+/* ngx-colors renderizza di default uno swatch di 26x26px (fissato via :host
+   nel suo stesso componente): troppo piccolo per essere notato come input
+   cliccabile. !important necessario per vincere sulla regola :host, che ha
+   specificità maggiore di un selettore di tipo globale. */
+ngx-colors {
+  width: 48px !important;
+  height: 48px !important;
+}
+
 /* Cliccando un'immagine nella home si apre in una modale (vedi home.ts). Questa
    regola deve stare qui, nel foglio globale, e non nello style scoped di Home:
    le <img> arrivano via [innerHTML] quindi non ricevono l'attributo
