@@ -6,10 +6,12 @@ import { charMinLength, descMaxLength, nameMaxLength } from '../../../config/con
 import { CommonModule } from '@angular/common';
 import { Editor } from '@tiptap/core';
 import { MathExtension } from '@aarkue/tiptap-math-extension';
+import { NgxColorsComponent, NgxColorsTriggerDirective } from 'ngx-colors';
 import { Router } from '@angular/router';
 import StarterKit from '@tiptap/starter-kit';
 import { SubjectService } from '../subject.service';
-import { defaultSubjectIconUrl } from '../subject-icon.util';
+import { defaultSubjectIconColor } from '../subject-icon.util';
+import { SubjectIconSvgComponent } from '../subject-icon-svg/subject-icon-svg.component';
 import { TiptapEditorDirective } from 'ngx-tiptap';
 import { Toast } from '../../toast/toast';
 import { ToastService } from '../../toast/toast.service';
@@ -17,7 +19,16 @@ import { ToastService } from '../../toast/toast.service';
 @Component({
   selector: 'app-create-subject',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, Toast, TiptapEditorDirective, TranslocoModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    Toast,
+    TiptapEditorDirective,
+    TranslocoModule,
+    NgxColorsComponent,
+    NgxColorsTriggerDirective,
+    SubjectIconSvgComponent,
+  ],
   templateUrl: './create-subject.component.html',
   styleUrls: ['./create-subject.component.scss']
 })
@@ -26,7 +37,7 @@ export class CreateSubjectComponent implements OnInit, OnDestroy {
   selectedFile: File | null = null;
   descEditor: Editor;
   descLength = 0;
-  previewUrl = defaultSubjectIconUrl;
+  previewUrl: string | null = null;
 
   readonly charMinLength = charMinLength;
   readonly nameMaxLength = nameMaxLength;
@@ -49,13 +60,14 @@ export class CreateSubjectComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subjectForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(nameMaxLength)]]
+      name: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(nameMaxLength)]],
+      color: [defaultSubjectIconColor, Validators.required],
     });
   }
 
   ngOnDestroy(): void {
     this.descEditor.destroy();
-    if (this.selectedFile) {
+    if (this.selectedFile && this.previewUrl) {
       URL.revokeObjectURL(this.previewUrl);
     }
   }
@@ -64,7 +76,7 @@ export class CreateSubjectComponent implements OnInit, OnDestroy {
     const element = event.currentTarget as HTMLInputElement;
     let fileList: FileList | null = element.files;
     if (fileList && fileList.length) {
-      if (this.selectedFile) {
+      if (this.selectedFile && this.previewUrl) {
         URL.revokeObjectURL(this.previewUrl);
       }
       this.selectedFile = fileList[0];
@@ -73,11 +85,11 @@ export class CreateSubjectComponent implements OnInit, OnDestroy {
   }
 
   resetIcon(): void {
-    if (this.selectedFile) {
+    if (this.selectedFile && this.previewUrl) {
       URL.revokeObjectURL(this.previewUrl);
     }
     this.selectedFile = null;
-    this.previewUrl = defaultSubjectIconUrl;
+    this.previewUrl = null;
   }
 
   async createSubject(): Promise<void> {
@@ -89,6 +101,7 @@ export class CreateSubjectComponent implements OnInit, OnDestroy {
     const formData = new FormData();
     formData.append('name', this.subjectForm.get('name')?.value);
     formData.append('desc', this.descEditor.getHTML());
+    formData.append('color', this.subjectForm.get('color')?.value);
     if (this.selectedFile) {
       formData.append('icon', this.selectedFile, this.selectedFile.name);
     }

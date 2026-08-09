@@ -161,6 +161,7 @@
       "iconLabel": "Icona",
       "iconPreview": "Anteprima icona",
       "resetIcon": "Ripristina immagine predefinita",
+      "iconColor": "Colore icona predefinita",
       "createButton": "Crea materia"
     },
     "edit": {
@@ -168,6 +169,7 @@
       "subtitle": "Aggiorna i dettagli della materia",
       "currentIcon": "Icona attuale",
       "replaceIcon": "Sostituisci icona",
+      "iconColor": "Colore icona predefinita",
       "saveChanges": "Salva Modifiche"
     },
     "manage": {
@@ -199,9 +201,12 @@
       "topicLabel": "Argomento",
       "selectTopic": "Seleziona argomento",
       "numQuestionsLabel": "Numero di domande",
+      "incrementAria": "Aumenta il numero di domande",
+      "decrementAria": "Diminuisci il numero di domande",
       "maxButton": "Max",
       "maxQuestionsError": "Puoi richiedere al massimo 1000 domande. Inserisci un numero più basso.",
       "atLeastOneError": "Seleziona almeno una materia o un argomento.",
+      "noFlashcardsError": "Nessuna flashcard trovata per la materia/argomento selezionati.",
       "startButton": "Avvia Test",
       "createError": "Impossibile creare il test"
     },

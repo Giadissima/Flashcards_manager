@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { Editor } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
 import { MathExtension } from '@aarkue/tiptap-math-extension';
+import { NgxColorsComponent, NgxColorsTriggerDirective } from 'ngx-colors';
 import { TiptapEditorDirective } from 'ngx-tiptap';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../subject.service';
@@ -13,12 +14,22 @@ import { Toast } from '../../toast/toast';
 import { ToastService } from '../../toast/toast.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { charMinLength, nameMaxLength, descMaxLength } from '../../../config/config';
-import { defaultSubjectIconUrl, getSubjectIconUrl } from '../subject-icon.util';
+import { buildDefaultSubjectIconSvgMarkup, defaultSubjectIconColor, getSubjectIconUrl } from '../subject-icon.util';
+import { SubjectIconSvgComponent } from '../subject-icon-svg/subject-icon-svg.component';
 
 @Component({
   selector: 'app-edit-subject',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, Toast, TiptapEditorDirective, TranslocoModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    Toast,
+    TiptapEditorDirective,
+    TranslocoModule,
+    NgxColorsComponent,
+    NgxColorsTriggerDirective,
+    SubjectIconSvgComponent,
+  ],
   templateUrl: './edit-subject.component.html',
   styleUrls: ['./edit-subject.component.scss']
 })
@@ -29,7 +40,18 @@ export class EditSubjectComponent implements OnInit, OnDestroy {
   selectedFile: File | null = null;
   descEditor: Editor;
   descLength = 0;
-  previewUrl = defaultSubjectIconUrl;
+  // null => nessuna icona caricata (né esistente né appena scelta): si mostra
+  // la preview live generata dal colore, che segue i cambi del color picker;
+  // altrimenti è la url di un'icona reale (persistita sul server o del file
+  // appena selezionato dall'utente)
+  previewUrl: string | null = null;
+  // true dopo un click su "reset": l'icona persistita va sostituita al salvataggio
+  // con l'SVG di default, generato al volo con il colore scelto in quel momento
+  private resetToDefault = false;
+
+  get canResetIcon(): boolean {
+    return !!this.selectedFile || (!!this.subject?.icon && !this.resetToDefault);
+  }
 
   readonly charMinLength = charMinLength;
   readonly nameMaxLength = nameMaxLength;
@@ -53,7 +75,8 @@ export class EditSubjectComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.editForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(nameMaxLength)]]
+      name: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(nameMaxLength)]],
+      color: [defaultSubjectIconColor, Validators.required],
     });
 
     this.route.paramMap.subscribe(params => {
@@ -73,10 +96,10 @@ export class EditSubjectComponent implements OnInit, OnDestroy {
   async loadSubjectData(id: string): Promise<void> {
     try {
       this.subject = await this.subjectService.getSubjectById(id);
-      this.editForm.patchValue(this.subject);
+      this.editForm.patchValue({ ...this.subject, color: this.subject.color ?? defaultSubjectIconColor });
       this.descEditor.commands.setContent(this.subject.desc ?? '');
       this.descLength = this.descEditor.getText().length;
-      this.previewUrl = getSubjectIconUrl(this.subject);
+      this.previewUrl = this.subject.icon ? getSubjectIconUrl(this.subject) : null;
     } catch (error) {
       this.toastService.show(this.transloco.translate('subject.toast.loadOneError'), 'error');
     }
@@ -86,14 +109,19 @@ export class EditSubjectComponent implements OnInit, OnDestroy {
     const element = event.currentTarget as HTMLInputElement;
     const fileList = element.files;
     if (fileList && fileList.length) {
+      this.resetToDefault = false;
       this.setSelectedFile(fileList[0]);
     }
   }
 
-  async resetIcon(): Promise<void> {
-    const response = await fetch(defaultSubjectIconUrl);
-    const blob = await response.blob();
-    this.setSelectedFile(new File([blob], 'default-subject-icon.png', { type: blob.type }));
+  // Torna alla preview live (che segue il color picker): l'eventuale file
+  // scelto va scartato, e l'icona persistita (se presente) verrà sostituita
+  // al salvataggio con l'SVG di default generato al volo, vedi updateSubject().
+  resetIcon(): void {
+    this.resetToDefault = true;
+    this.revokePreviewUrl();
+    this.selectedFile = null;
+    this.previewUrl = null;
   }
 
   private setSelectedFile(file: File): void {
@@ -103,7 +131,7 @@ export class EditSubjectComponent implements OnInit, OnDestroy {
   }
 
   private revokePreviewUrl(): void {
-    if (this.previewUrl.startsWith('blob:')) {
+    if (this.previewUrl?.startsWith('blob:')) {
       URL.revokeObjectURL(this.previewUrl);
     }
   }
@@ -117,8 +145,17 @@ export class EditSubjectComponent implements OnInit, OnDestroy {
     const formData = new FormData();
     formData.append('name', this.editForm.get('name')?.value);
     formData.append('desc', this.descEditor.getHTML());
-    if (this.selectedFile) {
-      formData.append('icon', this.selectedFile, this.selectedFile.name);
+    const color = this.editForm.get('color')?.value;
+    formData.append('color', color);
+
+    let fileToUpload = this.selectedFile;
+    if (!fileToUpload && this.resetToDefault && this.subject?.icon) {
+      const svgMarkup = buildDefaultSubjectIconSvgMarkup(color ?? defaultSubjectIconColor);
+      const blob = new Blob([svgMarkup], { type: 'image/svg+xml' });
+      fileToUpload = new File([blob], 'default-subject-icon.svg', { type: 'image/svg+xml' });
+    }
+    if (fileToUpload) {
+      formData.append('icon', fileToUpload, fileToUpload.name);
     }
 
     try {

@@ -1,4 +1,4 @@
-import { IsMongoId, IsOptional, IsString, Length } from 'class-validator';
+import { IsMongoId, IsOptional, IsString, Length, Matches } from 'class-validator';
 import {
   charMinLength,
   idLength,
@@ -37,4 +37,16 @@ export class ModifySubjectDto {
     return textOnly.length > 0 ? trimmed : '';
   })
   desc: string;
+
+  @IsString()
+  @IsOptional()
+  @Matches(/^#[0-9A-Fa-f]{6}$/, {
+    message: 'color must be a hex color in the format #rrggbb',
+  })
+  @ApiProperty({
+    description: 'Background color of the default subject icon',
+    example: '#7fa8d9',
+    required: false,
+  })
+  color?: string;
 }

@@ -34,6 +34,7 @@ export class SubjectController {
       properties: {
         name: { type: 'string', example: 'Matematica' },
         desc: { type: 'string', example: 'Materia scientifica di base' },
+        color: { type: 'string', example: '#7fa8d9' },
         icon: {
           type: 'string',
           format: 'binary',
@@ -73,6 +74,7 @@ export class SubjectController {
       properties: {
         name: { type: 'string', example: 'Matematica' },
         desc: { type: 'string', example: 'Materia scientifica di base' },
+        color: { type: 'string', example: '#7fa8d9' },
         icon: {
           type: 'string',
           format: 'binary',

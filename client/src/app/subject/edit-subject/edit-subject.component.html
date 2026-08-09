@@ -52,11 +52,21 @@
         <div class="form-group">
           <label class="form-label">{{ 'subject.edit.currentIcon' | transloco }}</label>
           <div class="d-flex align-items-center gap-2 mb-2">
+            @if (previewUrl) {
             <img [src]="previewUrl" alt="current icon" class="current-icon">
-            <button type="button" class="btn btn-outline-secondary btn-sm" (click)="resetIcon(); icon.value = ''">{{ 'subject.create.resetIcon' | transloco }}</button>
+            } @else {
+            <app-subject-icon-svg [fill]="editForm.get('color')?.value" class="current-icon"></app-subject-icon-svg>
+            }
+            <button type="button" class="btn btn-outline-secondary btn-sm" [disabled]="!canResetIcon" (click)="resetIcon(); icon.value = ''">{{ 'subject.create.resetIcon' | transloco }}</button>
           </div>
           <label for="icon" class="form-label">{{ 'subject.edit.replaceIcon' | transloco }}</label>
           <input type="file" id="icon" #icon accept="image/*" (change)="onFileSelected($event)" class="form-control">
+        </div>
+
+        <div class="form-group">
+          <label for="color" class="form-label">{{ 'subject.edit.iconColor' | transloco }}</label>
+          <ngx-colors ngxColorsTrigger id="color" formControlName="color" [title]="t('subject.edit.iconColor')"
+            [allowedModels]="['HEXA']" [lockValues]="{ alpha: 1, clamp: true }"></ngx-colors>
         </div>
 
         <div class="form-actions">

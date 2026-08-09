@@ -161,6 +161,7 @@
       "iconLabel": "Icon",
       "iconPreview": "Icon preview",
       "resetIcon": "Reset to default image",
+      "iconColor": "Default icon color",
       "createButton": "Create Subject"
     },
     "edit": {
@@ -168,6 +169,7 @@
       "subtitle": "Update the subject details",
       "currentIcon": "Current icon",
       "replaceIcon": "Replace icon",
+      "iconColor": "Default icon color",
       "saveChanges": "Save Changes"
     },
     "manage": {
@@ -199,9 +201,12 @@
       "topicLabel": "Topic",
       "selectTopic": "Select topic",
       "numQuestionsLabel": "Number of questions",
+      "incrementAria": "Increase number of questions",
+      "decrementAria": "Decrease number of questions",
       "maxButton": "Max",
       "maxQuestionsError": "You can request at most 1000 questions. Please enter a lower number.",
       "atLeastOneError": "Please select at least a subject or a topic.",
+      "noFlashcardsError": "No flashcards found for the selected subject/topic.",
       "startButton": "Start Test",
       "createError": "Unable to create the test"
     },

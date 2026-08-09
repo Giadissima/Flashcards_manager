@@ -18,6 +18,10 @@ export class Subject {
 
   @Prop({ required: false })
   desc?: string;
+
+  // colore di sfondo dell'icona SVG di default, usato quando icon non è impostato
+  @Prop({ required: false })
+  color?: string;
 }
 
 export const SubjectSchema = SchemaFactory.createForClass(Subject);
