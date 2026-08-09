@@ -152,6 +152,8 @@
       "descLabel": "Descrizione",
       "descMaxError": "La descrizione può avere al massimo {{max}} caratteri (attualmente {{current}}). Accorciala un po'.",
       "iconLabel": "Icona",
+      "iconPreview": "Anteprima icona",
+      "resetIcon": "Ripristina immagine predefinita",
       "createButton": "Crea materia"
     },
     "edit": {

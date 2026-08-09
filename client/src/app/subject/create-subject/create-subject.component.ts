@@ -1,17 +1,18 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
+import { charMinLength, descMaxLength, nameMaxLength } from '../../../config/config';
 
 import { CommonModule } from '@angular/common';
 import { Editor } from '@tiptap/core';
-import StarterKit from '@tiptap/starter-kit';
 import { MathExtension } from '@aarkue/tiptap-math-extension';
-import { TiptapEditorDirective } from 'ngx-tiptap';
 import { Router } from '@angular/router';
+import StarterKit from '@tiptap/starter-kit';
 import { SubjectService } from '../subject.service';
+import { defaultSubjectIconUrl } from '../subject-icon.util';
+import { TiptapEditorDirective } from 'ngx-tiptap';
 import { Toast } from '../../toast/toast';
 import { ToastService } from '../../toast/toast.service';
-import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
-import { charMinLength, nameMaxLength, descMaxLength } from '../../../config/config';
 
 @Component({
   selector: 'app-create-subject',
@@ -25,6 +26,7 @@ export class CreateSubjectComponent implements OnInit, OnDestroy {
   selectedFile: File | null = null;
   descEditor: Editor;
   descLength = 0;
+  previewUrl = defaultSubjectIconUrl;
 
   readonly charMinLength = charMinLength;
   readonly nameMaxLength = nameMaxLength;
@@ -53,14 +55,29 @@ export class CreateSubjectComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.descEditor.destroy();
+    if (this.selectedFile) {
+      URL.revokeObjectURL(this.previewUrl);
+    }
   }
 
   onFileSelected(event: Event): void {
     const element = event.currentTarget as HTMLInputElement;
     let fileList: FileList | null = element.files;
-    if (fileList) {
+    if (fileList && fileList.length) {
+      if (this.selectedFile) {
+        URL.revokeObjectURL(this.previewUrl);
+      }
       this.selectedFile = fileList[0];
+      this.previewUrl = URL.createObjectURL(this.selectedFile);
     }
+  }
+
+  resetIcon(): void {
+    if (this.selectedFile) {
+      URL.revokeObjectURL(this.previewUrl);
+    }
+    this.selectedFile = null;
+    this.previewUrl = defaultSubjectIconUrl;
   }
 
   async createSubject(): Promise<void> {

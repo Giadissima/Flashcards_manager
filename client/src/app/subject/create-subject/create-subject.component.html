@@ -50,8 +50,13 @@
         </div>
 
         <div class="form-group">
+          <label class="form-label">{{ 'subject.create.iconPreview' | transloco }}</label>
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <img [src]="previewUrl" alt="icon preview" class="current-icon">
+            <button type="button" class="btn btn-outline-secondary btn-sm" (click)="resetIcon(); icon.value = ''">{{ 'subject.create.resetIcon' | transloco }}</button>
+          </div>
           <label for="icon" class="form-label">{{ 'common.icon' | transloco }}</label>
-          <input type="file" id="icon" (change)="onFileSelected($event)" class="form-control">
+          <input type="file" id="icon" #icon accept="image/*" (change)="onFileSelected($event)" class="form-control">
         </div>
 
         <div class="form-actions">

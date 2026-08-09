@@ -12,7 +12,8 @@ import { SubjectService } from '../subject.service';
 import { Toast } from '../../toast/toast';
 import { ToastService } from '../../toast/toast.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
-import { baseUrlAPI, charMinLength, nameMaxLength, descMaxLength } from '../../../config/config';
+import { charMinLength, nameMaxLength, descMaxLength } from '../../../config/config';
+import { defaultSubjectIconUrl, getSubjectIconUrl } from '../subject-icon.util';
 
 @Component({
   selector: 'app-edit-subject',
@@ -28,6 +29,7 @@ export class EditSubjectComponent implements OnInit, OnDestroy {
   selectedFile: File | null = null;
   descEditor: Editor;
   descLength = 0;
+  previewUrl = defaultSubjectIconUrl;
 
   readonly charMinLength = charMinLength;
   readonly nameMaxLength = nameMaxLength;
@@ -65,6 +67,7 @@ export class EditSubjectComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.descEditor.destroy();
+    this.revokePreviewUrl();
   }
 
   async loadSubjectData(id: string): Promise<void> {
@@ -73,6 +76,7 @@ export class EditSubjectComponent implements OnInit, OnDestroy {
       this.editForm.patchValue(this.subject);
       this.descEditor.commands.setContent(this.subject.desc ?? '');
       this.descLength = this.descEditor.getText().length;
+      this.previewUrl = getSubjectIconUrl(this.subject);
     } catch (error) {
       this.toastService.show(this.transloco.translate('subject.toast.loadOneError'), 'error');
     }
@@ -82,14 +86,26 @@ export class EditSubjectComponent implements OnInit, OnDestroy {
     const element = event.currentTarget as HTMLInputElement;
     const fileList = element.files;
     if (fileList && fileList.length) {
-      this.selectedFile = fileList[0];
+      this.setSelectedFile(fileList[0]);
     }
   }
 
-  // subject.icon è l'id del file salvato su Mongo, non una URL: va risolto
-  // sull'endpoint che serve i byte del file (stessa logica di manage-subjects)
-  getIconUrl(): string {
-    return this.subject?.icon ? `${baseUrlAPI}file/${this.subject.icon}` : 'assets/favicon.png';
+  async resetIcon(): Promise<void> {
+    const response = await fetch(defaultSubjectIconUrl);
+    const blob = await response.blob();
+    this.setSelectedFile(new File([blob], 'default-subject-icon.png', { type: blob.type }));
+  }
+
+  private setSelectedFile(file: File): void {
+    this.revokePreviewUrl();
+    this.selectedFile = file;
+    this.previewUrl = URL.createObjectURL(file);
+  }
+
+  private revokePreviewUrl(): void {
+    if (this.previewUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(this.previewUrl);
+    }
   }
 
   async updateSubject(): Promise<void> {

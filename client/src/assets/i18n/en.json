@@ -152,6 +152,8 @@
       "descLabel": "Description",
       "descMaxError": "Description can have at most {{max}} characters (currently {{current}}). Please shorten it.",
       "iconLabel": "Icon",
+      "iconPreview": "Icon preview",
+      "resetIcon": "Reset to default image",
       "createButton": "Create Subject"
     },
     "edit": {
