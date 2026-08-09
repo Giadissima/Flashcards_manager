@@ -11,6 +11,7 @@ import { ToastService } from '../../toast/toast.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { SearchableSelectComponent, SelectOption } from '../../shared/searchable-select/searchable-select.component';
 import { getSubjectIconUrl } from '../../subject/subject-icon.util';
+import { charMinLength, nameMaxLength } from '../../../config/config';
 
 @Component({
   selector: 'app-create-topic',
@@ -42,7 +43,7 @@ export class CreateTopicComponent implements OnInit {
 
   ngOnInit(): void {
     this.topicForm = this.fb.group({
-      name: ['', Validators.required],
+      name: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(nameMaxLength)]],
       color: ['#75d2cb', Validators.required], // Default to black
       subject_id: [null] // Assuming subject_id is required
     });

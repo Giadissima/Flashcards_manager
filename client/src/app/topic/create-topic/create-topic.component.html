@@ -15,8 +15,12 @@
         <div class="form-group">
           <label for="name" class="form-label">{{ 'common.name' | transloco }}</label>
           <input type="text" class="form-control" id="name" formControlName="name">
-          @if (topicForm.get('name')?.touched && topicForm.get('name')?.hasError('required')) {
-          <div class="invalid-feedback">{{ 'topic.create.nameRequiredError' | transloco }}</div>
+          @if (topicForm.get('name')?.touched && topicForm.get('name')?.hasError('minlength')) {
+          <div class="invalid-feedback d-block">{{ 'topic.create.nameMinError' | transloco }}</div>
+          } @else if (topicForm.get('name')?.hasError('maxlength')) {
+          <div class="invalid-feedback d-block">{{ 'topic.create.nameMaxError' | transloco }}</div>
+          } @else if (topicForm.get('name')?.touched && topicForm.get('name')?.hasError('required')) {
+          <div class="invalid-feedback d-block">{{ 'topic.create.nameRequiredError' | transloco }}</div>
           }
         </div>
 

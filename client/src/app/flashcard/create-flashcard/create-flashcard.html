@@ -16,16 +16,16 @@
           <label for="title" class="form-label">{{ 'flashcard.create.titleLabel' | transloco }}</label>
           <input type="text" id="title" formControlName="title" class="form-control" [placeholder]="t('flashcard.create.titlePlaceholder')">
           @if(cardForm.get('title')?.hasError('minlength')){
-          <div class="invalid-feedback">
+          <div class="invalid-feedback d-block">
             {{ 'flashcard.create.titleMinError' | transloco }}
           </div>
           } @else if (cardForm.get('title')?.hasError('maxlength')) {
-          <div class="invalid-feedback">
+          <div class="invalid-feedback d-block">
             {{ 'flashcard.create.titleMaxError' | transloco }}
           </div>
           }
           @else if (cardForm.get('title')?.touched && cardForm.get('title')?.hasError('required')) {
-          <div class="invalid-feedback">{{ 'flashcard.create.titleRequiredError' | transloco }}</div>
+          <div class="invalid-feedback d-block">{{ 'flashcard.create.titleRequiredError' | transloco }}</div>
           }
         </div>
 
@@ -61,6 +61,18 @@
             <input type="file" id="question-image-input" accept="image/*" hidden (change)="onImageSelected($event, questionEditor)">
           </div>
           <tiptap-editor [editor]="questionEditor" class="tiptap-editor-custom"></tiptap-editor>
+          @if(cardForm.get('question')?.touched && cardForm.get('question')?.hasError('minlength')){
+          <div class="invalid-feedback d-block">
+            {{ 'flashcard.create.questionMinError' | transloco }}
+          </div>
+          } @else if (cardForm.get('question')?.hasError('maxlength')) {
+          <div class="invalid-feedback d-block">
+            {{ 'flashcard.create.questionMaxError' | transloco }}
+          </div>
+          }
+          @else if (cardForm.get('question')?.touched && cardForm.get('question')?.hasError('required')) {
+          <div class="invalid-feedback d-block">{{ 'flashcard.create.questionRequiredError' | transloco }}</div>
+          }
         </div>
 
         <div class="form-group">
@@ -95,21 +107,36 @@
             <input type="file" id="answer-image-input" accept="image/*" hidden (change)="onImageSelected($event, answerEditor)">
           </div>
           <tiptap-editor [editor]="answerEditor" class="tiptap-editor-custom"></tiptap-editor>
+          @if(cardForm.get('answer')?.touched && cardForm.get('answer')?.hasError('minlength')){
+          <div class="invalid-feedback d-block">
+            {{ 'flashcard.create.answerMinError' | transloco }}
+          </div>
+          } @else if (cardForm.get('answer')?.hasError('maxlength')) {
+          <div class="invalid-feedback d-block">
+            {{ 'flashcard.create.answerMaxError' | transloco }}
+          </div>
+          }
+          @else if (cardForm.get('answer')?.touched && cardForm.get('answer')?.hasError('required')) {
+          <div class="invalid-feedback d-block">{{ 'flashcard.create.answerRequiredError' | transloco }}</div>
+          }
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label for="subject" class="form-label">{{ 'flashcard.create.subjectLabel' | transloco }}</label>
             <app-searchable-select [options]="subjectOptions" [value]="selectedSubjectId"
-              [allOptionLabel]="t('common.allSubjects')" [placeholder]="t('common.allSubjects')"
+              [placeholder]="t('common.chooseSubject')"
               (valueChange)="onSubjectSelected($event)"></app-searchable-select>
           </div>
 
           <div class="form-group">
             <label for="topic" class="form-label">{{ 'flashcard.create.topicLabel' | transloco }}</label>
             <app-searchable-select [options]="topicOptions" [value]="selectedTopicId"
-              [allOptionLabel]="t('common.allTopics')" [placeholder]="t('common.allTopics')"
+              [placeholder]="t('common.chooseTopic')"
               (valueChange)="onTopicSelected($event)"></app-searchable-select>
+            @if (cardForm.get('topic_id')?.touched && cardForm.get('topic_id')?.hasError('required')) {
+            <div class="invalid-feedback d-block">{{ 'flashcard.create.topicRequiredError' | transloco }}</div>
+            }
           </div>
         </div>
 

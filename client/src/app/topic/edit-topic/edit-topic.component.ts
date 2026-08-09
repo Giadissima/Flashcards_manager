@@ -11,6 +11,7 @@ import { Toast } from '../../toast/toast';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { SearchableSelectComponent, SelectOption } from '../../shared/searchable-select/searchable-select.component';
 import { getSubjectIconUrl } from '../../subject/subject-icon.util';
+import { charMinLength, nameMaxLength } from '../../../config/config';
 
 @Component({
   selector: 'app-edit-topic',
@@ -44,7 +45,7 @@ export class EditTopicComponent implements OnInit {
 
   ngOnInit(): void {
     this.editForm = this.fb.group({
-      name: ['', Validators.required],
+      name: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(nameMaxLength)]],
       color: ['#000000'],
       subject_id: ['', Validators.required]
     });

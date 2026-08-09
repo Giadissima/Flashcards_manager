@@ -5,7 +5,7 @@ import {
   SelectOption,
 } from '../../shared/searchable-select/searchable-select.component';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
-import { charMinLength, titleMaxLength } from '../../../config/config';
+import { answerMaxLength, charMinLength, questionMaxLength, titleMaxLength } from '../../../config/config';
 
 import { CommonModule } from '@angular/common';
 import { Editor } from '@tiptap/core';
@@ -13,6 +13,7 @@ import { FileService } from '../../shared/file/file.service';
 import { FlashcardService } from '../flashcard.service';
 import Image from '@tiptap/extension-image';
 import { MathExtension } from '@aarkue/tiptap-math-extension';
+import Placeholder from '@tiptap/extension-placeholder';
 import StarterKit from '@tiptap/starter-kit';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
@@ -60,17 +61,41 @@ export class CreateFlashcard implements OnInit, OnDestroy {
     private transloco: TranslocoService
   ) {
     this.questionEditor = new Editor({
-      extensions: [StarterKit, MathExtension.configure({ evaluation: false }), Image.configure({ inline: false })],
+      extensions: [
+        StarterKit,
+        MathExtension.configure({ evaluation: false }),
+        Image.configure({ inline: false }),
+        Placeholder.configure({ placeholder: this.transloco.translate('flashcard.create.questionPlaceholder') }),
+      ],
+      onUpdate: ({ editor }) => {
+        this.cardForm.get('question')?.setValue(editor.getText());
+      },
+      onBlur: () => {
+        this.cardForm.get('question')?.markAsTouched();
+      },
     });
     this.answerEditor = new Editor({
-      extensions: [StarterKit, MathExtension.configure({ evaluation: false }), Image.configure({ inline: false })],
+      extensions: [
+        StarterKit,
+        MathExtension.configure({ evaluation: false }),
+        Image.configure({ inline: false }),
+        Placeholder.configure({ placeholder: this.transloco.translate('flashcard.create.answerPlaceholder') }),
+      ],
+      onUpdate: ({ editor }) => {
+        this.cardForm.get('answer')?.setValue(editor.getText());
+      },
+      onBlur: () => {
+        this.cardForm.get('answer')?.markAsTouched();
+      },
     });
   }
 
   ngOnInit(): void {
     this.cardForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(titleMaxLength)]],
-      topic_id: [''],
+      question: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(questionMaxLength)]],
+      answer: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(answerMaxLength)]],
+      topic_id: ['', Validators.required],
       subject_id: ['']
     });
 
@@ -179,6 +204,10 @@ export class CreateFlashcard implements OnInit, OnDestroy {
       await this.flashcardService.create(newCard);
       this.toastService.show(this.transloco.translate('flashcard.toast.cardAdded'), 'success')
       this.cardForm.reset();
+      this.selectedSubjectId = null;
+      this.selectedTopicId = null;
+      this.topics = [];
+      this.loadTopicsBySubject(undefined);
       this.questionEditor.commands.clearContent();
       this.answerEditor.commands.clearContent();
     } catch (err: any) {
@@ -189,6 +218,7 @@ export class CreateFlashcard implements OnInit, OnDestroy {
 
   onSubjectSelected(id: string | null | undefined): void {
     this.selectedSubjectId = id ?? null;
+    this.cardForm.get('subject_id')?.setValue(this.selectedSubjectId);
     this.topics = [];
     this.loadTopicsBySubject(this.selectedSubjectId ?? undefined);
 
@@ -197,17 +227,20 @@ export class CreateFlashcard implements OnInit, OnDestroy {
       !this.topics.some((t) => t._id === this.selectedTopicId)
     ) {
       this.selectedTopicId = null;
+      this.cardForm.get('topic_id')?.setValue(null);
     }
   }
 
   onTopicSelected(id: string | null | undefined): void {
     this.selectedTopicId = id ?? null;
+    this.cardForm.get('topic_id')?.setValue(this.selectedTopicId);
 
     // Seleziona in automatico la materia dell'argomento scelto, come in setup-test
     const topic = this.topics.find((t) => t._id === this.selectedTopicId);
     const subjectId = (topic?.subject_id as Subject | undefined)?._id;
     if (subjectId && subjectId !== this.selectedSubjectId) {
       this.selectedSubjectId = subjectId;
+      this.cardForm.get('subject_id')?.setValue(subjectId);
       this.topics = this.topics.filter(
         (t) => (t.subject_id as Subject)?._id === subjectId,
       );

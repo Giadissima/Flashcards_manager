@@ -1,7 +1,7 @@
 import { ActivatedRoute, Router } from '@angular/router';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { charMinLength, titleMaxLength } from '../../../config/config';
+import { answerMaxLength, charMinLength, questionMaxLength, titleMaxLength } from '../../../config/config';
 
 import { CommonModule } from '@angular/common';
 import { Editor } from '@tiptap/core';
@@ -71,15 +71,29 @@ export class EditFlashcard implements OnInit, OnDestroy {
   ) {
     this.questionEditor = new Editor({
       extensions: [StarterKit, MathExtension.configure({ evaluation: false }), Image.configure({ inline: false })],
+      onUpdate: ({ editor }) => {
+        this.editForm.get('question')?.setValue(editor.getText());
+      },
+      onBlur: () => {
+        this.editForm.get('question')?.markAsTouched();
+      },
     });
     this.answerEditor = new Editor({
       extensions: [StarterKit, MathExtension.configure({ evaluation: false }), Image.configure({ inline: false })],
+      onUpdate: ({ editor }) => {
+        this.editForm.get('answer')?.setValue(editor.getText());
+      },
+      onBlur: () => {
+        this.editForm.get('answer')?.markAsTouched();
+      },
     });
   }
 
   ngOnInit(): void {
     this.editForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(titleMaxLength)]],
+      question: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(questionMaxLength)]],
+      answer: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(answerMaxLength)]],
       subject_id: ['', Validators.required],
       topic_id: ['', Validators.required]
     });
@@ -131,6 +145,8 @@ export class EditFlashcard implements OnInit, OnDestroy {
 
       this.questionEditor.commands.setContent(card.question);
       this.answerEditor.commands.setContent(card.answer);
+      this.editForm.get('question')?.setValue(this.questionEditor.getText());
+      this.editForm.get('answer')?.setValue(this.answerEditor.getText());
 
     } catch (error) {
       console.error('Error loading card data', error);

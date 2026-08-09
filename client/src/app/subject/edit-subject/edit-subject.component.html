@@ -16,9 +16,11 @@
           <label for="name" class="form-label">{{ 'common.name' | transloco }}</label>
           <input type="text" id="name" formControlName="name" class="form-control">
           @if (editForm.get('name')?.touched && editForm.get('name')?.hasError('minlength')) {
-          <div class="invalid-feedback">{{ 'subject.create.nameMinError' | transloco:{ min: charMinLength } }}</div>
+          <div class="invalid-feedback d-block">{{ 'subject.create.nameMinError' | transloco:{ min: charMinLength } }}</div>
           } @else if (editForm.get('name')?.touched && editForm.get('name')?.hasError('maxlength')) {
-          <div class="invalid-feedback">{{ 'subject.create.nameMaxError' | transloco:{ max: nameMaxLength } }}</div>
+          <div class="invalid-feedback d-block">{{ 'subject.create.nameMaxError' | transloco:{ max: nameMaxLength } }}</div>
+          } @else if (editForm.get('name')?.touched && editForm.get('name')?.hasError('required')) {
+          <div class="invalid-feedback d-block">{{ 'subject.create.nameRequiredError' | transloco }}</div>
           }
         </div>
 
@@ -43,7 +45,7 @@
           </div>
           <tiptap-editor [editor]="descEditor" class="tiptap-editor-custom"></tiptap-editor>
           @if (descLength > descMaxLength) {
-          <div class="invalid-feedback">{{ 'subject.create.descMaxError' | transloco:{ max: descMaxLength, current: descLength } }}</div>
+          <div class="invalid-feedback d-block">{{ 'subject.create.descMaxError' | transloco:{ max: descMaxLength, current: descLength } }}</div>
           }
         </div>
 
