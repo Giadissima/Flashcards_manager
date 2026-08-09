@@ -370,6 +370,17 @@ input:-webkit-autofill:active {
   }
 }
 
+/* Placeholder di @tiptap/extension-placeholder: mostra il testo d'esempio
+   sul primo nodo vuoto tramite pseudo-elemento, senza occupare altezza. */
+.tiptap p.is-empty::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  color: var(--text-color);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
 /* Cliccando un'immagine nella home si apre in una modale (vedi home.ts). Questa
    regola deve stare qui, nel foglio globale, e non nello style scoped di Home:
    le <img> arrivano via [innerHTML] quindi non ricevono l'attributo
