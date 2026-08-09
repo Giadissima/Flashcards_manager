@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from './../subject.service';
@@ -12,13 +13,14 @@ import { getSubjectIconUrl } from '../subject-icon.util';
 @Component({
   selector: 'app-manage-subjects',
   standalone: true,
-  imports: [CommonModule, Toast, TranslocoModule],
+  imports: [CommonModule, Toast, FormsModule, TranslocoModule],
   templateUrl: './manage-subjects.component.html',
   styleUrls: ['./manage-subjects.component.scss']
 })
 export class ManageSubjectsComponent implements OnInit {
   subjects: Subject[] = [];
   private expandedSubjectIds = new Set<string>();
+  searchTerm = '';
 
   currentPage = 1;
   pageSize = 10;
@@ -41,13 +43,19 @@ export class ManageSubjectsComponent implements OnInit {
         skip: (this.currentPage - 1) * this.pageSize,
         limit: this.pageSize,
         sortField: 'name',
-        sortDirection: 'asc'
+        sortDirection: 'asc',
+        title: this.searchTerm.trim() || undefined
       });
       this.subjects = response.data;
       this.totalCount = response.count;
     } catch (error) {
       this.toastService.show(this.transloco.translate('subject.toast.loadError'), 'error');
     }
+  }
+
+  onFilterChange(): void {
+    this.currentPage = 1;
+    this.loadSubjects();
   }
 
   get totalPages(): number {

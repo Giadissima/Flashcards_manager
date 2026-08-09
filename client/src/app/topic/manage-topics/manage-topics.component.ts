@@ -24,7 +24,7 @@ export class ManageTopicsComponent implements OnInit {
   topics: Topic[] = [];
   subjects: Subject[] = [];
   selectedSubjectId: string | null = null;
-// TODO far funzionare la search
+  searchTerm = '';
 
   currentPage = 1;
   pageSize = 10;
@@ -73,7 +73,8 @@ export class ManageTopicsComponent implements OnInit {
         skip: (this.currentPage - 1) * this.pageSize,
         sortDirection: 'asc',
         sortField: 'name',
-        subject_id: this.selectedSubjectId || undefined
+        subject_id: this.selectedSubjectId || undefined,
+        title: this.searchTerm.trim() || undefined
       });
       this.topics = response.data;
       this.totalCount = response.count;

@@ -1,4 +1,4 @@
-import { PaginatedResponse, SimplePaginatedResponse } from '../models/http.dto';
+import { PaginatedResponse, SubjectFilter } from '../models/http.dto';
 
 import { Injectable } from '@angular/core';
 import { RestClientService } from '../api/rest-api.service';
@@ -13,7 +13,7 @@ export class SubjectService {
 
   constructor(private restClient: RestClientService) {}
 
-  getAllSubjects(filter: SimplePaginatedResponse): Promise<PaginatedResponse<Subject>> {
+  getAllSubjects(filter: SubjectFilter): Promise<PaginatedResponse<Subject>> {
     return this.restClient.get<PaginatedResponse<Subject>>(
       this.baseUrl + '/all',
       filter

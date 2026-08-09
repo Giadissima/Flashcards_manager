@@ -29,6 +29,9 @@ export class TopicService {
     if (filter.subject_id) {
       query.subject_id = filter.subject_id;
     }
+    if (filter.title) {
+      query.name = { $regex: filter.title, $options: 'i' };
+    }
 
     const [data, count] = await Promise.all([
       this.topicModel

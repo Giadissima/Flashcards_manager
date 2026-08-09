@@ -35,7 +35,8 @@
 
           <div class="col-md-5 subject-filter-col">
             <div class="input-group">
-              <input type="text" id="searchFilter" class="form-control" [placeholder]="t('topic.manage.searchPlaceholder')">
+              <input type="text" id="searchFilter" class="form-control" [placeholder]="t('topic.manage.searchPlaceholder')"
+                [(ngModel)]="searchTerm" (ngModelChange)="onFilterChange()">
               <span class="input-group-text search-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px"
                   fill="currentColor">

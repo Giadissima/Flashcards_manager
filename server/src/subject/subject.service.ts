@@ -39,9 +39,14 @@ export class SubjectService {
   async findAll(
     filter: FlashcardFilterDTO,
   ): Promise<BasePaginatedResult<SubjectDocument>> {
+    const query: any = {};
+    if (filter.title) {
+      query.name = { $regex: filter.title, $options: 'i' };
+    }
+
     const [data, count] = await Promise.all([
       this.subjectModel
-        .find()
+        .find(query)
         .sort([
           [filter.sortField, filter.sortDirection as SortOrder],
           ['_id', 'desc'],
@@ -49,7 +54,7 @@ export class SubjectService {
         .skip(filter.skip)
         .limit(filter.limit)
         .exec(),
-      this.subjectModel.find().countDocuments(),
+      this.subjectModel.find(query).countDocuments(),
     ]);
     return { data, count };
   }
