@@ -1,21 +1,19 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { charMinLength, descMaxLength, nameMaxLength } from '../../../config/config';
 
 import { CommonModule } from '@angular/common';
 import { Editor } from '@tiptap/core';
 import { MathExtension } from '@aarkue/tiptap-math-extension';
-import { NgxColorsComponent, NgxColorsTriggerDirective } from 'ngx-colors';
 import { Router } from '@angular/router';
 import StarterKit from '@tiptap/starter-kit';
 import { SubjectService } from '../subject.service';
 import { defaultSubjectIconColor } from '../subject-icon.util';
-import { SubjectIconSvgComponent } from '../subject-icon-svg/subject-icon-svg.component';
+import { SubjectIconPreviewComponent } from '../subject-icon-preview/subject-icon-preview.component';
 import { TiptapEditorDirective } from 'ngx-tiptap';
 import { Toast } from '../../toast/toast';
 import { ToastService } from '../../toast/toast.service';
-import { ThemeService } from '../../shared/theme/theme.service';
 
 @Component({
   selector: 'app-create-subject',
@@ -26,9 +24,7 @@ import { ThemeService } from '../../shared/theme/theme.service';
     Toast,
     TiptapEditorDirective,
     TranslocoModule,
-    NgxColorsComponent,
-    NgxColorsTriggerDirective,
-    SubjectIconSvgComponent,
+    SubjectIconPreviewComponent,
   ],
   templateUrl: './create-subject.component.html',
   styleUrls: ['./create-subject.component.scss']
@@ -38,7 +34,11 @@ export class CreateSubjectComponent implements OnInit, OnDestroy {
   selectedFile: File | null = null;
   descEditor: Editor;
   descLength = 0;
-  previewUrl: string | null = null;
+  filePreviewUrl: string | null = null;
+
+  get colorControl(): FormControl<string> {
+    return this.subjectForm.get('color') as FormControl<string>;
+  }
 
   readonly charMinLength = charMinLength;
   readonly nameMaxLength = nameMaxLength;
@@ -49,8 +49,7 @@ export class CreateSubjectComponent implements OnInit, OnDestroy {
     private router: Router,
     private subjectService: SubjectService,
     private toastService: ToastService,
-    private transloco: TranslocoService,
-    protected themeService: ThemeService
+    private transloco: TranslocoService
   ) {
     this.descEditor = new Editor({
       extensions: [StarterKit, MathExtension.configure({ evaluation: false })],
@@ -69,8 +68,8 @@ export class CreateSubjectComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.descEditor.destroy();
-    if (this.selectedFile && this.previewUrl) {
-      URL.revokeObjectURL(this.previewUrl);
+    if (this.selectedFile && this.filePreviewUrl) {
+      URL.revokeObjectURL(this.filePreviewUrl);
     }
   }
 
@@ -78,20 +77,20 @@ export class CreateSubjectComponent implements OnInit, OnDestroy {
     const element = event.currentTarget as HTMLInputElement;
     let fileList: FileList | null = element.files;
     if (fileList && fileList.length) {
-      if (this.selectedFile && this.previewUrl) {
-        URL.revokeObjectURL(this.previewUrl);
+      if (this.selectedFile && this.filePreviewUrl) {
+        URL.revokeObjectURL(this.filePreviewUrl);
       }
       this.selectedFile = fileList[0];
-      this.previewUrl = URL.createObjectURL(this.selectedFile);
+      this.filePreviewUrl = URL.createObjectURL(this.selectedFile);
     }
   }
 
   resetIcon(): void {
-    if (this.selectedFile && this.previewUrl) {
-      URL.revokeObjectURL(this.previewUrl);
+    if (this.selectedFile && this.filePreviewUrl) {
+      URL.revokeObjectURL(this.filePreviewUrl);
     }
     this.selectedFile = null;
-    this.previewUrl = null;
+    this.filePreviewUrl = null;
   }
 
   async createSubject(): Promise<void> {

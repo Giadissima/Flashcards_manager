@@ -35,7 +35,6 @@
     "topic": "Argomento",
     "description": "Descrizione",
     "actions": "Azioni",
-    "icon": "Icona",
     "search": "Cerca",
     "clearSearch": "Cancella ricerca",
     "allSubjects": "Tutte le Materie",
@@ -160,8 +159,7 @@
       "descMaxError": "La descrizione può avere al massimo {{max}} caratteri (attualmente {{current}}). Accorciala un po'.",
       "iconLabel": "Icona",
       "iconPreview": "Anteprima icona",
-      "resetIcon": "Ripristina immagine predefinita",
-      "iconColor": "Colore icona predefinita",
+      "iconColor": "Scegli il colore dell'icona di default",
       "createButton": "Crea materia"
     },
     "edit": {

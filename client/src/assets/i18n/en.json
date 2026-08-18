@@ -35,7 +35,7 @@
     "topic": "Topic",
     "description": "Description",
     "actions": "Actions",
-    "icon": "Icon",
+    "chooseFile": "Choose file",
     "search": "Search",
     "clearSearch": "Clear search",
     "allSubjects": "All Subjects",
@@ -160,9 +160,8 @@
       "descMaxError": "Description can have at most {{max}} characters (currently {{current}}). Please shorten it.",
       "iconLabel": "Icon",
       "iconPreview": "Icon preview",
-      "resetIcon": "Reset to default image",
-      "iconColor": "Default icon color",
-      "createButton": "Create Subject"
+      "createButton": "Create Subject",
+      "iconColor": "Choose color for default image"
     },
     "edit": {
       "title": "Edit Subject",

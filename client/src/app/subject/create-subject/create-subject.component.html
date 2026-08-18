@@ -16,9 +16,11 @@
           <label for="name" class="form-label">{{ 'common.name' | transloco }}</label>
           <input type="text" id="name" formControlName="name" class="form-control">
           @if (subjectForm.get('name')?.touched && subjectForm.get('name')?.hasError('minlength')) {
-          <div class="invalid-feedback d-block">{{ 'subject.create.nameMinError' | transloco:{ min: charMinLength } }}</div>
+          <div class="invalid-feedback d-block">{{ 'subject.create.nameMinError' | transloco:{ min: charMinLength } }}
+          </div>
           } @else if (subjectForm.get('name')?.touched && subjectForm.get('name')?.hasError('maxlength')) {
-          <div class="invalid-feedback d-block">{{ 'subject.create.nameMaxError' | transloco:{ max: nameMaxLength } }}</div>
+          <div class="invalid-feedback d-block">{{ 'subject.create.nameMaxError' | transloco:{ max: nameMaxLength } }}
+          </div>
           } @else if (subjectForm.get('name')?.touched && subjectForm.get('name')?.hasError('required')) {
           <div class="invalid-feedback d-block">{{ 'subject.create.nameRequiredError' | transloco }}</div>
           }
@@ -29,48 +31,34 @@
           <div class="editor-toolbar">
             <button (click)="descEditor.chain().focus().toggleBold().run()"
               [class.btn-outline-secondary]="!descEditor.isActive('bold')"
-              [class.btn-secondary]="descEditor.isActive('bold')"
-              class="btn"
-              type="button"><i class="bi bi-type-bold"></i></button>
+              [class.btn-secondary]="descEditor.isActive('bold')" class="btn" type="button"><i
+                class="bi bi-type-bold"></i></button>
             <button (click)="descEditor.chain().focus().toggleItalic().run()"
               [class.btn-outline-secondary]="!descEditor.isActive('italic')"
-              [class.btn-secondary]="descEditor.isActive('italic')"
-              class="btn"
-              type="button"><i class="bi bi-type-italic"></i></button>
+              [class.btn-secondary]="descEditor.isActive('italic')" class="btn" type="button"><i
+                class="bi bi-type-italic"></i></button>
             <button (click)="descEditor.chain().focus().toggleStrike().run()"
               [class.btn-outline-secondary]="!descEditor.isActive('strike')"
-              [class.btn-secondary]="descEditor.isActive('strike')"
-              class="btn"
-              type="button"><i class="bi bi-type-strikethrough"></i></button>
+              [class.btn-secondary]="descEditor.isActive('strike')" class="btn" type="button"><i
+                class="bi bi-type-strikethrough"></i></button>
           </div>
           <tiptap-editor [editor]="descEditor" class="tiptap-editor-custom"></tiptap-editor>
           @if (descLength > descMaxLength) {
-          <div class="invalid-feedback d-block">{{ 'subject.create.descMaxError' | transloco:{ max: descMaxLength, current: descLength } }}</div>
+          <div class="invalid-feedback d-block">{{ 'subject.create.descMaxError' | transloco:{ max: descMaxLength,
+            current: descLength } }}</div>
           }
         </div>
 
-        <div class="form-group">
-          <label class="form-label">{{ 'subject.create.iconPreview' | transloco }}</label>
-          <div class="d-flex align-items-center gap-2 mb-2">
-            @if (previewUrl) {
-            <img [src]="previewUrl" alt="icon preview" class="current-icon">
-            } @else {
-            <app-subject-icon-svg [fill]="subjectForm.get('color')?.value" class="current-icon"></app-subject-icon-svg>
-            }
-            <button type="button" class="btn btn-outline-secondary btn-sm" [disabled]="!selectedFile" (click)="resetIcon(); icon.value = ''">{{ 'subject.create.resetIcon' | transloco }}</button>
-          </div>
-          <label for="icon" class="form-label">{{ 'common.icon' | transloco }}</label>
-          <input type="file" id="icon" #icon accept="image/*" (change)="onFileSelected($event)" class="form-control">
-        </div>
-
-        <div class="form-group">
-          <label for="color" class="form-label">{{ 'subject.create.iconColor' | transloco }}</label>
-          <ngx-colors ngxColorsTrigger id="color" formControlName="color" [title]="t('subject.create.iconColor')"
-            [allowedModels]="['HEXA']" [theme]="(themeService.theme$ | async) ?? 'light'" [lockValues]="{ alpha: 1, clamp: true }"></ngx-colors>
-        </div>
+        <app-subject-icon-preview [previewUrl]="filePreviewUrl" [colorControl]="colorControl"
+          [colorTitle]="t('subject.create.iconColor')" [previewLabel]="t('subject.create.iconPreview')"
+          [fileLabel]="t('common.chooseFile')" (fileSelected)="onFileSelected($event)"
+          (reset)="resetIcon()"></app-subject-icon-preview>
 
         <div class="form-actions">
-          <button type="submit" class="btn btn-primary" [disabled]="subjectForm.invalid || descLength > descMaxLength">{{ 'subject.create.createButton' | transloco }}</button>
+          <button type="submit" class="btn"
+            [ngClass]="(subjectForm.invalid) || descLength > descMaxLength ? 'btn-outline-secondary' : 'btn-primary'"
+            [disabled]="subjectForm.invalid || descLength > descMaxLength">{{ 'subject.create.createButton' | transloco
+            }}</button>
         </div>
       </form>
     </div>

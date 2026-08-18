@@ -49,28 +49,15 @@
           }
         </div>
 
-        <div class="form-group">
-          <label class="form-label">{{ 'subject.edit.currentIcon' | transloco }}</label>
-          <div class="d-flex align-items-center gap-2 mb-2">
-            @if (previewUrl) {
-            <img [src]="previewUrl" alt="current icon" class="current-icon">
-            } @else {
-            <app-subject-icon-svg [fill]="editForm.get('color')?.value" class="current-icon"></app-subject-icon-svg>
-            }
-            <button type="button" class="btn btn-outline-secondary btn-sm" [disabled]="!canResetIcon" (click)="resetIcon(); icon.value = ''">{{ 'subject.create.resetIcon' | transloco }}</button>
-          </div>
-          <label for="icon" class="form-label">{{ 'subject.edit.replaceIcon' | transloco }}</label>
-          <input type="file" id="icon" #icon accept="image/*" (change)="onFileSelected($event)" class="form-control">
-        </div>
-
-        <div class="form-group">
-          <label for="color" class="form-label">{{ 'subject.edit.iconColor' | transloco }}</label>
-          <ngx-colors ngxColorsTrigger id="color" formControlName="color" [title]="t('subject.edit.iconColor')"
-            [allowedModels]="['HEXA']" [theme]="(themeService.theme$ | async) ?? 'light'" [lockValues]="{ alpha: 1, clamp: true }"></ngx-colors>
-        </div>
+        <app-subject-icon-preview [previewUrl]="previewUrl" [colorControl]="colorControl"
+          [colorTitle]="t('subject.edit.iconColor')" [previewLabel]="t('subject.edit.currentIcon')"
+          [fileLabel]="t('subject.edit.replaceIcon')" (fileSelected)="onFileSelected($event)"
+          (reset)="resetIcon()"></app-subject-icon-preview>
 
         <div class="form-actions">
-          <button type="submit" class="btn btn-primary" [disabled]="editForm.invalid || descLength > descMaxLength">{{ 'subject.edit.saveChanges' | transloco }}</button>
+          <button type="submit" class="btn" 
+          [ngClass]="(editForm.invalid || descLength > descMaxLength) ? 'btn-outline-secondary' : 'btn-primary'"
+          [disabled]="editForm.invalid || descLength > descMaxLength">{{ 'subject.edit.saveChanges' | transloco }}</button>
         </div>
       </form>
     </div>

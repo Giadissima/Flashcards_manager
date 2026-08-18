@@ -1,0 +1,29 @@
+.current-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--border-color);
+}
+
+.icon-preview-wrapper {
+  position: relative;
+  display: block;
+  width: fit-content;
+}
+
+.cancel-btn {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  padding: 0;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+}
+
+.rainbow-swatch {
+  position: absolute;
+  top: 40px;
+  right: -11px;
+}

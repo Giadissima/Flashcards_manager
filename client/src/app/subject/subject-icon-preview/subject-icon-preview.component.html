@@ -1,0 +1,18 @@
+<div class="form-group">
+  <label class="form-label">{{ previewLabel }}</label>
+  <div class="icon-preview-wrapper">
+    @if (previewUrl) {
+    <img [src]="previewUrl" alt="icon preview" class="current-icon">
+    <button type="button" class="btn btn-sm cancel-btn btn-dark" (click)="onReset(icon)">
+      <span class="material-symbols-outlined text-danger">cancel</span>
+    </button>
+    } @else {
+    <app-subject-icon-svg [fill]="colorControl.value" class="current-icon"></app-subject-icon-svg>
+    <ngx-colors ngxColorsTrigger [formControl]="colorControl" [title]="colorTitle" [allowedModels]="['HEXA']"
+      class="rainbow-swatch" [theme]="(themeService.theme$ | async) ?? 'light'"
+      [lockValues]="{ alpha: 1, clamp: true }"></ngx-colors>
+    }
+  </div>
+  <label for="icon" class="btn btn-secondary">{{ fileLabel }}</label>
+  <input type="file" id="icon" #icon accept="image/*" (change)="fileSelected.emit($event)" class="visually-hidden">
+</div>
