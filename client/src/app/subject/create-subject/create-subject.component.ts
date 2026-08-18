@@ -15,6 +15,7 @@ import { SubjectIconSvgComponent } from '../subject-icon-svg/subject-icon-svg.co
 import { TiptapEditorDirective } from 'ngx-tiptap';
 import { Toast } from '../../toast/toast';
 import { ToastService } from '../../toast/toast.service';
+import { ThemeService } from '../../shared/theme/theme.service';
 
 @Component({
   selector: 'app-create-subject',
@@ -48,7 +49,8 @@ export class CreateSubjectComponent implements OnInit, OnDestroy {
     private router: Router,
     private subjectService: SubjectService,
     private toastService: ToastService,
-    private transloco: TranslocoService
+    private transloco: TranslocoService,
+    protected themeService: ThemeService
   ) {
     this.descEditor = new Editor({
       extensions: [StarterKit, MathExtension.configure({ evaluation: false })],

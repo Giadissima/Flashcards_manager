@@ -27,7 +27,7 @@
         <div class="form-group">
           <label for="color" class="form-label">{{ 'common.color' | transloco }}</label>
           <ngx-colors ngxColorsTrigger id="color" formControlName="color"
-            [allowedModels]="['HEXA', 'RGBA']" [lockValues]="{ alpha: 1, clamp: true }"></ngx-colors>
+            [allowedModels]="['HEXA', 'RGBA']" [theme]="(themeService.theme$ | async) ?? 'light'" [lockValues]="{ alpha: 1, clamp: true }"></ngx-colors>
         </div>
 
         <div class="form-group">

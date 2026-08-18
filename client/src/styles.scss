@@ -2,6 +2,7 @@
 /* 1. Design System                   */
 /* ---------------------------------- */
 [data-theme='light'] {
+  color-scheme: light;
   --accent-color: #6941C6;
   --primary-color: #A294F9;
   --secondary-color: #CDC1FF;
@@ -15,6 +16,7 @@
 }
 
 [data-theme='dark'] {
+  color-scheme: dark;
   --accent-color: #328E6E;
   --primary-color: #67AE6E;
   --secondary-color: #90C67C;
@@ -388,6 +390,15 @@ input:-webkit-autofill:active {
 ngx-colors {
   width: 48px !important;
   height: 48px !important;
+}
+
+/* Il pannello del color picker (ngx-colors-overlay, appeso a document.body) usa
+   internamente una classe .bg-white per leggere il tema via var(--ngx-colors-surface).
+   Bootstrap (caricato globalmente) definisce anche lui .bg-white ma con !important,
+   che vince sempre sulla regola non-!important della libreria e forza lo sfondo
+   bianco a prescindere dal tema. Serve quindi un override altrettanto !important. */
+ngx-colors-overlay[data-ngx-colors-theme='dark'] .bg-white {
+  background: var(--ngx-colors-surface, #26272b) !important;
 }
 
 /* Cliccando un'immagine nella home si apre in una modale (vedi home.ts). Questa

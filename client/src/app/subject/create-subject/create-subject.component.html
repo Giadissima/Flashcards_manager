@@ -66,7 +66,7 @@
         <div class="form-group">
           <label for="color" class="form-label">{{ 'subject.create.iconColor' | transloco }}</label>
           <ngx-colors ngxColorsTrigger id="color" formControlName="color" [title]="t('subject.create.iconColor')"
-            [allowedModels]="['HEXA']" [lockValues]="{ alpha: 1, clamp: true }"></ngx-colors>
+            [allowedModels]="['HEXA']" [theme]="(themeService.theme$ | async) ?? 'light'" [lockValues]="{ alpha: 1, clamp: true }"></ngx-colors>
         </div>
 
         <div class="form-actions">

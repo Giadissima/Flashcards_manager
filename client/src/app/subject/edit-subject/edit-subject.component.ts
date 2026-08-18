@@ -16,6 +16,7 @@ import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { charMinLength, nameMaxLength, descMaxLength } from '../../../config/config';
 import { buildDefaultSubjectIconSvgMarkup, defaultSubjectIconColor, getSubjectIconUrl } from '../subject-icon.util';
 import { SubjectIconSvgComponent } from '../subject-icon-svg/subject-icon-svg.component';
+import { ThemeService } from '../../shared/theme/theme.service';
 
 @Component({
   selector: 'app-edit-subject',
@@ -63,7 +64,8 @@ export class EditSubjectComponent implements OnInit, OnDestroy {
     private router: Router,
     private subjectService: SubjectService,
     private toastService: ToastService,
-    private transloco: TranslocoService
+    private transloco: TranslocoService,
+    protected themeService: ThemeService
   ) {
     this.descEditor = new Editor({
       extensions: [StarterKit, MathExtension.configure({ evaluation: false })],

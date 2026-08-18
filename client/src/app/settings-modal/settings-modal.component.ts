@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { SearchableSelectComponent, SelectOption } from '../shared/searchable-select/searchable-select.component';
 import { ModalComponent } from '../shared/modal/modal.component';
+import { ThemeService } from '../shared/theme/theme.service';
 
 export type AppLanguage = 'it' | 'en';
 
@@ -97,10 +98,10 @@ export class SettingsModalComponent implements OnInit, OnChanges {
   private originalDarkMode = false;
   private originalLanguage: AppLanguage = 'it';
 
-  constructor(private transloco: TranslocoService) {}
+  constructor(private transloco: TranslocoService, private themeService: ThemeService) {}
 
   ngOnInit(): void {
-    this.loadTheme();
+    this.isDarkMode = this.themeService.theme === 'dark';
     this.loadLanguage();
   }
 
@@ -113,7 +114,7 @@ export class SettingsModalComponent implements OnInit, OnChanges {
   }
 
   save(): void {
-    localStorage.setItem('theme', this.isDarkMode ? 'dark' : 'light');
+    this.themeService.persist();
     localStorage.setItem('language', this.language);
     this.closeModal();
   }
@@ -121,7 +122,7 @@ export class SettingsModalComponent implements OnInit, OnChanges {
   cancel(): void {
     this.isDarkMode = this.originalDarkMode;
     this.language = this.originalLanguage;
-    document.documentElement.setAttribute('data-theme', this.isDarkMode ? 'dark' : 'light');
+    this.themeService.setTheme(this.isDarkMode ? 'dark' : 'light');
     this.transloco.setActiveLang(this.originalLanguage);
     this.closeModal();
   }
@@ -130,7 +131,7 @@ export class SettingsModalComponent implements OnInit, OnChanges {
   // solo al click su "Salva Modifiche" (vedi save()/cancel())
   toggleTheme(): void {
     this.isDarkMode = !this.isDarkMode;
-    document.documentElement.setAttribute('data-theme', this.isDarkMode ? 'dark' : 'light');
+    this.themeService.setTheme(this.isDarkMode ? 'dark' : 'light');
   }
 
   setLanguage(value: string | null | undefined): void {
@@ -141,16 +142,6 @@ export class SettingsModalComponent implements OnInit, OnChanges {
   private closeModal(): void {
     this.isOpen = false;
     this.isOpenChange.emit(false);
-  }
-
-  private loadTheme(): void {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) {
-      this.isDarkMode = savedTheme === 'dark';
-    } else {
-      this.isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    }
-    document.documentElement.setAttribute('data-theme', this.isDarkMode ? 'dark' : 'light');
   }
 
   private loadLanguage(): void {

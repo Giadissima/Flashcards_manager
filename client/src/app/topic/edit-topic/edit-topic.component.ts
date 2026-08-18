@@ -13,6 +13,7 @@ import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { SearchableSelectComponent, SelectOption } from '../../shared/searchable-select/searchable-select.component';
 import { getSubjectIconUrl } from '../../subject/subject-icon.util';
 import { charMinLength, nameMaxLength } from '../../../config/config';
+import { ThemeService } from '../../shared/theme/theme.service';
 
 @Component({
   selector: 'app-edit-topic',
@@ -41,7 +42,8 @@ export class EditTopicComponent implements OnInit {
     private router: Router,
     private toastService: ToastService,
     private subjectService: SubjectService,
-    private transloco: TranslocoService
+    private transloco: TranslocoService,
+    protected themeService: ThemeService
   ) { }
 
   ngOnInit(): void {
