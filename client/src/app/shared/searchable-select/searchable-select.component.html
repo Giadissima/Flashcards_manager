@@ -1,5 +1,5 @@
 <div class="dropdown" (appClickOutside)="close()" (keydown)="onKeydown($event)">
-  <button class="form-select text-start d-flex align-items-center gap-2" type="button" (click)="toggle()">
+  <button class="form-select text-start d-flex align-items-center gap-2" type="button" (click)="toggle()" (blur)="blurred.emit()">
     @if (selectedOption?.iconUrl) {
     <img [src]="selectedOption!.iconUrl" alt="" class="select-option-icon">
     } @else if (selectedOption?.color) {

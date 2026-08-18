@@ -15,6 +15,7 @@ import { FlashcardsService } from './flashcards.service';
 import { ApiOperation } from '@nestjs/swagger';
 import { BasePaginatedResult } from 'src/common.dto';
 import {
+  CountFlashcardsDTO,
   FlashcardFilterDTO,
   ModifyFlashcardDto,
   RandomFlashcardsDTO,
@@ -45,6 +46,14 @@ export class FlashcardsController {
   @Get('random')
   getRandom(@Query() filters: RandomFlashcardsDTO): Promise<{ _id: string }[]> {
     return this.flashcardsService.getRandom(filters);
+  }
+
+  @ApiOperation({
+    description: 'count flashcards matching the given filters',
+  })
+  @Get('count')
+  count(@Query() filters: CountFlashcardsDTO): Promise<number> {
+    return this.flashcardsService.count(filters);
   }
 
   @ApiOperation({ description: 'get a specific Flashcard from db' })

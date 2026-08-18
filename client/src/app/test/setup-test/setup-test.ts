@@ -36,6 +36,11 @@ export class SetupTest implements OnInit {
   subjects: Subject[] = [];
   topics: Topic[] = [];
   allTopics: Topic[] = [];
+  flashcardCount: number | null = null;
+
+  get noFlashcardsAvailable(): boolean {
+    return this.flashcardCount === 0;
+  }
 
   get subjectOptions(): SelectOption[] {
     return this.subjects.map((s) => ({ value: s._id!, label: s.name, iconUrl: getSubjectIconUrl(s) }));
@@ -57,7 +62,7 @@ export class SetupTest implements OnInit {
     this.testForm = this.fb.group({
       subject_id: [null],
       topic_id: [null],
-      numFlashcard: [10, [Validators.required, Validators.min(1), Validators.max(50)]]
+      numFlashcard: [10, [Validators.required, Validators.min(1), Validators.max(1000)]]
     }, { validators: atLeastOneValidator(['subject_id', 'topic_id']) });
   }
 
@@ -78,11 +83,45 @@ export class SetupTest implements OnInit {
         this.topics = this.allTopics;
       }
       this.testForm.get('topic_id')?.setValue(null);
+      this.updateFlashcardCount();
     });
   }
 
   onSubjectSelected(id: string | null | undefined): void {
     this.testForm.get('subject_id')?.setValue(id ?? null);
+  }
+
+  onSelectBlur(controlName: 'subject_id' | 'topic_id'): void {
+    this.testForm.get(controlName)?.markAsTouched();
+  }
+
+  async updateFlashcardCount(): Promise<void> {
+    const { subject_id, topic_id } = this.testForm.value;
+    if (!subject_id && !topic_id) {
+      this.flashcardCount = null;
+      return;
+    }
+    this.flashcardCount = await this.flashcardService.count({ subject_id, topic_id });
+  }
+
+  async setMaxQuestions(): Promise<void> {
+    const { subject_id, topic_id } = this.testForm.value;
+    const count = await this.flashcardService.count({ subject_id, topic_id });
+    this.testForm.get('numFlashcard')?.setValue(Math.min(count, 1000) || 1);
+  }
+
+  incrementQuestions(): void {
+    this.stepQuestions(1);
+  }
+
+  decrementQuestions(): void {
+    this.stepQuestions(-1);
+  }
+
+  private stepQuestions(delta: number): void {
+    const control = this.testForm.get('numFlashcard');
+    const current = Number(control?.value) || 0;
+    control?.setValue(Math.min(1000, Math.max(1, current + delta)));
   }
 
   onTopicSelected(id: string | null | undefined): void {
@@ -95,10 +134,11 @@ export class SetupTest implements OnInit {
     if (subjectId) {
       this.testForm.get('subject_id')?.setValue(subjectId, { emitEvent: false });
     }
+    this.updateFlashcardCount();
   }
 
   async startTest(): Promise<void> {
-    if (this.testForm.valid) {
+    if (this.testForm.valid && !this.noFlashcardsAvailable) {
       const { subject_id, topic_id, numFlashcard } = this.testForm.value;
       const queryParams: RandomCardFIlter = { subject_id, topic_id, numFlashcard };
       

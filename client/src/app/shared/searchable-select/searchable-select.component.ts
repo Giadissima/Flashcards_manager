@@ -34,6 +34,9 @@ export class SearchableSelectComponent {
   @Input() typeaheadDelayMs = 1000;
 
   @Output() valueChange = new EventEmitter<string | null | undefined>();
+  // Emesso quando il pulsante perde il focus: serve al form ospitante per marcare
+  // il controllo come touched, dato che questo componente non è un ControlValueAccessor
+  @Output() blurred = new EventEmitter<void>();
 
   @ViewChild('dropdownContent') dropdownContent?: ElementRef<HTMLElement>;
 

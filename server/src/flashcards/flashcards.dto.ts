@@ -103,10 +103,28 @@ export class RandomFlashcardsDTO {
   @Type(() => Number)
   @IsInt()
   @Min(1)
-  @Max(50, { message: 'Non puoi richiedere più di 50 domande in un singolo test.' })
+  @Max(1000, { message: 'Non puoi richiedere più di 1000 domande in un singolo test.' })
   @ApiProperty({
     description: 'Number of flashcard requested',
     required: false,
   })
   numFlashcard?: number = 10;
+}
+
+export class CountFlashcardsDTO {
+  @IsOptional()
+  @IsMongoId()
+  @ApiProperty({
+    description: 'Filter by subject ID',
+    required: false,
+  })
+  subject_id?: string;
+
+  @IsOptional()
+  @IsMongoId()
+  @ApiProperty({
+    description: 'Filter by topic ID',
+    required: false,
+  })
+  topic_id?: string;
 }

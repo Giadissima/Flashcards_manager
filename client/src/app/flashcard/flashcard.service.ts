@@ -30,6 +30,14 @@ export class FlashcardService {
     }
 
 
+  // Conta le flashcard che rispettano i filtri
+  count(filter: Pick<RandomCardFIlter, 'subject_id' | 'topic_id'>): Promise<number> {
+    return this.restClient.get<number>(
+      this.baseUrl + '/count',
+      filter
+    );
+  }
+
   // Legge una singola flashcard
   getById(id: string): Promise<Flashcard> {
     return this.restClient.get<Flashcard>(this.baseUrl + '/' + id);

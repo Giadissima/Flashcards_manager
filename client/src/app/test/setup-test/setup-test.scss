@@ -1,0 +1,57 @@
+.number-stepper {
+  position: relative;
+  display: inline-flex;
+}
+
+.num-flashcard-input {
+  width: 6rem;
+  padding-right: calc(var(--spacing-unit) * 3.5);
+  -moz-appearance: textfield;
+
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+
+.number-stepper-buttons {
+  position: absolute;
+  top: 1.4px;
+  right: 1.4px;
+  bottom: 1.4px;
+  display: flex;
+  flex-direction: column;
+  width: calc(var(--spacing-unit) * 3);
+  border-left: 1.4px solid var(--border-color);
+  border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
+  overflow: hidden;
+}
+
+.number-stepper-btn {
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background-color: var(--component-background);
+  color: var(--text-color);
+  font-size: 0.6rem;
+  line-height: 1;
+  padding: 0;
+  cursor: pointer;
+
+  &:hover {
+    background-color: var(--secondary-color);
+    color: var(--header-color);
+  }
+
+  &:active {
+    background-color: var(--primary-color);
+    color: var(--on-primary-color);
+  }
+
+  & + & {
+    border-top: 1.4px solid var(--border-color);
+  }
+}

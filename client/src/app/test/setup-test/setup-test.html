@@ -16,9 +16,10 @@
           <app-searchable-select
             [options]="subjectOptions"
             [value]="testForm.get('subject_id')?.value"
-            [allOptionLabel]="t('test.setup.anySubject')"
-            [placeholder]="t('test.setup.anySubject')"
+            [allOptionLabel]="t('test.setup.selectSubject')"
+            [placeholder]="t('test.setup.selectSubject')"
             (valueChange)="onSubjectSelected($event)"
+            (blurred)="onSelectBlur('subject_id')"
           ></app-searchable-select>
         </div>
 
@@ -27,15 +28,29 @@
           <app-searchable-select
             [options]="topicOptions"
             [value]="testForm.get('topic_id')?.value"
-            [allOptionLabel]="t('test.setup.anyTopic')"
-            [placeholder]="t('test.setup.anyTopic')"
+            [allOptionLabel]="t('test.setup.selectTopic')"
+            [placeholder]="t('test.setup.selectTopic')"
             (valueChange)="onTopicSelected($event)"
+            (blurred)="onSelectBlur('topic_id')"
           ></app-searchable-select>
         </div>
 
         <div class="mb-3">
           <label for="numFlashcard" class="form-label">{{ 'test.setup.numQuestionsLabel' | transloco }}</label>
-          <input type="number" id="numFlashcard" formControlName="numFlashcard" class="form-control" max="50">
+          <div class="d-flex align-items-center gap-2">
+            <div class="number-stepper">
+              <input type="number" id="numFlashcard" formControlName="numFlashcard" class="form-control num-flashcard-input" min="1" max="1000">
+              <div class="number-stepper-buttons">
+                <button type="button" class="number-stepper-btn" [attr.aria-label]="t('test.setup.incrementAria')" (click)="incrementQuestions()">
+                  <i class="bi bi-caret-up-fill"></i>
+                </button>
+                <button type="button" class="number-stepper-btn" [attr.aria-label]="t('test.setup.decrementAria')" (click)="decrementQuestions()">
+                  <i class="bi bi-caret-down-fill"></i>
+                </button>
+              </div>
+            </div>
+            <button type="button" class="btn" [ngClass]="(testForm.errors?.['atLeastOneRequired'] || noFlashcardsAvailable) ? 'btn-outline-secondary' : 'btn-secondary'" [disabled]="!!testForm.errors?.['atLeastOneRequired'] || noFlashcardsAvailable" (click)="setMaxQuestions()">{{ 'test.setup.maxButton' | transloco }}</button>
+          </div>
         </div>
 
         <div *ngIf="testForm.get('numFlashcard')?.errors?.['max'] && testForm.get('numFlashcard')?.touched" class="alert alert-danger">
@@ -46,8 +61,12 @@
           {{ 'test.setup.atLeastOneError' | transloco }}
         </div>
 
+        <div *ngIf="noFlashcardsAvailable && !testForm.errors?.['atLeastOneRequired']" class="alert alert-danger">
+          {{ 'test.setup.noFlashcardsError' | transloco }}
+        </div>
+
         <div class="d-flex justify-content-center mt-4">
-          <button type="submit" class="btn btn-primary d-flex align-items-center gap-2" [disabled]="testForm.invalid">
+          <button type="submit" class="btn d-flex align-items-center gap-2" [ngClass]="(testForm.invalid || noFlashcardsAvailable) ? 'btn-outline-secondary' : 'btn-primary'" [disabled]="testForm.invalid || noFlashcardsAvailable">
             <span class="material-symbols-outlined">play_arrow</span>
             {{ 'test.setup.startButton' | transloco }}
           </button>

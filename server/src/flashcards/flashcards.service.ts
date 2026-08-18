@@ -1,4 +1,5 @@
 import {
+  CountFlashcardsDTO,
   FlashcardFilterDTO,
   ModifyFlashcardDto,
   RandomFlashcardsDTO,
@@ -84,6 +85,19 @@ export class FlashcardsService {
         },
       ])
       .exec();
+  }
+
+  count(filter: CountFlashcardsDTO): Promise<number> {
+    const query: any = {};
+    if (filter.subject_id) {
+      query.subject_id = new Types.ObjectId(filter.subject_id);
+    }
+
+    if (filter.topic_id) {
+      query.topic_id = new Types.ObjectId(filter.topic_id);
+    }
+
+    return this.flashcardModel.countDocuments(query).exec();
   }
 
   async delete(
