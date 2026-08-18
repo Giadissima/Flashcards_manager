@@ -29,6 +29,11 @@
   --on-primary-color: #ffffff;
 }
 
+.btn-dark { // this button is trasparent and used for icons
+  --bs-btn-bg: rgba(255, 255, 255, 0);
+  --bs-btn-border-color: rgba(255, 255, 255, 0) 
+}
+
 :root {
   --font-family: 'Nunito', sans-serif;
 
@@ -387,9 +392,21 @@ input:-webkit-autofill:active {
    nel suo stesso componente): troppo piccolo per essere notato come input
    cliccabile. !important necessario per vincere sulla regola :host, che ha
    specificità maggiore di un selettore di tipo globale. */
-ngx-colors {
-  width: 48px !important;
-  height: 48px !important;
+.big-ngx-colors {
+  width: 48px;
+  height: 48px;
+}
+
+/* Optional utility: apply the .rainbow-swatch class to a single <ngx-colors>
+   to show a fixed rainbow wheel in the trigger circle instead of the selected
+   color. The color is applied by the component as an inline style
+   ([style.background]) on the innermost div (inside .bg-transparent), so
+   !important is required to override it. */
+ngx-colors.rainbow-swatch .main {
+  border: 2px solid white !important;
+}
+ngx-colors.rainbow-swatch .bg-transparent > div {
+  background: conic-gradient(from 0deg, red, orange, yellow, #00be00, #0022ff, #9a0eff, violet, red) !important;
 }
 
 /* Il pannello del color picker (ngx-colors-overlay, appeso a document.body) usa
