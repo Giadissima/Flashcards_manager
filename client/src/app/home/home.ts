@@ -1,4 +1,5 @@
 import { AfterViewChecked, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { SearchableSelectComponent, SelectOption } from '../shared/searchable-select/searchable-select.component';
 import { SearchInputComponent } from '../shared/search-input/search-input.component';
 
@@ -53,6 +54,8 @@ export class Home implements OnInit, AfterViewChecked, OnDestroy {
   // mappa _id -> boolean (true = mostra risposta)
   showAnswerMap: Record<string, boolean> = {};
 
+  private queryParamsSubscription?: Subscription;
+
   get subjectOptions(): SelectOption[] {
     return this.subjects.map((s) => ({ value: s._id!, label: s.name, iconUrl: getSubjectIconUrl(s) }));
   }
@@ -72,14 +75,6 @@ export class Home implements OnInit, AfterViewChecked, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    const qp = this.activatedRoute.snapshot.queryParamMap;
-    this.selectedSubjectId = qp.get('subject_id') || null;
-    this.selectedTopicId = qp.get('topic_id') || null;
-    this.searchTerm = qp.get('search') || '';
-    this.sortBy = (qp.get('sortBy') as 'title' | 'createdAt') || 'title';
-    this.sortDirection = (qp.get('sortDirection') as 'asc' | 'desc') || 'asc';
-    this.currentPage = Number(qp.get('page')) || 1;
-
     this.subjectService
       .getAllSubjects({
         sortField: 'name',
@@ -89,8 +84,21 @@ export class Home implements OnInit, AfterViewChecked, OnDestroy {
       })
       .then((data) => (this.subjects = data.data));
 
-    this.loadTopicsBySubject(this.selectedSubjectId || undefined);
-    this.loadFlashcards();
+    // Sottoscrizione (non snapshot): quando si naviga verso /home mentre si è
+    // già su /home (es. click sul logo), Angular riusa il componente esistente
+    // e non richiama ngOnInit, ma questa subscription si riattiva comunque e
+    // rilegge i filtri dall'URL, tenendo lo stato sincronizzato con la route.
+    this.queryParamsSubscription = this.activatedRoute.queryParamMap.subscribe((qp) => {
+      this.selectedSubjectId = qp.get('subject_id') || null;
+      this.selectedTopicId = qp.get('topic_id') || null;
+      this.searchTerm = qp.get('search') || '';
+      this.sortBy = (qp.get('sortBy') as 'title' | 'createdAt') || 'title';
+      this.sortDirection = (qp.get('sortDirection') as 'asc' | 'desc') || 'asc';
+      this.currentPage = Number(qp.get('page')) || 1;
+
+      this.loadTopicsBySubject(this.selectedSubjectId || undefined);
+      this.loadFlashcards();
+    });
   }
 
   private updateQueryParams(): void {
@@ -134,34 +142,23 @@ export class Home implements OnInit, AfterViewChecked, OnDestroy {
     if (this.currentPage >= this.totalPages) return;
     this.currentPage++;
     this.updateQueryParams();
-    this.loadFlashcards();
   }
 
   previousPage(): void {
     if (this.currentPage <= 1) return;
     this.currentPage--;
     this.updateQueryParams();
-    this.loadFlashcards();
   }
 
   onFilterChange(): void {
-    if (this.selectedSubjectId == null) {
-      this.loadTopicsBySubject(undefined);
-    } else if (this.selectedSubjectId) {
-      this.loadTopicsBySubject(this.selectedSubjectId);
-    } else {
-      this.topics = [];
-    }
     this.currentPage = 1;
     this.updateQueryParams();
-    this.loadFlashcards();
   }
 
   onSearchTermChange(term: string): void {
     this.searchTerm = term;
     this.currentPage = 1;
     this.updateQueryParams();
-    this.loadFlashcards();
   }
 
   setSortBy(field: 'title' | 'createdAt'): void {
@@ -173,7 +170,6 @@ export class Home implements OnInit, AfterViewChecked, OnDestroy {
     }
     this.currentPage = 1;
     this.updateQueryParams();
-    this.loadFlashcards();
   }
 
   getCardColor(card: Flashcard): string {
@@ -259,6 +255,7 @@ export class Home implements OnInit, AfterViewChecked, OnDestroy {
 
   ngOnDestroy(): void {
     this.destroyImageZoom();
+    this.queryParamsSubscription?.unsubscribe();
   }
 
   onImageModalClosed(): void {
