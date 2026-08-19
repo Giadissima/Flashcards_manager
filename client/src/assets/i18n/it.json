@@ -65,6 +65,30 @@
       "topicsLoadError": "Impossibile caricare gli argomenti per la materia selezionata"
     }
   },
+  "editor": {
+    "undo": "Annulla",
+    "redo": "Ripeti",
+    "paragraph": "Testo normale",
+    "headingMenu": "Stile testo",
+    "heading1": "Titolo 1",
+    "heading2": "Titolo 2",
+    "heading3": "Titolo 3",
+    "bold": "Grassetto",
+    "italic": "Corsivo",
+    "underline": "Sottolineato",
+    "strike": "Barrato",
+    "code": "Codice",
+    "bulletList": "Elenco puntato",
+    "orderedList": "Elenco numerato",
+    "blockquote": "Citazione",
+    "codeBlock": "Blocco di codice",
+    "horizontalRule": "Linea orizzontale",
+    "link": "Link",
+    "linkPrompt": "Inserisci l'URL del link",
+    "latexGroupTitle": "Formule matematiche (LaTeX)",
+    "latexInline": "Formula in linea",
+    "latexBlock": "Formula in blocco"
+  },
   "flashcard": {
     "create": {
       "title": "Crea una Nuova Flashcard",
@@ -84,8 +108,6 @@
       "answerMinError": "La risposta deve avere almeno 2 caratteri.",
       "answerMaxError": "Numero massimo di caratteri per la risposta raggiunto.",
       "answerRequiredError": "Inserisci una risposta.",
-      "inlineEquation": "Equazione inline",
-      "outlineEquation": "Equazione a blocco",
       "insertImage": "Inserisci immagine",
       "subjectLabel": "Materia",
       "subjectRequiredError": "Scegli una materia.",

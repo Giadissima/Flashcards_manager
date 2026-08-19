@@ -9,23 +9,19 @@ import { answerMaxLength, charMinLength, questionMaxLength, titleMaxLength } fro
 
 import { CommonModule } from '@angular/common';
 import { Editor } from '@tiptap/core';
-import { FileService } from '../../shared/file/file.service';
 import { FlashcardService } from '../flashcard.service';
 import Image from '@tiptap/extension-image';
 import { MathExtension } from '@aarkue/tiptap-math-extension';
 import Placeholder from '@tiptap/extension-placeholder';
+import { RichTextEditorComponent } from '../../shared/rich-text-editor/rich-text-editor.component';
 import StarterKit from '@tiptap/starter-kit';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
-import { TiptapEditorDirective } from 'ngx-tiptap';
 import { Toast } from "../../toast/toast";
 import { ToastService } from '../../toast/toast.service';
 import { Topic } from '../../models/topic.dto';
 import { TopicService } from '../../topic/topic.service';
-import { getFileUrl } from '../../shared/file/file-url.util';
 import { getSubjectIconUrl } from '../../subject/subject-icon.util';
-
-const maxImageSize = 5 * 1024 * 1024;
 
 @Component({
   selector: 'app-create-card',
@@ -34,7 +30,7 @@ const maxImageSize = 5 * 1024 * 1024;
     CommonModule,
     ReactiveFormsModule,
     Toast,
-    TiptapEditorDirective,
+    RichTextEditorComponent,
     TranslocoModule,
     SearchableSelectComponent
   ],
@@ -54,7 +50,6 @@ export class CreateFlashcard implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private flashcardService: FlashcardService,
-    private fileService: FileService,
     private toastService: ToastService,
     private topicService: TopicService,
     private subjectService: SubjectService,
@@ -165,33 +160,6 @@ export class CreateFlashcard implements OnInit, OnDestroy {
     const textarea = event.target as HTMLTextAreaElement;
     textarea.style.height = 'auto';
     textarea.style.height = textarea.scrollHeight + 'px';
-  }
-
-  async onImageSelected(event: Event, editor: Editor): Promise<void> {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (!file) return;
-
-    if (!file.type.startsWith('image/')) {
-      this.toastService.show(this.transloco.translate('flashcard.toast.invalidImageType'), 'error');
-      input.value = '';
-      return;
-    }
-    if (file.size > maxImageSize) {
-      this.toastService.show(this.transloco.translate('flashcard.toast.imageTooLarge'), 'error');
-      input.value = '';
-      return;
-    }
-
-    try {
-      const { _id } = await this.fileService.upload(file);
-      editor.chain().focus().setImage({ src: getFileUrl(_id) }).run();
-    } catch (err) {
-      console.error('Error uploading image', err);
-      this.toastService.show(this.transloco.translate('flashcard.toast.imageUploadError'), 'error');
-    } finally {
-      input.value = '';
-    }
   }
 
   async addCard() {

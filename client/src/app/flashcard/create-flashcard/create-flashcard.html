@@ -31,36 +31,7 @@
 
         <div class="form-group">
           <label for="question-editor" class="form-label">{{ 'flashcard.create.questionLabel' | transloco }}</label>
-          <div class="editor-toolbar">
-            <button (click)="questionEditor.chain().focus().toggleBold().run()"
-              [class.btn-outline-secondary]="!questionEditor.isActive('bold')"
-              [class.btn-secondary]="questionEditor.isActive('bold')"
-              class="btn"
-              type="button"><i class="bi bi-type-bold"></i></button>
-            <button (click)="questionEditor.chain().focus().toggleItalic().run()"
-              [class.btn-outline-secondary]="!questionEditor.isActive('italic')"
-              [class.btn-secondary]="questionEditor.isActive('italic')"
-              class="btn"
-              type="button"><i class="bi bi-type-italic" ></i></button>
-            <button (click)="questionEditor.chain().focus().toggleStrike().run()"
-              [class.btn-outline-secondary]="!questionEditor.isActive('strike')"
-              [class.btn-secondary]="questionEditor.isActive('strike')"
-              class="btn"
-              type="button"><i class="bi bi-type-strikethrough"></i></button>
-            <button 
-              (click)="questionEditor.commands.insertContent('$')"
-              class="btn btn-outline-secondary"
-              type="button"><i class="bi bi-calculator-fill"></i>{{ 'flashcard.create.inlineEquation' | transloco }}</button>
-            <button
-              (click)="questionEditor.commands.insertContent('$$')"
-              class="btn btn-outline-secondary"
-              type="button"><i class="bi bi-calculator-fill"></i>{{ 'flashcard.create.outlineEquation' | transloco }}</button>
-            <label for="question-image-input" class="btn btn-outline-secondary mb-0" title="{{ 'flashcard.create.insertImage' | transloco }}">
-              <i class="bi bi-image"></i>{{ 'flashcard.create.insertImage' | transloco }}
-            </label>
-            <input type="file" id="question-image-input" accept="image/*" hidden (change)="onImageSelected($event, questionEditor)">
-          </div>
-          <tiptap-editor [editor]="questionEditor" class="tiptap-editor-custom"></tiptap-editor>
+          <app-rich-text-editor [editor]="questionEditor"></app-rich-text-editor>
           @if(cardForm.get('question')?.touched && cardForm.get('question')?.hasError('minlength')){
           <div class="invalid-feedback d-block">
             {{ 'flashcard.create.questionMinError' | transloco }}
@@ -77,36 +48,7 @@
 
         <div class="form-group">
           <label for="answer-editor" class="form-label">{{ 'flashcard.create.answerLabel' | transloco }}</label>
-          <div class="editor-toolbar">
-            <button (click)="answerEditor.chain().focus().toggleBold().run()"
-              [class.btn-outline-secondary]="!answerEditor.isActive('bold')"
-              [class.btn-secondary]="answerEditor.isActive('bold')"
-              class="btn"
-              type="button"><i class="bi bi-type-bold"></i></button>
-            <button (click)="answerEditor.chain().focus().toggleItalic().run()"
-              [class.btn-outline-secondary]="!answerEditor.isActive('italic')"
-              [class.btn-secondary]="answerEditor.isActive('italic')"
-              class="btn"
-              type="button"><i class="bi bi-type-italic" ></i></button>
-            <button (click)="answerEditor.chain().focus().toggleStrike().run()"
-              [class.btn-outline-secondary]="!answerEditor.isActive('strike')"
-              [class.btn-secondary]="answerEditor.isActive('strike')"
-              class="btn"
-              type="button"><i class="bi bi-type-strikethrough"></i></button>
-            <button
-              (click)="answerEditor.commands.insertContent('$')"
-              class="btn btn-outline-secondary"
-              type="button"><i class="bi bi-calculator-fill"></i>{{ 'flashcard.create.inlineEquation' | transloco }}</button>
-            <button
-              (click)="answerEditor.commands.insertContent('$$')"
-              class="btn btn-outline-secondary"
-              type="button"><i class="bi bi-calculator-fill"></i>{{ 'flashcard.create.outlineEquation' | transloco }}</button>
-            <label for="answer-image-input" class="btn btn-outline-secondary mb-0" title="{{ 'flashcard.create.insertImage' | transloco }}">
-              <i class="bi bi-image"></i>{{ 'flashcard.create.insertImage' | transloco }}
-            </label>
-            <input type="file" id="answer-image-input" accept="image/*" hidden (change)="onImageSelected($event, answerEditor)">
-          </div>
-          <tiptap-editor [editor]="answerEditor" class="tiptap-editor-custom"></tiptap-editor>
+          <app-rich-text-editor [editor]="answerEditor"></app-rich-text-editor>
           @if(cardForm.get('answer')?.touched && cardForm.get('answer')?.hasError('minlength')){
           <div class="invalid-feedback d-block">
             {{ 'flashcard.create.answerMinError' | transloco }}
@@ -141,7 +83,9 @@
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="btn btn-primary" [disabled]="cardForm.invalid">{{ 'flashcard.create.addButton' | transloco }}</button>
+          <button type="submit" class="btn btn-primary" 
+          [ngClass]="cardForm.invalid ? 'btn-outline-secondary' : 'btn-primary'"
+          [disabled]="cardForm.invalid">{{ 'flashcard.create.addButton' | transloco }}</button>
         </div>
       </form>
     </div>

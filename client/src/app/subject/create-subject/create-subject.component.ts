@@ -5,15 +5,16 @@ import { charMinLength, descMaxLength, nameMaxLength } from '../../../config/con
 
 import { CommonModule } from '@angular/common';
 import { Editor } from '@tiptap/core';
+import Image from '@tiptap/extension-image';
 import { MathExtension } from '@aarkue/tiptap-math-extension';
 import { Router } from '@angular/router';
 import StarterKit from '@tiptap/starter-kit';
 import { SubjectService } from '../subject.service';
 import { defaultSubjectIconColor } from '../subject-icon.util';
 import { SubjectIconPreviewComponent } from '../subject-icon-preview/subject-icon-preview.component';
-import { TiptapEditorDirective } from 'ngx-tiptap';
 import { Toast } from '../../toast/toast';
 import { ToastService } from '../../toast/toast.service';
+import { RichTextEditorComponent } from '../../shared/rich-text-editor/rich-text-editor.component';
 
 @Component({
   selector: 'app-create-subject',
@@ -22,8 +23,8 @@ import { ToastService } from '../../toast/toast.service';
     CommonModule,
     ReactiveFormsModule,
     Toast,
-    TiptapEditorDirective,
     TranslocoModule,
+    RichTextEditorComponent,
     SubjectIconPreviewComponent,
   ],
   templateUrl: './create-subject.component.html',
@@ -52,7 +53,11 @@ export class CreateSubjectComponent implements OnInit, OnDestroy {
     private transloco: TranslocoService
   ) {
     this.descEditor = new Editor({
-      extensions: [StarterKit, MathExtension.configure({ evaluation: false })],
+      extensions: [
+        StarterKit,
+        MathExtension.configure({ evaluation: false }),
+        Image.configure({ inline: false }),
+      ],
     });
     this.descEditor.on('update', () => {
       this.descLength = this.descEditor.getText().length;

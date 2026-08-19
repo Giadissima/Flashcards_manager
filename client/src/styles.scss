@@ -377,6 +377,21 @@ input:-webkit-autofill:active {
   }
 }
 
+/* Bootstrap resetta blockquote a un semplice margin, senza bordo/indentazione:
+   il toggle sembra "non fare nulla" perché il risultato è indistinguibile da un
+   paragrafo normale. Qui gli diamo uno stile visibile. */
+.tiptap blockquote {
+  margin: calc(var(--spacing-unit) * 1.5) 0;
+  padding: calc(var(--spacing-unit) * 0.5) calc(var(--spacing-unit) * 1.5);
+  border-left: 3px solid var(--primary-color);
+  color: var(--sub-title-color);
+  font-style: italic;
+}
+
+.tiptap blockquote p {
+  margin-bottom: 0;
+}
+
 /* Placeholder di @tiptap/extension-placeholder: mostra il testo d'esempio
    sul primo nodo vuoto tramite pseudo-elemento, senza occupare altezza. */
 .tiptap p.is-empty::before {
@@ -772,6 +787,39 @@ usato in create, modify flashcards, create, modify, manage topics e subjects */
 
 .tiptap-editor-custom{
   color: var(--header-color) !important;
+}
+
+.editor-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(var(--spacing-unit) * 1.25);
+  margin-bottom: calc(var(--spacing-unit) * 0.75);
+
+  .btn-group .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: calc(var(--spacing-unit) * 0.5);
+  }
+
+  .dropdown-menu {
+    --bs-dropdown-bg: var(--component-background);
+    --bs-dropdown-color: var(--text-color);
+    --bs-dropdown-border-color: var(--border-color);
+    --bs-dropdown-link-color: var(--text-color);
+    --bs-dropdown-link-hover-bg: var(--primary-color);
+    --bs-dropdown-link-hover-color: var(--on-primary-color);
+    --bs-dropdown-link-active-bg: var(--primary-color);
+    --bs-dropdown-link-active-color: var(--on-primary-color);
+  }
+}
+
+.editor-toolbar-latex {
+  gap: calc(var(--spacing-unit) * 0.5);
+  padding: calc(var(--spacing-unit) * 0.25);
+  border: 1px solid var(--primary-color);
+  border-radius: var(--border-radius-sm);
+  background-color: color-mix(in srgb, var(--primary-color) 12%, transparent);
 }
 
 .form-actions {
