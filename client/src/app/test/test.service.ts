@@ -4,7 +4,7 @@ import { PaginatedResponse, TestFilter } from '../models/http.dto';
 import { Flashcard } from '../models/flashcard.dto';
 import { Injectable } from '@angular/core';
 import { RestClientService } from '../api/rest-api.service';
-import { Test, TestStats } from '../models/test.dto';
+import { Question, Test, TestStats } from '../models/test.dto';
 import { baseUrlAPI } from '../../config/config';
 
 @Injectable({
@@ -26,6 +26,22 @@ private baseUrl = 'test';
   // Legge un singolo test
   getById(id: string): Promise<Test> {
     return this.restClient.get<Test>(this.baseUrl + '/' + id);
+  }
+
+  // Numero totale di domande del test (senza scaricare l'intero array 'questions')
+  getQuestionsCount(testId: string): Promise<{ count: number; elapsed_time?: number }> {
+    return this.restClient.get(`${this.baseUrl}/${testId}/questions/count`);
+  }
+
+  // Una pagina di domande del test (skip/limit)
+  getQuestionsPage(testId: string, skip: number, limit: number): Promise<Question[]> {
+    return this.restClient.get(`${this.baseUrl}/${testId}/questions`, { skip, limit });
+  }
+
+  // Segna il test come completato senza dover rileggere/riscrivere l'intero documento
+  completeTest(testId: string, elapsed_time: number): Promise<void> {
+    const params = new HttpParams().set('time', elapsed_time);
+    return this.restClient.patch(`${this.baseUrl}/${testId}/complete`, {}, params);
   }
 
   // Legge le statistiche aggregate sui test, filtrabili come getAll

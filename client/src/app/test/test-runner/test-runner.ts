@@ -1,6 +1,5 @@
 import { ActivatedRoute, Router } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Subscription, interval } from 'rxjs';
 
 import { CommonModule } from '@angular/common';
@@ -9,45 +8,50 @@ import { DurationPipe } from '../../../pipes/duration.pipe';
 import { Flashcard } from '../../models/flashcard.dto';
 import { FlashcardService } from '../../flashcard/flashcard.service';
 import { KatexRendererPipe } from '../../pipes/katex-renderer.pipe';
-import { Test } from '../../models/test.dto';
+import { Subject } from '../../models/subject.dto';
+import { Topic } from '../../models/topic.dto';
 import { TestService } from '../test.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
+import { getSubjectIconUrl } from '../../subject/subject-icon.util';
 
 @Component({
   selector: 'app-test-runner',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, DurationPipe, KatexRendererPipe, ConfirmDialogComponent, TranslocoModule],
+  imports: [CommonModule, DurationPipe, KatexRendererPipe, ConfirmDialogComponent, TranslocoModule],
   templateUrl: './test-runner.html',
   styleUrls: ['./test-runner.scss']
 })
 export class TestRunner implements OnInit {
-  testForm: FormGroup;
-  showAnswer: boolean = false;
   testFinished = false; // TODO
-  flashcard!: Flashcard;
 
   testId!: string;
-  test: Test | undefined = undefined;
-  currentIndex: number = -1;
   elapsed_time: number = 0; // in secondi
   timerSub!: Subscription;
-  private startTime = 0;
+
+  // Griglia di flashcard, 9 per pagina (3x3). Il test non viene mai tenuto
+  // per intero in memoria (potrebbe avere centinaia di domande): si conosce
+  // solo il conteggio totale e si carica dal server una pagina alla volta.
+  totalQuestions = 0;
+  pageFlashcards: Flashcard[] = [];
+  pageSize = 9;
+  currentPage = 1;
+
+  // mappa flashcard_id -> boolean (risposta data, per le card già viste)
+  private answersMap: Record<string, boolean> = {};
+
+  // mappa flashcard_id -> boolean (true = mostra risposta)
+  showAnswerMap: Record<string, boolean> = {};
 
   showLeaveConfirm = false;
   private pendingDestination: string[] = [];
 
   constructor(
-    private fb: FormBuilder,
     private route: ActivatedRoute,
     private flashcardService: FlashcardService,
     private testService: TestService,
     private router: Router,
     private transloco: TranslocoService
-  ) {
-    this.testForm = this.fb.group({
-      isCorrect: [null]
-    });
-  }
+  ) {}
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
@@ -70,14 +74,15 @@ export class TestRunner implements OnInit {
       this.testService.updateElapsedTime(this.testId, this.elapsed_time)
         .catch(err => console.error('Errore aggiornamento timer', err));;
   }
-  
+
   async getTest() {
     if(!this.testId) return;
-    
-    this.test = await this.testService.getById(this.testId);
-    await this.loadNextFlashcard();
+
+    const { count, elapsed_time } = await this.testService.getQuestionsCount(this.testId);
+    this.totalQuestions = count;
     if(this.elapsed_time == 0)
-      this.elapsed_time = this.test.elapsed_time ?? 0;
+      this.elapsed_time = elapsed_time ?? 0;
+    await this.loadPage();
   }
 
   ngOnDestroy() {
@@ -86,38 +91,42 @@ export class TestRunner implements OnInit {
     }
   }
 
-  async updateAnswer(){
-    const answer = this.testForm.get("isCorrect")?.value;
-    const flashcard_id = this.test?.questions[this.currentIndex]?.flashcard_id;
-    if(answer != null && flashcard_id){
-      this.testService.updateAnswer(this.testId, flashcard_id, answer);
-    }
+  get totalPages(): number {
+    return Math.max(1, Math.ceil(this.totalQuestions / this.pageSize));
   }
 
-  async loadNextFlashcard() {
-    await this.updateAnswer();
-    this.testForm.reset({ isCorrect: null });
-    this.currentIndex++;
-    const question = this.test?.questions[this.currentIndex]?.flashcard_id;
-    if(!question) {
-      this.currentIndex--;
-      return;
+  async loadPage(): Promise<void> {
+    if (!this.testId) return;
+    const skip = (this.currentPage - 1) * this.pageSize;
+    const pageQuestions = await this.testService.getQuestionsPage(this.testId, skip, this.pageSize);
+    for (const q of pageQuestions) {
+      if (q.is_correct !== undefined) this.answersMap[q.flashcard_id] = q.is_correct;
     }
-    this.flashcard = await this.flashcardService.getById(question);
-    this.showAnswer = false;
+    this.pageFlashcards = await Promise.all(
+      pageQuestions.map((q) => this.flashcardService.getById(q.flashcard_id))
+    );
   }
 
-  async loadPreviousFlashcard() {
-    await this.updateAnswer();
-    this.testForm.reset({ isCorrect: null });
-    this.currentIndex--;
-    const question = this.test?.questions[this.currentIndex].flashcard_id;
-    if(!question) {
-      this.currentIndex--;
-      return;
-    }
-    this.flashcard = await this.flashcardService.getById(question);
-    this.showAnswer = false;
+  nextPage(): void {
+    if (this.currentPage >= this.totalPages) return;
+    this.currentPage++;
+    this.loadPage();
+  }
+
+  previousPage(): void {
+    if (this.currentPage <= 1) return;
+    this.currentPage--;
+    this.loadPage();
+  }
+
+  isCorrectAnswer(card: Flashcard): boolean | undefined {
+    return card._id ? this.answersMap[card._id] : undefined;
+  }
+
+  setAnswer(card: Flashcard, isCorrect: boolean): void {
+    if (!card._id) return;
+    this.answersMap[card._id] = isCorrect;
+    this.testService.updateAnswer(this.testId, card._id, isCorrect);
   }
 
   getCardColor(card: Flashcard): string {
@@ -127,23 +136,37 @@ export class TestRunner implements OnInit {
     return 'blue';
   }
 
-  seeAnswer(card: Flashcard): void {
-    if (!card._id) return;
-    this.showAnswer = !this.showAnswer;
+  getCardSubjectIconUrl(card: Flashcard): string {
+    const subject = card.subject_id && typeof card.subject_id !== 'string' ? card.subject_id : undefined;
+    return getSubjectIconUrl(subject as Subject | undefined);
+  }
+
+  getCardSubjectName(card: Flashcard): string {
+    return card.subject_id && typeof card.subject_id !== 'string' ? card.subject_id.name : '';
+  }
+
+  getCardTopicName(card: Flashcard): string {
+    return card.topic_id && typeof card.topic_id !== 'string' ? (card.topic_id as Topic).name : '';
+  }
+
+  getCardBody(card: Flashcard): string {
+    if (!card._id) return card.question;
+    return '<p>' + (this.showAnswerMap[card._id] ? card.answer : card.question) + '</p>';
   }
 
   getCardButtonText(card: Flashcard): string {
     if (!card._id) return '';
-    return this.transloco.translate(this.showAnswer ? 'test.runner.seeQuestion' : 'test.runner.seeAnswer');
+    return this.transloco.translate(this.showAnswerMap[card._id] ? 'test.runner.seeQuestion' : 'test.runner.seeAnswer');
+  }
+
+  seeAnswer(card: Flashcard): void {
+    if (!card._id) return;
+    this.showAnswerMap[card._id] = !this.showAnswerMap[card._id];
   }
 
   async finishTest() {
-    if(!this.test) return;
-    await this.updateAnswer();
-    this.test = await this.testService.getById(this.testId);
-    this.test.completedAt = new Date();
-    this.test.elapsed_time = this.elapsed_time;
-    this.testService.update(this.testId, this.test);
+    if(!this.testId) return;
+    await this.testService.completeTest(this.testId, this.elapsed_time);
     this.router.navigate(['/test-result',this.testId],);
   }
 
@@ -162,12 +185,11 @@ export class TestRunner implements OnInit {
     this.showLeaveConfirm = false;
   }
 
-  // Salva la risposta corrente e il tempo trascorso, poi esce senza chiudere
-  // il test: rimane "in corso" e potrà essere ripreso in seguito (anche da un
-  // altro dispositivo, dato che lo stato vive sul server, non nel client).
+  // Salva il tempo trascorso, poi esce senza chiudere il test: rimane "in corso"
+  // e potrà essere ripreso in seguito (anche da un altro dispositivo, dato che
+  // lo stato vive sul server, non nel client).
   async confirmLeave(): Promise<void> {
     this.showLeaveConfirm = false;
-    await this.updateAnswer();
     if (this.testId) {
       await this.testService
         .updateElapsedTime(this.testId, this.elapsed_time)
