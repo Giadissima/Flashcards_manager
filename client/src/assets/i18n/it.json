@@ -216,7 +216,7 @@
     "setup": {
       "title": "Nuovo Test",
       "subtitle": "Scegli materia, argomento e numero di domande",
-      "subjectLabel": "materia",
+      "subjectLabel": "Materia",
       "selectSubject": "Seleziona materia",
       "topicLabel": "Argomento",
       "selectTopic": "Seleziona argomento",
