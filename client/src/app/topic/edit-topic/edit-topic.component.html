@@ -38,7 +38,9 @@
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="btn btn-primary" [disabled]="editForm.invalid">{{ 'topic.edit.saveChanges' | transloco }}</button>
+          <button type="submit" class="btn btn-primary" 
+          [ngClass]="editForm.invalid ? 'btn-outline-secondary' : 'btn-primary'"
+          [disabled]="editForm.invalid">{{ 'topic.edit.saveChanges' | transloco }}</button>
         </div>
       </form>
     </div>

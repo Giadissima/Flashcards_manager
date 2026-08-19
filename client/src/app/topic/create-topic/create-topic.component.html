@@ -38,7 +38,9 @@
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="btn btn-primary" [disabled]="topicForm.invalid">{{ 'topic.create.createButton' | transloco }}</button>
+          <button type="submit" class="btn btn-primary" 
+          [ngClass]="topicForm.invalid ? 'btn-outline-secondary' : 'btn-primary'"
+          [disabled]="topicForm.invalid">{{ 'topic.create.createButton' | transloco }}</button>
         </div>
       </form>
     </div>
