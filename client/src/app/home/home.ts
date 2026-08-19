@@ -410,6 +410,7 @@ export class Home implements OnInit, AfterViewChecked, OnDestroy {
 
   onSubjectSelected(id: string | null | undefined): void {
     this.selectedSubjectId = id;
+    this.selectedTopicId = null;
     this.onFilterChange();
   }
 
