@@ -1,5 +1,5 @@
 <div class="container mt-4" *transloco="let t">
-  <div class="icons-wrapper">
+  <div class="icons-wrapper" [class.timer-over-hour]="elapsed_time >= 3600">
     <div class="circle-wrapper timer-icon">
       <span class="material-symbols-outlined">timer</span>
       <span>

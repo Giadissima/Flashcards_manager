@@ -109,4 +109,15 @@
       font-size: 24px;
     }
   }
+
+  &.timer-over-hour {
+    .timer-icon {
+      width: 60px;
+      height: 60px;
+    }
+
+    .pause-play-icon {
+      right: -15px;
+    }
+  }
 }
