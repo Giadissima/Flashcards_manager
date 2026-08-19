@@ -14,6 +14,7 @@ import { Flashcard } from 'src/flashcards/flashcards.schema';
 import { Test, TestDocument } from './test.schema';
 import { Model, PipelineStage, Types } from 'mongoose';
 import {
+  QuestionDto,
   TestCreateRequest,
   TestFilterDto,
   TestStats,
@@ -45,6 +46,65 @@ export class TestService {
 
     const flashcardId = test.questions[0].flashcard_id;
     return this.flashcardService.findOne(flashcardId.toString());
+  }
+
+  // Numero totale di domande del test, senza portare l'intero array
+  // 'questions' in memoria: $size viene calcolato da Mongo e solo il numero
+  // risultante attraversa la rete
+  async getQuestionsCount(test_id: string): Promise<{
+    count: number;
+    elapsed_time?: number;
+  }> {
+    if (!validateObjectIdParam(test_id))
+      throw new BadRequestException('The id does not satisfy requirements');
+
+    const [result] = await this.testModel.aggregate([
+      { $match: { _id: new Types.ObjectId(test_id) } },
+      {
+        $project: {
+          count: { $size: '$questions' },
+          elapsed_time: 1,
+        },
+      },
+    ]);
+
+    if (!result) throw new NotFoundException('test not found');
+
+    return {
+      count: result.count,
+      elapsed_time: result.elapsed_time,
+    };
+  }
+
+  // Una singola pagina di domande (skip/limit), tramite $slice: Mongo estrae
+  // solo la porzione richiesta, senza caricare le altre domande del test
+  async getQuestionsPage(
+    test_id: string,
+    skip: number,
+    limit: number,
+  ): Promise<QuestionDto[]> {
+    if (!validateObjectIdParam(test_id))
+      throw new BadRequestException('The id does not satisfy requirements');
+
+    const [result] = await this.testModel.aggregate([
+      { $match: { _id: new Types.ObjectId(test_id) } },
+      { $project: { questions: { $slice: ['$questions', skip, limit] } } },
+    ]);
+
+    if (!result) throw new NotFoundException('test not found');
+
+    return result.questions;
+  }
+
+  // Segna il test come completato senza dover rileggere/riscrivere
+  // l'intero documento (incluso l'array 'questions') dal client
+  completeTest(id: string, elapsed_time: number) {
+    if (!validateObjectIdParam(id))
+      throw new BadRequestException('The id does not satisfy requirements');
+    return this.testModel.findByIdAndUpdate(id, {
+      completedAt: new Date(),
+      elapsed_time,
+    });
   }
   // TODO devo trovare un modo per filtrare solo le domande che non hanno categoria
   async create(test: TestCreateRequest): Promise<TestDocument> {

@@ -79,9 +79,37 @@ export class TestController {
     return this.testService.getQuestion(test_id, question_index);
   }
 
+  @ApiOperation({
+    description:
+      'get the total number of questions of a test, without loading the questions array',
+  })
+  @Get(':id/questions/count')
+  getQuestionsCount(@Param('id') id: string) {
+    return this.testService.getQuestionsCount(id);
+  }
+
+  @ApiOperation({ description: 'get one page of questions of a test' })
+  @Get(':id/questions')
+  getQuestionsPage(
+    @Param('id') id: string,
+    @Query('skip') skip: string,
+    @Query('limit') limit: string,
+  ) {
+    return this.testService.getQuestionsPage(
+      id,
+      Number(skip) || 0,
+      Number(limit) || 9,
+    );
+  }
+
   @Patch(':id/time')
   updateelapsed_time(@Param('id') id: string, @Query('time') time: number) {
     return this.testService.updateelapsed_time(id, time);
+  }
+
+  @Patch(':id/complete')
+  complete(@Param('id') id: string, @Query('time') time: number) {
+    return this.testService.completeTest(id, Number(time));
   }
 
   @Patch(':id')
