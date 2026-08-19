@@ -408,8 +408,8 @@ input:-webkit-autofill:active {
    cliccabile. !important necessario per vincere sulla regola :host, che ha
    specificità maggiore di un selettore di tipo globale. */
 .big-ngx-colors {
-  width: 48px;
-  height: 48px;
+  width: 48px !important;
+  height: 48px !important;
 }
 
 /* Optional utility: apply the .rainbow-swatch class to a single <ngx-colors>
