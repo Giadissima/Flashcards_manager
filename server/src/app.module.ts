@@ -3,7 +3,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { FileModule } from './file/file.module';
-import { FileService } from './file/file.service';
 import { FlashcardsModule } from './flashcards/flashcards.module';
 import { TopicModule } from './topic/topic.module';
 import { ImportExportModule } from './import-export/import-export.module';

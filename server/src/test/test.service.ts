@@ -6,11 +6,9 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import {
   BasePaginatedResult,
-  shuffleArray,
   validateObjectIdParam,
 } from 'src/common.dto';
 
-import { Flashcard } from 'src/flashcards/flashcards.schema';
 import { Test, TestDocument } from './test.schema';
 import { Model, PipelineStage, Types } from 'mongoose';
 import {
@@ -31,7 +29,6 @@ export class TestService {
   }
   constructor(
     @InjectModel(Test.name) private testModel: Model<Test>,
-    @InjectModel(Flashcard.name) private flashcardModel: Model<Flashcard>,
     private readonly flashcardService: FlashcardsService,
   ) {}
 

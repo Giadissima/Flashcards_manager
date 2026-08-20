@@ -1,5 +1,5 @@
 import { Filters, idLength, nameMaxLength } from './config';
-import { IsIn, IsMongoId, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
+import { IsIn, IsString, Max, MaxLength, Min } from 'class-validator';
 
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
@@ -57,12 +57,4 @@ export function validateObjectIdParam(id: string) {
     id.length == idLength &&
     Types.ObjectId.isValid(id)
   );
-}
-
-export function shuffleArray<T>(array: T[]): T[] {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
 }

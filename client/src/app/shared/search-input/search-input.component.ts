@@ -13,7 +13,6 @@ import { TranslocoModule } from '@jsverse/transloco';
   standalone: true,
   imports: [CommonModule, FormsModule, TranslocoModule],
   templateUrl: './search-input.component.html',
-  styleUrl: './search-input.component.scss',
 })
 export class SearchInputComponent {
   @Input() value: string = '';

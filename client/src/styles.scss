@@ -137,8 +137,6 @@ h6 {
   color: var(--text-color);
   font-family: var(--font-family);
   transition: border-color 0.2s, box-shadow 0.2s;
-
-  .search-input {}
 }
 
 /* Riserva spazio per la freccina del dropdown, altrimenti il testo (se lungo)
@@ -267,7 +265,6 @@ input:-webkit-autofill:active {
 /* Button Refinement */
 .btn {
   border-radius: var(--border-radius-md);
-  transition: all 0.2s;
   transition: all 0.2s ease-in-out;
   /* Smooth transition for shadow and lift */
   outline: none;
@@ -600,7 +597,6 @@ ngx-colors-overlay[data-ngx-colors-theme='dark'] .bg-white {
 .filter-bar .row {
   justify-content: space-between;
   flex-direction: row;
-  row-gap: 3;
 }
 
 /* Le select (native o app-searchable-select) dentro le filter-bar stanno in
@@ -828,13 +824,6 @@ usato in create, modify flashcards, create, modify, manage topics e subjects */
   }
 }
 
-.editor-toolbar-latex {
-  gap: calc(var(--spacing-unit) * 0.5);
-  padding: calc(var(--spacing-unit) * 0.25);
-  border: 1px solid var(--primary-color);
-  border-radius: var(--border-radius-sm);
-  background-color: color-mix(in srgb, var(--primary-color) 12%, transparent);
-}
 
 .form-actions {
   display: flex;

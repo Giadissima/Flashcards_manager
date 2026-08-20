@@ -1,9 +1,8 @@
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
-import { Question, Test } from '../../models/test.dto';
+import { Question } from '../../models/test.dto';
 
 import { CommonModule } from '@angular/common';
-import { Flashcard } from '../../models/flashcard.dto';
 import { FlashcardService } from '../../flashcard/flashcard.service';
 import { RandomCardFIlter } from '../../models/http.dto';
 import { Router } from '@angular/router';
@@ -11,7 +10,6 @@ import { SearchableSelectComponent, SelectOption } from '../../shared/searchable
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
 import { TestService } from '../test.service';
-import { ToastService } from '../../toast/toast.service';
 import { Topic } from '../../models/topic.dto';
 import { TopicService } from '../../topic/topic.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';

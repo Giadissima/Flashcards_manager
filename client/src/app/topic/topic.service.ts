@@ -2,7 +2,6 @@ import { TopicFilter, PaginatedResponse } from '../models/http.dto';
 import { Topic } from '../models/topic.dto';
 import { Injectable } from '@angular/core';
 import { RestClientService } from '../api/rest-api.service';
-import { baseUrlAPI } from '../../config/config';
 
 @Injectable({
   providedIn: 'root',

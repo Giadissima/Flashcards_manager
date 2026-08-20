@@ -1,6 +1,6 @@
 import * as qs from 'qs';
 
-import { EventEmitter, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 
 import { Router } from '@angular/router';
@@ -14,9 +14,6 @@ import { firstValueFrom } from 'rxjs';
   providedIn: 'root'
 })
 export class RestClientService {
-
-  public offlineException: EventEmitter<HttpErrorResponse> = new EventEmitter();
-  public serverErrorException: EventEmitter<HttpErrorResponse> = new EventEmitter();
 
   private readonly baseUrl = baseUrlAPI;
 
@@ -36,10 +33,6 @@ export class RestClientService {
     console.error(`[${method}] error`, error);
     if (error.status === 401) {
       this.router.navigate(['']);
-    } else if (error.status === 0) {
-      this.offlineException.emit(error);
-    } else if (error.status >= 500) {
-      this.serverErrorException.emit(error);
     }
   }
 
@@ -59,19 +52,6 @@ export class RestClientService {
     return firstValueFrom(this.http.post(this.getFullUrl(endpoint), body, reqOpts))
       .catch((error) => {
         this.handleError(error, 'POST');
-        throw error;
-      });
-  }
-
-  async postToAnotherEndpoint(endpoint: string, body: any, httpParams?: HttpParams): Promise<any> {
-    return this.post(endpoint, body, httpParams);
-  }
-
-  async put(endpoint: string, body: any, httpParams?: HttpParams): Promise<any> {
-    const reqOpts = { params: httpParams || new HttpParams(), headers: new HttpHeaders() };
-    return firstValueFrom(this.http.put(this.getFullUrl(endpoint), body, reqOpts))
-      .catch((error) => {
-        this.handleError(error, 'PUT');
         throw error;
       });
   }

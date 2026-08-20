@@ -30,7 +30,6 @@ import { SubjectIconPreviewComponent } from '../subject-icon-preview/subject-ico
     LoadStateComponent,
   ],
   templateUrl: './edit-subject.component.html',
-  styleUrls: ['./edit-subject.component.scss']
 })
 export class EditSubjectComponent implements OnInit, OnDestroy {
   @ViewChild(LoadStateComponent, { static: true }) loadState!: LoadStateComponent;

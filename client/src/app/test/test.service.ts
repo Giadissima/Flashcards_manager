@@ -1,11 +1,9 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpParams } from '@angular/common/http';
 import { PaginatedResponse, TestFilter } from '../models/http.dto';
 
-import { Flashcard } from '../models/flashcard.dto';
 import { Injectable } from '@angular/core';
 import { RestClientService } from '../api/rest-api.service';
 import { Question, Test, TestStats } from '../models/test.dto';
-import { baseUrlAPI } from '../../config/config';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +11,7 @@ import { baseUrlAPI } from '../../config/config';
 export class TestService {
 private baseUrl = 'test';
 
-  constructor(private http: HttpClient, private restClient: RestClientService) {}
+  constructor(private restClient: RestClientService) {}
 
   // Legge tutti i test
   getAll(filter: TestFilter): Promise<PaginatedResponse<Test>> {

@@ -21,7 +21,6 @@ import { ThemeService } from '../../shared/theme/theme.service';
   standalone: true,
   imports: [ReactiveFormsModule, CommonModule, Toast, TranslocoModule, SearchableSelectComponent, NgxColorsComponent, NgxColorsTriggerDirective, LoadStateComponent],
   templateUrl: './edit-topic.component.html',
-  styleUrls: ['./edit-topic.component.scss']
 })
 export class EditTopicComponent implements OnInit {
   @ViewChild(LoadStateComponent, { static: true }) loadState!: LoadStateComponent;

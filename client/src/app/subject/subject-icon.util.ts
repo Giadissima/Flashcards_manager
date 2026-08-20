@@ -1,7 +1,6 @@
 import { Subject } from '../models/subject.dto';
 import { baseUrlAPI } from '../../config/config';
 
-export const defaultSubjectIconUrl = 'assets/default-subject-icon.png';
 export const defaultSubjectIconColor = '#bbdefb';
 
 // path ufficiali Google Fonts Material Icons "menu_book" (variante two-tone,

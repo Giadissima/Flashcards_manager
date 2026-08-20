@@ -1,7 +1,6 @@
-import { CardFilter, PaginatedResponse, RandomCardFIlter, SimplePaginatedResponse } from '../models/http.dto';
+import { CardFilter, PaginatedResponse, RandomCardFIlter } from '../models/http.dto';
 
 import { Flashcard } from '../models/flashcard.dto';
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { RestClientService } from '../api/rest-api.service';
 
@@ -11,7 +10,7 @@ import { RestClientService } from '../api/rest-api.service';
 export class FlashcardService {
   private baseUrl = 'flashcards';
 
-  constructor(private http: HttpClient, private restClient: RestClientService) {}
+  constructor(private restClient: RestClientService) {}
 
   // Legge tutte le flashcard
   getAll(filter: CardFilter): Promise<PaginatedResponse<Flashcard>> {

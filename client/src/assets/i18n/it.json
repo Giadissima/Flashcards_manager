@@ -26,7 +26,6 @@
     "previous": "Precedente",
     "next": "Successivo",
     "pageOf": "Pagina {{current}} di {{total}}",
-    "saveChanges": "Salva Modifiche",
     "cancel": "Annulla",
     "yes": "Sì",
     "name": "Nome",
@@ -151,11 +150,9 @@
     "create": {
       "title": "Crea nuovo argomento",
       "subtitle": "Aggiungi un nuovo argomento di studio",
-      "nameLabel": "Nome",
       "nameRequiredError": "Il nome è obbligatorio.",
       "nameMinError": "Il nome deve avere almeno 2 caratteri.",
       "nameMaxError": "Numero massimo di caratteri per il nome raggiunto.",
-      "colorLabel": "Colore",
       "colorTitle": "Scegli il tuo colore",
       "createButton": "Crea argomento"
     },
@@ -187,13 +184,10 @@
     "create": {
       "title": "Crea nuova materia",
       "subtitle": "Aggiungi una nuova materia di studio",
-      "nameLabel": "Nome",
       "nameMaxError": "Il nome può avere al massimo {{max}} caratteri. Accorcialo un po'.",
       "nameMinError": "Il nome deve avere almeno {{min}} caratteri.",
       "nameRequiredError": "Inserisci un nome.",
-      "descLabel": "Descrizione",
       "descMaxError": "La descrizione può avere al massimo {{max}} caratteri (attualmente {{current}}). Accorciala un po'.",
-      "iconLabel": "Icona",
       "iconPreview": "Anteprima icona",
       "iconColor": "Scegli il colore dell'icona di default",
       "createButton": "Crea materia"

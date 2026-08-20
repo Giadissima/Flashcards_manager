@@ -26,7 +26,6 @@
     "previous": "Previous",
     "next": "Next",
     "pageOf": "Page {{current}} of {{total}}",
-    "saveChanges": "Save Changes",
     "cancel": "Cancel",
     "yes": "Yes",
     "name": "Name",
@@ -151,11 +150,9 @@
     "create": {
       "title": "Create New Topic",
       "subtitle": "Add a new topic to study",
-      "nameLabel": "Name",
       "nameRequiredError": "Name is required.",
       "nameMinError": "Name should have min 2 characters.",
       "nameMaxError": "Name's max characters reached.",
-      "colorLabel": "Color",
       "colorTitle": "Choose your color",
       "createButton": "Create Topic"
     },
@@ -187,13 +184,10 @@
     "create": {
       "title": "Create New Subject",
       "subtitle": "Add a new subject to study",
-      "nameLabel": "Name",
       "nameMaxError": "Name can have at most {{max}} characters. Please shorten it.",
       "nameMinError": "Name must have at least {{min}} characters.",
       "nameRequiredError": "Please insert a name.",
-      "descLabel": "Description",
       "descMaxError": "Description can have at most {{max}} characters (currently {{current}}). Please shorten it.",
-      "iconLabel": "Icon",
       "iconPreview": "Icon preview",
       "createButton": "Create Subject",
       "iconColor": "Choose color for default image"

@@ -35,7 +35,6 @@ import { getSubjectIconUrl } from '../../subject/subject-icon.util';
     SearchableSelectComponent
   ],
   templateUrl: './create-flashcard.html',
-  styleUrls: ['./create-flashcard.scss']
 })
 export class CreateFlashcard implements OnInit, OnDestroy {
   cardForm!: FormGroup;
@@ -155,12 +154,6 @@ export class CreateFlashcard implements OnInit, OnDestroy {
         color: t.color,
       }));
     }
-
-  textAreaAutoResize(event: Event) {
-    const textarea = event.target as HTMLTextAreaElement;
-    textarea.style.height = 'auto';
-    textarea.style.height = textarea.scrollHeight + 'px';
-  }
 
   async addCard() {
     if (this.cardForm.invalid) {

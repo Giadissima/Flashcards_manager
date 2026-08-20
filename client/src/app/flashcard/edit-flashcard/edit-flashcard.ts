@@ -28,7 +28,6 @@ import { getSubjectIconUrl } from '../../subject/subject-icon.util';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, Toast, RichTextEditorComponent, TranslocoModule, SearchableSelectComponent, LoadStateComponent],
   templateUrl: './edit-flashcard.html',
-  styleUrls: ['./edit-flashcard.scss']
 })
 export class EditFlashcard implements OnInit, OnDestroy {
   @ViewChild(LoadStateComponent, { static: true }) loadState!: LoadStateComponent;
@@ -190,12 +189,6 @@ export class EditFlashcard implements OnInit, OnDestroy {
       console.error('Error updating card', error);
       this.toastService.show(this.transloco.translate('flashcard.toast.updateError'), 'error');
     }
-  }
-
-  textAreaAutoResize(event: Event) {
-    const textarea = event.target as HTMLTextAreaElement;
-    textarea.style.height = 'auto';
-    textarea.style.height = textarea.scrollHeight + 'px';
   }
 
   async loadTopicsBySubject(subjectId: string | undefined) {

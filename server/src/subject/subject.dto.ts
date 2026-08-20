@@ -1,7 +1,6 @@
-import { IsMongoId, IsOptional, IsString, Length, Matches } from 'class-validator';
+import { IsOptional, IsString, Length, Matches } from 'class-validator';
 import {
   charMinLength,
-  idLength,
   nameMaxLength,
   descMaxLength,
 } from 'src/config';

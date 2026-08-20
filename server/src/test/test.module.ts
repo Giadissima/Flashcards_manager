@@ -1,4 +1,3 @@
-import { Flashcard, FlashcardSchema } from 'src/flashcards/flashcards.schema';
 import { Test, TestSchema } from './test.schema';
 
 import { FlashcardsModule } from 'src/flashcards/flashcards.module';
@@ -10,9 +9,6 @@ import { TestService } from './test.service';
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Test.name, schema: TestSchema }]),
-    MongooseModule.forFeature([
-      { name: Flashcard.name, schema: FlashcardSchema },
-    ]),
     FlashcardsModule,
   ],
   providers: [TestService],

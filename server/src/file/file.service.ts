@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FlattenMaps, Model } from 'mongoose';
+import { Model } from 'mongoose';
 import { FileDocument, FileMongo } from './file.schema';
-import { ReadStream } from 'fs';
 import { Binary } from 'mongodb';
 
 @Injectable()

@@ -36,7 +36,6 @@ import { ThemeService } from '../../shared/theme/theme.service';
     NgxColorsTriggerDirective,
   ],
   templateUrl: './create-topic.component.html',
-  styleUrls: ['./create-topic.component.scss'],
 })
 export class CreateTopicComponent implements OnInit {
   topicForm!: FormGroup;

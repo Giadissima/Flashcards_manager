@@ -23,8 +23,6 @@ import { getSubjectIconUrl } from '../../subject/subject-icon.util';
   styleUrls: ['./test-runner.scss']
 })
 export class TestRunner implements OnInit {
-  testFinished = false; // TODO
-
   @ViewChild(LoadStateComponent, { static: true }) loadState!: LoadStateComponent;
 
   testId!: string;

@@ -28,7 +28,6 @@ import { RichTextEditorComponent } from '../../shared/rich-text-editor/rich-text
     SubjectIconPreviewComponent,
   ],
   templateUrl: './create-subject.component.html',
-  styleUrls: ['./create-subject.component.scss']
 })
 export class CreateSubjectComponent implements OnInit, OnDestroy {
   subjectForm!: FormGroup;

@@ -1,4 +1,3 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { RestClientService } from '../api/rest-api.service';
 
@@ -8,7 +7,7 @@ import { RestClientService } from '../api/rest-api.service';
 export class ImportExportService {
   private baseUrl = 'import-export';
 
-  constructor(private http: HttpClient, private restClient: RestClientService) {}
+  constructor(private restClient: RestClientService) {}
 
   /**
    * Esporta le flashcard. Se subject_id è fornito, esporta solo quelle di quella materia.

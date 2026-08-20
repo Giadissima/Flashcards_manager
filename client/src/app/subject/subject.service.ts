@@ -3,7 +3,6 @@ import { PaginatedResponse, SubjectFilter } from '../models/http.dto';
 import { Injectable } from '@angular/core';
 import { RestClientService } from '../api/rest-api.service';
 import { Subject } from '../models/subject.dto';
-import { baseUrlAPI } from '../../config/config';
 
 @Injectable({
   providedIn: 'root'
