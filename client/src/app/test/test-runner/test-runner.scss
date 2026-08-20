@@ -1,13 +1,3 @@
-.test-runner-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: calc(var(--spacing-unit) * 3);
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
-}
-
 .flashcard-actions {
   display: flex;
   flex-wrap: wrap;
@@ -29,54 +19,34 @@
   font-size: 0.8rem;
 }
 
+.flashcard{
+  max-width: 500px;
+  width: 100%;
+  margin-left: 15%;
+  margin-right: 15%;
+}
+
 .icon-wrapper {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  cursor: pointer;
-  border: 1px solid var(--secondary-color);
   border-radius: 50%;
-  transition: all 0.2s ease;
+  padding: 6px;
+  line-height: 0;
 
   svg {
     width: 24px;
     height: 24px;
-    fill: var(--text-color);
-  }
-
-  &:hover {
-    background-color: var(--secondary-color);
-  }
-}
-
-.selected-icon {
-  fill: var(--primary-color) !important;
-}
-
-
-#results {
-  background-color: var(--component-background);
-  padding: calc(var(--spacing-unit) * 4);
-  border-radius: var(--border-radius-lg);
-  box-shadow: var(--box-shadow-md);
-  text-align: center;
-  margin-top: calc(var(--spacing-unit) * 4);
-
-  div {
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: var(--spacing-unit);
+    fill: currentColor;
   }
 }
 
 
 .icons-wrapper {
-  position: relative;
+  position: fixed;
+  top: calc(var(--navbar-height) + var(--spacing-unit));
+  right: calc(var(--spacing-unit) * 3);
+  z-index: 1030;
   display: block;
   width: fit-content;
-  
+
   .circle-wrapper {
     display: inline-flex;
     flex-direction: column;

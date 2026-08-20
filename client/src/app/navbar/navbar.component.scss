@@ -7,7 +7,9 @@ nav {
   border-bottom: 1px solid var(--bs-btn-border-color);
   box-shadow: var(--box-shadow-sm);
   margin-bottom: 1px;
-  position: relative; // ancora il pulsante "crea card" centrato sotto i 519px
+  position: sticky; // anchors the "create card" button centered below 519px, and pins the navbar at the top on scroll
+  top: 0;
+  z-index: 1050;
 }
 
 .logo-container {
