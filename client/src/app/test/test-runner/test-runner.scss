@@ -1,3 +1,27 @@
+.test-info-box {
+  background-color: var(--accent-color);
+  color: var(--on-accent-color);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--box-shadow-md);
+  padding: calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 3);
+  text-align: center;
+  width: 100%;
+  max-width: 500px;
+  --bs-secondary-color: color-mix(in srgb, var(--on-accent-color) 75%, transparent);
+
+  .test-info-subject {
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .test-info-date,
+  .test-info-progress {
+    font-size: 0.85rem;
+  }
+}
+
 .flashcard-actions {
   display: flex;
   flex-wrap: wrap;
@@ -8,32 +32,44 @@
 }
 
 .flashcard-subject-icon {
-  width: 40px;
-  height: 40px;
+  width: 56px;
+  height: 56px;
   object-fit: cover;
   border-radius: 50%;
   flex-shrink: 0;
 }
 
 .flashcard-meta {
-  font-size: 0.8rem;
+  font-size: 1rem;
 }
 
-.flashcard{
-  max-width: 500px;
+.flashcard {
+  max-width: 700px;
   width: 100%;
-  margin-left: 15%;
-  margin-right: 15%;
+
+  .card-title {
+    font-size: 1.5rem;
+  }
+
+  .flashcard-text {
+    font-size: 1.2rem;
+    line-height: 1.6;
+  }
+
+  .flashcard-actions .btn {
+    font-size: 1.1rem;
+    padding: 0.5rem 1.1rem;
+  }
 }
 
 .icon-wrapper {
   border-radius: 50%;
-  padding: 6px;
+  padding: 8px;
   line-height: 0;
 
   svg {
-    width: 24px;
-    height: 24px;
+    width: 30px;
+    height: 30px;
     fill: currentColor;
   }
 }
@@ -61,19 +97,19 @@
   
   .pause-play-icon {
     position: absolute;
-    right: -13px;
+    right: -15px;
     bottom: 0px;
     padding: 0px;
     background: var(--primary-color);
     .material-symbols-outlined{
-      font-size: 20px;
+      font-size: 24px;
     }
   }
   
   .timer-icon{
     background: #FF9500;
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
     font-size: 11px;
     .material-symbols-outlined{
       font-size: 24px;
@@ -82,12 +118,12 @@
 
   &.timer-over-hour {
     .timer-icon {
-      width: 60px;
-      height: 60px;
+      width: 70px;
+      height: 70px;
     }
 
     .pause-play-icon {
-      right: -15px;
+      right: -17px;
     }
   }
 }

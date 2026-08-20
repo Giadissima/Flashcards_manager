@@ -13,6 +13,7 @@
   --text-color: #667085;
   --component-background: #f8f9fa;
   --on-primary-color: #000000;
+  --on-accent-color: #f8f9fa;
 }
 
 [data-theme='dark'] {
@@ -27,6 +28,7 @@
   --text-color: rgba(255, 255, 255, 0.7);
   --component-background: #1E1E1E;
   --on-primary-color: #ffffff;
+  --on-accent-color: #f8f9fa;
 }
 
 .btn-dark { // this button is trasparent and used for icons

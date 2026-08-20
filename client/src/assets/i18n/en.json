@@ -285,7 +285,9 @@
       "endTest": "End test",
       "leaveConfirmTitle": "Leave the test?",
       "leaveConfirmMessage": "Your progress will be saved, do you want to continue?",
-      "getTestError": "Unable to retrieve the test"
+      "getTestError": "Unable to retrieve the test",
+      "startedOn": "Started on",
+      "progress": "{{answered}} / {{total}} answered"
     }
   },
   "importExport": {
