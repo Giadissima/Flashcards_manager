@@ -129,12 +129,20 @@ export class TestService {
     }
   }
 
-  updateAnswer(test_id: string, question_id: string, is_correct: boolean) {
+  updateAnswer(
+    test_id: string,
+    question_id: string,
+    is_correct: boolean | undefined,
+  ) {
     if (!validateObjectIdParam(test_id) || !validateObjectIdParam(question_id))
       throw new BadRequestException('The id does not satisfy requirements');
+    const update =
+      is_correct === undefined
+        ? { $unset: { 'questions.$.is_correct': '' } }
+        : { $set: { 'questions.$.is_correct': is_correct } };
     return this.testModel.findOneAndUpdate(
       { _id: test_id, 'questions.flashcard_id': question_id },
-      { $set: { 'questions.$.is_correct': is_correct } },
+      update,
       { new: true },
     );
   }

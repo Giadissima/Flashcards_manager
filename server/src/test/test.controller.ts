@@ -62,12 +62,12 @@ export class TestController {
   updateAnswer(
     @Param('test_id') test_id: string,
     @Param('question_id') question_id: string,
-    @Query('is_correct') is_correct: string,
+    @Query('is_correct') is_correct?: string,
   ) {
     return this.testService.updateAnswer(
       test_id,
       question_id,
-      is_correct === 'true' ? true : false,
+      is_correct === undefined ? undefined : is_correct === 'true',
     );
   }
 

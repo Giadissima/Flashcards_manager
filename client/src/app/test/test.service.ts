@@ -73,8 +73,8 @@ private baseUrl = 'test';
     return this.restClient.delete<void>(this.baseUrl + '/' + id)
   }
 
-  updateAnswer(test_id: string, flashcard_id:string, is_correct: boolean): Promise<void> {
-    const queryParam = new HttpParams().set('is_correct', is_correct);
+  updateAnswer(test_id: string, flashcard_id: string, is_correct: boolean | undefined): Promise<void> {
+    const queryParam = is_correct === undefined ? new HttpParams() : new HttpParams().set('is_correct', is_correct);
     return this.restClient.patch(`${this.baseUrl}/${test_id}/answer/${flashcard_id}`, {}, queryParam);
   }
 }

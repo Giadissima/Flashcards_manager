@@ -137,8 +137,16 @@ export class TestRunner implements OnInit {
 
   setAnswer(card: Flashcard, isCorrect: boolean): void {
     if (!card._id) return;
-    this.answersMap[card._id] = isCorrect;
-    this.testService.updateAnswer(this.testId, card._id, isCorrect);
+    const wasAnswered = this.answersMap[card._id] !== undefined;
+    const newValue = this.answersMap[card._id] === isCorrect ? undefined : isCorrect;
+    if (newValue === undefined) {
+      delete this.answersMap[card._id];
+    } else {
+      this.answersMap[card._id] = newValue;
+    }
+    if (wasAnswered && newValue === undefined) this.answeredCount--;
+    if (!wasAnswered && newValue !== undefined) this.answeredCount++;
+    this.testService.updateAnswer(this.testId, card._id, newValue);
   }
 
   getCardColor(card: Flashcard): string {
