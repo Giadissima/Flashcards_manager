@@ -45,6 +45,10 @@ export class TestRunner implements OnInit {
   showLeaveConfirm = false;
   private pendingDestination: string[] = [];
 
+  subjectName = '';
+  testStartDate?: Date;
+  answeredCount = 0;
+
   constructor(
     private route: ActivatedRoute,
     private flashcardService: FlashcardService,
@@ -82,7 +86,15 @@ export class TestRunner implements OnInit {
     this.totalQuestions = count;
     if(this.elapsed_time == 0)
       this.elapsed_time = elapsed_time ?? 0;
+
+    const test = await this.testService.getById(this.testId);
+    this.testStartDate = test.createdAt;
+    this.answeredCount = test.questions.filter(q => q.is_correct !== undefined).length;
+
     await this.loadPage();
+    if (this.pageFlashcards.length > 0) {
+      this.subjectName = this.getCardSubjectName(this.pageFlashcards[0]);
+    }
   }
 
   ngOnDestroy() {
