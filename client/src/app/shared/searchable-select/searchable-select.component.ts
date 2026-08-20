@@ -28,6 +28,7 @@ export class SearchableSelectComponent {
   @Input() options: SelectOption[] = [];
   @Input() value: string | null | undefined = null;
   @Input() placeholder = 'Select...';
+  @Input() disabled = false;
   // Se valorizzata, aggiunge una prima opzione (es. "All Subjects") che azzera la selezione
   @Input() allOptionLabel: string | null = null;
   // Tempo di inattività dopo cui il testo digitato per la ricerca viene azzerato
@@ -53,6 +54,7 @@ export class SearchableSelectComponent {
   }
 
   toggle(): void {
+    if (this.disabled) return;
     this.isOpen = !this.isOpen;
   }
 

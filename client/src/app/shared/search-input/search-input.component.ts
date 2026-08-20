@@ -19,6 +19,7 @@ export class SearchInputComponent {
   @Input() value: string = '';
   @Input() placeholder = '';
   @Input() inputId = 'searchFilter';
+  @Input() disabled = false;
 
   @Output() valueChange = new EventEmitter<string>();
 

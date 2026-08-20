@@ -1,5 +1,5 @@
 import { AfterViewChecked, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Subject as RxSubject, Subscription, debounceTime } from 'rxjs';
 import { SearchableSelectComponent, SelectOption } from '../shared/searchable-select/searchable-select.component';
 import { SearchInputComponent } from '../shared/search-input/search-input.component';
 
@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 import { Flashcard } from '../models/flashcard.dto';
 import { FlashcardService } from '../flashcard/flashcard.service';
 import { KatexRendererPipe } from '../pipes/katex-renderer.pipe';
+import { LoadStateComponent } from '../shared/load-state/load-state.component';
 import Panzoom, { PanzoomObject } from '@panzoom/panzoom';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from '../models/subject.dto';
@@ -22,16 +23,18 @@ import { ModalComponent } from '../shared/modal/modal.component';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, Toast, KatexRendererPipe, SearchableSelectComponent, SearchInputComponent, TranslocoModule, ModalComponent],
+  imports: [CommonModule, Toast, KatexRendererPipe, SearchableSelectComponent, SearchInputComponent, TranslocoModule, ModalComponent, LoadStateComponent],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
 export class Home implements OnInit, AfterViewChecked, OnDestroy {
   @ViewChild('imageModalImg') imageModalImgRef?: ElementRef<HTMLImageElement>;
+  @ViewChild(LoadStateComponent, { static: true }) loadState!: LoadStateComponent;
 
   flashcards: Flashcard[] = [];
   isImageModalOpen = false;
   selectedImageUrl: string | null = null;
+  imageLoading = false;
   private panzoomInstance: PanzoomObject | null = null;
   private imageZoomNeedsInit = false;
   private readonly onImageWheel = (event: WheelEvent): void => {
@@ -55,6 +58,18 @@ export class Home implements OnInit, AfterViewChecked, OnDestroy {
   showAnswerMap: Record<string, boolean> = {};
 
   private queryParamsSubscription?: Subscription;
+  // Debounces search-box typing: each keystroke updates searchTerm immediately (so
+  // the input feels responsive) but the actual reload only fires 1s after the user
+  // stops typing - otherwise every keystroke on a slow connection locks the field.
+  private readonly searchTermChanges = new RxSubject<void>();
+  private searchTermChangesSubscription?: Subscription;
+  // true only for the very first queryParamMap emission: that's the one wrapped
+  // in app-load-state. Later ones (filter/sort/page changes) reload in place -
+  // swapping the whole page for a spinner on every filter click would be bad UX.
+  private isInitialLoad = true;
+  // true while a filter/sort/page change is reloading data; disables the filter
+  // controls so a slow response can't be overtaken by a second, out-of-order one.
+  isReloading = false;
 
   get subjectOptions(): SelectOption[] {
     return this.subjects.map((s) => ({ value: s._id!, label: s.name, iconUrl: getSubjectIconUrl(s) }));
@@ -75,14 +90,10 @@ export class Home implements OnInit, AfterViewChecked, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.subjectService
-      .getAllSubjects({
-        sortField: 'name',
-        sortDirection: 'asc',
-        skip: 0,
-        limit: 50,
-      })
-      .then((data) => (this.subjects = data.data));
+    this.searchTermChangesSubscription = this.searchTermChanges.pipe(debounceTime(1000)).subscribe(() => {
+      this.currentPage = 1;
+      this.updateQueryParams();
+    });
 
     // Sottoscrizione (non snapshot): quando si naviga verso /home mentre si è
     // già su /home (es. click sul logo), Angular riusa il componente esistente
@@ -96,9 +107,50 @@ export class Home implements OnInit, AfterViewChecked, OnDestroy {
       this.sortDirection = (qp.get('sortDirection') as 'asc' | 'desc') || 'asc';
       this.currentPage = Number(qp.get('page')) || 1;
 
-      this.loadTopicsBySubject(this.selectedSubjectId || undefined);
-      this.loadFlashcards();
+      if (this.isInitialLoad) {
+        this.isInitialLoad = false;
+        this.loadState.run(() => this.loadInitialData());
+      } else {
+        this.reloadOnFilterChange();
+      }
     });
+  }
+
+  // Errors are not handled here: app-load-state intercepts them via run() and shows the 404/error state.
+  private async loadInitialData(): Promise<void> {
+    const subjectsData = await this.subjectService.getAllSubjects({
+      sortField: 'name',
+      sortDirection: 'asc',
+      skip: 0,
+      limit: 50,
+    });
+    this.subjects = subjectsData.data;
+
+    await this.loadTopicsBySubject(this.selectedSubjectId || undefined);
+    await this.loadFlashcards();
+  }
+
+  // Used for reloads after the initial load (filter/sort/page changes, restoring a
+  // deleted card): those aren't behind app-load-state, so they need their own error
+  // surface (a toast) instead of an unhandled rejection.
+  private async reloadFlashcards(): Promise<void> {
+    try {
+      await this.loadFlashcards();
+    } catch (err) {
+      console.error('Error loading flashcards', err);
+      this.toast.show(this.transloco.translate('home.toast.flashcardsLoadError'), 'error');
+    }
+  }
+
+  // Disables the filter controls for the duration of the reload so a slow response
+  // can't be overtaken by a second, out-of-order one.
+  private async reloadOnFilterChange(): Promise<void> {
+    this.isReloading = true;
+    await Promise.all([
+      this.loadTopicsBySubject(this.selectedSubjectId || undefined),
+      this.reloadFlashcards(),
+    ]);
+    this.isReloading = false;
   }
 
   private updateQueryParams(): void {
@@ -117,21 +169,18 @@ export class Home implements OnInit, AfterViewChecked, OnDestroy {
     });
   }
 
-  loadFlashcards(): void {
-    this.flashcardsService
-      .getAll({
-        sortField: this.sortBy,
-        sortDirection: this.sortDirection,
-        skip: (this.currentPage - 1) * this.pageSize,
-        limit: this.pageSize,
-        subject_id: this.selectedSubjectId || undefined,
-        topic_id: this.selectedTopicId || undefined,
-        title: this.searchTerm || undefined,
-      })
-      .then((data) => {
-        this.flashcards = data.data;
-        this.totalCount = data.count;
-      });
+  async loadFlashcards(): Promise<void> {
+    const data = await this.flashcardsService.getAll({
+      sortField: this.sortBy,
+      sortDirection: this.sortDirection,
+      skip: (this.currentPage - 1) * this.pageSize,
+      limit: this.pageSize,
+      subject_id: this.selectedSubjectId || undefined,
+      topic_id: this.selectedTopicId || undefined,
+      title: this.searchTerm || undefined,
+    });
+    this.flashcards = data.data;
+    this.totalCount = data.count;
   }
 
   get totalPages(): number {
@@ -157,8 +206,7 @@ export class Home implements OnInit, AfterViewChecked, OnDestroy {
 
   onSearchTermChange(term: string): void {
     this.searchTerm = term;
-    this.currentPage = 1;
-    this.updateQueryParams();
+    this.searchTermChanges.next();
   }
 
   setSortBy(field: 'title' | 'createdAt'): void {
@@ -240,14 +288,28 @@ export class Home implements OnInit, AfterViewChecked, OnDestroy {
   onFlashcardTextClick(event: MouseEvent): void {
     const target = event.target as HTMLElement;
     if (target.tagName === 'IMG') {
+      this.imageLoading = true;
       this.selectedImageUrl = (target as HTMLImageElement).src;
       this.isImageModalOpen = true;
       this.imageZoomNeedsInit = true;
     }
   }
 
+  onModalImageLoaded(): void {
+    this.imageLoading = false;
+  }
+
   ngAfterViewChecked(): void {
-    if (this.imageZoomNeedsInit && this.imageModalImgRef) {
+    // Reopening the same image doesn't change the [src] binding, so the browser
+    // never fires another 'load' event - poll the native .complete flag instead,
+    // which reflects the fetch state regardless of whether src actually changed.
+    if (this.imageLoading && this.imageModalImgRef?.nativeElement.complete) {
+      this.imageLoading = false;
+    }
+
+    // Wait for the image to actually finish loading: while imageLoading is true
+    // the <img> is display:none, so panzoom would measure a zero-size element.
+    if (this.imageZoomNeedsInit && this.imageModalImgRef && !this.imageLoading) {
       this.imageZoomNeedsInit = false;
       this.initImageZoom();
     }
@@ -256,6 +318,7 @@ export class Home implements OnInit, AfterViewChecked, OnDestroy {
   ngOnDestroy(): void {
     this.destroyImageZoom();
     this.queryParamsSubscription?.unsubscribe();
+    this.searchTermChangesSubscription?.unsubscribe();
   }
 
   onImageModalClosed(): void {
@@ -322,7 +385,7 @@ export class Home implements OnInit, AfterViewChecked, OnDestroy {
     try {
       await this.flashcardsService.create(restoredCard);
       this.toast.show(this.transloco.translate('home.toast.cardRestored'), 'success');
-      this.loadFlashcards();
+      this.reloadFlashcards();
     } catch (error: any) {
       this.toast.show(this.transloco.translate('home.toast.restoreError'), 'error');
     }

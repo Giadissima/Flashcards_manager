@@ -4,6 +4,21 @@
   gap: calc(var(--spacing-unit) * 3);
 }
 
+.flashcard-grid-wrapper {
+  position: relative;
+}
+
+.flashcard-grid-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: calc(var(--spacing-unit) * 6);
+  background: color-mix(in srgb, var(--background-color) 70%, transparent);
+}
+
 .flashcard-actions {
   display: flex;
   flex-wrap: wrap;

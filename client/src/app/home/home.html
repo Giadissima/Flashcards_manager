@@ -1,3 +1,4 @@
+<app-load-state errorMessageKey="home.toast.flashcardsLoadError">
 <div class="container" *transloco="let t">
   <div class="filter-bar mb-4">
     <div class="row gy-2 gx-3 align-items-center">
@@ -8,6 +9,7 @@
           [value]="selectedSubjectId"
           [allOptionLabel]="t('common.allSubjects')"
           [placeholder]="t('common.allSubjects')"
+          [disabled]="isReloading"
           (valueChange)="onSubjectSelected($event)"
         ></app-searchable-select>
       </div>
@@ -18,6 +20,7 @@
           [value]="selectedTopicId"
           [allOptionLabel]="t('common.allTopics')"
           [placeholder]="t('common.allTopics')"
+          [disabled]="isReloading"
           (valueChange)="onTopicSelected($event)"
         ></app-searchable-select>
       </div>
@@ -25,13 +28,16 @@
         <app-search-input
           [value]="searchTerm"
           [placeholder]="t('home.searchPlaceholder')"
+          [disabled]="isReloading"
           (valueChange)="onSearchTermChange($event)"
         ></app-search-input>
       </div>
       <div class="col-auto">
         <div class="btn-group" role="group">
-          <button type="button" class="btn btn-outline-primary border-bootstrap-btn-custom" (click)="setSortBy('title')"
-            [class.active]="sortBy === 'title'">
+          <button type="button" class="btn" (click)="setSortBy('title')"
+            [class.btn-primary]="sortBy === 'title' && !isReloading" [class.btn-outline-primary]="sortBy !== 'title' && !isReloading"
+            [class.btn-secondary]="sortBy === 'title' && isReloading" [class.btn-outline-secondary]="sortBy !== 'title' && isReloading"
+            [disabled]="isReloading">
             {{ 'home.sortName' | transloco }}
             @if (sortBy === 'title') {
             @if (sortDirection === 'desc') {
@@ -47,8 +53,10 @@
             }
             }
           </button>
-          <button type="button" class="btn btn-outline-primary border-bootstrap-btn-custom"
-            (click)="setSortBy('createdAt')" [class.active]="sortBy === 'createdAt'">
+          <button type="button" class="btn" (click)="setSortBy('createdAt')"
+            [class.btn-primary]="sortBy === 'createdAt' && !isReloading" [class.btn-outline-primary]="sortBy !== 'createdAt' && !isReloading"
+            [class.btn-secondary]="sortBy === 'createdAt' && isReloading" [class.btn-outline-secondary]="sortBy !== 'createdAt' && isReloading"
+            [disabled]="isReloading">
             {{ 'home.sortDate' | transloco }}
             @if (sortBy === 'createdAt') {
             @if (sortDirection === 'desc') {
@@ -69,7 +77,15 @@
     </div>
   </div>
 
-  <div class="flashcard-grid">
+  <div class="flashcard-grid-wrapper">
+    @if (isReloading) {
+    <div class="flashcard-grid-overlay">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">{{ 'common.loading' | transloco }}</span>
+      </div>
+    </div>
+    }
+    <div class="flashcard-grid">
     @for (card of flashcards; track card._id) {
     <div class="card flashcard flashcard-topic-color" [style.border-top-color]="getCardColor(card)">
       <div class="flashcard-title d-flex align-items-center gap-2">
@@ -110,14 +126,16 @@
       </div>
     </div>
     }
+    </div>
   </div>
 
   <div class="d-flex justify-content-between align-items-center mt-4">
-    <button type="button" class="btn" (click)="previousPage()" [disabled]="currentPage === 1">{{ 'common.previous' | transloco }}</button>
+    <button type="button" class="btn" (click)="previousPage()" [disabled]="currentPage === 1 || isReloading">{{ 'common.previous' | transloco }}</button>
     <span>{{ 'common.pageOf' | transloco:{ current: currentPage, total: totalPages } }}</span>
-    <button type="button" class="btn" (click)="nextPage()" [disabled]="currentPage >= totalPages">{{ 'common.next' | transloco }}</button>
+    <button type="button" class="btn" (click)="nextPage()" [disabled]="currentPage >= totalPages || isReloading">{{ 'common.next' | transloco }}</button>
   </div>
 </div>
+</app-load-state>
 
 <app-modal
   [(isOpen)]="isImageModalOpen"
@@ -126,7 +144,15 @@
   (closed)="onImageModalClosed()"
 >
   @if (selectedImageUrl) {
-  <img #imageModalImg [src]="selectedImageUrl" alt="" class="image-modal-img">
+  @if (imageLoading) {
+  <div class="image-modal-loading">
+    <div class="spinner-border text-light" role="status">
+      <span class="visually-hidden">{{ 'common.loading' | transloco }}</span>
+    </div>
+  </div>
+  }
+  <img #imageModalImg [src]="selectedImageUrl" alt="" class="image-modal-img" [class.image-modal-img-loading]="imageLoading"
+    (load)="onModalImageLoaded()" (error)="onModalImageLoaded()">
   <div class="image-modal-zoom-controls">
     <button type="button" class="btn btn-light btn-sm" (click)="zoomOut()" [attr.aria-label]="'home.zoomOut' | transloco">
       <i class="bi bi-zoom-out"></i>

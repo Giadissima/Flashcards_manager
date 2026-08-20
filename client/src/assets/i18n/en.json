@@ -75,7 +75,8 @@
       "restoreError": "Error restoring card",
       "cardCopied": "Card copied successfully",
       "copyError": "Copy error",
-      "topicsLoadError": "Failed to load topics for the selected subject"
+      "topicsLoadError": "Failed to load topics for the selected subject",
+      "flashcardsLoadError": "Unable to load the flashcards"
     }
   },
   "editor": {

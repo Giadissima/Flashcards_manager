@@ -75,7 +75,8 @@
       "restoreError": "Errore durante il ripristino della flashcard",
       "cardCopied": "Flashcard copiata con successo",
       "copyError": "Errore durante la copia",
-      "topicsLoadError": "Impossibile caricare gli argomenti per la materia selezionata"
+      "topicsLoadError": "Impossibile caricare gli argomenti per la materia selezionata",
+      "flashcardsLoadError": "Non è stato possibile caricare le flashcard"
     }
   },
   "editor": {
