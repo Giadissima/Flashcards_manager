@@ -1,11 +1,12 @@
 import { ActivatedRoute, Router } from '@angular/router';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { CommonModule } from '@angular/common';
 import { Editor } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
 import { MathExtension } from '@aarkue/tiptap-math-extension';
+import { LoadStateComponent } from '../../shared/load-state/load-state.component';
 import { TiptapEditorDirective } from 'ngx-tiptap';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../subject.service';
@@ -26,11 +27,14 @@ import { SubjectIconPreviewComponent } from '../subject-icon-preview/subject-ico
     TiptapEditorDirective,
     TranslocoModule,
     SubjectIconPreviewComponent,
+    LoadStateComponent,
   ],
   templateUrl: './edit-subject.component.html',
   styleUrls: ['./edit-subject.component.scss']
 })
 export class EditSubjectComponent implements OnInit, OnDestroy {
+  @ViewChild(LoadStateComponent, { static: true }) loadState!: LoadStateComponent;
+
   editForm!: FormGroup;
   subjectId?: string;
   subject?: Subject;
@@ -80,7 +84,9 @@ export class EditSubjectComponent implements OnInit, OnDestroy {
       const id = params.get('id');
       if (id) {
         this.subjectId = id;
-        this.loadSubjectData(id);
+        this.loadState.run(() => this.loadSubjectData(id));
+      } else {
+        this.router.navigate(['/not-found']);
       }
     });
   }
@@ -90,16 +96,13 @@ export class EditSubjectComponent implements OnInit, OnDestroy {
     this.revokePreviewUrl();
   }
 
+  // Errors are not handled here: app-load-state intercepts them via run() and shows the 404/error state.
   async loadSubjectData(id: string): Promise<void> {
-    try {
-      this.subject = await this.subjectService.getSubjectById(id);
-      this.editForm.patchValue({ ...this.subject, color: this.subject.color ?? defaultSubjectIconColor });
-      this.descEditor.commands.setContent(this.subject.desc ?? '');
-      this.descLength = this.descEditor.getText().length;
-      this.previewUrl = this.subject.icon ? getSubjectIconUrl(this.subject) : null;
-    } catch (error) {
-      this.toastService.show(this.transloco.translate('subject.toast.loadOneError'), 'error');
-    }
+    this.subject = await this.subjectService.getSubjectById(id);
+    this.editForm.patchValue({ ...this.subject, color: this.subject.color ?? defaultSubjectIconColor });
+    this.descEditor.commands.setContent(this.subject.desc ?? '');
+    this.descLength = this.descEditor.getText().length;
+    this.previewUrl = this.subject.icon ? getSubjectIconUrl(this.subject) : null;
   }
 
   onFileSelected(event: Event): void {

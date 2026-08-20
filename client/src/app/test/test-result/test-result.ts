@@ -1,11 +1,12 @@
 import { CommonModule, NgClass } from '@angular/common';
 
-import { ActivatedRoute, RouterLink } from '@angular/router';
-import { Component } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Component, ViewChild } from '@angular/core';
 import { DurationExtendedFormatPipe } from '../../../pipes/duration.extended.pipe';
 import { Flashcard } from '../../models/flashcard.dto';
 import { FlashcardService } from '../../flashcard/flashcard.service';
 import { KatexRendererPipe } from '../../pipes/katex-renderer.pipe';
+import { LoadStateComponent } from '../../shared/load-state/load-state.component';
 import { Test } from '../../models/test.dto';
 import { TestService } from '../test.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
@@ -13,11 +14,13 @@ import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 @Component({
   selector: 'app-test-result',
   standalone: true,
-  imports: [CommonModule, DurationExtendedFormatPipe, NgClass, KatexRendererPipe, RouterLink, TranslocoModule],
+  imports: [CommonModule, DurationExtendedFormatPipe, NgClass, KatexRendererPipe, RouterLink, TranslocoModule, LoadStateComponent],
   templateUrl: './test-result.html',
   styleUrl: './test-result.scss'
 })
 export class TestResult {
+  @ViewChild(LoadStateComponent, { static: true }) loadState!: LoadStateComponent;
+
   testId!: string;
   test!: Test;
   stats = { correct: 0, wrong: 0, blank: 0 };
@@ -37,7 +40,8 @@ export class TestResult {
     private route: ActivatedRoute,
     private testService: TestService,
     private flashcardService: FlashcardService,
-    private transloco: TranslocoService
+    private transloco: TranslocoService,
+    private router: Router
   ){}
 
   ngOnInit(): void {
@@ -45,21 +49,16 @@ export class TestResult {
         const id = params.get('test_id');
         if(id){
           this.testId = id;
-          this.viewTest();
+          this.loadState.run(() => this.viewTest());
         }else {
-          alert(this.transloco.translate('test.result.getTestError'));
+          this.router.navigate(['/not-found'], { queryParams: { message: 'common.error.testNotFound' } });
         }
       });
     }
 
-  async viewTest() {
-    //get test
-    if(!this.testId) return;
+  // Errors are not handled here: app-load-state intercepts them via run() and shows the 404/error state.
+  async viewTest(): Promise<void> {
     this.test = await this.testService.getById(this.testId);
-    if(!this.test) {
-      alert(this.transloco.translate('test.result.getTestError'));
-      return;
-    }
 
     // setup html variables
     this.stats = this.test.questions.reduce(

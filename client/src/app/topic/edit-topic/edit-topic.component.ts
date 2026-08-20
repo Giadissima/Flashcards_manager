@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -8,6 +8,7 @@ import { ToastService } from '../../toast/toast.service';
 import { SubjectService } from '../../subject/subject.service';
 import { Subject } from '../../models/subject.dto';
 
+import { LoadStateComponent } from '../../shared/load-state/load-state.component';
 import { Toast } from '../../toast/toast';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { SearchableSelectComponent, SelectOption } from '../../shared/searchable-select/searchable-select.component';
@@ -18,11 +19,13 @@ import { ThemeService } from '../../shared/theme/theme.service';
 @Component({
   selector: 'app-edit-topic',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, Toast, TranslocoModule, SearchableSelectComponent, NgxColorsComponent, NgxColorsTriggerDirective],
+  imports: [ReactiveFormsModule, CommonModule, Toast, TranslocoModule, SearchableSelectComponent, NgxColorsComponent, NgxColorsTriggerDirective, LoadStateComponent],
   templateUrl: './edit-topic.component.html',
   styleUrls: ['./edit-topic.component.scss']
 })
 export class EditTopicComponent implements OnInit {
+  @ViewChild(LoadStateComponent, { static: true }) loadState!: LoadStateComponent;
+
   editForm!: FormGroup;
   topicId?: string;
   subjects: Subject[] = [];
@@ -57,7 +60,9 @@ export class EditTopicComponent implements OnInit {
       const id = params.get('id');
       if (id) {
         this.topicId = id;
-        this.loadTopicData(id);
+        this.loadState.run(() => this.loadTopicData(id));
+      } else {
+        this.router.navigate(['/not-found']);
       }
     });
     this.loadSubjects();
@@ -73,18 +78,14 @@ export class EditTopicComponent implements OnInit {
     }
   }
 
+  // Errors are not handled here: app-load-state intercepts them via run() and shows the 404/error state.
   async loadTopicData(id: string): Promise<void> {
-    try {
-      const topic = await this.topicService.getTopicById(id);
-      console.dir(topic);
-      this.editForm.patchValue({
-        name: topic.name,
-        color: topic.color,
-        subject_id: typeof topic.subject_id === 'string' ? '' : topic.subject_id._id
-      });
-    } catch (error) {
-      this.toastService.show(this.transloco.translate('topic.toast.loadError'), 'error');
-    }
+    const topic = await this.topicService.getTopicById(id);
+    this.editForm.patchValue({
+      name: topic.name,
+      color: topic.color,
+      subject_id: typeof topic.subject_id === 'string' ? '' : topic.subject_id._id
+    });
   }
 
   async updateTopic(): Promise<void> {

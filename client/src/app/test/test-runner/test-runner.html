@@ -1,4 +1,5 @@
-<div class="container mt-4" *transloco="let t">
+<div class="container mt-4">
+  <app-load-state errorMessageKey="test.runner.getTestError" notFoundMessageKey="common.error.testNotFound">
   <div class="icons-wrapper" [class.timer-over-hour]="elapsed_time >= 3600">
     <div class="circle-wrapper timer-icon">
       <span class="material-symbols-outlined">timer</span>
@@ -67,6 +68,7 @@
     <button type="button" class="btn btn-primary" id="finishTest" (click)="finishTest()">{{ 'test.runner.endTest' |
       transloco }}</button>
   </div>
+  </app-load-state>
 </div>
 
 <ng-container *transloco="let t">

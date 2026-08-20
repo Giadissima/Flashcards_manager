@@ -1,5 +1,5 @@
 import { ActivatedRoute, Router } from '@angular/router';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Subscription, interval } from 'rxjs';
 
 import { CommonModule } from '@angular/common';
@@ -8,6 +8,7 @@ import { DurationPipe } from '../../../pipes/duration.pipe';
 import { Flashcard } from '../../models/flashcard.dto';
 import { FlashcardService } from '../../flashcard/flashcard.service';
 import { KatexRendererPipe } from '../../pipes/katex-renderer.pipe';
+import { LoadStateComponent } from '../../shared/load-state/load-state.component';
 import { Subject } from '../../models/subject.dto';
 import { Topic } from '../../models/topic.dto';
 import { TestService } from '../test.service';
@@ -17,12 +18,14 @@ import { getSubjectIconUrl } from '../../subject/subject-icon.util';
 @Component({
   selector: 'app-test-runner',
   standalone: true,
-  imports: [CommonModule, DurationPipe, KatexRendererPipe, ConfirmDialogComponent, TranslocoModule],
+  imports: [CommonModule, DurationPipe, KatexRendererPipe, ConfirmDialogComponent, TranslocoModule, LoadStateComponent],
   templateUrl: './test-runner.html',
   styleUrls: ['./test-runner.scss']
 })
 export class TestRunner implements OnInit {
   testFinished = false; // TODO
+
+  @ViewChild(LoadStateComponent, { static: true }) loadState!: LoadStateComponent;
 
   testId!: string;
   elapsed_time: number = 0; // in secondi
@@ -62,11 +65,9 @@ export class TestRunner implements OnInit {
       const id = params.get('test_id');
       if(id){
         this.testId = id;
-        this.getTest()
-        // imposto un timer da aggiornare ogni 30 secondi
-        this.timerSub = interval(1000).subscribe(() => this.updateTimer());
+        this.loadState.run(() => this.getTest());
       }else {
-        alert(this.transloco.translate('test.runner.getTestError'));
+        this.router.navigate(['/not-found'], { queryParams: { message: 'common.error.testNotFound' } });
       }
     });
   }
@@ -79,7 +80,8 @@ export class TestRunner implements OnInit {
         .catch(err => console.error('Errore aggiornamento timer', err));;
   }
 
-  async getTest() {
+  // Errors are not handled here: app-load-state intercepts them via run() and shows the 404/error state.
+  async getTest(): Promise<void> {
     if(!this.testId) return;
 
     const { count, elapsed_time } = await this.testService.getQuestionsCount(this.testId);
@@ -95,6 +97,9 @@ export class TestRunner implements OnInit {
     if (this.pageFlashcards.length > 0) {
       this.subjectName = this.getCardSubjectName(this.pageFlashcards[0]);
     }
+
+    // timer starts only now: the test data is actually available
+    this.timerSub = interval(1000).subscribe(() => this.updateTimer());
   }
 
   ngOnDestroy() {
