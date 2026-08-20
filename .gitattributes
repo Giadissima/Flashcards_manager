@@ -1,0 +1,11 @@
+# Line endings: LF both in the repository and in the working tree, on every OS.
+#
+# The project is built inside Linux containers (node:22, nginx:alpine) and
+# Prettier defaults to endOfLine "lf", so CRLF only ever produced diff noise
+# and lint errors. Declaring it here means the rule travels with the repo
+# instead of depending on each machine's core.autocrlf setting.
+* text=auto eol=lf
+
+# Binary assets: never converted, never diffed as text.
+*.png binary
+*.ico binary
