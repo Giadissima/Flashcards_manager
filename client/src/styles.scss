@@ -297,7 +297,7 @@ input:-webkit-autofill:active {
 /* Outline Button Refinement */
 .btn-outline-primary {
   /* Default State */
-  --bs-btn-color: var(--header-color);
+  --bs-btn-color: var(--primary-color);
   --bs-btn-border-color: var(--primary-color);
 
   /* Hover State */
