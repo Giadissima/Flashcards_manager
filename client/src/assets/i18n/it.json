@@ -42,9 +42,21 @@
     "allTopics": "Tutti gli Argomenti",
     "chooseSubject": "Scegli una materia",
     "chooseTopic": "Scegli un argomento",
-    "error": "Errore",
     "loading": "Caricamento...",
-    "testNotFoundError": "Non è stato possibile recuperare il test"
+    "retry": "Riprova",
+    "backHome": "Torna alla Home",
+    "error": {
+      "load": "Non è stato possibile caricare i dati",
+      "offline": "Nessuna connessione al server. Controlla la tua rete e riprova.",
+      "server": "Il server non è al momento raggiungibile. Riprova tra qualche istante.",
+      "notFound": "La risorsa richiesta non esiste",
+      "testNotFound": "Non è stato possibile recuperare il test"
+    }
+  },
+  "notFound": {
+    "title": "404",
+    "message": "La pagina che stai cercando non esiste.",
+    "backHome": "Torna alla Home"
   },
   "home": {
     "searchPlaceholder": "Cerca flashcard...",

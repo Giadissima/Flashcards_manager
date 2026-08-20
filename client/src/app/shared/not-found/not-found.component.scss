@@ -1,0 +1,17 @@
+.not-found-container {
+  min-height: calc(100vh - var(--navbar-height));
+  padding: calc(var(--spacing-unit) * 3);
+  gap: var(--spacing-unit);
+}
+
+.not-found-code {
+  font-size: 6rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  line-height: 1;
+}
+
+.not-found-message {
+  font-size: 1.1rem;
+  margin-bottom: calc(var(--spacing-unit) * 2);
+}

@@ -7,6 +7,7 @@ import { EditTopicComponent } from './topic/edit-topic/edit-topic.component';
 import { Home } from './home/home';
 import { ManageSubjectsComponent } from './subject/manage-subjects/manage-subjects.component';
 import { ManageTopicsComponent } from './topic/manage-topics/manage-topics.component';
+import { NotFoundComponent } from './shared/not-found/not-found.component';
 import { Routes } from '@angular/router';
 import { SetupTest } from './test/setup-test/setup-test';
 import { TestHistory } from './test/test-history/test-history';
@@ -28,4 +29,6 @@ export const routes: Routes = [
   { path: 'manage-subjects', component: ManageSubjectsComponent },
   { path: 'create-subject', component: CreateSubjectComponent },
   { path: 'edit-subject/:id', component: EditSubjectComponent },
+  { path: 'not-found', component: NotFoundComponent },
+  { path: '**', component: NotFoundComponent },
 ];

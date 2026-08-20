@@ -1,0 +1,25 @@
+@switch (state) {
+  @case ('loading') {
+  <div class="load-state-spinner text-center mt-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">{{ 'common.loading' | transloco }}</span>
+    </div>
+  </div>
+  }
+  @case ('error') {
+  <div class="load-state-error text-center mt-5">
+    <p class="text-muted mb-3">{{ displayedErrorKey | transloco }}</p>
+    <div class="d-flex justify-content-center gap-2">
+      @if (showBackHome) {
+      <button type="button" class="btn btn-outline-primary" (click)="goHome()">{{ 'common.backHome' | transloco }}</button>
+      }
+      @if (showRetry) {
+      <button type="button" class="btn btn-primary" (click)="retry()">{{ 'common.retry' | transloco }}</button>
+      }
+    </div>
+  </div>
+  }
+  @case ('ready') {
+    <ng-content></ng-content>
+  }
+}
