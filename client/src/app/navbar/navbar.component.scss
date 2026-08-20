@@ -72,19 +72,24 @@ nav {
 }
 
 .hamburger-btn {
-  display: none;
+  display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   gap: 5px;
-  width: 36px;
+  width: 0;
   height: 36px;
+  margin-left: calc(-1 * var(--spacing-unit) * 2); // annulla il gap del flex container quando è collassato
   padding: 0;
   border: none;
   background: none;
   cursor: pointer;
   border-radius: var(--border-radius-sm);
   flex-shrink: 0;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: width 0.25s ease, margin-left 0.25s ease, opacity 0.2s ease;
 }
 
 .hamburger-btn:hover {
@@ -118,12 +123,15 @@ nav {
 
 // Sotto i 600px: il menu centrale collassa in una sidebar laterale off-canvas,
 // apribile/chiudibile con il bottone hamburger (che diventa una X quando aperta).
-@media (max-width: 799px) {
+@media (max-width: 840px) {
   .hamburger-btn {
-    display: flex;
+    width: 36px;
+    margin-left: 0;
+    opacity: 1;
+    pointer-events: auto;
   }
 
-@media (max-width: 519px) {
+@media (max-width: 550px) {
   .project-name {
     display: none;
   }
