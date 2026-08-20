@@ -3,7 +3,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 export type TestDocument = Test & Document;
 
-@Schema({ _id: false }) // disabilita _id automatico per subdocumento
+@Schema({ _id: false }) // subdocument: no automatic _id
 export class Question {
   @Prop({ type: Types.ObjectId, ref: 'Flashcard', required: true })
   flashcard_id: Types.ObjectId;

@@ -32,5 +32,8 @@ export class Flashcard {
   })
   subject_id: mongoose.Types.ObjectId;
 }
-// ! exploit: il client potrebbe decidere di fare una flashcard appartenente a un gruppo e una materia non collegate modificando a mano la richiesta, dato che non ho messo controlli a riguardo. Non ce li metterò nemmeno perché non ne ho voglia, il mio progetto è un progetto semplice per studiarci sopra, se però sentite la necessità di modificarlo fatemi pure una pull request!
+// ! known gap: by editing the request by hand a client can create a flashcard
+// whose topic and subject are not related to each other, since nothing checks
+// that. It is left as is on purpose - this is a small project to study on - but
+// pull requests adding the check are welcome!
 export const FlashcardSchema = SchemaFactory.createForClass(Flashcard);

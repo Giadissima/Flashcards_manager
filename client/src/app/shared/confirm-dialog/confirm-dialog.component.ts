@@ -4,8 +4,8 @@ import { CommonModule } from '@angular/common';
 import { ModalComponent } from '../modal/modal.component';
 
 /**
- * Dialog di conferma generico, costruito sopra ModalComponent per restare
- * coerente con gli altri modali dell'app.
+ * Generic confirmation dialog, built on top of ModalComponent so it stays
+ * consistent with the other modals of the app.
  */
 @Component({
   selector: 'app-confirm-dialog',

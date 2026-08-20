@@ -7,15 +7,15 @@ export interface SelectOption {
   value: string;
   label: string;
   iconUrl?: string;
-  // alternativa a iconUrl per opzioni senza immagine ma con un colore
-  // associato (es. i topic), mostrato come pallino invece dell'icona
+  // Alternative to iconUrl for options with no image but an associated color
+  // (topics, for instance): rendered as a dot instead of the icon.
   color?: string;
 }
 
 /**
- * Dropdown custom riusabile al posto di un <select> nativo: click per aprire/chiudere,
- * click fuori per chiudere, e ricerca digitando (type-ahead) che sposta il focus
- * sull'opzione corrispondente senza selezionarla, per poter affinare il testo.
+ * Reusable custom dropdown replacing a native <select>: click to open/close,
+ * click outside to close, and type-ahead search that moves the focus onto the
+ * matching option without selecting it, so the text can still be refined.
  */
 @Component({
   selector: 'app-searchable-select',
@@ -29,14 +29,14 @@ export class SearchableSelectComponent {
   @Input() value: string | null | undefined = null;
   @Input() placeholder = 'Select...';
   @Input() disabled = false;
-  // Se valorizzata, aggiunge una prima opzione (es. "All Subjects") che azzera la selezione
+  // When set, adds a first option (e.g. "All Subjects") that clears the selection
   @Input() allOptionLabel: string | null = null;
-  // Tempo di inattività dopo cui il testo digitato per la ricerca viene azzerato
+  // Idle time after which the typed search text is discarded
   @Input() typeaheadDelayMs = 1000;
 
   @Output() valueChange = new EventEmitter<string | null | undefined>();
-  // Emesso quando il pulsante perde il focus: serve al form ospitante per marcare
-  // il controllo come touched, dato che questo componente non è un ControlValueAccessor
+  // Emitted when the button loses focus: the hosting form needs it to mark the
+  // control as touched, since this component is not a ControlValueAccessor
   @Output() blurred = new EventEmitter<void>();
 
   @ViewChild('dropdownContent') dropdownContent?: ElementRef<HTMLElement>;
@@ -70,7 +70,7 @@ export class SearchableSelectComponent {
 
   onKeydown(event: KeyboardEvent): void {
     if (!this.isOpen) return;
-    // Accumula solo caratteri singoli stampabili (ignora frecce, invio, tab, scorciatoie...)
+    // Only accumulate single printable characters (skip arrows, enter, tab, shortcuts...)
     if (event.key.length !== 1 || event.ctrlKey || event.metaKey || event.altKey) {
       return;
     }
@@ -83,8 +83,8 @@ export class SearchableSelectComponent {
     this.focusMatchingOption();
   }
 
-  // Sposta il focus sulla prima opzione il cui nome inizia con il testo digitato,
-  // senza selezionarla: permette di continuare a digitare per affinare la ricerca.
+  // Moves the focus to the first option whose label starts with the typed text,
+  // without selecting it, so the user can keep typing to refine the search.
   private focusMatchingOption(): void {
     if (!this.dropdownContent || !this.typeaheadBuffer) return;
 

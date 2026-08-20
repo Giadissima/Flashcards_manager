@@ -1,9 +1,9 @@
 import { Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-// Deve combaciare con la durata delle animazioni "-out" in modal.component.scss:
-// il modale resta nel DOM (display:block) fino allo scadere di questo timer,
-// altrimenti nascondere subito l'elemento interromperebbe l'animazione a metà.
+// Must match the duration of the "-out" animations in modal.component.scss: the
+// modal stays in the DOM (display:block) until this timer expires, otherwise
+// hiding the element right away would cut the animation in half.
 const CLOSE_ANIMATION_MS = 200;
 
 @Component({
@@ -24,16 +24,16 @@ export class ModalComponent {
   @Output() isOpenChange = new EventEmitter<boolean>();
   @Output() closed = new EventEmitter<void>();
 
-  // true finché il modale è nel DOM, anche durante l'animazione di chiusura
+  // true while the modal is in the DOM, closing animation included
   visible = false;
   closing = false;
 
   private _isOpen = false;
   private closeTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
-  // Setter invece di un semplice campo: sia il binding [isOpen] del parent sia
-  // la chiamata interna this.isOpen = false dentro close() devono passare dallo
-  // stesso punto per far scattare l'animazione di apertura/chiusura in ogni caso.
+  // A setter rather than a plain field: both the parent's [isOpen] binding and
+  // the internal this.isOpen = false inside close() have to go through the same
+  // place, so the open/close animation fires in either case.
   @Input()
   set isOpen(value: boolean) {
     if (value === this._isOpen) return;

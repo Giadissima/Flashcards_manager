@@ -10,8 +10,8 @@ export class ImportExportService {
   constructor(private restClient: RestClientService) {}
 
   /**
-   * Esporta le flashcard. Se subject_id è fornito, esporta solo quelle di quella materia.
-   * Ritorna un Promise che si risolve in un Blob (il file JSON).
+   * Exports the flashcards as a zip. When subject_id is given, only the
+   * flashcards of that subject are exported.
    */
   export(subject_id?: string): Promise<Blob> {
     return this.restClient.get<Blob>(
@@ -22,8 +22,8 @@ export class ImportExportService {
   }
 
   /**
-   * Importa flashcard da un file JSON.
-   * @param file Il file da caricare.
+   * Imports flashcards from a previously exported json or zip file.
+   * @param file the archive to upload.
    */
   import(file: File): Promise<{ imported: number; skipped: number }> {
     const formData = new FormData();

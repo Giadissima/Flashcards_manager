@@ -14,12 +14,12 @@ export class Subject {
   name: string;
 
   @Prop({ required: false })
-  icon?: string; // TODO non deve essere una stringa!
+  icon?: string; // TODO it should not be a plain string
 
   @Prop({ required: false })
   desc?: string;
 
-  // colore di sfondo dell'icona SVG di default, usato quando icon non è impostato
+  // background color of the default SVG icon, used when no icon file is set
   @Prop({ required: false })
   color?: string;
 }

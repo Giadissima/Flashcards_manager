@@ -3,28 +3,28 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import katex from 'katex';
 
 /**
- * Regex per trovare $$block$$ e $inline$.
- * Gruppo 1 per il block math, gruppo 2 per l'inline math.
- * Il negative lookbehind `(?<!\\)` evita di agganciare i dollari escapati.
+ * Matches $$block$$ and $inline$.
+ * Group 1 is the block math, group 2 the inline math.
+ * The negative lookbehind `(?<!\\)` skips escaped dollar signs.
  */
 const MATH_REGEX = /(?<!\\)\$\$(.*?)(?<!\\)\$\$|(?<!\\)\$(.*?)(?<!\\)\$/gs;
 
 /**
- * Delimitatore dei segnaposto. Deve restare in ASCII puro e senza `&`, `<`, `>`:
- * il sanitizer di Angular riscrive in entità numeriche tutto ciò che cade fuori
- * dall'intervallo `#`-`~`, quindi un carattere "esotico" non sopravvivrebbe al
- * round-trip. Solo lettere e trattini: passa inalterato come nodo di testo.
+ * Placeholder delimiter. It has to stay pure ASCII and avoid `&`, `<`, `>`:
+ * Angular's sanitizer rewrites anything outside the `#`-`~` range into numeric
+ * entities, so an "exotic" character would not survive the round-trip. Letters
+ * and dashes only: it goes through untouched, as a text node.
  */
 const PLACEHOLDER_MARK = 'katex-placeholder-6f3a1c';
 
-/** Entità che l'editor introduce nell'HTML e che KaTeX deve ricevere decodificate. */
+/** Entities the editor puts in the HTML that KaTeX must receive decoded. */
 const HTML_ENTITIES: [RegExp, string][] = [
   [/&lt;/g, '<'],
   [/&gt;/g, '>'],
   [/&quot;/g, '"'],
   [/&#0*39;|&#x0*27;/gi, "'"],
   [/&nbsp;/g, ' '],
-  // &amp; per ultimo, altrimenti riespanderebbe le entità decodificate sopra
+  // &amp; last, otherwise it would re-expand the entities decoded above
   [/&amp;/g, '&'],
 ];
 
@@ -40,13 +40,14 @@ export class KatexRendererPipe implements PipeTransform {
       return '';
     }
 
-    // Il sanitizer che Angular applica a [innerHTML] cancella tutti gli attributi
-    // `style`, ma l'intero layout di KaTeX (altezze delle vlist, `top` di apici e
-    // pedici, margini delle mspace) vive proprio lì: passargli la formula già
-    // renderizzata la appiattirebbe. Quindi la si mette da parte dietro un
-    // segnaposto, si sanitizza il contenuto salvato — l'unica parte che arriva dal
-    // database e va ripulita — e solo dopo si reinnesta l'output di KaTeX, che è
-    // generato qui e non contiene HTML dell'utente.
+    // The sanitizer Angular applies to [innerHTML] strips every `style`
+    // attribute, but KaTeX's whole layout (vlist heights, `top` of superscripts
+    // and subscripts, mspace margins) lives exactly there: handing it the
+    // already-rendered formula would flatten it. So the formula is parked behind
+    // a placeholder, the stored content is sanitized - that is the only part
+    // coming from the database and in need of a clean-up - and only afterwards
+    // the KaTeX output is grafted back in, since it is generated here and
+    // contains no user HTML.
     const formulas: string[] = [];
     const withPlaceholders = value.replace(
       MATH_REGEX,
@@ -68,17 +69,16 @@ export class KatexRendererPipe implements PipeTransform {
 
   private renderMath(match: string, blockMathContent?: string, inlineMathContent?: string): string {
     const latex = blockMathContent || inlineMathContent || '';
-    const displayMode = !!blockMathContent; // true per il block math, false per l'inline
+    const displayMode = !!blockMathContent; // true for block math, false for inline
 
     try {
       return katex.renderToString(this.decodeEntities(latex), {
-        throwOnError: false, // Non solleva errori, rende il testo originale
+        throwOnError: false, // never throws: renders the original text instead
         displayMode,
       });
     } catch (e) {
       console.error('KaTeX rendering error for:', latex, e);
-      // Se il rendering fallisce, restituisce l'espressione LaTeX originale
-      // con i suoi delimitatori
+      // If rendering fails, give back the original LaTeX with its delimiters
       return match;
     }
   }

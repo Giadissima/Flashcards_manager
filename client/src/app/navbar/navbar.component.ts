@@ -18,10 +18,11 @@ type NavbarDropdown = 'topics' | 'subjects' | 'test';
 export class NavbarComponent {
   isSettingsOpen = false;
   isImportExportOpen = false;
-  openDropdown: NavbarDropdown | null = null; // serve per dire se è stato fatto un click delle selezioni "topics", "subject",...
+  // Which of the "topics" / "subjects" / "test" menus is currently open
+  openDropdown: NavbarDropdown | null = null;
   isMobileMenuOpen = false;
-  // disabilita temporaneamente la transizione della sidebar mentre si ridimensiona la finestra,
-  // altrimenti attraversare il breakpoint mobile la fa "lampeggiare" aperta un istante
+  // Temporarily disables the sidebar transition while the window is resized:
+  // crossing the mobile breakpoint would otherwise make it flash open for a moment
   isResizing = false;
   private resizeTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
@@ -46,11 +47,11 @@ export class NavbarComponent {
     }
   }
 
-  // inverte lo stato (chiuso o aperto) del menù hamburger fatto per i dispositivi mobile
+  // Toggles the hamburger menu used on mobile devices
   toggleMobileMenu(): void {
     this.isMobileMenuOpen = !this.isMobileMenuOpen;
     if (!this.isMobileMenuOpen) {
-      this.openDropdown = null; // azzera le scelte fatte sulle dropdown
+      this.openDropdown = null; // also collapse any open dropdown
     }
   }
 
@@ -58,8 +59,8 @@ export class NavbarComponent {
     this.isMobileMenuOpen = false;
     this.openDropdown = null;
   }
-  
-  // se è stata cliccata una route, naviga a quella pagine chiudendo il menù e azzerando la scelta
+
+  // A route was clicked: navigate there, closing the menu and the dropdown
   onNavigate(name: NavbarDropdown): void {
     this.closeDropdown(name);
     this.closeMobileMenu();

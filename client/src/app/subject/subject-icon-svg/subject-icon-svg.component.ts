@@ -4,12 +4,12 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { buildDefaultSubjectIconSvgMarkup, defaultSubjectIconColor } from '../subject-icon.util';
 
 /**
- * Icona SVG di default per le materie: cerchio pieno del colore "fill" con
- * il disegno (libro aperto "menu_book" specchiato + matita "edit") nello
- * stesso colore ma scurito di una percentuale fissa, per ottenere l'effetto
- * a due tonalità dell'icona originale senza dover passare due colori.
- * Riusa lo stesso markup generato in subject-icon.util.ts, così la preview
- * live e la data-URI usata negli <img> restano sempre identiche.
+ * Default SVG icon for subjects: a filled circle in the "fill" color with the
+ * drawing (mirrored "menu_book" open book + "edit" pencil) in the same color,
+ * darkened by a fixed percentage, to get the two-tone look of the original icon
+ * without having to pass two colors.
+ * It reuses the very markup generated in subject-icon.util.ts, so the live
+ * preview and the data-URI used inside <img> tags always stay identical.
  */
 @Component({
   selector: 'app-subject-icon-svg',

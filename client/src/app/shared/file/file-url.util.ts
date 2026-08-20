@@ -1,7 +1,7 @@
 import { baseUrlAPI } from '../../../config/config';
 
-// id di un documento FileMongo -> URL da cui i suoi byte vengono serviti
-// (vedi FileController.findOne, cache-control immutabile)
+// Id of a FileMongo document -> URL its bytes are served from
+// (see FileController.findOne, immutable cache-control)
 export function getFileUrl(id: string): string {
   return `${baseUrlAPI}file/${id}`;
 }

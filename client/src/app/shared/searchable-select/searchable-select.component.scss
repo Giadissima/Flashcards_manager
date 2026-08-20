@@ -12,9 +12,9 @@
   text-align: left;
 }
 
-/* Il pannello segue sempre la larghezza del pulsante come minimo, ma può
-   allargarsi (fino a un max-width) quando icona+testo non ci stanno: in quel
-   caso resta centrato sul pulsante invece di sporgere solo a destra */
+/* The panel is never narrower than the button, but it may grow (up to a
+   max-width) when icon + label do not fit: in that case it stays centred on the
+   button instead of sticking out to the right only. */
 .dropdown-content {
   left: 50%;
   transform: translateX(-50%);

@@ -20,13 +20,13 @@ function extensionFromMimetype(mimetype: string): string {
   return subtype;
 }
 
-// Gli zip iniziano sempre con la signature "PK" (0x50 0x4B)
+// Every zip archive starts with the "PK" signature (0x50 0x4B)
 function looksLikeZip(buffer: Buffer): boolean {
   return buffer.length >= 2 && buffer[0] === 0x50 && buffer[1] === 0x4b;
 }
 
-// Le immagini inline nel question/answer sono referenziate come
-// <img src="/api/file/{id mongo a 24 caratteri hex}">
+// Inline images inside question/answer are referenced as
+// <img src="/api/file/{24 hex char mongo id}">
 const IMAGE_REF_REGEX = /file\/([0-9a-fA-F]{24})/g;
 
 function extractImageFileIds(html: string | undefined): string[] {
@@ -85,15 +85,15 @@ export class ImportExportService {
     let imported = 0;
     let skipped = 0;
 
-    // Condivisa tra tutte le flashcard di questo import: se piu' card
-    // referenziano la stessa immagine, viene ricreata sul db una sola volta.
+    // Shared by every flashcard of this import: if several cards reference
+    // the same image, it is recreated on the db only once.
     const restoredImageIdsByOldId = new Map<string, string>();
 
     for (const item of data) {
       const subject_obj: SubjectFileFormat | undefined =
         item.subject_id ?? item.topic_id?.subject_id;
 
-      // ? subject creation (o riuso di una materia già esistente con lo stesso nome)
+      // ? subject creation (or reuse of an existing subject with the same name)
       let subject_doc: SubjectDocument | undefined = undefined;
       if (subject_obj) {
         const existingSubject = await this.subjectModel
@@ -132,16 +132,16 @@ export class ImportExportService {
           .exec();
       }
 
-      // ? flashcard creation, solo se non esiste già una copia identica
+      // ? flashcard creation, only when an identical copy does not exist yet
       const title = item.title?.trim();
       const question = item.question?.trim();
       const answer = item.answer?.trim();
 
-      // Il confronto duplicati usa il testo così com'era nell'export (con gli
-      // id immagine originali): un re-import dello stesso zip sullo stesso db
-      // deve combaciare esattamente con quanto già salvato. Riscrivere prima
-      // gli id (che cambiano a ogni restore) farebbe fallire il match e
-      // creerebbe un duplicato con un'immagine clonata ad ogni singolo import.
+      // The duplicate check uses the text exactly as it was in the export (with
+      // the original image ids): re-importing the same zip into the same db must
+      // match what is already stored. Rewriting the ids first (they change on
+      // every restore) would break the match and create a duplicate with a
+      // cloned image on every single import.
       const duplicateFilter: Record<string, unknown> = {
         title,
         question,
@@ -181,10 +181,10 @@ export class ImportExportService {
     return { imported, skipped };
   }
 
-  // Ricrea sul db il file dell'icona di una materia appena importata, se
-  // l'export era uno zip e contiene l'immagine referenziata. Con un import
-  // di solo JSON (senza immagini) l'icona viene semplicemente lasciata
-  // vuota: andrà ricaricata a mano dalla pagina di modifica materia.
+  // Recreates on the db the icon file of a freshly imported subject, when the
+  // export was a zip and it contains the referenced image. With a JSON-only
+  // import (no images) the icon is simply left empty: it has to be uploaded
+  // again by hand from the subject edit page.
   private async restoreSubjectIcon(
     zip: JSZip | undefined,
     subject_obj: SubjectFileFormat,
@@ -204,12 +204,12 @@ export class ImportExportService {
     return String(savedIcon._id);
   }
 
-  // Ricrea sul db le immagini inline referenziate nel question/answer di una
-  // flashcard appena importata (solo se l'export era uno zip), popolando la
-  // mappa condivisa id-vecchio -> id-nuovo passata dal chiamante. Con un
-  // import di solo JSON le immagini non vengono ricreate: i riferimenti
-  // <img src="/api/file/{id}"> restano quelli originali (potenzialmente rotti
-  // sul nuovo db), come già avviene per l'icona di una materia.
+  // Recreates on the db the inline images referenced in question/answer of a
+  // freshly imported flashcard (only when the export was a zip), filling the
+  // shared old-id -> new-id map passed in by the caller. With a JSON-only
+  // import the images are not recreated: the <img src="/api/file/{id}">
+  // references keep pointing at the original ids (possibly broken on the new
+  // db), exactly as happens for a subject icon.
   private async restoreFlashcardImages(
     zip: JSZip,
     images: Record<string, FlashcardImageMeta>,
@@ -247,7 +247,7 @@ export class ImportExportService {
       { iconFileName: string; iconMimetype: string }
     >();
 
-    // 1. raccoglie e allega al zip un'icona per ogni materia distinta coinvolta
+    // 1. collect and attach to the zip one icon per distinct subject involved
     for (const doc of flashcards) {
       const subjectDoc = doc.subject_id ?? doc.topic_id?.subject_id;
       if (!subjectDoc?.icon) continue;
@@ -266,7 +266,7 @@ export class ImportExportService {
       });
     }
 
-    // 2. annota ogni riferimento a materia con il percorso della sua icona nel zip
+    // 2. annotate every subject reference with the path of its icon in the zip
     for (const doc of flashcards) {
       const subjectDoc = doc.subject_id ?? doc.topic_id?.subject_id;
       if (!subjectDoc) continue;
@@ -278,7 +278,7 @@ export class ImportExportService {
       }
     }
 
-    // 3. raccoglie e allega al zip le immagini inline referenziate in question/answer
+    // 3. collect and attach to the zip the inline images used in question/answer
     const imageMetaByFileId = new Map<string, FlashcardImageMeta>();
 
     for (const doc of flashcards) {
@@ -309,5 +309,5 @@ export class ImportExportService {
 
     return zip.generateAsync({ type: 'nodebuffer' });
   }
-  // TODO l'export dovrà essere filtrato anche per argomento (topic), oltre che per materia
+  // TODO the export should be filterable by topic too, not only by subject
 }

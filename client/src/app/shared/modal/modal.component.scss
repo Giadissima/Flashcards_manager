@@ -3,10 +3,10 @@
 }
 
 .modal-backdrop {
-  /* Solo questo elemento scurisce lo sfondo: niente background anche su
-     .modal, altrimenti i due si sommano e il risultato è troppo scuro.
-     Il colore è già la tinta finale (leggermente scuro): l'animazione va da
-     opacity 0 a 1 su QUESTO rgba, non su un nero pieno. */
+  /* Only this element dims the background: no background on .modal too, or the
+     two would stack up and the result would be far too dark.
+     The colour is already the final tint (slightly dark): the animation runs
+     from opacity 0 to 1 on THIS rgba, not on a solid black. */
   background-color: rgba(0, 0, 0, 0.35);
   z-index: 1050;
 }
@@ -21,10 +21,10 @@
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
-/* Apertura/chiusura: il componente tiene l'elemento nel DOM (display:block)
-   per tutta la durata dell'animazione "-out" tramite lo stato "closing",
-   altrimenti passare subito a display:none la interromperebbe a metà. La
-   durata qui (0.2s) deve combaciare con CLOSE_ANIMATION_MS nel component TS. */
+/* Opening/closing: the component keeps the element in the DOM (display:block)
+   for the whole duration of the "-out" animation through the "closing" state,
+   since switching straight to display:none would cut it in half. The duration
+   here (0.2s) must match CLOSE_ANIMATION_MS in the component TS. */
 @keyframes modal-backdrop-in {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -66,8 +66,8 @@
 }
 
 .modal-dialog {
-  /* Stato prima che l'animazione parta: evita un flash del contenuto a piena
-     opacità nel fotogramma tra display:block e l'inizio della keyframe. */
+  /* State before the animation starts: avoids a flash of fully opaque content
+     in the frame between display:block and the first keyframe. */
   opacity: 0;
 }
 

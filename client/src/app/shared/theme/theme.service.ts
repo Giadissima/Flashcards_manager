@@ -20,7 +20,7 @@ export class ThemeService {
     return this._theme.value;
   }
 
-  // applica subito il tema come anteprima, senza salvarlo (vedi persist())
+  // Applies the theme right away as a preview, without saving it (see persist())
   setTheme(theme: AppTheme): void {
     this._theme.next(theme);
     this.applyTheme(theme);

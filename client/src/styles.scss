@@ -31,7 +31,7 @@
   --on-accent-color: #f8f9fa;
 }
 
-.btn-dark { // this button is trasparent and used for icons
+.btn-dark { // this button is transparent and used for icons
   --bs-btn-bg: rgba(255, 255, 255, 0);
   --bs-btn-border-color: rgba(255, 255, 255, 0) 
 }
@@ -49,9 +49,9 @@
   --box-shadow-sm: 0 1px 2px 0 var(--border-color);
   --box-shadow-md: 0 4px 8px -2px var(--border-color), 0 2px 4px -2px var(--border-color);
 
-  /* Altezza reale della navbar (misurata): usata per non far mai sconfinare
-     sotto la navbar contenuti in overlay come il lightbox immagine. Se cambia
-     padding/logo della navbar va aggiornata anche qui. */
+  /* Measured height of the navbar: used to keep overlay content such as the
+     image lightbox from ever sliding under it. If the navbar padding or logo
+     changes, this has to be updated too. */
   --navbar-height: 56px;
 
   /* Syncing Bootstrap core variables with the design system */
@@ -139,9 +139,9 @@ h6 {
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-/* Riserva spazio per la freccina del dropdown, altrimenti il testo (se lungo)
-   ci finisce sotto: qui serve padding, non margin, perché la freccina è
-   un background-image dentro il padding-box, non fuori dal box */
+/* Reserves room for the dropdown caret, otherwise a long label ends up under
+   it: padding is needed here, not margin, because the caret is a
+   background-image inside the padding box, not outside it. */
 .form-select {
   padding-right: calc(var(--spacing-unit) * 4.5);
 }
@@ -164,8 +164,8 @@ h6 {
   color: var(--text-color) !important;
 }
 
-/* Il pulsante "Scegli file" è uno pseudo-elemento nativo del browser,
-   non viene toccato dalle regole generali su .form-control */
+/* The "Choose file" button is a native browser pseudo-element: the general
+   .form-control rules do not reach it. */
 .form-control[type='file']::file-selector-button,
 .form-control[type='file']::-webkit-file-upload-button {
   background-color: var(--component-background);
@@ -177,8 +177,8 @@ h6 {
   margin-inline-end: calc(var(--spacing-unit) * 1.5);
 }
 
-/* Bootstrap ha una regola :hover:not(:disabled) più specifica della nostra,
-   quindi qui serve !important per vincere il conflitto in ogni ordine di caricamento */
+/* Bootstrap has a :hover:not(:disabled) rule more specific than ours, so
+   !important is needed to win regardless of the loading order. */
 .form-control[type='file']:hover::file-selector-button,
 .form-control[type='file']:hover::-webkit-file-upload-button,
 .form-control[type='file']::file-selector-button:hover,
@@ -187,15 +187,16 @@ h6 {
   color: var(--header-color) !important;
 }
 
-/* L'icona della X di Bootstrap è un SVG a tratto nero fisso: sul tema scuro
-   va invertita per restare visibile (stessa tecnica di .btn-close-white) */
+/* Bootstrap's X icon is an SVG with a fixed black stroke: on the dark theme it
+   has to be inverted to stay visible (same trick as .btn-close-white). */
 [data-theme='dark'] .btn-close {
   filter: invert(1) grayscale(100%) brightness(200%);
 }
 
-/* Bootstrap disegna lo switch con un bordo quasi trasparente e il pallino del colore degli argomenti
-   via background-image (SVG): qui si forza un bordo nero sempre visibile e
-   il pallino nero in light / bianco in dark per un contrasto leggibile */
+/* Bootstrap draws the switch with an almost transparent border and the knob as
+   a background-image (SVG) in the theme colour: here the border is forced to a
+   always-visible black, and the knob to black in light / white in dark for
+   readable contrast. */
 .form-switch .form-check-input {
   width: 2.5em;
   height: 1.25em;
@@ -209,10 +210,10 @@ h6 {
   border-color: #000;
 }
 
-/* Bootstrap ha una regola dedicata a :focus che ridefinisce --bs-form-switch-bg
-   in blu chiaro (#86b7fe) con specificità più alta della regola base sopra:
-   va sovrascritta esplicitamente qui, altrimenti il pallino torna blu appena
-   il campo ha il focus (cioè subito dopo il click) */
+/* Bootstrap has a dedicated :focus rule redefining --bs-form-switch-bg to light
+   blue (#86b7fe), with higher specificity than the base rule above: it has to be
+   overridden explicitly here, otherwise the knob turns blue as soon as the field
+   takes focus (that is, right after the click). */
 .form-switch .form-check-input:focus {
   --bs-form-switch-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23000'/%3e%3c/svg%3e") !important;
   border-color: #000 !important;
@@ -225,8 +226,8 @@ h6 {
   --bs-form-switch-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e") !important;
 }
 
-/* Impedisce a Chrome/Edge di forzare uno sfondo bianco quando si seleziona
-   un suggerimento dalla cronologia dell'input o in caso di autofill */
+/* Stops Chrome/Edge from forcing a white background when a suggestion from the
+   input history is picked, or on autofill. */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
@@ -265,8 +266,8 @@ input:-webkit-autofill:active {
 /* Button Refinement */
 .btn {
   border-radius: var(--border-radius-md);
-  transition: all 0.2s ease-in-out;
   /* Smooth transition for shadow and lift */
+  transition: all 0.2s ease-in-out;
   outline: none;
   box-shadow: none;
 }
@@ -324,15 +325,15 @@ input:-webkit-autofill:active {
   height: 100%;
 }
 
-/* Questa parte è per il colore del topic mostrato sulla cima della card */
+/* The topic colour strip shown on top of a card */
 .flashcard-topic-color {
-  /* Aumentiamo lo spessore per renderlo più visibile*/
+  /* Thick enough to be noticed */
   border-top: 6px solid var(--primary-color);
 
-  /* Usa il raggio grande per angoli più "morbidi" */
+  /* The large radius gives softer corners */
   border-radius: var(--border-radius-lg) !important;
 
-  /* impedisce al bordo superiore di restare rettangolare */
+  /* Keeps the top border from staying rectangular */
   overflow: hidden;
 }
 
@@ -360,10 +361,10 @@ input:-webkit-autofill:active {
   margin-bottom: calc(var(--spacing-unit) * 2);
 }
 
-/* Una formula in display mode ($$...$$) è un blocco a larghezza propria e non va
-   a capo (KaTeX mette white-space: nowrap sulla .base): dentro una card stretta
-   deve scorrere in orizzontale invece di sfondare la griglia. Il padding lascia
-   spazio ai tratti discendenti, che l'overflow altrimenti taglierebbe. */
+/* A display-mode formula ($$...$$) is a block with its own width and never
+   wraps (KaTeX sets white-space: nowrap on .base): inside a narrow card it has
+   to scroll horizontally instead of breaking the grid. The padding leaves room
+   for descenders, which the overflow would otherwise clip. */
 .flashcard-text,
 .question-text,
 .answer,
@@ -376,9 +377,9 @@ input:-webkit-autofill:active {
   }
 }
 
-/* Bootstrap resetta blockquote a un semplice margin, senza bordo/indentazione:
-   il toggle sembra "non fare nulla" perché il risultato è indistinguibile da un
-   paragrafo normale. Qui gli diamo uno stile visibile. */
+/* Bootstrap resets blockquote to a plain margin, with no border or indent: the
+   toggle looks like it "does nothing" because the result is indistinguishable
+   from a normal paragraph. Here it gets a visible style. */
 .tiptap blockquote {
   margin: calc(var(--spacing-unit) * 1.5) 0;
   padding: calc(var(--spacing-unit) * 0.5) calc(var(--spacing-unit) * 1.5);
@@ -391,8 +392,8 @@ input:-webkit-autofill:active {
   margin-bottom: 0;
 }
 
-/* Placeholder di @tiptap/extension-placeholder: mostra il testo d'esempio
-   sul primo nodo vuoto tramite pseudo-elemento, senza occupare altezza. */
+/* Placeholder from @tiptap/extension-placeholder: shows the sample text on the
+   first empty node through a pseudo-element, without taking up any height. */
 .tiptap p.is-empty::before {
   content: attr(data-placeholder);
   float: left;
@@ -402,10 +403,9 @@ input:-webkit-autofill:active {
   pointer-events: none;
 }
 
-/* ngx-colors renderizza di default uno swatch di 26x26px (fissato via :host
-   nel suo stesso componente): troppo piccolo per essere notato come input
-   cliccabile. !important necessario per vincere sulla regola :host, che ha
-   specificità maggiore di un selettore di tipo globale. */
+/* ngx-colors renders a 26x26px swatch by default (set through :host in its own
+   component): too small to read as a clickable input. !important is required to
+   beat the :host rule, which outranks a plain global type selector. */
 .big-ngx-colors {
   width: 48px !important;
   height: 48px !important;
@@ -423,20 +423,20 @@ ngx-colors.rainbow-swatch .bg-transparent > div {
   background: conic-gradient(from 0deg, red, orange, yellow, #00be00, #0022ff, #9a0eff, violet, red) !important;
 }
 
-/* Il pannello del color picker (ngx-colors-overlay, appeso a document.body) usa
-   internamente una classe .bg-white per leggere il tema via var(--ngx-colors-surface).
-   Bootstrap (caricato globalmente) definisce anche lui .bg-white ma con !important,
-   che vince sempre sulla regola non-!important della libreria e forza lo sfondo
-   bianco a prescindere dal tema. Serve quindi un override altrettanto !important. */
+/* The colour picker panel (ngx-colors-overlay, attached to document.body) uses a
+   .bg-white class internally to read the theme through var(--ngx-colors-surface).
+   Bootstrap (loaded globally) also defines .bg-white, but with !important, which
+   always beats the library's plain rule and forces a white background whatever
+   the theme. An equally !important override is therefore needed. */
 ngx-colors-overlay[data-ngx-colors-theme='dark'] .bg-white {
   background: var(--ngx-colors-surface, #26272b) !important;
 }
 
-/* Cliccando un'immagine nella home si apre in una modale (vedi home.ts). Questa
-   regola deve stare qui, nel foglio globale, e non nello style scoped di Home:
-   le <img> arrivano via [innerHTML] quindi non ricevono l'attributo
-   _ngcontent-* di Angular, e un selettore scoped come ".flashcard-text img"
-   nel component style non le vede mai. */
+/* Clicking an image on the home page opens it in a modal (see home.ts). This
+   rule has to live here, in the global sheet, and not in Home's scoped styles:
+   the <img> tags arrive through [innerHTML] so they never get Angular's
+   _ngcontent-* attribute, and a scoped selector such as ".flashcard-text img"
+   in the component style would never match them. */
 .flashcard-text img {
   cursor: zoom-in;
 }
@@ -450,13 +450,13 @@ ngx-colors-overlay[data-ngx-colors-theme='dark'] .bg-white {
     padding: 2px 0;
     margin: calc(var(--spacing-unit) * 1.5) 0;
 
-    /* Stessa scrollbar "a tema" usata in .dropdown-content: le variabili
-       --border-color/--component-background cambiano già con [data-theme],
-       quindi non serve una regola separata per il dark mode.
-       Su Chromium/Opera, se scrollbar-color è impostata sullo stesso elemento,
-       le regole ::-webkit-scrollbar-* (hover incluso) vengono ignorate del
-       tutto: qui si riserva scrollbar-width/-color solo ai browser che NON
-       supportano lo pseudo-elemento webkit (cioè Firefox). */
+    /* Same themed scrollbar as .dropdown-content: --border-color and
+       --component-background already change with [data-theme], so no separate
+       dark-mode rule is needed.
+       On Chromium/Opera, setting scrollbar-color on the same element makes the
+       ::-webkit-scrollbar-* rules (hover included) be ignored entirely: so
+       scrollbar-width/-color are reserved for the browsers that do NOT support
+       the webkit pseudo-element (that is, Firefox). */
     @supports not selector(::-webkit-scrollbar) {
       scrollbar-width: thin;
       scrollbar-color: var(--border-color) var(--component-background);
@@ -479,11 +479,11 @@ ngx-colors-overlay[data-ngx-colors-theme='dark'] .bg-white {
       background-color: var(--primary-color);
     }
 
-    /* Le freccine ai due capi: gli pseudo-elementi delle scrollbar non
-       supportano clip-path/transform (rendering interno del browser, non
-       la normale pipeline CSS), quindi la freccia va disegnata come
-       background-image SVG, stessa tecnica già usata per il pallino dello
-       .form-switch qui sopra: variante nera di default, bianca in dark mode */
+    /* The arrows at both ends: scrollbar pseudo-elements do not support
+       clip-path/transform (they are drawn by the browser internally, outside the
+       normal CSS pipeline), so the arrow has to be a background-image SVG - the
+       same trick already used for the .form-switch knob above: black by default,
+       white in dark mode. */
     &::-webkit-scrollbar-button {
       background-color: transparent;
       background-repeat: no-repeat;
@@ -515,20 +515,20 @@ ngx-colors-overlay[data-ngx-colors-theme='dark'] .bg-white {
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3e%3cpath d='M8 5L2 1.5V8.5Z' fill='%23fff'/%3e%3c/svg%3e");
 }
 
-/* Lightbox immagine della home: le classi passate come [dialogClass]/[contentClass]
-   finiscono su elementi del template di ModalComponent (.modal-dialog/.modal-content),
-   non su quello di Home, quindi devono stare qui e non nello style scoped di Home
-   (stesso motivo del cursore delle immagini più sopra).
-   .modal-dialog di Bootstrap ha width:auto ma un max-width fisso (500px): resta
-   quindi sempre alla stessa larghezza a prescindere dall'immagine. width:fit-content
-   invece la fa aderire alle dimensioni reali dell'immagine (piccola = dialog piccola),
-   allargandosi fino al max-width/max-height solo se l'immagine è davvero più grande. */
-/* Niente centratura verticale per il lightbox: va ancorato appena sotto la
-   navbar. .modal-dialog-centered di Bootstrap centrerebbe .modal-content
-   dentro .modal-dialog (che si autoimpone alto via min-height: calc(100% -
-   3.5rem) apposta per avere spazio in cui centrare): qui quel min-height va
-   annullato, e il margin-top di default (1.75rem, per il centraggio) va
-   sostituito con l'altezza esatta della navbar + 1px. */
+/* Home image lightbox: the classes passed as [dialogClass]/[contentClass] land
+   on elements of ModalComponent's template (.modal-dialog/.modal-content), not
+   on Home's, so they belong here and not in Home's scoped styles (same reason as
+   the image cursor above).
+   Bootstrap's .modal-dialog has width:auto but a fixed max-width (500px), so it
+   would always stay the same width whatever the image. width:fit-content instead
+   makes it hug the real size of the image (small image = small dialog), growing
+   up to max-width/max-height only when the image really is bigger.
+   No vertical centring for the lightbox: it is anchored just below the navbar.
+   Bootstrap's .modal-dialog-centered would centre .modal-content inside
+   .modal-dialog (which makes itself tall through min-height: calc(100% - 3.5rem)
+   precisely to have room to centre in): that min-height has to be cancelled, and
+   the default margin-top (1.75rem, for the centring) replaced with the exact
+   navbar height + 1px. */
 .image-modal-dialog {
   width: fit-content;
   max-width: 90vw;
@@ -553,9 +553,9 @@ ngx-colors-overlay[data-ngx-colors-theme='dark'] .bg-white {
   width: auto;
   height: auto;
   max-width: 90vw;
-  /* Oltre a navbar + margine, sottrae anche l'header del modale (~64px, il
-     bottone di chiusura): altrimenti l'immagine da sola potrebbe restare
-     dentro i limiti ma header+immagine insieme sconfinerebbero comunque. */
+  /* On top of navbar + margin, this also subtracts the modal header (~64px, the
+     close button): otherwise the image alone could fit, yet header + image
+     together would still overflow. */
   max-height: calc(100vh - var(--navbar-height) - 32px - 64px);
   border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);
   touch-action: none;
@@ -599,27 +599,30 @@ ngx-colors-overlay[data-ngx-colors-theme='dark'] .bg-white {
   flex-direction: row;
 }
 
-/* Le select (native o app-searchable-select) dentro le filter-bar stanno in
-   colonne .col-auto, larghe quanto il loro contenuto: senza un min-width
-   esplicito il width:100% interno del select non ha nulla su cui risolversi
-   e la colonna collassa quasi al minimo invece di allargarsi fino al
-   max-width (--base-input-size) già impostato sulla regola condivisa dei form.
-   .col-auto di suo non si restringe mai (flex-shrink: 0): un min-width fisso
-   a --base-input-size la farebbe sfondare il contenitore sugli schermi più stretti di
-   --base-input-size. min(--base-input-size, 100%) invece resta --base-input-size quando c'è spazio, ma scende
-   al 100% dello spazio disponibile quando quello spazio è minore di --base-input-size. */
+/* The selects (native or app-searchable-select) inside the filter bars live in
+   .col-auto columns, as wide as their content: without an explicit min-width the
+   select's inner width:100% has nothing to resolve against, and the column
+   collapses to nearly nothing instead of growing up to --base-input-size.
+   A .col-auto never shrinks on its own (flex-shrink: 0): a min-width fixed at
+   --base-input-size would make it overflow its container on screens narrower
+   than that. min(--base-input-size, 100%) instead stays at --base-input-size
+   when there is room, and drops to 100% of the available space when there is
+   not.
+   NOTE: --base-input-size is currently declared as `var(300px)`, which is not
+   valid CSS, so these two declarations are dropped by the browser. See the
+   review notes before "fixing" it - doing so changes the current layout. */
 .filter-bar .col-auto:has(.form-select) {
   flex: 1 1 auto;
   min-width: min(--base-input-size, 100%);
   max-width: --base-input-size;
 }
 
-/* Search bar: icona sempre a destra, fusa con l'input in un unico componente.
-   L'input vive dentro un wrapper (per poterci sovrapporre la "X"), quindi non è
-   più figlio diretto di .input-group e le regole di Bootstrap che smussano solo
-   gli angoli esterni (:first-child/:last-child) non lo raggiungono più: gli
-   angoli lato-icona vanno quindi azzerati esplicitamente qui invece di
-   affidarsi a Bootstrap. */
+/* Search bar: the icon always sits on the right, merged with the input into one
+   component. The input lives inside a wrapper (so the "X" can be overlaid on
+   it), so it is no longer a direct child of .input-group and Bootstrap's rules
+   rounding only the outer corners (:first-child/:last-child) no longer reach it:
+   the icon-side corners are therefore zeroed explicitly here instead of relying
+   on Bootstrap. */
 .search-icon {
   background-color: var(--secondary-color);
   border-left: 0px;
@@ -628,8 +631,8 @@ ngx-colors-overlay[data-ngx-colors-theme='dark'] .bg-white {
   color: var(--header-color);
 }
 
-/* Pulsante "X" per svuotare rapidamente una search bar: sovrapposto all'input
-   (non un input-group-text a sé) per non alterare la larghezza del campo */
+/* "X" button to clear a search bar quickly: overlaid on the input (rather than
+   being an input-group-text of its own) so the field keeps its width. */
 .search-input-wrapper {
   position: relative;
   flex: 1 1 auto;
@@ -661,17 +664,15 @@ ngx-colors-overlay[data-ngx-colors-theme='dark'] .bg-white {
   opacity: 1;
 }
 
-/* Contenitore per l'icona circolare nell'header */
+/* Wrapper for the round icon in a card header */
 .header-icon-container {
   background-color: var(--background-color);
-  /* Colore di sfondo leggero */
   width: 48px;
   height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  /* Rende il contenitore tondo */
   border: 1px solid var(--border-color);
 }
 
@@ -697,13 +698,12 @@ ngx-colors-overlay[data-ngx-colors-theme='dark'] .bg-white {
   max-height: 320px;
   overflow-y: auto;
 
-  /* Le variabili --component-background/--border-color cambiano già col
-     tema, quindi la scrollbar si adatta automaticamente senza bisogno di
-     una regola separata per il dark mode.
-     Su Chromium/Opera, se scrollbar-color è impostata sullo stesso elemento,
-     le regole ::-webkit-scrollbar-* (hover incluso) vengono ignorate del
-     tutto: qui si riserva scrollbar-width/-color solo ai browser che NON
-     supportano lo pseudo-elemento webkit (cioè Firefox). */
+  /* --component-background/--border-color already change with the theme, so the
+     scrollbar adapts on its own without a separate dark-mode rule.
+     On Chromium/Opera, setting scrollbar-color on the same element makes the
+     ::-webkit-scrollbar-* rules (hover included) be ignored entirely: so
+     scrollbar-width/-color are reserved for the browsers that do NOT support
+     the webkit pseudo-element (that is, Firefox). */
   @supports not selector(::-webkit-scrollbar) {
     scrollbar-width: thin;
     scrollbar-color: var(--border-color) var(--component-background);
@@ -727,11 +727,11 @@ ngx-colors-overlay[data-ngx-colors-theme='dark'] .bg-white {
   background-color: var(--primary-color);
 }
 
-/* Le freccine ai due capi: gli pseudo-elementi delle scrollbar non
-   supportano clip-path/transform (rendering interno del browser, non la
-   normale pipeline CSS), quindi la freccia va disegnata come background-image
-   SVG, stessa tecnica già usata per il pallino dello .form-switch qui sopra:
-   variante nera di default, bianca in dark mode */
+/* The arrows at both ends: scrollbar pseudo-elements do not support
+   clip-path/transform (they are drawn by the browser internally, outside the
+   normal CSS pipeline), so the arrow has to be a background-image SVG - the
+   same trick already used for the .form-switch knob above: black by default,
+   white in dark mode. */
 .dropdown-content::-webkit-scrollbar-button {
   background-color: transparent;
   background-repeat: no-repeat;
@@ -779,8 +779,8 @@ ngx-colors-overlay[data-ngx-colors-theme='dark'] .bg-white {
   display: block;
 }
 
-/* PATTERN GRAFICO GLOBALE PER AGGIUNTA O MODIFICA DI CONTENUTI
-usato in create, modify flashcards, create, modify, manage topics e subjects */
+/* Global layout pattern for the "add or edit content" pages: create/edit
+   flashcard, create/edit/manage topics and subjects. */
 
 .form-group {
   margin-bottom: calc(var(--spacing-unit) * 3);

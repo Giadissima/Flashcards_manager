@@ -12,8 +12,8 @@ export class Topic {
   @Prop({ required: true })
   name: string;
 
-  @Prop({ required: false }) // TODO dovrà essere obbligatorio!
-  color?: string; // TODO non deve essere una stringa!
+  @Prop({ required: false }) // TODO this will have to become mandatory
+  color?: string; // TODO it should not be a plain string
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,

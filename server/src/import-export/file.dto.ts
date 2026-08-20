@@ -11,9 +11,9 @@ export interface FlashcardFileFormat {
   topic_id: TopicFileFormat | undefined;
   subject_id: SubjectFileFormat | undefined;
   __v: number;
-  // presente solo negli export in zip: immagini inline referenziate nell'HTML
-  // di question/answer (<img src="/api/file/{id}">), indicizzate per id del
-  // file originale, usate dall'import per ricrearle sul nuovo db
+  // Present only in zip exports: the inline images referenced from the HTML of
+  // question/answer (<img src="/api/file/{id}">), indexed by the id of the
+  // original file, used by the import to recreate them on the new db.
   images?: Record<string, FlashcardImageMeta>;
 }
 
@@ -29,8 +29,8 @@ export interface SubjectFileFormat {
   _id: string;
   name: string;
   icon: string | null;
-  // presenti solo negli export in zip: percorso dell'icona dentro l'archivio
-  // e il suo mimetype, usati dall'import per ricreare il file sul nuovo db
+  // Present only in zip exports: the path of the icon inside the archive and
+  // its mimetype, used by the import to recreate the file on the new db.
   iconFileName?: string;
   iconMimetype?: string;
   desc: string;

@@ -5,8 +5,8 @@ import { FormsModule } from '@angular/forms';
 import { TranslocoModule } from '@jsverse/transloco';
 
 /**
- * Search bar riutilizzabile: campo di testo + icona di ricerca (a destra) +
- * pulsante "X" per svuotare rapidamente il campo, visibile solo quando c'è testo.
+ * Reusable search bar: text field + search icon (on the right) + an "X" button
+ * to clear the field quickly, shown only while there is something to clear.
  */
 @Component({
   selector: 'app-search-input',

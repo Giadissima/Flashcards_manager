@@ -2,6 +2,6 @@ export interface Subject {
   _id?: string;
   name: string;
   desc?: string;
-  icon?: string; // URL to the icon
-  color?: string; // colore di sfondo dell'icona SVG di default, usato quando icon non è impostato
+  icon?: string; // id of the uploaded icon file, resolved by getSubjectIconUrl()
+  color?: string; // background color of the default SVG icon, used when icon is unset
 }
