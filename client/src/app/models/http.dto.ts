@@ -8,7 +8,6 @@ export interface SimplePaginatedResponse{
   sortDirection: 'asc' | 'desc';
   skip: number;
   limit: number;
-  // filter: FilterInterface TODO lasciato già predisposto per la ricerca per data
 }
 
 export interface TopicFilter extends SimplePaginatedResponse {
@@ -19,7 +18,7 @@ export interface TopicFilter extends SimplePaginatedResponse {
 export interface SubjectFilter extends SimplePaginatedResponse {
   title?: string;
 }
-// TODO pulire i file dto e cercare di fare meglio le divisioni delle classi/interfacce sia qui sia nel server
+
 export interface CardFilter extends SimplePaginatedResponse {
   subject_id?: string;
   topic_id?: string;
