@@ -8,3 +8,6 @@ export const questionMaxLength = 700;
 export const answerMaxLength = 1000;
 export const nameMaxLength = 30;
 export const descMaxLength = 1000;
+
+// how many entries a subject/topic dropdown loads at once
+export const selectableListLimit = 50;

@@ -19,9 +19,9 @@ import { Toast } from '../../toast/toast';
 import { ToastService } from '../../toast/toast.service';
 import { Topic } from '../../models/topic.dto';
 import { TopicService } from '../../topic/topic.service';
+import { toSubjectOptions, toTopicOptions } from '../../shared/select-options.util';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { SearchableSelectComponent, SelectOption } from '../../shared/searchable-select/searchable-select.component';
-import { getSubjectIconUrl } from '../../subject/subject-icon.util';
 
 @Component({
   selector: 'app-edit-flashcard',
@@ -39,19 +39,11 @@ export class EditFlashcard implements OnInit, OnDestroy {
   subjects: Subject[] = [];
 
   get subjectOptions(): SelectOption[] {
-    return this.subjects.map((s) => ({
-      value: s._id!,
-      label: s.name,
-      iconUrl: getSubjectIconUrl(s),
-    }));
+    return toSubjectOptions(this.subjects);
   }
 
   get topicOptions(): SelectOption[] {
-    return this.topics.map((t) => ({
-      value: t._id!,
-      label: t.name,
-      color: t.color,
-    }));
+    return toTopicOptions(this.topics);
   }
 
   questionEditor: Editor;
@@ -193,14 +185,7 @@ export class EditFlashcard implements OnInit, OnDestroy {
 
   async loadTopicsBySubject(subjectId: string | undefined) {
     try {
-      const response = await this.topicService.getAllTopics({
-        skip: 0,
-        limit: 50,
-        sortField: 'name',
-        sortDirection: 'asc',
-        subject_id: subjectId
-      });
-      this.topics = response.data;
+      this.topics = await this.topicService.getSelectableTopics(subjectId);
     } catch (err) {
       console.error('Error loading topics for subject ' + subjectId, err);
       this.toastService.show(this.transloco.translate('flashcard.toast.topicsLoadError'), 'error');
@@ -209,13 +194,7 @@ export class EditFlashcard implements OnInit, OnDestroy {
 
   async loadSubjects() {
     try {
-      const response = await this.subjectService.getAllSubjects({
-        skip: 0,
-        limit: 50,
-        sortField: 'name',
-        sortDirection: 'asc'
-      });
-      this.subjects = response.data;
+      this.subjects = await this.subjectService.getSelectableSubjects();
     } catch (err) {
       console.error('Error loading subjects', err);
       this.toastService.show(this.transloco.translate('flashcard.toast.subjectsLoadError'), 'error');

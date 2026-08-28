@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { PaginatedList } from '../../shared/paginated-list';
+import { toSubjectOptions } from '../../shared/select-options.util';
 import { Router } from '@angular/router';
 import { SearchInputComponent } from '../../shared/search-input/search-input.component';
 import { SearchableSelectComponent, SelectOption } from '../../shared/searchable-select/searchable-select.component';
@@ -12,7 +13,6 @@ import { ToastService } from '../../toast/toast.service';
 import { Topic } from '../../models/topic.dto';
 import { TopicService } from '../topic.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
-import { getSubjectIconUrl } from '../../subject/subject-icon.util';
 
 @Component({
   selector: 'app-manage-topics',
@@ -28,7 +28,7 @@ export class ManageTopicsComponent extends PaginatedList implements OnInit {
   searchTerm = '';
 
   get subjectOptions(): SelectOption[] {
-    return this.subjects.map((s) => ({ value: s._id!, label: s.name, iconUrl: getSubjectIconUrl(s) }));
+    return toSubjectOptions(this.subjects);
   }
   constructor(
     private topicService: TopicService,
@@ -47,8 +47,7 @@ export class ManageTopicsComponent extends PaginatedList implements OnInit {
 
   async loadSubjects() {
     try {
-      const response = await this.subjectService.getAllSubjects({ limit: 50, skip: 0, sortDirection: 'asc', sortField: 'name' });
-      this.subjects = response.data;
+      this.subjects = await this.subjectService.getSelectableSubjects();
     } catch (err) {
       console.error('Error loading subjects', err);
       this.toastService.show(this.transloco.translate('topic.toast.subjectsLoadError'), 'error');

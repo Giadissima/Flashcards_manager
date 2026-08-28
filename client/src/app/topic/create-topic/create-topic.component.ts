@@ -19,9 +19,9 @@ import {
   SearchableSelectComponent,
   SelectOption,
 } from '../../shared/searchable-select/searchable-select.component';
-import { getSubjectIconUrl } from '../../subject/subject-icon.util';
 import { charMinLength, nameMaxLength } from '../../../config/config';
 import { ThemeService } from '../../shared/theme/theme.service';
+import { toSubjectOptions } from '../../shared/select-options.util';
 
 @Component({
   selector: 'app-create-topic',
@@ -42,11 +42,7 @@ export class CreateTopicComponent implements OnInit {
   subjects: Subject[] = [];
 
   get subjectOptions(): SelectOption[] {
-    return this.subjects.map((s) => ({
-      value: s._id!,
-      label: s.name,
-      iconUrl: getSubjectIconUrl(s),
-    }));
+    return toSubjectOptions(this.subjects);
   }
 
   constructor(
@@ -98,13 +94,7 @@ export class CreateTopicComponent implements OnInit {
 
   async loadSubjects() {
     try {
-      const response = await this.subjectService.getAllSubjects({
-        skip: 0,
-        limit: 50,
-        sortField: 'name',
-        sortDirection: 'asc',
-      });
-      this.subjects = response.data;
+      this.subjects = await this.subjectService.getSelectableSubjects();
     } catch (err) {
       console.error('Error loading subjects', err);
       this.toastService.show(

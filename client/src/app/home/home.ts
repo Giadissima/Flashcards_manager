@@ -11,6 +11,7 @@ import { LoadStateComponent } from '../shared/load-state/load-state.component';
 import Panzoom, { PanzoomObject } from '@panzoom/panzoom';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PaginatedList } from '../shared/paginated-list';
+import { toSubjectOptions, toTopicOptions } from '../shared/select-options.util';
 import { Subject } from '../models/subject.dto';
 import { SubjectService } from '../subject/subject.service';
 import { Toast } from '../toast/toast';
@@ -70,11 +71,11 @@ export class Home extends PaginatedList implements OnInit, AfterViewChecked, OnD
   isReloading = false;
 
   get subjectOptions(): SelectOption[] {
-    return this.subjects.map((s) => ({ value: s._id!, label: s.name, iconUrl: getSubjectIconUrl(s) }));
+    return toSubjectOptions(this.subjects);
   }
 
   get topicOptions(): SelectOption[] {
-    return this.topics.map((t) => ({ value: t._id!, label: t.name, color: t.color }));
+    return toTopicOptions(this.topics);
   }
 
   constructor(
@@ -118,13 +119,7 @@ export class Home extends PaginatedList implements OnInit, AfterViewChecked, OnD
 
   // Errors are not handled here: app-load-state intercepts them via run() and shows the 404/error state.
   private async loadInitialData(): Promise<void> {
-    const subjectsData = await this.subjectService.getAllSubjects({
-      sortField: 'name',
-      sortDirection: 'asc',
-      skip: 0,
-      limit: 50,
-    });
-    this.subjects = subjectsData.data;
+    this.subjects = await this.subjectService.getSelectableSubjects();
 
     await this.loadTopicsBySubject(this.selectedSubjectId || undefined);
     await this.loadFlashcards();
@@ -382,14 +377,7 @@ export class Home extends PaginatedList implements OnInit, AfterViewChecked, OnD
 
   async loadTopicsBySubject(subjectId: string | undefined) {
     try {
-      const response = await this.topicService.getAllTopics({
-        skip: 0,
-        limit: 50,
-        sortField: 'name',
-        sortDirection: 'asc',
-        subject_id: subjectId,
-      });
-      this.topics = response.data;
+      this.topics = await this.topicService.getSelectableTopics(subjectId);
     } catch (err) {
       console.error('Error loading topics for subject ' + subjectId, err);
       this.toast.show(

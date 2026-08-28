@@ -11,13 +11,13 @@ import { CommonModule } from '@angular/common';
 import { DurationPipe } from '../../../pipes/duration.pipe';
 import { FormsModule } from '@angular/forms';
 import { PaginatedList } from '../../shared/paginated-list';
+import { toSubjectOptions, toTopicOptions } from '../../shared/select-options.util';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
 import { TestService } from '../test.service';
 import { ToastService } from '../../toast/toast.service';
 import { Topic } from '../../models/topic.dto';
 import { TopicService } from '../../topic/topic.service';
-import { getSubjectIconUrl } from '../../subject/subject-icon.util';
 
 @Component({
   selector: 'app-test-history',
@@ -58,19 +58,11 @@ export class TestHistory extends PaginatedList implements OnInit {
   selectedStatus: string | null = null;
 
   get subjectOptions(): SelectOption[] {
-    return this.subjects.map((s) => ({
-      value: s._id!,
-      label: s.name,
-      iconUrl: getSubjectIconUrl(s),
-    }));
+    return toSubjectOptions(this.subjects);
   }
 
   get topicOptions(): SelectOption[] {
-    return this.topics.map((t) => ({
-      value: t._id!,
-      label: t.name,
-      color: t.color,
-    }));
+    return toTopicOptions(this.topics);
   }
 
   ngOnInit(): void {
@@ -93,24 +85,12 @@ export class TestHistory extends PaginatedList implements OnInit {
   }
 
   async loadSubjects(): Promise<void> {
-    const response = await this.subjectService.getAllSubjects({
-      limit: 50,
-      skip: 0,
-      sortDirection: 'asc',
-      sortField: 'name',
-    });
-    this.subjects = response.data;
+    this.subjects = await this.subjectService.getSelectableSubjects();
   }
 
   async loadTopics(): Promise<void> {
-    const response = await this.topicService.getAllTopics({
-      limit: 50,
-      skip: 0,
-      sortDirection: 'asc',
-      sortField: 'name',
-    });
-    this.allTopics = response.data;
-    this.topics = response.data;
+    this.allTopics = await this.topicService.getSelectableTopics();
+    this.topics = this.allTopics;
   }
 
   onSubjectSelected(id: string | null | undefined): void {

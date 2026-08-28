@@ -2,6 +2,7 @@ import { TopicFilter, PaginatedResponse } from '../models/http.dto';
 import { Topic } from '../models/topic.dto';
 import { Injectable } from '@angular/core';
 import { RestClientService } from '../api/rest-api.service';
+import { selectableListLimit } from '../../config/config';
 
 @Injectable({
   providedIn: 'root',
@@ -16,6 +17,21 @@ export class TopicService {
       this.baseUrl,
       filter,
     );
+  }
+
+  /**
+   * The alphabetical list every topic dropdown is filled with; without a
+   * subject it returns the topics of every subject.
+   */
+  async getSelectableTopics(subjectId?: string): Promise<Topic[]> {
+    const response = await this.getAllTopics({
+      skip: 0,
+      limit: selectableListLimit,
+      sortField: 'name',
+      sortDirection: 'asc',
+      subject_id: subjectId,
+    });
+    return response.data;
   }
 
   getTopicById(id: string): Promise<Topic> {

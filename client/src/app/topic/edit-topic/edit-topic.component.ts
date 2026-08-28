@@ -12,9 +12,9 @@ import { LoadStateComponent } from '../../shared/load-state/load-state.component
 import { Toast } from '../../toast/toast';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { SearchableSelectComponent, SelectOption } from '../../shared/searchable-select/searchable-select.component';
-import { getSubjectIconUrl } from '../../subject/subject-icon.util';
 import { charMinLength, nameMaxLength } from '../../../config/config';
 import { ThemeService } from '../../shared/theme/theme.service';
+import { toSubjectOptions } from '../../shared/select-options.util';
 
 @Component({
   selector: 'app-edit-topic',
@@ -30,11 +30,7 @@ export class EditTopicComponent implements OnInit {
   subjects: Subject[] = [];
 
   get subjectOptions(): SelectOption[] {
-    return this.subjects.map((s) => ({
-      value: s._id!,
-      label: s.name,
-      iconUrl: getSubjectIconUrl(s),
-    }));
+    return toSubjectOptions(this.subjects);
   }
 
   constructor(
@@ -69,8 +65,7 @@ export class EditTopicComponent implements OnInit {
 
   async loadSubjects() {
     try {
-      const response = await this.subjectService.getAllSubjects({ limit: 50, skip: 0, sortDirection: 'asc', sortField: 'name' });
-      this.subjects = response.data;
+      this.subjects = await this.subjectService.getSelectableSubjects();
     } catch (err) {
       console.error('Error loading subjects', err);
       this.toastService.show(this.transloco.translate('topic.toast.subjectsLoadError'), 'error');

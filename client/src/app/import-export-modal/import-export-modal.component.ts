@@ -7,8 +7,8 @@ import { SubjectService } from '../subject/subject.service';
 import { ToastService } from '../toast/toast.service';
 import { SearchableSelectComponent, SelectOption } from '../shared/searchable-select/searchable-select.component';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
-import { getSubjectIconUrl } from '../subject/subject-icon.util';
 import { ModalComponent } from '../shared/modal/modal.component';
+import { toSubjectOptions } from '../shared/select-options.util';
 
 @Component({
   selector: 'app-import-export-modal',
@@ -98,7 +98,7 @@ export class ImportExportModalComponent implements OnInit {
   isLoading = false;
 
   get subjectOptions(): SelectOption[] {
-    return this.subjects.map((s) => ({ value: s._id!, label: s.name, iconUrl: getSubjectIconUrl(s) }));
+    return toSubjectOptions(this.subjects);
   }
 
   constructor(
@@ -114,13 +114,7 @@ export class ImportExportModalComponent implements OnInit {
 
   async loadSubjects() {
     try {
-      const response = await this.subjectService.getAllSubjects({ 
-        skip: 0, 
-        limit: 50,
-        sortField: '_id',
-        sortDirection: 'asc'
-      });
-      this.subjects = response.data;
+      this.subjects = await this.subjectService.getSelectableSubjects();
     } catch (error) {
       console.error('Error loading subjects', error);
     }

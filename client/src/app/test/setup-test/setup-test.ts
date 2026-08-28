@@ -12,8 +12,8 @@ import { SubjectService } from '../../subject/subject.service';
 import { TestService } from '../test.service';
 import { Topic } from '../../models/topic.dto';
 import { TopicService } from '../../topic/topic.service';
+import { toSubjectOptions, toTopicOptions } from '../../shared/select-options.util';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
-import { getSubjectIconUrl } from '../../subject/subject-icon.util';
 
 export function atLeastOneValidator(controls: string[]): ValidatorFn {
   return (group: AbstractControl): ValidationErrors | null => {
@@ -41,11 +41,11 @@ export class SetupTest implements OnInit {
   }
 
   get subjectOptions(): SelectOption[] {
-    return this.subjects.map((s) => ({ value: s._id!, label: s.name, iconUrl: getSubjectIconUrl(s) }));
+    return toSubjectOptions(this.subjects);
   }
 
   get topicOptions(): SelectOption[] {
-    return this.topics.map((t) => ({ value: t._id!, label: t.name, color: t.color }));
+    return toTopicOptions(this.topics);
   }
 
   constructor(
@@ -65,13 +65,13 @@ export class SetupTest implements OnInit {
   }
 
   ngOnInit(): void {
-    this.subjectService.getAllSubjects({ limit: 50, skip: 0, sortDirection: 'asc', sortField: 'name' })
-      .then(response => this.subjects = response.data);
+    this.subjectService.getSelectableSubjects()
+      .then(subjects => this.subjects = subjects);
 
-    this.topicService.getAllTopics({ limit: 50, skip: 0, sortDirection: 'asc', sortField: 'name' })
-      .then(response => {
-        this.allTopics = response.data;
-        this.topics = response.data;
+    this.topicService.getSelectableTopics()
+      .then(topics => {
+        this.allTopics = topics;
+        this.topics = topics;
       });
 
     this.testForm.get('subject_id')?.valueChanges.subscribe(subjectId => {
