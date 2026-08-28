@@ -1,13 +1,10 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { BasePaginatedResult } from 'src/common.dto';
 import {
-  BasePaginatedResult,
-  validateObjectIdParam,
-} from 'src/common.dto';
+  assertValidObjectId,
+  deleteByIdOrThrow,
+} from 'src/common/mongo.util';
 
 import { Test, TestDocument } from './test.schema';
 import { Model, PipelineStage, Types } from 'mongoose';
@@ -20,11 +17,12 @@ import {
 } from './test.dto';
 import { FlashcardsService } from 'src/flashcards/flashcards.service';
 
+const ENTITY = 'Test';
+
 @Injectable()
 export class TestService {
   update(id: string, test: TestDocument) {
-    if (!validateObjectIdParam(id))
-      throw new BadRequestException('The id does not satisfy requirements');
+    assertValidObjectId(id);
     return this.testModel.findByIdAndUpdate(id, test);
   }
   constructor(
@@ -52,8 +50,7 @@ export class TestService {
     count: number;
     elapsed_time?: number;
   }> {
-    if (!validateObjectIdParam(test_id))
-      throw new BadRequestException('The id does not satisfy requirements');
+    assertValidObjectId(test_id);
 
     const [result] = await this.testModel.aggregate([
       { $match: { _id: new Types.ObjectId(test_id) } },
@@ -80,8 +77,7 @@ export class TestService {
     skip: number,
     limit: number,
   ): Promise<QuestionDto[]> {
-    if (!validateObjectIdParam(test_id))
-      throw new BadRequestException('The id does not satisfy requirements');
+    assertValidObjectId(test_id);
 
     const [result] = await this.testModel.aggregate([
       { $match: { _id: new Types.ObjectId(test_id) } },
@@ -96,8 +92,7 @@ export class TestService {
   // Segna il test come completato senza dover rileggere/riscrivere
   // l'intero documento (incluso l'array 'questions') dal client
   completeTest(id: string, elapsed_time: number) {
-    if (!validateObjectIdParam(id))
-      throw new BadRequestException('The id does not satisfy requirements');
+    assertValidObjectId(id);
     return this.testModel.findByIdAndUpdate(id, {
       completedAt: new Date(),
       elapsed_time,
@@ -109,21 +104,12 @@ export class TestService {
   }
 
   updateelapsed_time(id: string, time: number) {
-    if (!validateObjectIdParam(id))
-      throw new BadRequestException('The id does not satisfy requirements');
+    assertValidObjectId(id);
     return this.testModel.findByIdAndUpdate(id, { elapsed_time: time });
   }
 
-  async delete(
-    id: string,
-  ): Promise<void | BadRequestException | NotFoundException> {
-    if (!validateObjectIdParam(id))
-      throw new BadRequestException('The id does not satisfy requirements');
-
-    const result = await this.testModel.findByIdAndDelete(id);
-    if (result == null) {
-      throw new NotFoundException(`Topic with id ${id} not found`);
-    }
+  delete(id: string): Promise<void> {
+    return deleteByIdOrThrow(this.testModel, id, ENTITY);
   }
 
   updateAnswer(
@@ -131,8 +117,8 @@ export class TestService {
     question_id: string,
     is_correct: boolean | undefined,
   ) {
-    if (!validateObjectIdParam(test_id) || !validateObjectIdParam(question_id))
-      throw new BadRequestException('The id does not satisfy requirements');
+    assertValidObjectId(test_id);
+    assertValidObjectId(question_id);
     const update =
       is_correct === undefined
         ? { $unset: { 'questions.$.is_correct': '' } }

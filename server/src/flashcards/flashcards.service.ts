@@ -5,14 +5,19 @@ import {
   RandomFlashcardsDTO,
 } from './flashcards.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Flashcard, FlashcardDocument } from './flashcards.schema';
-import { Model, SortOrder, Types } from 'mongoose';
-import { BasePaginatedResult, validateObjectIdParam } from 'src/common.dto';
+import { FilterQuery, Model, Types } from 'mongoose';
+import { BasePaginatedResult } from 'src/common.dto';
+import {
+  deleteByIdOrThrow,
+  findPaginated,
+  updateByIdOrThrow,
+} from 'src/common/mongo.util';
+
+const ENTITY = 'Flashcard';
+const POPULATE = ['topic_id', 'subject_id'];
+const defaultRandomSampleSize = 10;
 
 @Injectable()
 export class FlashcardsService {
@@ -26,105 +31,61 @@ export class FlashcardsService {
   }
 
   findOne(id: string): Promise<FlashcardDocument | null> {
-    return this.flashcardModel
-      .findById(id)
-      .populate(['topic_id', 'subject_id'])
-      .exec();
+    return this.flashcardModel.findById(id).populate(POPULATE).exec();
   }
 
-  async findAll(
+  findAll(
     filter: FlashcardFilterDTO,
   ): Promise<BasePaginatedResult<FlashcardDocument>> {
-    const query: any = {};
-    if (filter.subject_id) {
-      query.subject_id = filter.subject_id;
-    }
-    if (filter.topic_id) {
-      query.topic_id = filter.topic_id;
-    }
-    if (filter.title) {
-      query.title = { $regex: filter.title, $options: 'i' };
-    }
+    const query: FilterQuery<Flashcard> = {};
+    if (filter.subject_id) query.subject_id = filter.subject_id;
+    if (filter.topic_id) query.topic_id = filter.topic_id;
+    if (filter.title) query.title = { $regex: filter.title, $options: 'i' };
 
-    const [data, count] = await Promise.all([
-      this.flashcardModel
-        .find(query)
-        .sort([
-          [filter.sortField, filter.sortDirection as SortOrder],
-          ['_id', 'desc'],
-        ])
-        .skip(filter.skip)
-        .limit(filter.limit)
-        .populate(['topic_id', 'subject_id'])
-        .exec(),
-      this.flashcardModel.find(query).countDocuments(),
-    ]);
-    return { data, count };
+    return findPaginated<FlashcardDocument>(
+      this.flashcardModel,
+      query,
+      filter,
+      POPULATE,
+    );
   }
 
   getRandom(filter: RandomFlashcardsDTO): Promise<{ _id: string }[]> {
-    const query: any = {};
-    if (filter.subject_id) {
-      query.subject_id = new Types.ObjectId(filter.subject_id);
-    }
-
-    if (filter.topic_id) {
-      query.topic_id = new Types.ObjectId(filter.topic_id);
-    }
-
-    const sampleSize = filter.numFlashcard || 10; // Default to 10 if numFlashcard is not provided or is falsy
-
     return this.flashcardModel
       .aggregate<{ _id: string }>([
-        { $match: query },
-        { $sample: { size: sampleSize } },
-        {
-          $project: {
-            _id: { $toString: '$_id' },
-          },
-        },
+        { $match: this.buildObjectIdQuery(filter) },
+        { $sample: { size: filter.numFlashcard || defaultRandomSampleSize } },
+        { $project: { _id: { $toString: '$_id' } } },
       ])
       .exec();
   }
 
   count(filter: CountFlashcardsDTO): Promise<number> {
-    const query: any = {};
+    return this.flashcardModel
+      .countDocuments(this.buildObjectIdQuery(filter))
+      .exec();
+  }
+
+  delete(id: string): Promise<void> {
+    return deleteByIdOrThrow(this.flashcardModel, id, ENTITY);
+  }
+
+  update(id: string, updateObj: ModifyFlashcardDto): Promise<void> {
+    return updateByIdOrThrow(this.flashcardModel, id, updateObj, ENTITY);
+  }
+
+  // The aggregation pipeline does not cast strings to ObjectId the way find()
+  // does, so subject_id/topic_id have to be converted explicitly here.
+  private buildObjectIdQuery(
+    filter: CountFlashcardsDTO,
+  ): FilterQuery<Flashcard> {
+    const query: FilterQuery<Flashcard> = {};
     if (filter.subject_id) {
       query.subject_id = new Types.ObjectId(filter.subject_id);
     }
-
     if (filter.topic_id) {
       query.topic_id = new Types.ObjectId(filter.topic_id);
     }
-
-    return this.flashcardModel.countDocuments(query).exec();
-  }
-
-  async delete(
-    id: string,
-  ): Promise<void | BadRequestException | NotFoundException> {
-    if (!validateObjectIdParam(id))
-      throw new BadRequestException('The id does not satisfy requirements');
-
-    const result = await this.flashcardModel.deleteOne({ _id: id });
-    if (result.deletedCount === 0) {
-      throw new NotFoundException(`Flashcard with id ${id} not found`);
-    }
-  }
-
-  async update(
-    id: string,
-    updateObj: ModifyFlashcardDto,
-  ): Promise<void | NotFoundException> {
-    if (!validateObjectIdParam(id))
-      throw new BadRequestException('The id does not satisfy requirements');
-
-    const result = await this.flashcardModel
-      .findByIdAndUpdate({ _id: id }, updateObj, { new: true })
-      .exec();
-
-    if (!result) {
-      throw new NotFoundException('Flashcard with id ${id} not found');
-    }
+    return query;
   }
 }

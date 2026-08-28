@@ -1,19 +1,18 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-  UploadedFile,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { FilterQuery, Model } from 'mongoose';
 import { Subject, SubjectDocument } from './subject.schema';
 import { ModifySubjectDto } from './subject.dto';
-import { Model, SortOrder } from 'mongoose';
+import { BasePaginatedResult } from 'src/common.dto';
 import {
-  BasePaginatedResult,
-  validateObjectIdParam,
-} from 'src/common.dto';
+  assertValidObjectId,
+  deleteByIdOrThrow,
+  findPaginated,
+} from 'src/common/mongo.util';
 import { FileService } from 'src/file/file.service';
 import { FlashcardFilterDTO } from 'src/flashcards/flashcards.dto';
+
+const ENTITY = 'Subject';
 
 @Injectable()
 export class SubjectService {
@@ -24,7 +23,7 @@ export class SubjectService {
 
   async create(
     createSubjectDto: ModifySubjectDto,
-    @UploadedFile() icon?: Express.Multer.File,
+    icon?: Express.Multer.File,
   ): Promise<void> {
     const icon_id = icon
       ? (await this.fileService.create([icon]))._id
@@ -36,70 +35,51 @@ export class SubjectService {
     return this.subjectModel.findById(id).exec();
   }
 
-  async findAll(
+  findAll(
     filter: FlashcardFilterDTO,
   ): Promise<BasePaginatedResult<SubjectDocument>> {
-    const query: any = {};
-    if (filter.title) {
-      query.name = { $regex: filter.title, $options: 'i' };
-    }
+    const query: FilterQuery<Subject> = {};
+    if (filter.title) query.name = { $regex: filter.title, $options: 'i' };
 
-    const [data, count] = await Promise.all([
-      this.subjectModel
-        .find(query)
-        .sort([
-          [filter.sortField, filter.sortDirection as SortOrder],
-          ['_id', 'desc'],
-        ])
-        .skip(filter.skip)
-        .limit(filter.limit)
-        .exec(),
-      this.subjectModel.find(query).countDocuments(),
-    ]);
-    return { data, count };
+    return findPaginated<SubjectDocument>(this.subjectModel, query, filter);
   }
 
-  async delete(
-    id: string,
-  ): Promise<void | BadRequestException | NotFoundException> {
-    if (!validateObjectIdParam(id))
-      throw new BadRequestException('The id does not satisfy requirements');
-
-    const result = await this.subjectModel.deleteOne({ _id: id });
-    if (result.deletedCount === 0) {
-      throw new NotFoundException(`Subject with id ${id} not found`);
-    }
+  delete(id: string): Promise<void> {
+    return deleteByIdOrThrow(this.subjectModel, id, ENTITY);
   }
 
+  // Not routed through updateByIdOrThrow: the previous icon has to be read
+  // before the update and deleted only once the update succeeded.
   async update(
     id: string,
     updateObj: ModifySubjectDto,
     icon?: Express.Multer.File,
-  ): Promise<void | NotFoundException> {
-    if (!validateObjectIdParam(id))
-      throw new BadRequestException('The id does not satisfy requirements');
+  ): Promise<void> {
+    assertValidObjectId(id);
 
     const existing = await this.subjectModel.findById(id).exec();
     if (!existing) {
-      throw new NotFoundException(`Subject with id ${id} not found`);
+      throw new NotFoundException(`${ENTITY} with id ${id} not found`);
     }
 
-    const newIconId = icon ? (await this.fileService.create([icon]))._id : undefined;
+    const newIconId = icon
+      ? (await this.fileService.create([icon]))._id
+      : undefined;
     const previousIconId = existing.icon;
 
     const result = await this.subjectModel
       .findByIdAndUpdate(
-        { _id: id },
+        id,
         { ...updateObj, ...(newIconId ? { icon: newIconId } : {}) },
         { new: true },
       )
       .exec();
 
     if (!result) {
-      throw new NotFoundException(`Subject with id ${id} not found`);
+      throw new NotFoundException(`${ENTITY} with id ${id} not found`);
     }
 
-    // cancella la vecchia icona solo dopo che l'update è andato a buon fine
+    // Drop the previous icon only once the update actually succeeded.
     if (newIconId && previousIconId) {
       await this.fileService.delete(previousIconId.toString());
     }

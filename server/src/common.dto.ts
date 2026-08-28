@@ -1,9 +1,8 @@
-import { Filters, idLength, nameMaxLength } from './config';
+import { Filters, nameMaxLength } from './config';
 import { IsIn, IsString, Max, MaxLength, Min } from 'class-validator';
 
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { Types } from 'mongoose';
 
 export class BasicFilterRequest{
   @Type(() => Number)
@@ -49,12 +48,4 @@ export class BasicFilterRequest{
 export interface BasePaginatedResult<T> {
   count: number;
   data: T[];
-}
-
-export function validateObjectIdParam(id: string) {
-  return (
-    typeof id === 'string' &&
-    id.length == idLength &&
-    Types.ObjectId.isValid(id)
-  );
 }

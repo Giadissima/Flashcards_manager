@@ -1,14 +1,18 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { FilterQuery, Model } from 'mongoose';
 import { Topic, TopicDocument } from './topic.schema';
 import { ModifyTopicDto } from './topic.dto';
-import { Model, SortOrder } from 'mongoose';
-import { BasePaginatedResult, validateObjectIdParam } from 'src/common.dto';
+import { BasePaginatedResult } from 'src/common.dto';
+import {
+  deleteByIdOrThrow,
+  findPaginated,
+  updateByIdOrThrow,
+} from 'src/common/mongo.util';
 import { FlashcardFilterDTO } from 'src/flashcards/flashcards.dto';
+
+const ENTITY = 'Topic';
+const POPULATE = 'subject_id';
 
 @Injectable()
 export class TopicService {
@@ -19,61 +23,29 @@ export class TopicService {
   }
 
   findOne(id: string): Promise<TopicDocument | null> {
-    return this.topicModel.findById(id).populate('subject_id').exec();
+    return this.topicModel.findById(id).populate(POPULATE).exec();
   }
 
-  async findAll(
+  findAll(
     filter: FlashcardFilterDTO,
   ): Promise<BasePaginatedResult<TopicDocument>> {
-    const query: any = {};
-    if (filter.subject_id) {
-      query.subject_id = filter.subject_id;
-    }
-    if (filter.title) {
-      query.name = { $regex: filter.title, $options: 'i' };
-    }
+    const query: FilterQuery<Topic> = {};
+    if (filter.subject_id) query.subject_id = filter.subject_id;
+    if (filter.title) query.name = { $regex: filter.title, $options: 'i' };
 
-    const [data, count] = await Promise.all([
-      this.topicModel
-        .find(query)
-        .sort([
-          [filter.sortField, filter.sortDirection as SortOrder],
-          ['_id', 'desc'],
-        ])
-        .skip(filter.skip)
-        .limit(filter.limit)
-        .populate('subject_id')
-        .exec(),
-      this.topicModel.find(query).countDocuments(),
-    ]);
-    return { data, count };
+    return findPaginated<TopicDocument>(
+      this.topicModel,
+      query,
+      filter,
+      POPULATE,
+    );
   }
 
-  async delete(
-    id: string,
-  ): Promise<void | BadRequestException | NotFoundException> {
-    if (!validateObjectIdParam(id))
-      throw new BadRequestException('The id does not satisfy requirements');
-
-    const result = await this.topicModel.deleteOne({ _id: id });
-    if (result.deletedCount === 0) {
-      throw new NotFoundException(`Topic with id ${id} not found`);
-    }
+  delete(id: string): Promise<void> {
+    return deleteByIdOrThrow(this.topicModel, id, ENTITY);
   }
 
-  async update(
-    id: string,
-    updateObj: ModifyTopicDto,
-  ): Promise<void | NotFoundException> {
-    if (!validateObjectIdParam(id))
-      throw new BadRequestException('The id does not satisfy requirements');
-
-    const result = await this.topicModel
-      .findByIdAndUpdate({ _id: id }, updateObj, { new: true })
-      .exec();
-
-    if (!result) {
-      throw new NotFoundException('Topic with id ${id} not found');
-    }
+  update(id: string, updateObj: ModifyTopicDto): Promise<void> {
+    return updateByIdOrThrow(this.topicModel, id, updateObj, ENTITY);
   }
 }
