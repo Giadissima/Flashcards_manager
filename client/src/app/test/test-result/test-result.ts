@@ -2,7 +2,7 @@ import { CommonModule, NgClass } from '@angular/common';
 
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Component, ViewChild } from '@angular/core';
-import { DurationExtendedFormatPipe } from '../../../pipes/duration.extended.pipe';
+import { DurationLongPipe } from '../../pipes/duration-long.pipe';
 import { FlashcardService } from '../../flashcard/flashcard.service';
 import { KatexRendererPipe } from '../../pipes/katex-renderer.pipe';
 import { LoadStateComponent } from '../../shared/load-state/load-state.component';
@@ -13,7 +13,7 @@ import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 @Component({
   selector: 'app-test-result',
   standalone: true,
-  imports: [CommonModule, DurationExtendedFormatPipe, NgClass, KatexRendererPipe, RouterLink, TranslocoModule, LoadStateComponent],
+  imports: [CommonModule, DurationLongPipe, NgClass, KatexRendererPipe, RouterLink, TranslocoModule, LoadStateComponent],
   templateUrl: './test-result.html',
   styleUrl: './test-result.scss'
 })

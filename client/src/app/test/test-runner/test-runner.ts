@@ -4,7 +4,7 @@ import { Subscription, interval } from 'rxjs';
 
 import { CommonModule } from '@angular/common';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
-import { DurationPipe } from '../../../pipes/duration.pipe';
+import { DurationPipe } from '../../pipes/duration.pipe';
 import { Flashcard } from '../../models/flashcard.dto';
 import { FlashcardService } from '../../flashcard/flashcard.service';
 import { KatexRendererPipe } from '../../pipes/katex-renderer.pipe';

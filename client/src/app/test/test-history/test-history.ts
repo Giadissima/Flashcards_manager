@@ -8,7 +8,7 @@ import { Test, TestStats } from '../../models/test.dto';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 
 import { CommonModule } from '@angular/common';
-import { DurationPipe } from '../../../pipes/duration.pipe';
+import { DurationPipe } from '../../pipes/duration.pipe';
 import { FormsModule } from '@angular/forms';
 import { PaginatedList } from '../../shared/paginated-list';
 import { toSubjectOptions, toTopicOptions } from '../../shared/select-options.util';
