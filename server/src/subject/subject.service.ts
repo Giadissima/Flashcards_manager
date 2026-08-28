@@ -3,14 +3,13 @@ import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
 import { Subject, SubjectDocument } from './subject.schema';
 import { ModifySubjectDto } from './subject.dto';
-import { BasePaginatedResult } from 'src/common.dto';
+import { BasePaginatedResult, ListFilterRequest } from 'src/common.dto';
 import {
   assertValidObjectId,
   deleteByIdOrThrow,
   findPaginated,
 } from 'src/common/mongo.util';
 import { FileService } from 'src/file/file.service';
-import { FlashcardFilterDTO } from 'src/flashcards/flashcards.dto';
 
 const ENTITY = 'Subject';
 
@@ -36,7 +35,7 @@ export class SubjectService {
   }
 
   findAll(
-    filter: FlashcardFilterDTO,
+    filter: ListFilterRequest,
   ): Promise<BasePaginatedResult<SubjectDocument>> {
     const query: FilterQuery<Subject> = {};
     if (filter.title) query.name = { $regex: filter.title, $options: 'i' };

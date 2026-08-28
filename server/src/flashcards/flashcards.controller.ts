@@ -13,10 +13,9 @@ import {
 
 import { FlashcardsService } from './flashcards.service';
 import { ApiOperation } from '@nestjs/swagger';
-import { BasePaginatedResult } from 'src/common.dto';
+import { BasePaginatedResult, ListFilterRequest } from 'src/common.dto';
 import {
   CountFlashcardsDTO,
-  FlashcardFilterDTO,
   ModifyFlashcardDto,
   RandomFlashcardsDTO,
 } from './flashcards.dto';
@@ -35,7 +34,7 @@ export class FlashcardsController {
   @ApiOperation({ description: 'get all Flashcard from db with filters' })
   @Get('all')
   findAll(
-    @Query() filters: FlashcardFilterDTO,
+    @Query() filters: ListFilterRequest,
   ): Promise<BasePaginatedResult<FlashcardDocument>> {
     return this.flashcardsService.findAll(filters);
   }

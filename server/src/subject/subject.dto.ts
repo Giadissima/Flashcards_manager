@@ -1,13 +1,9 @@
 import { IsOptional, IsString, Length, Matches } from 'class-validator';
-import {
-  charMinLength,
-  nameMaxLength,
-  descMaxLength,
-} from 'src/config';
+import { charMinLength, descMaxLength, nameMaxLength } from 'src/config';
 
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
 import { IsHtmlTextLength } from 'src/common/validators/html-text-length.validator';
+import { Trim, TrimHtml } from 'src/common/transform.decorators';
 
 /** The Dto file contains the description of the client requests and the server's responses*/
 export class ModifySubjectDto {
@@ -17,7 +13,7 @@ export class ModifySubjectDto {
     description: 'Name',
     example: 'Math',
   })
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  @Trim()
   name: string;
 
   @IsString()
@@ -25,16 +21,9 @@ export class ModifySubjectDto {
   @IsHtmlTextLength(charMinLength, descMaxLength, { allowEmpty: true })
   @ApiProperty({
     description: 'Description',
-    example: 'Matematica 2o anno liceo', // TODO tradurlo in inglese
+    example: 'Maths, second year of high school',
   })
-  @Transform(({ value }) => {
-    if (typeof value !== 'string') return value;
-    const trimmed = value.trim();
-    // un editor TipTap vuoto produce "<p></p>": lo si normalizza a stringa
-    // vuota invece di salvare markup senza contenuto reale
-    const textOnly = trimmed.replace(/<[^>]*>/g, '').trim();
-    return textOnly.length > 0 ? trimmed : '';
-  })
+  @TrimHtml()
   desc: string;
 
   @IsString()

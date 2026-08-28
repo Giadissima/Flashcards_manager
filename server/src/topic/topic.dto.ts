@@ -2,7 +2,7 @@ import { IsMongoId, IsOptional, IsString, Length } from 'class-validator';
 import { charMinLength, idLength, nameMaxLength } from 'src/config';
 
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
+import { Trim, TrimToUndefined } from 'src/common/transform.decorators';
 
 /** The Dto file contains the description of the client requests and the server's responses*/
 export class ModifyTopicDto {
@@ -12,7 +12,7 @@ export class ModifyTopicDto {
     description: 'Name',
     example: 'Operazioni Aritmetiche',
   })
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  @Trim()
   name: string;
 
   @IsString()
@@ -20,8 +20,8 @@ export class ModifyTopicDto {
     description: 'color',
     example: '#CDCDCD',
   })
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
-  color: string; // TODO vedere da input come viene inviato il dato e metterci dei controlli
+  @Trim()
+  color: string; // TODO check how the value arrives from the input and validate it
 
   @IsOptional()
   @IsMongoId()
@@ -30,10 +30,6 @@ export class ModifyTopicDto {
     description: 'subject id',
     example: null,
   })
-  @Transform(({ value }) =>
-    typeof value === 'string'
-      ? value.trim() || undefined // "" diventa undefined
-      : value,
-  )
+  @TrimToUndefined()
   subject_id: string;
 }

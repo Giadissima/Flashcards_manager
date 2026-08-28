@@ -1,6 +1,5 @@
 import {
   CountFlashcardsDTO,
-  FlashcardFilterDTO,
   ModifyFlashcardDto,
   RandomFlashcardsDTO,
 } from './flashcards.dto';
@@ -8,7 +7,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Injectable } from '@nestjs/common';
 import { Flashcard, FlashcardDocument } from './flashcards.schema';
 import { FilterQuery, Model, Types } from 'mongoose';
-import { BasePaginatedResult } from 'src/common.dto';
+import { BasePaginatedResult, ListFilterRequest } from 'src/common.dto';
 import {
   deleteByIdOrThrow,
   findPaginated,
@@ -35,7 +34,7 @@ export class FlashcardsService {
   }
 
   findAll(
-    filter: FlashcardFilterDTO,
+    filter: ListFilterRequest,
   ): Promise<BasePaginatedResult<FlashcardDocument>> {
     const query: FilterQuery<Flashcard> = {};
     if (filter.subject_id) query.subject_id = filter.subject_id;

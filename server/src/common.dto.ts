@@ -1,5 +1,13 @@
 import { Filters, nameMaxLength } from './config';
-import { IsIn, IsString, Max, MaxLength, Min } from 'class-validator';
+import {
+  IsIn,
+  IsMongoId,
+  IsOptional,
+  IsString,
+  Max,
+  MaxLength,
+  Min,
+} from 'class-validator';
 
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
@@ -43,6 +51,38 @@ export class BasicFilterRequest{
     default: 'desc',
   })
   sortDirection: string;
+}
+
+/**
+ * Query string accepted by every paginated list endpoint (flashcards, topics,
+ * subjects). Declared once here instead of being borrowed from another
+ * module's DTO: with forbidNonWhitelisted enabled this class *is* the contract
+ * of those endpoints, so it belongs where all three can see it.
+ */
+export class ListFilterRequest extends BasicFilterRequest {
+  @IsOptional()
+  @IsMongoId()
+  @ApiProperty({
+    description: 'Filter by subject ID',
+    required: false,
+  })
+  subject_id?: string;
+
+  @IsOptional()
+  @IsMongoId()
+  @ApiProperty({
+    description: 'Filter by topic ID',
+    required: false,
+  })
+  topic_id?: string;
+
+  @IsOptional()
+  @IsString()
+  @ApiProperty({
+    description: 'Search a title',
+    required: false,
+  })
+  title?: string;
 }
 
 export interface BasePaginatedResult<T> {

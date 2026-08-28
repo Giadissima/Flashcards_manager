@@ -3,13 +3,12 @@ import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
 import { Topic, TopicDocument } from './topic.schema';
 import { ModifyTopicDto } from './topic.dto';
-import { BasePaginatedResult } from 'src/common.dto';
+import { BasePaginatedResult, ListFilterRequest } from 'src/common.dto';
 import {
   deleteByIdOrThrow,
   findPaginated,
   updateByIdOrThrow,
 } from 'src/common/mongo.util';
-import { FlashcardFilterDTO } from 'src/flashcards/flashcards.dto';
 
 const ENTITY = 'Topic';
 const POPULATE = 'subject_id';
@@ -27,7 +26,7 @@ export class TopicService {
   }
 
   findAll(
-    filter: FlashcardFilterDTO,
+    filter: ListFilterRequest,
   ): Promise<BasePaginatedResult<TopicDocument>> {
     const query: FilterQuery<Topic> = {};
     if (filter.subject_id) query.subject_id = filter.subject_id;

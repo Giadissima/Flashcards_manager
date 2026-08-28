@@ -15,10 +15,16 @@ import {
 import { SubjectService } from './subject.service';
 import { ModifySubjectDto } from './subject.dto';
 import { ApiBody, ApiConsumes, ApiOperation } from '@nestjs/swagger';
-import { BasePaginatedResult } from 'src/common.dto';
+import { BasePaginatedResult, ListFilterRequest } from 'src/common.dto';
 import { SubjectDocument } from './subject.schema';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { FlashcardFilterDTO } from 'src/flashcards/flashcards.dto';
+
+// Shared by create and update; the icon differs, so it stays at each call site.
+const subjectPayloadFields = {
+  name: { type: 'string', example: 'Matematica' },
+  desc: { type: 'string', example: 'Materia scientifica di base' },
+  color: { type: 'string', example: '#7fa8d9' },
+} as const;
 
 @Controller('subject')
 export class SubjectController {
@@ -32,9 +38,7 @@ export class SubjectController {
     schema: {
       type: 'object',
       properties: {
-        name: { type: 'string', example: 'Matematica' },
-        desc: { type: 'string', example: 'Materia scientifica di base' },
-        color: { type: 'string', example: '#7fa8d9' },
+        ...subjectPayloadFields,
         icon: {
           type: 'string',
           format: 'binary',
@@ -54,7 +58,7 @@ export class SubjectController {
   @ApiOperation({ description: 'get all subject from db with filters' })
   @Get('all')
   findAll(
-    @Query() filters: FlashcardFilterDTO,
+    @Query() filters: ListFilterRequest,
   ): Promise<BasePaginatedResult<SubjectDocument>> {
     return this.subjectService.findAll(filters);
   }
@@ -72,9 +76,7 @@ export class SubjectController {
     schema: {
       type: 'object',
       properties: {
-        name: { type: 'string', example: 'Matematica' },
-        desc: { type: 'string', example: 'Materia scientifica di base' },
-        color: { type: 'string', example: '#7fa8d9' },
+        ...subjectPayloadFields,
         icon: {
           type: 'string',
           format: 'binary',
