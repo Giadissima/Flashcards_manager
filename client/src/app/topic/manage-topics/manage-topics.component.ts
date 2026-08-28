@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
+import { PaginatedList } from '../../shared/paginated-list';
 import { Router } from '@angular/router';
 import { SearchInputComponent } from '../../shared/search-input/search-input.component';
 import { SearchableSelectComponent, SelectOption } from '../../shared/searchable-select/searchable-select.component';
@@ -20,15 +21,11 @@ import { getSubjectIconUrl } from '../../subject/subject-icon.util';
   templateUrl: './manage-topics.component.html',
   styleUrls: ['./manage-topics.component.scss']
 })
-export class ManageTopicsComponent implements OnInit {
+export class ManageTopicsComponent extends PaginatedList implements OnInit {
   topics: Topic[] = [];
   subjects: Subject[] = [];
   selectedSubjectId: string | null = null;
   searchTerm = '';
-
-  currentPage = 1;
-  pageSize = 10;
-  totalCount = 0;
 
   get subjectOptions(): SelectOption[] {
     return this.subjects.map((s) => ({ value: s._id!, label: s.name, iconUrl: getSubjectIconUrl(s) }));
@@ -39,7 +36,9 @@ export class ManageTopicsComponent implements OnInit {
     private toastService: ToastService,
     private subjectService: SubjectService,
     private transloco: TranslocoService
-  ) { }
+  ) {
+    super();
+  }
 
   ngOnInit(): void {
     this.loadTopics();
@@ -75,7 +74,7 @@ export class ManageTopicsComponent implements OnInit {
     try {
       const response = await this.topicService.getAllTopics({
         limit: this.pageSize,
-        skip: (this.currentPage - 1) * this.pageSize,
+        skip: this.pageSkip,
         sortDirection: 'asc',
         sortField: 'name',
         subject_id: this.selectedSubjectId || undefined,
@@ -88,19 +87,7 @@ export class ManageTopicsComponent implements OnInit {
     }
   }
 
-  get totalPages(): number {
-    return Math.max(1, Math.ceil(this.totalCount / this.pageSize));
-  }
-
-  nextPage(): void {
-    if (this.currentPage >= this.totalPages) return;
-    this.currentPage++;
-    this.loadTopics();
-  }
-
-  previousPage(): void {
-    if (this.currentPage <= 1) return;
-    this.currentPage--;
+  protected override onPageChange(): void {
     this.loadTopics();
   }
 

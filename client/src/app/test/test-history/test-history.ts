@@ -10,6 +10,7 @@ import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { CommonModule } from '@angular/common';
 import { DurationPipe } from '../../../pipes/duration.pipe';
 import { FormsModule } from '@angular/forms';
+import { PaginatedList } from '../../shared/paginated-list';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
 import { TestService } from '../test.service';
@@ -32,7 +33,7 @@ import { getSubjectIconUrl } from '../../subject/subject-icon.util';
   templateUrl: './test-history.html',
   styleUrl: './test-history.scss',
 })
-export class TestHistory implements OnInit {
+export class TestHistory extends PaginatedList implements OnInit {
   constructor(
     private testService: TestService,
     private subjectService: SubjectService,
@@ -40,12 +41,12 @@ export class TestHistory implements OnInit {
     private router: Router,
     private toast: ToastService,
     private transloco: TranslocoService,
-  ) {}
+  ) {
+    super();
+  }
 
   tests: Test[] = [];
-  totalCount = 0;
-  currentPage = 1;
-  pageSize = 20;
+  override pageSize = 20;
   stats: TestStats | null = null;
 
   subjects: Subject[] = [];
@@ -185,7 +186,7 @@ export class TestHistory implements OnInit {
       .getAll({
         sortField: 'updatedAt',
         sortDirection: 'desc',
-        skip: (this.currentPage - 1) * this.pageSize,
+        skip: this.pageSkip,
         limit: this.pageSize,
         ...this.activeFilters,
       })
@@ -195,19 +196,7 @@ export class TestHistory implements OnInit {
       });
   }
 
-  get totalPages(): number {
-    return Math.max(1, Math.ceil(this.totalCount / this.pageSize));
-  }
-
-  nextPage(): void {
-    if (this.currentPage >= this.totalPages) return;
-    this.currentPage++;
-    this.loadTests();
-  }
-
-  previousPage(): void {
-    if (this.currentPage <= 1) return;
-    this.currentPage--;
+  protected override onPageChange(): void {
     this.loadTests();
   }
 

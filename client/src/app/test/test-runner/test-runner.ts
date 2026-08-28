@@ -9,6 +9,7 @@ import { Flashcard } from '../../models/flashcard.dto';
 import { FlashcardService } from '../../flashcard/flashcard.service';
 import { KatexRendererPipe } from '../../pipes/katex-renderer.pipe';
 import { LoadStateComponent } from '../../shared/load-state/load-state.component';
+import { PaginatedList } from '../../shared/paginated-list';
 import { Subject } from '../../models/subject.dto';
 import { Topic } from '../../models/topic.dto';
 import { TestService } from '../test.service';
@@ -22,20 +23,18 @@ import { getSubjectIconUrl } from '../../subject/subject-icon.util';
   templateUrl: './test-runner.html',
   styleUrls: ['./test-runner.scss']
 })
-export class TestRunner implements OnInit {
+export class TestRunner extends PaginatedList implements OnInit {
   @ViewChild(LoadStateComponent, { static: true }) loadState!: LoadStateComponent;
 
   testId!: string;
   elapsed_time: number = 0; // in secondi
   timerSub!: Subscription;
 
-  // Griglia di flashcard, 9 per pagina (3x3). Il test non viene mai tenuto
-  // per intero in memoria (potrebbe avere centinaia di domande): si conosce
-  // solo il conteggio totale e si carica dal server una pagina alla volta.
-  totalQuestions = 0;
+  // Grid of flashcards, 9 per page (3x3). The test is never held in memory as
+  // a whole (it may have hundreds of questions): only the total count is known,
+  // and one page at a time is fetched from the server.
+  override pageSize = 9;
   pageFlashcards: Flashcard[] = [];
-  pageSize = 9;
-  currentPage = 1;
 
   // mappa flashcard_id -> boolean (risposta data, per le card già viste)
   private answersMap: Record<string, boolean> = {};
@@ -56,7 +55,9 @@ export class TestRunner implements OnInit {
     private testService: TestService,
     private router: Router,
     private transloco: TranslocoService
-  ) {}
+  ) {
+    super();
+  }
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
@@ -83,7 +84,7 @@ export class TestRunner implements OnInit {
     if(!this.testId) return;
 
     const { count, elapsed_time } = await this.testService.getQuestionsCount(this.testId);
-    this.totalQuestions = count;
+    this.totalCount = count;
     if(this.elapsed_time == 0)
       this.elapsed_time = elapsed_time ?? 0;
 
@@ -106,14 +107,9 @@ export class TestRunner implements OnInit {
     }
   }
 
-  get totalPages(): number {
-    return Math.max(1, Math.ceil(this.totalQuestions / this.pageSize));
-  }
-
   async loadPage(): Promise<void> {
     if (!this.testId) return;
-    const skip = (this.currentPage - 1) * this.pageSize;
-    const pageQuestions = await this.testService.getQuestionsPage(this.testId, skip, this.pageSize);
+    const pageQuestions = await this.testService.getQuestionsPage(this.testId, this.pageSkip, this.pageSize);
     for (const q of pageQuestions) {
       if (q.is_correct !== undefined) this.answersMap[q.flashcard_id] = q.is_correct;
     }
@@ -122,15 +118,7 @@ export class TestRunner implements OnInit {
     );
   }
 
-  nextPage(): void {
-    if (this.currentPage >= this.totalPages) return;
-    this.currentPage++;
-    this.loadPage();
-  }
-
-  previousPage(): void {
-    if (this.currentPage <= 1) return;
-    this.currentPage--;
+  protected override onPageChange(): void {
     this.loadPage();
   }
 

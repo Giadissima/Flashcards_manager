@@ -17,7 +17,7 @@
       <div class="test-info-date text-muted">{{ 'test.runner.startedOn' | transloco }} {{ testStartDate |
         date:'dd/MM/yyyy HH:mm' }}</div>
       <div class="test-info-progress text-muted">{{ 'test.runner.progress' | transloco:{ answered: answeredCount, total:
-        totalQuestions } }}</div>
+        totalCount } }}</div>
     </div>
     @for (card of pageFlashcards; track card._id) {
     <div class="card flashcard flashcard-topic-color mb-3" [style.border-top-color]="getCardColor(card)">

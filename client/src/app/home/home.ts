@@ -10,6 +10,7 @@ import { KatexRendererPipe } from '../pipes/katex-renderer.pipe';
 import { LoadStateComponent } from '../shared/load-state/load-state.component';
 import Panzoom, { PanzoomObject } from '@panzoom/panzoom';
 import { ActivatedRoute, Router } from '@angular/router';
+import { PaginatedList } from '../shared/paginated-list';
 import { Subject } from '../models/subject.dto';
 import { SubjectService } from '../subject/subject.service';
 import { Toast } from '../toast/toast';
@@ -27,7 +28,7 @@ import { ModalComponent } from '../shared/modal/modal.component';
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
-export class Home implements OnInit, AfterViewChecked, OnDestroy {
+export class Home extends PaginatedList implements OnInit, AfterViewChecked, OnDestroy {
   @ViewChild('imageModalImg') imageModalImgRef?: ElementRef<HTMLImageElement>;
   @ViewChild(LoadStateComponent, { static: true }) loadState!: LoadStateComponent;
 
@@ -49,10 +50,7 @@ export class Home implements OnInit, AfterViewChecked, OnDestroy {
   sortBy: 'title' | 'createdAt' = 'title';
   sortDirection: 'asc' | 'desc' = 'asc';
 
-  // Paginazione
-  currentPage = 1;
-  pageSize = 21;
-  totalCount = 0;
+  override pageSize = 21;
 
   // mappa _id -> boolean (true = mostra risposta)
   showAnswerMap: Record<string, boolean> = {};
@@ -87,7 +85,9 @@ export class Home implements OnInit, AfterViewChecked, OnDestroy {
     private subjectService: SubjectService,
     private topicService: TopicService,
     private transloco: TranslocoService,
-  ) {}
+  ) {
+    super();
+  }
 
   ngOnInit(): void {
     this.searchTermChangesSubscription = this.searchTermChanges.pipe(debounceTime(1000)).subscribe(() => {
@@ -173,7 +173,7 @@ export class Home implements OnInit, AfterViewChecked, OnDestroy {
     const data = await this.flashcardsService.getAll({
       sortField: this.sortBy,
       sortDirection: this.sortDirection,
-      skip: (this.currentPage - 1) * this.pageSize,
+      skip: this.pageSkip,
       limit: this.pageSize,
       subject_id: this.selectedSubjectId || undefined,
       topic_id: this.selectedTopicId || undefined,
@@ -183,19 +183,8 @@ export class Home implements OnInit, AfterViewChecked, OnDestroy {
     this.totalCount = data.count;
   }
 
-  get totalPages(): number {
-    return Math.max(1, Math.ceil(this.totalCount / this.pageSize));
-  }
-
-  nextPage(): void {
-    if (this.currentPage >= this.totalPages) return;
-    this.currentPage++;
-    this.updateQueryParams();
-  }
-
-  previousPage(): void {
-    if (this.currentPage <= 1) return;
-    this.currentPage--;
+  // Paging goes through the URL: the queryParamMap subscription reloads.
+  protected override onPageChange(): void {
     this.updateQueryParams();
   }
 

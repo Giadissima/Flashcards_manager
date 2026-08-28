@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
+import { PaginatedList } from '../../shared/paginated-list';
 import { Router } from '@angular/router';
 import { SearchInputComponent } from '../../shared/search-input/search-input.component';
 import { Subject } from '../../models/subject.dto';
@@ -17,21 +18,19 @@ import { getSubjectIconUrl } from '../subject-icon.util';
   templateUrl: './manage-subjects.component.html',
   styleUrls: ['./manage-subjects.component.scss']
 })
-export class ManageSubjectsComponent implements OnInit {
+export class ManageSubjectsComponent extends PaginatedList implements OnInit {
   subjects: Subject[] = [];
   private expandedSubjectIds = new Set<string>();
   searchTerm = '';
-
-  currentPage = 1;
-  pageSize = 10;
-  totalCount = 0;
 
   constructor(
     private subjectService: SubjectService,
     private router: Router,
     private toastService: ToastService,
     private transloco: TranslocoService
-  ) {}
+  ) {
+    super();
+  }
 
   ngOnInit(): void {
     this.loadSubjects();
@@ -40,7 +39,7 @@ export class ManageSubjectsComponent implements OnInit {
   async loadSubjects(): Promise<void> {
     try {
       const response = await this.subjectService.getAllSubjects({
-        skip: (this.currentPage - 1) * this.pageSize,
+        skip: this.pageSkip,
         limit: this.pageSize,
         sortField: 'name',
         sortDirection: 'asc',
@@ -63,19 +62,7 @@ export class ManageSubjectsComponent implements OnInit {
     this.onFilterChange();
   }
 
-  get totalPages(): number {
-    return Math.max(1, Math.ceil(this.totalCount / this.pageSize));
-  }
-
-  nextPage(): void {
-    if (this.currentPage >= this.totalPages) return;
-    this.currentPage++;
-    this.loadSubjects();
-  }
-
-  previousPage(): void {
-    if (this.currentPage <= 1) return;
-    this.currentPage--;
+  protected override onPageChange(): void {
     this.loadSubjects();
   }
 
