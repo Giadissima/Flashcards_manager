@@ -64,8 +64,10 @@ export class EditSubjectComponent implements OnInit, OnDestroy {
     private toastService: ToastService,
     private transloco: TranslocoService
   ) {
-    // No Image here, as before: the toolbar of this page has no image button.
-    this.descEditor = createRichTextEditor({ withImage: false });
+    // Image is registered even though this toolbar has no image button: TipTap
+    // parses the stored HTML against the schema, so without it the <img> tags
+    // of a description written on the create page would be silently dropped.
+    this.descEditor = createRichTextEditor({ withImage: true });
     this.descEditor.on('update', () => {
       this.descLength = this.descEditor.getText().length;
     });
