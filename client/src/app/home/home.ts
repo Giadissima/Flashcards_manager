@@ -12,6 +12,7 @@ import Panzoom, { PanzoomObject } from '@panzoom/panzoom';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PaginatedList } from '../shared/paginated-list';
 import { toSubjectOptions, toTopicOptions } from '../shared/select-options.util';
+import * as cardView from '../shared/flashcard-view.util';
 import { Subject } from '../models/subject.dto';
 import { SubjectService } from '../subject/subject.service';
 import { Toast } from '../toast/toast';
@@ -19,7 +20,6 @@ import { ToastService } from '../toast/toast.service';
 import { Topic } from '../models/topic.dto';
 import { TopicService } from '../topic/topic.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
-import { getSubjectIconUrl } from '../subject/subject-icon.util';
 import { ModalComponent } from '../shared/modal/modal.component';
 
 @Component({
@@ -205,58 +205,23 @@ export class Home extends PaginatedList implements OnInit, AfterViewChecked, OnD
   }
 
   getCardColor(card: Flashcard): string {
-    // se topic_id è un oggetto Topic, usa il suo colore
-    if (
-      card.topic_id &&
-      typeof card.topic_id !== 'string' &&
-      card.topic_id.color
-    ) {
-      return card.topic_id.color;
-    }
-    // fallback
-    return 'blue';
+    return cardView.getCardColor(card);
   }
 
   getCardSubjectIconUrl(card: Flashcard): string {
-    // subject_id è quasi sempre popolato direttamente sulla flashcard (sia da
-    // create-flashcard che dall'import), ma in caso contrario si risolve
-    // comunque tramite la lista già caricata per il filtro
-    let subject: Subject | undefined;
-    if (card.subject_id && typeof card.subject_id !== 'string') {
-      subject = card.subject_id;
-    } else if (typeof card.subject_id === 'string') {
-      subject = this.subjects.find((s) => s._id === card.subject_id);
-    }
-    return getSubjectIconUrl(subject);
+    return cardView.getCardSubjectIconUrl(card);
   }
 
   getCardSubjectName(card: Flashcard): string {
-    if (card.subject_id && typeof card.subject_id !== 'string') {
-      return card.subject_id.name;
-    }
-    if (typeof card.subject_id === 'string') {
-      return this.subjects.find((s) => s._id === card.subject_id)?.name ?? '';
-    }
-    return '';
+    return cardView.getCardSubjectName(card);
   }
 
   getCardTopicName(card: Flashcard): string {
-    if (card.topic_id && typeof card.topic_id !== 'string') {
-      return card.topic_id.name;
-    }
-    if (typeof card.topic_id === 'string') {
-      return this.topics.find((t) => t._id === card.topic_id)?.name ?? '';
-    }
-    return '';
+    return cardView.getCardTopicName(card);
   }
 
   getCardBody(card: Flashcard): string {
-    if (!card._id) return card.question;
-    return (
-      '<p>' +
-      (this.showAnswerMap[card._id] ? card.answer : card.question) +
-      '</p>'
-    );
+    return cardView.getCardBody(card, this.showAnswerMap[card._id]);
   }
 
   // cambia da 'Vedi risposta' a 'Vedi domanda'

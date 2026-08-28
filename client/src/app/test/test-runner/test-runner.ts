@@ -10,11 +10,9 @@ import { FlashcardService } from '../../flashcard/flashcard.service';
 import { KatexRendererPipe } from '../../pipes/katex-renderer.pipe';
 import { LoadStateComponent } from '../../shared/load-state/load-state.component';
 import { PaginatedList } from '../../shared/paginated-list';
-import { Subject } from '../../models/subject.dto';
-import { Topic } from '../../models/topic.dto';
+import * as cardView from '../../shared/flashcard-view.util';
 import { TestService } from '../test.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
-import { getSubjectIconUrl } from '../../subject/subject-icon.util';
 
 @Component({
   selector: 'app-test-runner',
@@ -141,28 +139,23 @@ export class TestRunner extends PaginatedList implements OnInit {
   }
 
   getCardColor(card: Flashcard): string {
-    if (card.topic_id && typeof card.topic_id !== 'string' && card.topic_id.color) {
-      return card.topic_id.color;
-    }
-    return 'blue';
+    return cardView.getCardColor(card);
   }
 
   getCardSubjectIconUrl(card: Flashcard): string {
-    const subject = card.subject_id && typeof card.subject_id !== 'string' ? card.subject_id : undefined;
-    return getSubjectIconUrl(subject as Subject | undefined);
+    return cardView.getCardSubjectIconUrl(card);
   }
 
   getCardSubjectName(card: Flashcard): string {
-    return card.subject_id && typeof card.subject_id !== 'string' ? card.subject_id.name : '';
+    return cardView.getCardSubjectName(card);
   }
 
   getCardTopicName(card: Flashcard): string {
-    return card.topic_id && typeof card.topic_id !== 'string' ? (card.topic_id as Topic).name : '';
+    return cardView.getCardTopicName(card);
   }
 
   getCardBody(card: Flashcard): string {
-    if (!card._id) return card.question;
-    return '<p>' + (this.showAnswerMap[card._id] ? card.answer : card.question) + '</p>';
+    return cardView.getCardBody(card, this.showAnswerMap[card._id]);
   }
 
   getCardButtonText(card: Flashcard): string {
