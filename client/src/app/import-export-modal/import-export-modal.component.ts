@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
-import { CommonModule } from '@angular/common';
 import { ImportExportService } from './import-export.service';
 import { Subject } from '../models/subject.dto';
 import { SubjectService } from '../subject/subject.service';
@@ -13,7 +12,7 @@ import { toSubjectOptions } from '../shared/select-options.util';
 @Component({
   selector: 'app-import-export-modal',
   standalone: true,
-  imports: [CommonModule, SearchableSelectComponent, TranslocoModule, ModalComponent],
+  imports: [SearchableSelectComponent, TranslocoModule, ModalComponent],
   template: `
     <app-modal [isOpen]="isOpen" [title]="'importExport.title' | transloco" (closed)="close()" *transloco="let t">
       <ng-container modal-header-start>
@@ -56,11 +55,13 @@ import { toSubjectOptions } from '../shared/select-options.util';
         </button>
       </section>
 
-      <div *ngIf="isLoading" class="text-center mt-3">
+      @if (isLoading) {
+      <div class="text-center mt-3">
         <div class="spinner-border text-primary" role="status">
           <span class="visually-hidden">{{ 'common.loading' | transloco }}</span>
         </div>
       </div>
+      }
     </app-modal>
   `,
   styles: [`

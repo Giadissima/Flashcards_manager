@@ -18,7 +18,8 @@
   </div>
 
   <!-- Main Grid Layout -->
-  <div class="summary-grid" *ngIf="test">
+  @if (test) {
+  <div class="summary-grid">
     
     <!-- Score Card -->
     <div class="card score-card">
@@ -69,6 +70,7 @@
       </div>
     </div>
   </div>
+  }
 
   <!-- Questions Review -->
   @if(questions && questions.length){

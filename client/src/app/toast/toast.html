@@ -14,12 +14,13 @@
     <div class="d-flex">
       <div class="toast-body">
         {{ message }}
+        @if (actionLabel) {
         <button
-          *ngIf="actionLabel"
           type="button"
           class="btn btn-link btn-sm text-white text-decoration-underline p-0 ms-2 align-baseline"
           (click)="triggerAction()"
         >{{ actionLabel }}</button>
+        }
       </div>
       <button
         type="button"

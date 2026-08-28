@@ -53,17 +53,23 @@
           </div>
         </div>
 
-        <div *ngIf="testForm.get('numFlashcard')?.errors?.['max'] && testForm.get('numFlashcard')?.touched" class="alert alert-danger">
+        @if (testForm.get('numFlashcard')?.errors?.['max'] && testForm.get('numFlashcard')?.touched) {
+        <div class="alert alert-danger">
           {{ 'test.setup.maxQuestionsError' | transloco }}
         </div>
+        }
 
-        <div *ngIf="testForm.errors?.['atLeastOneRequired'] && (testForm.touched || testForm.dirty)" class="alert alert-danger">
+        @if (testForm.errors?.['atLeastOneRequired'] && (testForm.touched || testForm.dirty)) {
+        <div class="alert alert-danger">
           {{ 'test.setup.atLeastOneError' | transloco }}
         </div>
+        }
 
-        <div *ngIf="noFlashcardsAvailable && !testForm.errors?.['atLeastOneRequired']" class="alert alert-danger">
+        @if (noFlashcardsAvailable && !testForm.errors?.['atLeastOneRequired']) {
+        <div class="alert alert-danger">
           {{ 'test.setup.noFlashcardsError' | transloco }}
         </div>
+        }
 
         <div class="d-flex justify-content-center mt-4">
           <button type="submit" class="btn d-flex align-items-center gap-2" [ngClass]="(testForm.invalid || noFlashcardsAvailable) ? 'btn-outline-secondary' : 'btn-primary'" [disabled]="testForm.invalid || noFlashcardsAvailable">
