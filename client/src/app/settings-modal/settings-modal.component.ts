@@ -5,8 +5,7 @@ import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { SearchableSelectComponent, SelectOption } from '../shared/searchable-select/searchable-select.component';
 import { ModalComponent } from '../shared/modal/modal.component';
 import { ThemeService } from '../shared/theme/theme.service';
-
-export type AppLanguage = 'it' | 'en';
+import { AppLanguage, storeLanguage } from '../shared/language';
 
 @Component({
   selector: 'app-settings-modal',
@@ -115,7 +114,7 @@ export class SettingsModalComponent implements OnInit, OnChanges {
 
   save(): void {
     this.themeService.persist();
-    localStorage.setItem('language', this.language);
+    storeLanguage(this.language);
     this.closeModal();
   }
 
