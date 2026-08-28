@@ -8,8 +8,7 @@ bootstrapApplication(App, {
   ...appConfig,
   providers: [
     ...(appConfig.providers ?? []),
-    // TODO aggiungere interceptor errori
-    provideHttpClient(withInterceptorsFromDi()) // <- sostituisce HttpClientModule, registra HttpClient nel DI system standalone.
+    provideHttpClient(withInterceptorsFromDi()) // <- replaces HttpClientModule, registers HttpClient in the standalone DI system.
   ]
 }).catch(err => console.error(err));
 
