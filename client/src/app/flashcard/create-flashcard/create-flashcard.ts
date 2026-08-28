@@ -9,12 +9,9 @@ import { answerMaxLength, charMinLength, questionMaxLength, titleMaxLength } fro
 
 import { CommonModule } from '@angular/common';
 import { Editor } from '@tiptap/core';
+import { createRichTextEditor } from '../../shared/rich-text-editor/editor.factory';
 import { FlashcardService } from '../flashcard.service';
-import Image from '@tiptap/extension-image';
-import { MathExtension } from '@aarkue/tiptap-math-extension';
-import Placeholder from '@tiptap/extension-placeholder';
 import { RichTextEditorComponent } from '../../shared/rich-text-editor/rich-text-editor.component';
-import StarterKit from '@tiptap/starter-kit';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
 import { Toast } from "../../toast/toast";
@@ -54,39 +51,15 @@ export class CreateFlashcard implements OnInit, OnDestroy {
     private subjectService: SubjectService,
     private transloco: TranslocoService
   ) {
-    this.questionEditor = new Editor({
-      extensions: [
-        StarterKit,
-        MathExtension.configure({ evaluation: false }),
-        Image.configure({ inline: false }),
-        Placeholder.configure({
-          placeholder: ({ editor }) =>
-            editor.isEmpty ? this.transloco.translate('flashcard.create.questionPlaceholder') : '',
-        }),
-      ],
-      onUpdate: ({ editor }) => {
-        this.cardForm.get('question')?.setValue(editor.getText());
-      },
-      onBlur: () => {
-        this.cardForm.get('question')?.markAsTouched();
-      },
+    this.questionEditor = createRichTextEditor({
+      placeholder: () => this.transloco.translate('flashcard.create.questionPlaceholder'),
+      onUpdate: (editor) => this.cardForm.get('question')?.setValue(editor.getText()),
+      onBlur: () => this.cardForm.get('question')?.markAsTouched(),
     });
-    this.answerEditor = new Editor({
-      extensions: [
-        StarterKit,
-        MathExtension.configure({ evaluation: false }),
-        Image.configure({ inline: false }),
-        Placeholder.configure({
-          placeholder: ({ editor }) =>
-            editor.isEmpty ? this.transloco.translate('flashcard.create.answerPlaceholder') : '',
-        }),
-      ],
-      onUpdate: ({ editor }) => {
-        this.cardForm.get('answer')?.setValue(editor.getText());
-      },
-      onBlur: () => {
-        this.cardForm.get('answer')?.markAsTouched();
-      },
+    this.answerEditor = createRichTextEditor({
+      placeholder: () => this.transloco.translate('flashcard.create.answerPlaceholder'),
+      onUpdate: (editor) => this.cardForm.get('answer')?.setValue(editor.getText()),
+      onBlur: () => this.cardForm.get('answer')?.markAsTouched(),
     });
   }
 

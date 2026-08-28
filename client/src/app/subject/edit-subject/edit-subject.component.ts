@@ -4,8 +4,7 @@ import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } 
 
 import { CommonModule } from '@angular/common';
 import { Editor } from '@tiptap/core';
-import StarterKit from '@tiptap/starter-kit';
-import { MathExtension } from '@aarkue/tiptap-math-extension';
+import { createRichTextEditor } from '../../shared/rich-text-editor/editor.factory';
 import { LoadStateComponent } from '../../shared/load-state/load-state.component';
 import { TiptapEditorDirective } from 'ngx-tiptap';
 import { Subject } from '../../models/subject.dto';
@@ -65,9 +64,8 @@ export class EditSubjectComponent implements OnInit, OnDestroy {
     private toastService: ToastService,
     private transloco: TranslocoService
   ) {
-    this.descEditor = new Editor({
-      extensions: [StarterKit, MathExtension.configure({ evaluation: false })],
-    });
+    // No Image here, as before: the toolbar of this page has no image button.
+    this.descEditor = createRichTextEditor({ withImage: false });
     this.descEditor.on('update', () => {
       this.descLength = this.descEditor.getText().length;
     });
