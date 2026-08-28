@@ -13,7 +13,7 @@ private baseUrl = 'test';
 
   constructor(private restClient: RestClientService) {}
 
-  // Legge tutti i test
+  // Reads one page of tests
   getAll(filter: TestFilter): Promise<PaginatedResponse<Test>> {
       return this.restClient.get<PaginatedResponse<Test>>(
         this.baseUrl + '/all',  
@@ -21,28 +21,28 @@ private baseUrl = 'test';
       );
     }
 
-  // Legge un singolo test
+  // Reads a single test
   getById(id: string): Promise<Test> {
     return this.restClient.get<Test>(this.baseUrl + '/' + id);
   }
 
-  // Numero totale di domande del test (senza scaricare l'intero array 'questions')
+  // Total number of questions, without downloading the whole 'questions' array
   getQuestionsCount(testId: string): Promise<{ count: number; elapsed_time?: number }> {
     return this.restClient.get(`${this.baseUrl}/${testId}/questions/count`);
   }
 
-  // Una pagina di domande del test (skip/limit)
+  // One page of questions of the test (skip/limit)
   getQuestionsPage(testId: string, skip: number, limit: number): Promise<Question[]> {
     return this.restClient.get(`${this.baseUrl}/${testId}/questions`, { skip, limit });
   }
 
-  // Segna il test come completato senza dover rileggere/riscrivere l'intero documento
+  // Marks the test as completed without reading back and rewriting the whole document
   completeTest(testId: string, elapsed_time: number): Promise<void> {
     const params = new HttpParams().set('time', elapsed_time);
     return this.restClient.patch(`${this.baseUrl}/${testId}/complete`, {}, params);
   }
 
-  // Legge le statistiche aggregate sui test, filtrabili come getAll
+  // Aggregate stats over the tests, filtered the same way as getAll
   getStats(filter?: Pick<TestFilter, 'subject_id' | 'topic_id' | 'onlyWrong' | 'completed'>): Promise<TestStats> {
     return this.restClient.get<TestStats>(this.baseUrl + '/stats', filter);
   }
@@ -56,17 +56,17 @@ private baseUrl = 'test';
     );
   }
 
-  // Crea un test
+  // Creates a test
   create(test: Test): Promise<Test> {
     return this.restClient.post(this.baseUrl, test);
   }
 
-  // Modifica un test
+  // Updates a test
   update(id: string, test: Test): Promise<void> {
     return this.restClient.patch(this.baseUrl + '/' + id, test);
   }
 
-  // Elimina un test
+  // Deletes a test
   delete(id: string): Promise<void>{
     return this.restClient.delete<void>(this.baseUrl + '/' + id)
   }

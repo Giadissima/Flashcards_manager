@@ -9,9 +9,9 @@ export class FileService {
   constructor(
     @InjectModel(FileMongo.name) private fileModel: Model<FileMongo>,
   ) {}
-  // accetta un tipo ridotto (non l'intero Express.Multer.File) perché usa solo
-  // questi due campi: così può essere chiamato anche per file ricostruiti da
-  // uno zip in fase di import, non solo da un vero upload multipart
+  // Takes a reduced shape, not the whole Express.Multer.File, because only these
+  // two fields are used: this way it can also be called for files rebuilt from a
+  // zip during an import, not just from a real multipart upload
   create(file: { buffer: Buffer; mimetype: string }[]): Promise<FileDocument> {
     return new this.fileModel({
       content: file[0].buffer,
@@ -19,7 +19,7 @@ export class FileService {
     }).save();
   }
 
-  // aggiungere una res per fare il download del file
+  // TODO take a res parameter to serve the file as a download
   async findOne(id: string) {
     return this.fileModel.findById(id).lean().exec();
   }
@@ -32,7 +32,7 @@ export class FileService {
     return Buffer.isBuffer(b)
       ? b
       : b instanceof Binary
-        ? b.buffer // estrai il buffer dal Binary
+        ? b.buffer // unwrap the Binary
         : Buffer.from(b);
   }
 }

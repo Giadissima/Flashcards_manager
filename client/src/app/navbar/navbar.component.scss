@@ -17,7 +17,7 @@ nav {
   align-items: center;
   text-decoration: none;
   gap: var(--spacing-unit);
-  flex-shrink: 0; // resta sempre fissato nell'angolo a sinistra, non si comprime
+  flex-shrink: 0; // always pinned to the left corner, never shrinks
 }
 
 .logo {
@@ -79,7 +79,7 @@ nav {
   gap: 5px;
   width: 0;
   height: 36px;
-  margin-left: calc(-1 * var(--spacing-unit) * 2); // annulla il gap del flex container quando è collassato
+  margin-left: calc(-1 * var(--spacing-unit) * 2); // cancels the flex gap while collapsed
   padding: 0;
   border: none;
   background: none;
@@ -121,8 +121,8 @@ nav {
   display: none;
 }
 
-// Sotto i 600px: il menu centrale collassa in una sidebar laterale off-canvas,
-// apribile/chiudibile con il bottone hamburger (che diventa una X quando aperta).
+// Below this width the centre menu collapses into an off-canvas side drawer,
+// opened and closed with the hamburger button, which turns into an X while open.
 @media (max-width: 840px) {
   .hamburger-btn {
     width: 36px;
@@ -162,9 +162,9 @@ nav {
     overflow-y: auto;
   }
 
-  // evita che il primo passaggio in modalità mobile (position: static -> fixed)
-  // venga animato come se la sidebar si aprisse per un istante: durante il
-  // resize la transizione va disattivata, si riattiva subito dopo
+  // Keeps the first switch into mobile mode (position: static -> fixed) from
+  // being animated as if the drawer were opening for an instant: the transition
+  // is turned off during the resize and back on right after.
   .menu-container.no-transition {
     transition: none;
   }

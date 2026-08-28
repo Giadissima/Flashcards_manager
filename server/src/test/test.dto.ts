@@ -14,13 +14,13 @@ export class QuestionDto {
 
 export class TestCreateRequest {
   @IsArray()
-  @ValidateNested({ each: true }) // valida ogni elemento dell'array
-  @Type(() => QuestionDto)        // trasforma ogni elemento in QuestionDto
+  @ValidateNested({ each: true }) // validates every element of the array
+  @Type(() => QuestionDto) // turns every element into a QuestionDto
   questions: QuestionDto[];
 }
 
-// Filtri condivisi tra la lista dei test (TestFilterDto) e le statistiche aggregate
-// (getStats): permettono di far corrispondere le stats mostrate ai filtri applicati
+// Filters shared between the test list (TestFilterDto) and the aggregate stats
+// (getStats), so the stats shown always match the applied filters
 export class TestStatsFilterDto {
   @IsOptional()
   @IsMongoId()

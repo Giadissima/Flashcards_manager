@@ -105,7 +105,7 @@ export class SettingsModalComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    // ad ogni apertura salva lo stato attuale, così "Annulla" può ripristinarlo
+    // On every opening, snapshot the current state so "Cancel" can restore it
     if (changes['isOpen'] && this.isOpen) {
       this.originalDarkMode = this.isDarkMode;
       this.originalLanguage = this.language;
@@ -126,8 +126,8 @@ export class SettingsModalComponent implements OnInit, OnChanges {
     this.closeModal();
   }
 
-  // il tema viene applicato subito come anteprima, ma salvato in localStorage
-  // solo al click su "Salva Modifiche" (vedi save()/cancel())
+  // The theme is applied right away as a preview, but only written to
+  // localStorage on "Save" (see save()/cancel())
   toggleTheme(): void {
     this.isDarkMode = !this.isDarkMode;
     this.themeService.setTheme(this.isDarkMode ? 'dark' : 'light');

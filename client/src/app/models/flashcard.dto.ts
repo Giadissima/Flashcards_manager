@@ -8,7 +8,7 @@ export interface Flashcard {
   question: string;
   answer: string;
 
-  topic_id?: string | Topic;      // ObjectId serializzato come stringa (lato client viene castato sempre a stringa)
-  subject_id?: string | Subject;    // ObjectId serializzato come stringa
+  topic_id?: string | Topic; // populated by the server, a plain id on the way back
+  subject_id?: string | Subject; // populated by the server, a plain id on the way back
 }
 

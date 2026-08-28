@@ -113,7 +113,7 @@ export class TestHistory extends PaginatedList implements OnInit {
   onTopicSelected(id: string | null | undefined): void {
     this.selectedTopicId = id ?? null;
 
-    // Seleziona in automatico la materia dell'argomento scelto, come in setup-test
+    // Automatically picks the subject of the chosen topic, as in setup-test
     const topic = this.allTopics.find((t) => t._id === this.selectedTopicId);
     const subjectId = (topic?.subject_id as Subject | undefined)?._id;
     if (subjectId && subjectId !== this.selectedSubjectId) {
@@ -193,15 +193,15 @@ export class TestHistory extends PaginatedList implements OnInit {
     this.router.navigate(['/test-result', test._id]);
   }
 
-  // Riprende un test non concluso (anche da un altro dispositivo, dato che
-  // il progresso vive sul server, non nello stato locale del client)
+  // Resumes an unfinished test, even from another device, since the progress
+  // lives on the server and not in the local state of the client
   resumeTest(test: Test): void {
     if (!test._id) return;
     this.router.navigate(['/test', test._id]);
   }
 
-  // Chiude un test non concluso senza rispondere alle domande rimanenti
-  // (restano "non date", come se il test fosse stato terminato in anticipo)
+  // Closes an unfinished test without answering the remaining questions:
+  // they stay blank, as if the test had been ended early
   async stopTest(test: Test): Promise<void> {
     if (!test._id) return;
     try {

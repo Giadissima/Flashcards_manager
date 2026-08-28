@@ -56,7 +56,7 @@ export class FileController {
   }
 
   @ApiOperation({ description: 'get a specific file from db' })
-  @Get(':id') // TODO aggiungere la response di swaggere della NotFoundException
+  @Get(':id') // TODO document the NotFoundException response in Swagger
   async findOne(@Param('id') id: string, @Res() res: Response) {
     const fileDoc = await this.fileService.findOne(id);
     if (!fileDoc) {
@@ -69,8 +69,8 @@ export class FileController {
       'Content-Type': fileDoc.mimetype,
       'Content-Length': content.length,
       'Content-Disposition': `inline; filename="${fileDoc._id}"`,
-      // ogni edit crea un nuovo file con un nuovo id (vedi SubjectService.update),
-      // quindi il contenuto dietro a questo id non cambierà mai: cache permanente
+      // Every edit creates a new file with a new id (see SubjectService.update),
+      // so the content behind this id will never change: cache it forever
       'Cache-Control': 'public, max-age=31536000, immutable',
     });
 

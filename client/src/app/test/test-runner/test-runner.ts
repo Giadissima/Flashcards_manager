@@ -34,10 +34,10 @@ export class TestRunner extends PaginatedList implements OnInit {
   override pageSize = 9;
   pageFlashcards: Flashcard[] = [];
 
-  // mappa flashcard_id -> boolean (risposta data, per le card già viste)
+  // Maps flashcard_id to the answer given, for the cards already seen
   private answersMap: Record<string, boolean> = {};
 
-  // mappa flashcard_id -> boolean (true = mostra risposta)
+  // Maps flashcard_id to whether its answer, instead of its question, is shown
   showAnswerMap: Record<string, boolean> = {};
 
   showLeaveConfirm = false;
@@ -174,7 +174,7 @@ export class TestRunner extends PaginatedList implements OnInit {
     this.router.navigate(['/test-result',this.testId],);
   }
 
-  // Apre il dialog di conferma prima di uscire dal test senza concluderlo
+  // Opens the confirmation dialog before leaving a test that is not over yet
   requestPause(): void {
     this.pendingDestination = ['/test-result'];
     this.showLeaveConfirm = true;
@@ -189,9 +189,9 @@ export class TestRunner extends PaginatedList implements OnInit {
     this.showLeaveConfirm = false;
   }
 
-  // Salva il tempo trascorso, poi esce senza chiudere il test: rimane "in corso"
-  // e potrà essere ripreso in seguito (anche da un altro dispositivo, dato che
-  // lo stato vive sul server, non nel client).
+  // Saves the elapsed time, then leaves without closing the test: it stays in
+  // progress and can be resumed later, even from another device, since the state
+  // lives on the server and not in the client.
   async confirmLeave(): Promise<void> {
     this.showLeaveConfirm = false;
     if (this.testId) {

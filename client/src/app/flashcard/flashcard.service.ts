@@ -12,7 +12,7 @@ export class FlashcardService {
 
   constructor(private restClient: RestClientService) {}
 
-  // Legge tutte le flashcard
+  // Reads one page of flashcards
   getAll(filter: CardFilter): Promise<PaginatedResponse<Flashcard>> {
       return this.restClient.get<PaginatedResponse<Flashcard>>(
         this.baseUrl + '/all',
@@ -20,7 +20,7 @@ export class FlashcardService {
       );
     }
 
-    // Legge tutte le flashcard
+    // Reads one page of flashcards
   getRandom(filter: RandomCardFIlter): Promise<{_id: string}[]> {
       return this.restClient.get<{_id: string}[]>(
         this.baseUrl + '/random',
@@ -29,7 +29,7 @@ export class FlashcardService {
     }
 
 
-  // Conta le flashcard che rispettano i filtri
+  // Counts the flashcards matching the filters
   count(filter: Pick<RandomCardFIlter, 'subject_id' | 'topic_id'>): Promise<number> {
     return this.restClient.get<number>(
       this.baseUrl + '/count',
@@ -37,22 +37,22 @@ export class FlashcardService {
     );
   }
 
-  // Legge una singola flashcard
+  // Reads a single flashcard
   getById(id: string): Promise<Flashcard> {
     return this.restClient.get<Flashcard>(this.baseUrl + '/' + id);
   }
 
-  // Crea una flashcard
+  // Creates a flashcard
   create(card: Flashcard): Promise<void> {
     return this.restClient.post(this.baseUrl, card);
   }
 
-  // Modifica una flashcard
+  // Updates a flashcard
   update(id: string, card: Omit<Flashcard, '_id'>): Promise<void> {
     return this.restClient.patch(this.baseUrl + '/' + id, card);
   }
 
-  // Elimina una flashcard
+  // Deletes a flashcard
   delete(id: string): Promise<void>{
     return this.restClient.delete<void>(this.baseUrl + '/' + id)
   }

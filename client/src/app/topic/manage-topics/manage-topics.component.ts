@@ -110,8 +110,8 @@ export class ManageTopicsComponent extends PaginatedList implements OnInit {
     if (confirm(this.transloco.translate('topic.manage.deleteConfirm'))) {
       try {
         await this.topicService.deleteTopic(id);
-        // ricarica invece di filtrare in locale: skip/limit sono legati al
-        // server, altrimenti la pagina mostrerebbe un elemento in meno del dovuto
+        // Reload instead of filtering locally: skip/limit are resolved by the
+        // server, so the page would otherwise show one item less than it should
         await this.loadTopics();
         this.toastService.show(this.transloco.translate('topic.toast.deleted'), 'success');
       } catch (error) {

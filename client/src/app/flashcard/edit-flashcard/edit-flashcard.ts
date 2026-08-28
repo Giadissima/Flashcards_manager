@@ -110,7 +110,7 @@ export class EditFlashcard implements OnInit, OnDestroy {
       await this.loadSubjects();
     }
 
-    // Estraiamo gli ID stringa (potrebbero essere oggetti se popolati dal backend)
+    // The ids arrive either populated (an object) or as a plain id string
     const subjectId = typeof card.subject_id === 'object' ? (card.subject_id as any)?._id : card.subject_id;
     const topicId = typeof card.topic_id === 'object' ? (card.topic_id as any)?._id : card.topic_id;
 

@@ -154,7 +154,7 @@ export class CreateFlashcard implements OnInit, OnDestroy {
     this.selectedTopicId = id ?? null;
     this.cardForm.get('topic_id')?.setValue(this.selectedTopicId);
 
-    // Seleziona in automatico la materia dell'argomento scelto, come in setup-test
+    // Automatically picks the subject of the chosen topic, as in setup-test
     const topic = this.topics.find((t) => t._id === this.selectedTopicId);
     const subjectId = (topic?.subject_id as Subject | undefined)?._id;
     if (subjectId && subjectId !== this.selectedSubjectId) {

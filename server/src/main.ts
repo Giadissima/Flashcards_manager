@@ -34,8 +34,8 @@ async function bootstrap() {
 
   app.useGlobalPipes( // class-validation
     new ValidationPipe({
-      whitelist: true, // rimuove campi non dichiarati nei DTO
-      forbidNonWhitelisted: true, // lancia errore se ci sono campi extra
+      whitelist: true, // strips properties not declared in the DTOs
+      forbidNonWhitelisted: true, // rejects the request when extra properties are sent
       transform: true, // converte automaticamente i tipi (es. string → number)
     }),
   );

@@ -53,7 +53,7 @@ export class Home extends PaginatedList implements OnInit, AfterViewChecked, OnD
 
   override pageSize = 21;
 
-  // mappa _id -> boolean (true = mostra risposta)
+  // Maps a flashcard _id to whether its answer, instead of its question, is shown
   showAnswerMap: Record<string, boolean> = {};
 
   private queryParamsSubscription?: Subscription;
@@ -96,10 +96,10 @@ export class Home extends PaginatedList implements OnInit, AfterViewChecked, OnD
       this.updateQueryParams();
     });
 
-    // Sottoscrizione (non snapshot): quando si naviga verso /home mentre si è
-    // già su /home (es. click sul logo), Angular riusa il componente esistente
-    // e non richiama ngOnInit, ma questa subscription si riattiva comunque e
-    // rilegge i filtri dall'URL, tenendo lo stato sincronizzato con la route.
+    // Subscription, not snapshot: navigating to /home while already on /home
+    // (clicking the logo, for instance) makes Angular reuse the existing
+    // component and skip ngOnInit, but this subscription fires anyway and
+    // re-reads the filters from the URL, keeping the state in sync with the route.
     this.queryParamsSubscription = this.activatedRoute.queryParamMap.subscribe((qp) => {
       this.selectedSubjectId = qp.get('subject_id') || null;
       this.selectedTopicId = qp.get('topic_id') || null;
@@ -224,7 +224,7 @@ export class Home extends PaginatedList implements OnInit, AfterViewChecked, OnD
     return cardView.getCardBody(card, this.showAnswerMap[card._id]);
   }
 
-  // cambia da 'Vedi risposta' a 'Vedi domanda'
+  // Switches between "See answer" and "See question"
   getCardButtonText(card: Flashcard): string {
     return this.transloco.translate(this.showAnswerMap[card._id] ? 'home.seeQuestion' : 'home.seeAnswer');
   }
@@ -359,11 +359,11 @@ export class Home extends PaginatedList implements OnInit, AfterViewChecked, OnD
   }
 
   copyCard(card: Flashcard): void {
-    // 1. Prepariamo la stringa da copiare
+    // 1. Build the text to copy
     const textToCopy = `${card.title}\nQuestion: ${card.question}\nAnswer: ${card.answer}`;
 
-    // 2. Proviamo la via moderna (Clipboard API)
-    // Controlliamo se esiste l'oggetto e se siamo in un contesto sicuro (HTTPS/Localhost)
+    // 2. Try the modern route (Clipboard API)
+    // It only exists in a secure context (HTTPS or localhost)
     if (navigator.clipboard && window.isSecureContext) {
       navigator.clipboard
         .writeText(textToCopy)
@@ -371,32 +371,32 @@ export class Home extends PaginatedList implements OnInit, AfterViewChecked, OnD
           this.toast.show(this.transloco.translate('home.toast.cardCopied'), 'success');
         })
         .catch((err) => {
-          // Se per qualche motivo l'API moderna fallisce, proviamo il fallback
+          // Should the modern API fail anyway, fall back
           this.executeFallbackCopy(textToCopy);
         });
     } else {
-      // 3. Se l'API moderna non esiste (es. rete privata HTTP), usiamo il fallback
+      // 3. No modern API (a plain HTTP private network, say): use the fallback
       this.executeFallbackCopy(textToCopy);
     }
   }
 
   private executeFallbackCopy(text: string): void {
-    // Creiamo un elemento "invisibile" per contenere il testo
+    // An off-screen textarea is needed: execCommand('copy') copies the current
     const textArea = document.createElement('textarea');
     textArea.value = text;
 
-    // Lo posizioniamo fuori dallo schermo per non disturbare l'utente
+    // selection, not an arbitrary string
     textArea.style.position = 'fixed';
     textArea.style.left = '-9999px';
     textArea.style.top = '0';
     document.body.appendChild(textArea);
 
-    // Selezioniamo il contenuto
+    // Select its content
     textArea.focus();
     textArea.select();
 
     try {
-      // Il vecchio comando in caso di url con http
+      // The legacy command, for plain http URLs
       const successful = document.execCommand('copy');
       if (successful) {
         this.toast.show(this.transloco.translate('home.toast.cardCopied'), 'success');

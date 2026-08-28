@@ -5,7 +5,7 @@
     <span class="project-name">Flashcards Manager</span>
   </a>
 
-  <!-- Centro: Menu (sotto i 600px diventa una sidebar apribile dall'hamburger) -->
+  <!-- Centre: menu. Below the breakpoint it becomes a drawer opened by the hamburger -->
   <div class="menu-container" [class.open]="isMobileMenuOpen" [class.no-transition]="isResizing">
     <div class="dropdown" (appClickOutside)="closeDropdown('topics')">
       <span class="menu-item" (click)="toggleDropdown('topics')">
@@ -48,7 +48,7 @@
     </div>
   </div>
 
-  <!-- Sfondo scuro dietro la sidebar mobile: chiude il menu al click -->
+  <!-- Dim backdrop behind the mobile drawer: closes the menu on click -->
   <div class="mobile-menu-backdrop" [class.show]="isMobileMenuOpen" (click)="closeMobileMenu()"></div>
 
   <!-- Destra: Pulsante crea card e switch tema -->
@@ -60,7 +60,7 @@
     <button (click)="openSettings()" class="theme-switch-btn" type="button" [attr.aria-label]="'settings.title' | transloco">
       <span class="material-symbols-outlined">settings</span>
     </button>
-    <!-- Bottone hamburger: visibile solo sotto i 600px, apre il menu come sidebar da destra -->
+    <!-- Hamburger button: shown below the breakpoint, opens the menu as a drawer from the right -->
     <button
       type="button"
       class="hamburger-btn"

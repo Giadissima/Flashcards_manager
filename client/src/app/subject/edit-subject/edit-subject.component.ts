@@ -40,12 +40,12 @@ export class EditSubjectComponent implements OnInit, OnDestroy {
   descEditor: Editor;
   descLength = 0;
   // null => nessuna icona caricata (né esistente né appena scelta): si mostra
-  // la preview live generata dal colore, che segue i cambi del color picker;
-  // altrimenti è la url di un'icona reale (persistita sul server o del file
-  // appena selezionato dall'utente)
+  // the live preview generated from the colour, which follows the colour picker;
+  // otherwise it is the URL of a real icon, either stored on the server or the
+  // file just selected by the user
   previewUrl: string | null = null;
-  // true dopo un click su "reset": l'icona persistita va sostituita al salvataggio
-  // con l'SVG di default, generato al volo con il colore scelto in quel momento
+  // true after a "reset" click: on save the stored icon has to be replaced with
+  // the default SVG, generated on the fly with the colour chosen at that moment
   private resetToDefault = false;
 
   get colorControl(): FormControl<string> {
@@ -113,9 +113,9 @@ export class EditSubjectComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Torna alla preview live (che segue il color picker): l'eventuale file
+  // Goes back to the live preview, which follows the colour picker: any picked
   // scelto va scartato, e l'icona persistita (se presente) verrà sostituita
-  // al salvataggio con l'SVG di default generato al volo, vedi updateSubject().
+  // on save with the default SVG generated on the fly, see updateSubject().
   resetIcon(): void {
     this.resetToDefault = true;
     this.revokePreviewUrl();

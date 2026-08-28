@@ -125,8 +125,8 @@ export class SetupTest implements OnInit {
   onTopicSelected(id: string | null | undefined): void {
     this.testForm.get('topic_id')?.setValue(id ?? null);
 
-    // Seleziona in automatico la materia del topic scelto, senza emettere l'evento:
-    // altrimenti la subscription su subject_id rifiltrerebbe i topic e azzererebbe questa stessa selezione
+    // Automatically picks the subject of the chosen topic, without emitting the event:
+    // the subscription on subject_id would otherwise re-filter the topics and clear this very selection
     const topic = this.allTopics.find(t => t._id === id);
     const subjectId = (topic?.subject_id as Subject | undefined)?._id;
     if (subjectId) {

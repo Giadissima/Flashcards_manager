@@ -75,8 +75,8 @@ export class ManageSubjectsComponent extends PaginatedList implements OnInit {
   }
 
   // vecchie materie salvate prima dell'editor TipTap possono avere desc a
-  // null/undefined o la stringa letterale "null" (bug di FormData.append
-  // con un valore undefined); qui si tratta tutto come "nessuna descrizione"
+  // or to the literal string "null" (FormData.append stringifies undefined):
+  // all of those count as "no description" here.
   hasDescription(subject: Subject): boolean {
     const desc = subject.desc;
     if (!desc || desc.trim().toLowerCase() === 'null') return false;
@@ -108,8 +108,8 @@ export class ManageSubjectsComponent extends PaginatedList implements OnInit {
     if (confirm(this.transloco.translate('subject.manage.deleteConfirm'))) {
       try {
         await this.subjectService.deleteSubject(id);
-        // ricarica invece di filtrare in locale: skip/limit sono legati al
-        // server, altrimenti la pagina mostrerebbe un elemento in meno del dovuto
+        // Reload instead of filtering locally: skip/limit are resolved by the
+        // server, so the page would otherwise show one item less than it should
         await this.loadSubjects();
         this.toastService.show(this.transloco.translate('subject.toast.deleted'), 'success');
       } catch (error) {

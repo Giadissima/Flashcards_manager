@@ -1,6 +1,6 @@
 export interface PaginatedResponse<T> {
   count: number;
-  data: T[]; // cambiare il server in "result"
+  data: T[]; // TODO rename to "result" on the server side too
 }
 
 export interface SimplePaginatedResponse{
@@ -29,7 +29,7 @@ export type RandomCardFIlter = Pick<CardFilter, 'subject_id' | 'topic_id'> & {
   numFlashcard?: number;
 };
 
-// ha gli stessi attributi di cardfilter tranne il titolo, più i filtri sulle risposte sbagliate e sullo stato
+// Same fields as CardFilter minus the title, plus the test-only filters
 export type TestFilter = Omit<CardFilter, 'title'> & {
   onlyWrong?: boolean;
   completed?: boolean;

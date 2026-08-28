@@ -20,11 +20,14 @@ export interface ToastOptions {
   providedIn: 'root'
 })
 export class ToastService {
-  private _toastMessage = new BehaviorSubject<ToastData | null>(null); // crea un BehaviorSubject, ovvero uno stream di eventi osservabile capace di memorizzare il valore attuale e il valore precedente, lo inizializziamo a null
-  toastMessage$ = this._toastMessage.asObservable(); // creo un observable che osserva i cambiamenti del BehaviorSubect
+  // BehaviorSubject: an observable stream that also remembers its current value,
+  // so a subscriber attaching later still receives the toast on screen.
+  private _toastMessage = new BehaviorSubject<ToastData | null>(null);
+  toastMessage$ = this._toastMessage.asObservable();
   private hideTimeout: ReturnType<typeof setTimeout> | null = null;
 
-  show(message: string, type: ToastType, options?: ToastOptions) { // mostro il messaggio e poi chiudo dopo la durata indicata
+  // Shows the message, then hides it again after the given duration.
+  show(message: string, type: ToastType, options?: ToastOptions) {
     if (this.hideTimeout) {
       clearTimeout(this.hideTimeout);
     }

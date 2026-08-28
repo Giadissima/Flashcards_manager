@@ -43,9 +43,9 @@ export class TestService {
     return this.flashcardService.findOne(flashcardId.toString());
   }
 
-  // Numero totale di domande del test, senza portare l'intero array
-  // 'questions' in memoria: $size viene calcolato da Mongo e solo il numero
-  // risultante attraversa la rete
+  // Total number of questions in the test, without pulling the whole
+  // 'questions' array into memory: $size is computed by Mongo and only the
+  // resulting number travels over the wire
   async getQuestionsCount(test_id: string): Promise<{
     count: number;
     elapsed_time?: number;
@@ -70,8 +70,8 @@ export class TestService {
     };
   }
 
-  // Una singola pagina di domande (skip/limit), tramite $slice: Mongo estrae
-  // solo la porzione richiesta, senza caricare le altre domande del test
+  // A single page of questions (skip/limit) via $slice: Mongo extracts only the
+  // requested slice, without loading the other questions of the test
   async getQuestionsPage(
     test_id: string,
     skip: number,
@@ -89,8 +89,8 @@ export class TestService {
     return result.questions;
   }
 
-  // Segna il test come completato senza dover rileggere/riscrivere
-  // l'intero documento (incluso l'array 'questions') dal client
+  // Marks the test as completed without having the client read back and
+  // rewrite the whole document, the 'questions' array included
   completeTest(id: string, elapsed_time: number) {
     assertValidObjectId(id);
     return this.testModel.findByIdAndUpdate(id, {
@@ -98,7 +98,7 @@ export class TestService {
       elapsed_time,
     });
   }
-  // TODO devo trovare un modo per filtrare solo le domande che non hanno categoria
+  // TODO find a way to filter only the questions that have no category
   async create(test: TestCreateRequest): Promise<TestDocument> {
     return new this.testModel(test).save();
   }
@@ -130,9 +130,9 @@ export class TestService {
     );
   }
 
-  // Condiviso tra findAll e getStats: entrambi devono rispettare gli stessi
-  // filtri (subject_id/topic_id/onlyWrong/completed) applicati sulla lista dei
-  // test, così che le stats mostrate corrispondano a ciò che è filtrato
+  // Shared by findAll and getStats: both must honour the same filters
+  // (subject_id/topic_id/onlyWrong/completed) applied to the test list, so that
+  // the stats shown always match what is currently filtered
   private buildFilterPipeline(filter: TestStatsFilterDto): PipelineStage[] {
     const pipeline: PipelineStage[] = [];
 
@@ -150,11 +150,11 @@ export class TestService {
       });
     }
 
-    // subject_id/topic_id non sono salvati sul test: si risale alle flashcard
-    // delle domande per sapere a quale materia/argomento appartiene il test.
-    // questions.flashcard_id in alcuni documenti storici è salvato come stringa
-    // invece che come ObjectId: va convertito esplicitamente prima del $lookup,
-    // altrimenti il confronto con flashcard._id (ObjectId) non troverebbe nulla
+    // subject_id/topic_id are not stored on the test: the subject and topic a test
+    // belongs to are resolved through the flashcards of its questions.
+    // In some historical documents questions.flashcard_id is stored as a string
+    // instead of an ObjectId, so it must be converted before the $lookup or it
+    // would never match flashcard._id, which is an ObjectId
     if (filter.subject_id || filter.topic_id) {
       pipeline.push({
         $addFields: {
