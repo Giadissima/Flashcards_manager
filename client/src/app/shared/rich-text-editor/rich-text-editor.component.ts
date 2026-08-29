@@ -36,6 +36,23 @@ export class RichTextEditorComponent {
     }
     const url = window.prompt(this.transloco.translate('editor.linkPrompt'));
     if (!url) return;
+
+    // With nothing selected there is no text to turn into a link, and setLink
+    // would only arm the mark: everything typed next would silently become part
+    // of the link. In that case the URL itself is inserted as the link text.
+    if (this.editor.state.selection.empty) {
+      this.editor
+        .chain()
+        .focus()
+        .insertContent({
+          type: 'text',
+          text: url,
+          marks: [{ type: 'link', attrs: { href: url } }],
+        })
+        .run();
+      return;
+    }
+
     this.editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
   }
 
