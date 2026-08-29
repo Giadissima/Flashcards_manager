@@ -841,6 +841,15 @@ $image-modal-height: calc(100vh - var(--navbar-height) - 32px - 64px);
   justify-content: center;
   margin-top: calc(var(--spacing-unit) * 4);
 }
+/* A glyph sits on the text baseline, so next to a label it rides high: measured
+   at 7px above the text in the navbar menus and 3.5px in the card buttons.
+   Bootstrap Icons shipped its own correction (vertical-align: -.125em on the
+   ::before), the font does not. `middle` brings every one of them to within a
+   pixel, and has no effect where the icon is already a flex item. */
+.material-symbols-outlined {
+  vertical-align: middle;
+}
+
 /* Icon sizes that used to be set on the <svg> element itself, kept now that the
    same icons come from the Material Symbols font. */
 .search-icon .material-symbols-outlined {
