@@ -27,24 +27,7 @@
 
         <div class="form-group">
           <label for="desc-editor" class="form-label">{{ 'common.description' | transloco }}</label>
-          <div class="editor-toolbar">
-            <button (click)="descEditor.chain().focus().toggleBold().run()"
-              [class.btn-outline-secondary]="!descEditor.isActive('bold')"
-              [class.btn-secondary]="descEditor.isActive('bold')"
-              class="btn"
-              type="button"><i class="bi bi-type-bold"></i></button>
-            <button (click)="descEditor.chain().focus().toggleItalic().run()"
-              [class.btn-outline-secondary]="!descEditor.isActive('italic')"
-              [class.btn-secondary]="descEditor.isActive('italic')"
-              class="btn"
-              type="button"><i class="bi bi-type-italic"></i></button>
-            <button (click)="descEditor.chain().focus().toggleStrike().run()"
-              [class.btn-outline-secondary]="!descEditor.isActive('strike')"
-              [class.btn-secondary]="descEditor.isActive('strike')"
-              class="btn"
-              type="button"><i class="bi bi-type-strikethrough"></i></button>
-          </div>
-          <tiptap-editor [editor]="descEditor" class="tiptap-editor-custom"></tiptap-editor>
+          <app-rich-text-editor [editor]="descEditor"></app-rich-text-editor>
           @if (descLength > descMaxLength) {
           <div class="invalid-feedback d-block">{{ 'subject.create.descMaxError' | transloco:{ max: descMaxLength, current: descLength } }}</div>
           }

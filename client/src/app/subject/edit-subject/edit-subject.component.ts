@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
 import { Editor } from '@tiptap/core';
 import { createRichTextEditor } from '../../shared/rich-text-editor/editor.factory';
 import { LoadStateComponent } from '../../shared/load-state/load-state.component';
-import { TiptapEditorDirective } from 'ngx-tiptap';
+import { RichTextEditorComponent } from '../../shared/rich-text-editor/rich-text-editor.component';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../subject.service';
 import { Toast } from '../../toast/toast';
@@ -23,7 +23,7 @@ import { SubjectIconPreviewComponent } from '../subject-icon-preview/subject-ico
     CommonModule,
     ReactiveFormsModule,
     Toast,
-    TiptapEditorDirective,
+    RichTextEditorComponent,
     TranslocoModule,
     SubjectIconPreviewComponent,
     LoadStateComponent,
@@ -64,9 +64,9 @@ export class EditSubjectComponent implements OnInit, OnDestroy {
     private toastService: ToastService,
     private transloco: TranslocoService
   ) {
-    // Image is registered even though this toolbar has no image button: TipTap
-    // parses the stored HTML against the schema, so without it the <img> tags
-    // of a description written on the create page would be silently dropped.
+    // Same editor as the create page, images included: TipTap parses the stored
+    // HTML against the registered schema, so without Image the <img> tags of an
+    // existing description would be silently dropped on load.
     this.descEditor = createRichTextEditor({ withImage: true });
     this.descEditor.on('update', () => {
       this.descLength = this.descEditor.getText().length;
