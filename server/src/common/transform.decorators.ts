@@ -1,5 +1,7 @@
 import { Transform } from 'class-transformer';
 
+import { hasHtmlContent } from './html.util';
+
 /**
  * Payload normalisation shared by the DTOs: the same transforms were repeated
  * inline on almost every string property.
@@ -27,6 +29,5 @@ export const TrimHtml = () =>
   Transform(({ value }) => {
     if (typeof value !== 'string') return value;
     const trimmed = value.trim();
-    const textOnly = trimmed.replace(/<[^>]*>/g, '').trim();
-    return textOnly.length > 0 ? trimmed : '';
+    return hasHtmlContent(trimmed) ? trimmed : '';
   });
