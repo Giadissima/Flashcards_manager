@@ -27,6 +27,7 @@
     "next": "Next",
     "pageOf": "Page {{current}} of {{total}}",
     "cancel": "Cancel",
+    "icon": "Icon",
     "yes": "Yes",
     "name": "Name",
     "color": "Color",
