@@ -12,6 +12,10 @@
 }
 
 .not-found-message {
+  // Not .text-muted: that resolves to --bs-secondary-color, a fixed dark grey
+  // that Bootstrap sets with !important, and this page is not inside a .card
+  // where the design system remaps it. On the dark theme it was unreadable.
+  color: var(--text-color);
   font-size: 1.1rem;
   margin-bottom: calc(var(--spacing-unit) * 2);
 }

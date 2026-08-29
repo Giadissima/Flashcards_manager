@@ -1,3 +1,6 @@
 .load-state-error p {
+  // See not-found.component.scss: .text-muted is a fixed dark grey forced with
+  // !important, unreadable on the dark theme outside a .card.
+  color: var(--text-color);
   font-size: 1.05rem;
 }

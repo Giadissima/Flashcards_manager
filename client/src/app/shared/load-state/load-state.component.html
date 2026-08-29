@@ -8,7 +8,7 @@
   }
   @case ('error') {
   <div class="load-state-error text-center mt-5">
-    <p class="text-muted mb-3">{{ displayedErrorKey | transloco }}</p>
+    <p class="mb-3">{{ displayedErrorKey | transloco }}</p>
     <div class="d-flex justify-content-center gap-2">
       @if (showBackHome) {
       <button type="button" class="btn btn-outline-primary" (click)="goHome()">{{ 'common.backHome' | transloco }}</button>
