@@ -84,13 +84,17 @@ export class TestResult {
 
   this.questions = await Promise.all(
     this.test.questions.map(async (q) => {
-      const flashcard = await this.flashcardService.getById(q.flashcard_id);
+      // A flashcard can be deleted while tests still reference it: the review
+      // shows "not available" for that question rather than failing as a whole.
+      const flashcard = await this.flashcardService
+        .getById(q.flashcard_id)
+        .catch(() => null);
       let res;
       if(q.is_correct === true) res = 'true';
       else if(q.is_correct === false) res = 'false';
       else res = 'blank';
       return {
-        id: flashcard?._id,
+        id: flashcard?._id ?? q.flashcard_id,
         title: flashcard?.title ?? this.transloco.translate('test.result.titleNotAvailable'),
         is_correct: res,
         question: flashcard?.question ?? this.transloco.translate('test.result.questionNotAvailable'),

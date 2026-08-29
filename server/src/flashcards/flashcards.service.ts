@@ -10,6 +10,7 @@ import { FilterQuery, Model, Types } from 'mongoose';
 import { BasePaginatedResult, ListFilterRequest } from 'src/common.dto';
 import {
   deleteByIdOrThrow,
+  findByIdOrThrow,
   findPaginated,
   updateByIdOrThrow,
 } from 'src/common/mongo.util';
@@ -29,8 +30,13 @@ export class FlashcardsService {
     await new this.flashcardModel(createFlashcardDto).save();
   }
 
-  findOne(id: string): Promise<FlashcardDocument | null> {
-    return this.flashcardModel.findById(id).populate(POPULATE).exec();
+  findOne(id: string): Promise<FlashcardDocument> {
+    return findByIdOrThrow<FlashcardDocument>(
+      this.flashcardModel,
+      id,
+      ENTITY,
+      POPULATE,
+    );
   }
 
   findAll(

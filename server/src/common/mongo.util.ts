@@ -55,6 +55,28 @@ export async function findPaginated<T>(
   return { data: data as T[], count };
 }
 
+/**
+ * A document by id, or a 404. findById resolves to null for a missing id, which
+ * would otherwise leave the route answering "200 null" and the caller guessing.
+ */
+export async function findByIdOrThrow<T>(
+  model: Model<any>,
+  id: string,
+  entityName: string,
+  populate?: string | string[],
+): Promise<T> {
+  assertValidObjectId(id);
+
+  const query = model.findById(id);
+  if (populate) query.populate(populate as any);
+
+  const document = await query.exec();
+  if (!document) {
+    throw new NotFoundException(`${entityName} with id ${id} not found`);
+  }
+  return document as T;
+}
+
 export async function deleteByIdOrThrow(
   model: Model<any>,
   id: string,

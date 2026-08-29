@@ -4,6 +4,7 @@ import { BasePaginatedResult } from 'src/common.dto';
 import {
   assertValidObjectId,
   deleteByIdOrThrow,
+  findByIdOrThrow,
 } from 'src/common/mongo.util';
 
 import { Test, TestDocument } from './test.schema';
@@ -272,12 +273,7 @@ export class TestService {
     };
   }
 
-  async findOne(id: string): Promise<TestDocument> {
-    const test = await this.testModel.findById(id).exec();
-
-    if (!test || test == null)
-      throw new NotFoundException('test not found');
-
-    return test;
+  findOne(id: string): Promise<TestDocument> {
+    return findByIdOrThrow<TestDocument>(this.testModel, id, ENTITY);
   }
 }

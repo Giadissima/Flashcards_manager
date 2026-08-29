@@ -7,6 +7,7 @@ import { BasePaginatedResult, ListFilterRequest } from 'src/common.dto';
 import {
   assertValidObjectId,
   deleteByIdOrThrow,
+  findByIdOrThrow,
   findPaginated,
 } from 'src/common/mongo.util';
 import { FileService } from 'src/file/file.service';
@@ -30,8 +31,8 @@ export class SubjectService {
     await new this.subjectModel({ ...createSubjectDto, icon: icon_id }).save();
   }
 
-  findOne(id: string): Promise<SubjectDocument | null> {
-    return this.subjectModel.findById(id).exec();
+  findOne(id: string): Promise<SubjectDocument> {
+    return findByIdOrThrow<SubjectDocument>(this.subjectModel, id, ENTITY);
   }
 
   findAll(

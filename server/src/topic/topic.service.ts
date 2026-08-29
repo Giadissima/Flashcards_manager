@@ -6,6 +6,7 @@ import { ModifyTopicDto } from './topic.dto';
 import { BasePaginatedResult, ListFilterRequest } from 'src/common.dto';
 import {
   deleteByIdOrThrow,
+  findByIdOrThrow,
   findPaginated,
   updateByIdOrThrow,
 } from 'src/common/mongo.util';
@@ -21,8 +22,8 @@ export class TopicService {
     await new this.topicModel({ ...createTopicDto }).save();
   }
 
-  findOne(id: string): Promise<TopicDocument | null> {
-    return this.topicModel.findById(id).populate(POPULATE).exec();
+  findOne(id: string): Promise<TopicDocument> {
+    return findByIdOrThrow<TopicDocument>(this.topicModel, id, ENTITY, POPULATE);
   }
 
   findAll(

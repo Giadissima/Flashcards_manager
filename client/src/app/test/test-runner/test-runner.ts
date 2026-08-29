@@ -113,9 +113,14 @@ export class TestRunner extends PaginatedList implements OnInit {
     for (const q of pageQuestions) {
       if (q.is_correct !== undefined) this.answersMap[q.flashcard_id] = q.is_correct;
     }
-    this.pageFlashcards = await Promise.all(
-      pageQuestions.map((q) => this.flashcardService.getById(q.flashcard_id))
+    // A flashcard can be deleted while tests still reference it: the ones that
+    // are gone are left out of the page instead of breaking the whole run.
+    const loaded = await Promise.all(
+      pageQuestions.map((q) =>
+        this.flashcardService.getById(q.flashcard_id).catch(() => null)
+      )
     );
+    this.pageFlashcards = loaded.filter((card): card is Flashcard => card !== null);
   }
 
   protected override onPageChange(): void {
