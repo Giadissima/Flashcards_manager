@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
+import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
 import { PaginatedList } from '../../shared/paginated-list';
 import { toSubjectOptions } from '../../shared/select-options.util';
 import { Router } from '@angular/router';
@@ -17,7 +18,7 @@ import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 @Component({
   selector: 'app-manage-topics',
   standalone: true,
-  imports: [CommonModule, Toast, SearchInputComponent, SearchableSelectComponent, TranslocoModule],
+  imports: [CommonModule, Toast, SearchInputComponent, SearchableSelectComponent, TranslocoModule, ConfirmDialogComponent],
   templateUrl: './manage-topics.component.html',
   styleUrls: ['./manage-topics.component.scss']
 })
@@ -105,18 +106,35 @@ export class ManageTopicsComponent extends PaginatedList implements OnInit {
     this.router.navigate(['/edit-topic', id]);
   }
 
-  async deleteTopic(id?: string): Promise<void> {
+  /** Which topic the confirmation dialog is currently asking about. */
+  private pendingDeleteId: string | null = null;
+  showDeleteConfirm = false;
+
+  askDeleteTopic(id?: string): void {
     if (!id) return;
-    if (confirm(this.transloco.translate('topic.manage.deleteConfirm'))) {
-      try {
-        await this.topicService.deleteTopic(id);
-        // Reload instead of filtering locally: skip/limit are resolved by the
-        // server, so the page would otherwise show one item less than it should
-        await this.loadTopics();
-        this.toastService.show(this.transloco.translate('topic.toast.deleted'), 'success');
-      } catch (error) {
-        this.toastService.show(this.transloco.translate('topic.toast.deleteError'), 'error');
-      }
+    this.pendingDeleteId = id;
+    this.showDeleteConfirm = true;
+  }
+
+  cancelDelete(): void {
+    this.showDeleteConfirm = false;
+    this.pendingDeleteId = null;
+  }
+
+  async confirmDelete(): Promise<void> {
+    const id = this.pendingDeleteId;
+    this.cancelDelete();
+    if (!id) return;
+
+    try {
+      await this.topicService.deleteTopic(id);
+      // Reload instead of filtering locally: skip/limit are resolved by the
+      // server, so the page would otherwise show one item less than it should
+      await this.loadTopics();
+      this.toastService.show(this.transloco.translate('topic.toast.deleted'), 'success');
+    } catch (error) {
+      console.error('Error deleting topic', error);
+      this.toastService.show(this.transloco.translate('topic.toast.deleteError'), 'error');
     }
   }
 }

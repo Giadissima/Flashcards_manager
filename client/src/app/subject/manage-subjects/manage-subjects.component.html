@@ -61,7 +61,7 @@
                 edit
                 </span>
               </button>
-              <button class="btn btn-outline-warning mx-1" (click)="deleteSubject(subject._id)">
+              <button class="btn btn-outline-warning mx-1" (click)="askDeleteSubject(subject._id)">
                 <span class="material-symbols-outlined">
                 delete
                 </span>
@@ -88,3 +88,9 @@
     </div>
     <app-toast></app-toast>
 <app-image-lightbox #lightbox></app-image-lightbox>
+<ng-container *transloco="let t">
+  <app-confirm-dialog [isOpen]="showDeleteConfirm" [title]="t('common.confirmDelete')"
+    [message]="t('subject.manage.deleteConfirm')" [confirmLabel]="t('common.yes')" [cancelLabel]="t('common.cancel')"
+    (confirmed)="confirmDelete()" (cancelled)="cancelDelete()"></app-confirm-dialog>
+</ng-container>
+

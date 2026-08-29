@@ -54,7 +54,8 @@
     },
     "zoomIn": "Zoom in",
     "zoomOut": "Zoom out",
-    "zoomReset": "Reset zoom"
+    "zoomReset": "Reset zoom",
+    "confirmDelete": "Confirm deletion"
   },
   "notFound": {
     "title": "404",

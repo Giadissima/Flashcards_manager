@@ -23,10 +23,12 @@ import { ModalComponent } from '../modal/modal.component';
 })
 export class ConfirmDialogComponent {
   @Input() isOpen = false;
-  @Input() title = 'Conferma';
-  @Input() message = '';
-  @Input() confirmLabel = 'Sì';
-  @Input() cancelLabel = 'Annulla';
+  // Required rather than defaulted: a default would be a hardcoded string in one
+  // language, silently shown whenever a call site forgets to translate one.
+  @Input({ required: true }) title!: string;
+  @Input({ required: true }) message!: string;
+  @Input({ required: true }) confirmLabel!: string;
+  @Input({ required: true }) cancelLabel!: string;
 
   @Output() confirmed = new EventEmitter<void>();
   @Output() cancelled = new EventEmitter<void>();

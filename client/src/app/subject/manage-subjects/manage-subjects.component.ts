@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
+import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
 import { ImageLightboxComponent } from '../../shared/image-lightbox/image-lightbox.component';
 import { PaginatedList } from '../../shared/paginated-list';
 import { ZoomableImagesDirective } from '../../shared/zoomable-images.directive';
@@ -17,7 +18,7 @@ import { hasHtmlContent } from '../../shared/html.util';
 @Component({
   selector: 'app-manage-subjects',
   standalone: true,
-  imports: [CommonModule, Toast, SearchInputComponent, TranslocoModule, ImageLightboxComponent, ZoomableImagesDirective],
+  imports: [CommonModule, Toast, SearchInputComponent, TranslocoModule, ImageLightboxComponent, ZoomableImagesDirective, ConfirmDialogComponent],
   templateUrl: './manage-subjects.component.html',
   styleUrls: ['./manage-subjects.component.scss']
 })
@@ -105,18 +106,35 @@ export class ManageSubjectsComponent extends PaginatedList implements OnInit {
     }
   }
 
-  async deleteSubject(id?: string): Promise<void> {
+  /** Which subject the confirmation dialog is currently asking about. */
+  private pendingDeleteId: string | null = null;
+  showDeleteConfirm = false;
+
+  askDeleteSubject(id?: string): void {
     if (!id) return;
-    if (confirm(this.transloco.translate('subject.manage.deleteConfirm'))) {
-      try {
-        await this.subjectService.deleteSubject(id);
-        // Reload instead of filtering locally: skip/limit are resolved by the
-        // server, so the page would otherwise show one item less than it should
-        await this.loadSubjects();
-        this.toastService.show(this.transloco.translate('subject.toast.deleted'), 'success');
-      } catch (error) {
-        this.toastService.show(this.transloco.translate('subject.toast.deleteError'), 'error');
-      }
+    this.pendingDeleteId = id;
+    this.showDeleteConfirm = true;
+  }
+
+  cancelDelete(): void {
+    this.showDeleteConfirm = false;
+    this.pendingDeleteId = null;
+  }
+
+  async confirmDelete(): Promise<void> {
+    const id = this.pendingDeleteId;
+    this.cancelDelete();
+    if (!id) return;
+
+    try {
+      await this.subjectService.deleteSubject(id);
+      // Reload instead of filtering locally: skip/limit are resolved by the
+      // server, so the page would otherwise show one item less than it should
+      await this.loadSubjects();
+      this.toastService.show(this.transloco.translate('subject.toast.deleted'), 'success');
+    } catch (error) {
+      console.error('Error deleting subject', error);
+      this.toastService.show(this.transloco.translate('subject.toast.deleteError'), 'error');
     }
   }
 }
