@@ -5,7 +5,7 @@ export const baseUrlAPI = '/api/'
 export const charMinLength = 2;
 export const titleMaxLength = 100;
 export const questionMaxLength = 700;
-export const answerMaxLength = 1000;
+export const answerMaxLength = 8000;
 export const nameMaxLength = 30;
 export const descMaxLength = 1000;
 
