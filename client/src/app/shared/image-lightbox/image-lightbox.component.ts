@@ -71,7 +71,10 @@ export class ImageLightboxComponent implements AfterViewChecked, OnDestroy {
     // <img> is display:none, so panzoom would measure a zero-size element.
     if (this.needsZoomInit && this.imageRef && !this.loading) {
       this.needsZoomInit = false;
-      this.initZoom();
+      // Deferred to after the browser has laid the image out: panzoom measures
+      // the element against its parent, and reading that mid-update gave it
+      // dimensions from before the image replaced the spinner.
+      requestAnimationFrame(() => this.initZoom());
     }
   }
 

@@ -533,9 +533,17 @@ ngx-colors-overlay[data-ngx-colors-theme='dark'] .bg-white {
    precisely to have room to centre in): that min-height has to be cancelled, and
    the default margin-top (1.75rem, for the centring) replaced with the exact
    navbar height + 1px. */
+// The viewer is a box of fixed size and the image is scaled to fit it, so a
+// small image is enlarged instead of sitting tiny in the middle and a large one
+// is reduced. Keeping the box fixed also stops the dialog from resizing when the
+// spinner gives way to the image: that resize is what used to leave the image
+// off-centre, because panzoom measured the geometry across the change.
+$image-modal-width: 90vw;
+$image-modal-height: calc(100vh - var(--navbar-height) - 32px - 64px);
+
 .image-modal-dialog {
-  width: fit-content;
-  max-width: 90vw;
+  width: $image-modal-width;
+  max-width: $image-modal-width;
   min-height: 0;
   margin-top: calc(var(--navbar-height) + 1px);
   margin-bottom: var(--spacing-unit);
@@ -554,13 +562,13 @@ ngx-colors-overlay[data-ngx-colors-theme='dark'] .bg-white {
 
 .image-modal-img {
   display: block;
-  width: auto;
-  height: auto;
-  max-width: 90vw;
-  /* On top of navbar + margin, this also subtracts the modal header (~64px, the
-     close button): otherwise the image alone could fit, yet header + image
-     together would still overflow. */
-  max-height: calc(100vh - var(--navbar-height) - 32px - 64px);
+  /* The height subtracts the navbar, the margins and the modal header (~64px,
+     the close button): the image alone could fit while header plus image would
+     not. object-fit keeps the aspect ratio inside that fixed box, scaling a
+     small image up and a large one down. */
+  width: 100%;
+  height: $image-modal-height;
+  object-fit: contain;
   border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);
   touch-action: none;
   cursor: grab;
@@ -574,8 +582,9 @@ ngx-colors-overlay[data-ngx-colors-theme='dark'] .bg-white {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 300px;
-  height: 300px;
+  /* Same box as the image, so nothing moves when one replaces the other. */
+  width: 100%;
+  height: $image-modal-height;
 }
 
 .image-modal-img-loading {
