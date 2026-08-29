@@ -97,7 +97,7 @@
     "orderedList": "Elenco numerato",
     "blockquote": "Citazione",
     "codeBlock": "Blocco di codice",
-    "horizontalRule": "Linea orizzontale",
+    "horizontalLine": "Linea orizzontale",
     "link": "Link",
     "linkPrompt": "Inserisci l'URL del link",
     "latexGroupTitle": "Formule matematiche (LaTeX)",

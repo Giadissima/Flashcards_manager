@@ -97,7 +97,7 @@
     "orderedList": "Ordered list",
     "blockquote": "Blockquote",
     "codeBlock": "Code block",
-    "horizontalRule": "Horizontal rule",
+    "horizontalLine": "Horizontal line",
     "link": "Link",
     "linkPrompt": "Enter the link URL",
     "latexGroupTitle": "Math formulas (LaTeX)",

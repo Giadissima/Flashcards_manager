@@ -42,29 +42,21 @@ export class RichTextEditorComponent {
   }
 
   toggleLink(): void {
+    // Already writing inside a link: stop it here, so what follows is plain
+    // text. Only the pending mark is dropped - unsetLink() would have used
+    // extendEmptyMarkRange and stripped the link off the whole word already
+    // typed, which left the button with no way to end a link.
     if (this.editor.isActive('link')) {
-      this.editor.chain().focus().unsetLink().run();
+      this.editor.chain().focus().unsetMark('link').run();
       return;
     }
+
     const url = window.prompt(this.transloco.translate('editor.linkPrompt'));
     if (!url) return;
 
-    // With nothing selected there is no text to turn into a link, and setLink
-    // would only arm the mark: everything typed next would silently become part
-    // of the link. In that case the URL itself is inserted as the link text.
-    if (this.editor.state.selection.empty) {
-      this.editor
-        .chain()
-        .focus()
-        .insertContent({
-          type: 'text',
-          text: url,
-          marks: [{ type: 'link', attrs: { href: url } }],
-        })
-        .run();
-      return;
-    }
-
+    // With a selection the link wraps it. With none, the mark is armed instead:
+    // whatever is typed next comes out linked, until the button is pressed
+    // again to end it.
     this.editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
   }
 
