@@ -10,10 +10,7 @@
     <div class="dropdown" (appClickOutside)="closeDropdown('topics')">
       <span class="menu-item" (click)="toggleDropdown('topics')">
         {{ 'navbar.topics' | transloco }}
-        <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
-          fill="currentColor">
-          <path d="M480-360 280-560h400L480-360Z" />
-        </svg>
+        <span class="material-symbols-outlined">arrow_drop_down</span>
       </span>
       <div class="dropdown-content" [class.show]="openDropdown === 'topics'">
         <a routerLink="/create-topic" (click)="onNavigate('topics')">{{ 'navbar.createTopic' | transloco }}</a>
@@ -23,10 +20,7 @@
     <div class="dropdown" (appClickOutside)="closeDropdown('subjects')">
       <span class="menu-item" (click)="toggleDropdown('subjects')">
         {{ 'navbar.subjects' | transloco }}
-        <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
-          fill="currentColor">
-          <path d="M480-360 280-560h400L480-360Z" />
-        </svg>
+        <span class="material-symbols-outlined">arrow_drop_down</span>
       </span>
       <div class="dropdown-content" [class.show]="openDropdown === 'subjects'">
         <a routerLink="/create-subject" (click)="onNavigate('subjects')">{{ 'navbar.createSubject' | transloco }}</a>
@@ -36,10 +30,7 @@
     <div class="dropdown" (appClickOutside)="closeDropdown('test')">
       <span class="menu-item" (click)="toggleDropdown('test')">
         {{ 'navbar.test' | transloco }}
-        <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
-          fill="currentColor">
-          <path d="M480-360 280-560h400L480-360Z" />
-        </svg>
+        <span class="material-symbols-outlined">arrow_drop_down</span>
       </span>
       <div class="dropdown-content" [class.show]="openDropdown === 'test'">
         <a routerLink="/setup-test" (click)="onNavigate('test')">{{ 'navbar.startTest' | transloco }}</a>

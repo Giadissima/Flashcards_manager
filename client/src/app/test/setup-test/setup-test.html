@@ -42,10 +42,10 @@
               <input type="number" id="numFlashcard" formControlName="numFlashcard" class="form-control num-flashcard-input" min="1" max="1000">
               <div class="number-stepper-buttons">
                 <button type="button" class="number-stepper-btn" [attr.aria-label]="t('test.setup.incrementAria')" (click)="incrementQuestions()">
-                  <i class="bi bi-caret-up-fill"></i>
+                  <span class="material-symbols-outlined">arrow_drop_up</span>
                 </button>
                 <button type="button" class="number-stepper-btn" [attr.aria-label]="t('test.setup.decrementAria')" (click)="decrementQuestions()">
-                  <i class="bi bi-caret-down-fill"></i>
+                  <span class="material-symbols-outlined">arrow_drop_down</span>
                 </button>
               </div>
             </div>

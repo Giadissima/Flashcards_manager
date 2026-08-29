@@ -29,6 +29,18 @@ export class RichTextEditorComponent {
     private transloco: TranslocoService
   ) {}
 
+  /**
+   * Material Symbols name for the block the cursor sits in, shown on the button
+   * that opens the paragraph/heading menu. With an icon font the glyph is the
+   * element's text, so it is computed here instead of toggled through classes.
+   */
+  get currentBlockIcon(): string {
+    for (const level of [1, 2, 3] as const) {
+      if (this.editor.isActive('heading', { level })) return `format_h${level}`;
+    }
+    return 'format_paragraph';
+  }
+
   toggleLink(): void {
     if (this.editor.isActive('link')) {
       this.editor.chain().focus().unsetLink().run();

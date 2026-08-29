@@ -841,3 +841,16 @@ $image-modal-height: calc(100vh - var(--navbar-height) - 32px - 64px);
   justify-content: center;
   margin-top: calc(var(--spacing-unit) * 4);
 }
+/* Icon sizes that used to be set on the <svg> element itself, kept now that the
+   same icons come from the Material Symbols font. */
+.search-icon .material-symbols-outlined {
+  font-size: 20px;
+}
+
+.search-clear-btn .material-symbols-outlined {
+  font-size: 18px;
+}
+
+.editor-toolbar .material-symbols-outlined {
+  font-size: 20px;
+}
