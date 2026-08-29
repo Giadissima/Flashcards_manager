@@ -10,6 +10,7 @@ import { Toast } from '../../toast/toast';
 import { ToastService } from '../../toast/toast.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { getSubjectIconUrl } from '../subject-icon.util';
+import { hasHtmlContent } from '../../shared/html.util';
 
 @Component({
   selector: 'app-manage-subjects',
@@ -80,8 +81,7 @@ export class ManageSubjectsComponent extends PaginatedList implements OnInit {
   hasDescription(subject: Subject): boolean {
     const desc = subject.desc;
     if (!desc || desc.trim().toLowerCase() === 'null') return false;
-    const textOnly = desc.replace(/<[^>]*>/g, '').trim();
-    return textOnly.length > 0;
+    return hasHtmlContent(desc);
   }
 
   toggleDescription(id?: string): void {
