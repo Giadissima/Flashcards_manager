@@ -10,6 +10,8 @@ import { SearchableSelectComponent, SelectOption } from '../../shared/searchable
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
 import { TestService } from '../test.service';
+import { Toast } from '../../toast/toast';
+import { ToastService } from '../../toast/toast.service';
 import { Topic } from '../../models/topic.dto';
 import { TopicService } from '../../topic/topic.service';
 import { toSubjectOptions, toTopicOptions } from '../../shared/select-options.util';
@@ -25,7 +27,7 @@ export function atLeastOneValidator(controls: string[]): ValidatorFn {
 @Component({
   selector: 'app-setup-test',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, SearchableSelectComponent, TranslocoModule],
+  imports: [ReactiveFormsModule, CommonModule, SearchableSelectComponent, TranslocoModule, Toast],
   templateUrl: './setup-test.html',
   styleUrls: ['./setup-test.scss']
 })
@@ -55,7 +57,8 @@ export class SetupTest implements OnInit {
     private flashcardService: FlashcardService,
     private topicService: TopicService,
     private router: Router,
-    private transloco: TranslocoService
+    private transloco: TranslocoService,
+    private toastService: ToastService
   ) {
     this.testForm = this.fb.group({
       subject_id: [null],
@@ -155,7 +158,7 @@ export class SetupTest implements OnInit {
 
     } catch (err: any) {
       console.error(err);
-      window.alert(this.transloco.translate('test.setup.createError')); // TODO change in toast
+      this.toastService.show(this.transloco.translate('test.setup.createError'), 'error');
       this.router.navigate(['']);
         }
       }
