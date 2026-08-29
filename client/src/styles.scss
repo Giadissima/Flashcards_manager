@@ -60,7 +60,6 @@
   --bs-body-bg: var(--background-color);
   --bs-body-color: var(--text-color);
 
-  --base-input-size: var(300px);
 }
 
 /* ---------------------------------- */
@@ -612,22 +611,11 @@ $image-modal-height: calc(100vh - var(--navbar-height) - 32px - 64px);
   flex-direction: row;
 }
 
-/* The selects (native or app-searchable-select) inside the filter bars live in
-   .col-auto columns, as wide as their content: without an explicit min-width the
-   select's inner width:100% has nothing to resolve against, and the column
-   collapses to nearly nothing instead of growing up to --base-input-size.
-   A .col-auto never shrinks on its own (flex-shrink: 0): a min-width fixed at
-   --base-input-size would make it overflow its container on screens narrower
-   than that. min(--base-input-size, 100%) instead stays at --base-input-size
-   when there is room, and drops to 100% of the available space when there is
-   not.
-   NOTE: --base-input-size is currently declared as `var(300px)`, which is not
-   valid CSS, so these two declarations are dropped by the browser. See the
-   review notes before "fixing" it - doing so changes the current layout. */
+/* A .col-auto is as wide as its content and never shrinks on its own, so the
+   select columns of a filter bar are allowed to grow and share the spare room
+   instead. */
 .filter-bar .col-auto:has(.form-select) {
   flex: 1 1 auto;
-  min-width: min(--base-input-size, 100%);
-  max-width: --base-input-size;
 }
 
 /* Search bar: the icon always sits on the right, merged with the input into one
