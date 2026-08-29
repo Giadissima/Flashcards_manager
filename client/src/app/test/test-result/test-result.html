@@ -92,11 +92,11 @@
         }">
       <div class="card-body">
         <h5 class="question-title">{{ q.title }}</h5>
-        <div class="question-text" [innerHTML]="q.question | katexRenderer"></div>
+        <div class="question-text" [innerHTML]="q.question | katexRenderer" (zoomableImages)="lightbox.open($event)"></div>
 
         <div class="answer-block correct-answer">
           <p>{{ 'test.result.correctAnswerLabel' | transloco }}</p>
-          <div class="answer" [innerHTML]="q.answer | katexRenderer"></div>
+          <div class="answer" [innerHTML]="q.answer | katexRenderer" (zoomableImages)="lightbox.open($event)"></div>
         </div>
       </div>
     </div>
@@ -107,6 +107,8 @@
   }
 </div>
 </app-load-state>
+<app-image-lightbox #lightbox></app-image-lightbox>
+
 
 <!-- Font Awesome for icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">

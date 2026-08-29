@@ -438,7 +438,10 @@ ngx-colors-overlay[data-ngx-colors-theme='dark'] .bg-white {
    the <img> tags arrive through [innerHTML] so they never get Angular's
    _ngcontent-* attribute, and a scoped selector such as ".flashcard-text img"
    in the component style would never match them. */
-.flashcard-text img {
+.flashcard-text img,
+.question-text img,
+.answer img,
+.subject-description img {
   cursor: zoom-in;
 }
 

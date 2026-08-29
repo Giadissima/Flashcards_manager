@@ -5,7 +5,9 @@ import { Component, ViewChild } from '@angular/core';
 import { DurationLongPipe } from '../../pipes/duration-long.pipe';
 import { FlashcardService } from '../../flashcard/flashcard.service';
 import { KatexRendererPipe } from '../../pipes/katex-renderer.pipe';
+import { ImageLightboxComponent } from '../../shared/image-lightbox/image-lightbox.component';
 import { LoadStateComponent } from '../../shared/load-state/load-state.component';
+import { ZoomableImagesDirective } from '../../shared/zoomable-images.directive';
 import { Test } from '../../models/test.dto';
 import { TestService } from '../test.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
@@ -13,7 +15,7 @@ import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 @Component({
   selector: 'app-test-result',
   standalone: true,
-  imports: [CommonModule, DurationLongPipe, NgClass, KatexRendererPipe, RouterLink, TranslocoModule, LoadStateComponent],
+  imports: [CommonModule, DurationLongPipe, NgClass, KatexRendererPipe, RouterLink, TranslocoModule, LoadStateComponent, ImageLightboxComponent, ZoomableImagesDirective],
   templateUrl: './test-result.html',
   styleUrl: './test-result.scss'
 })

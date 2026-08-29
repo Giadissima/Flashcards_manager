@@ -1,4 +1,4 @@
-import { AfterViewChecked, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Subject as RxSubject, Subscription, debounceTime } from 'rxjs';
 import { SearchableSelectComponent, SelectOption } from '../shared/searchable-select/searchable-select.component';
 import { SearchInputComponent } from '../shared/search-input/search-input.component';
@@ -8,7 +8,6 @@ import { Flashcard } from '../models/flashcard.dto';
 import { FlashcardService } from '../flashcard/flashcard.service';
 import { KatexRendererPipe } from '../pipes/katex-renderer.pipe';
 import { LoadStateComponent } from '../shared/load-state/load-state.component';
-import Panzoom, { PanzoomObject } from '@panzoom/panzoom';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PaginatedList } from '../shared/paginated-list';
 import { toSubjectOptions, toTopicOptions } from '../shared/select-options.util';
@@ -20,29 +19,20 @@ import { ToastService } from '../toast/toast.service';
 import { Topic } from '../models/topic.dto';
 import { TopicService } from '../topic/topic.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
-import { ModalComponent } from '../shared/modal/modal.component';
+import { ImageLightboxComponent } from '../shared/image-lightbox/image-lightbox.component';
+import { ZoomableImagesDirective } from '../shared/zoomable-images.directive';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, Toast, KatexRendererPipe, SearchableSelectComponent, SearchInputComponent, TranslocoModule, ModalComponent, LoadStateComponent],
+  imports: [CommonModule, Toast, KatexRendererPipe, SearchableSelectComponent, SearchInputComponent, TranslocoModule, ImageLightboxComponent, ZoomableImagesDirective, LoadStateComponent],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
-export class Home extends PaginatedList implements OnInit, AfterViewChecked, OnDestroy {
-  @ViewChild('imageModalImg') imageModalImgRef?: ElementRef<HTMLImageElement>;
+export class Home extends PaginatedList implements OnInit, OnDestroy {
   @ViewChild(LoadStateComponent, { static: true }) loadState!: LoadStateComponent;
 
   flashcards: Flashcard[] = [];
-  isImageModalOpen = false;
-  selectedImageUrl: string | null = null;
-  imageLoading = false;
-  private panzoomInstance: PanzoomObject | null = null;
-  private imageZoomNeedsInit = false;
-  private readonly onImageWheel = (event: WheelEvent): void => {
-    event.preventDefault();
-    this.panzoomInstance?.zoomWithWheel(event);
-  };
   subjects: Subject[] = [];
   topics: Topic[] = [];
   selectedSubjectId: string | null | undefined = null;
@@ -234,76 +224,9 @@ export class Home extends PaginatedList implements OnInit, AfterViewChecked, OnD
     this.showAnswerMap[card._id] = !this.showAnswerMap[card._id];
   }
 
-  onFlashcardTextClick(event: MouseEvent): void {
-    const target = event.target as HTMLElement;
-    if (target.tagName === 'IMG') {
-      this.imageLoading = true;
-      this.selectedImageUrl = (target as HTMLImageElement).src;
-      this.isImageModalOpen = true;
-      this.imageZoomNeedsInit = true;
-    }
-  }
-
-  onModalImageLoaded(): void {
-    this.imageLoading = false;
-  }
-
-  ngAfterViewChecked(): void {
-    // Reopening the same image doesn't change the [src] binding, so the browser
-    // never fires another 'load' event - poll the native .complete flag instead,
-    // which reflects the fetch state regardless of whether src actually changed.
-    if (this.imageLoading && this.imageModalImgRef?.nativeElement.complete) {
-      this.imageLoading = false;
-    }
-
-    // Wait for the image to actually finish loading: while imageLoading is true
-    // the <img> is display:none, so panzoom would measure a zero-size element.
-    if (this.imageZoomNeedsInit && this.imageModalImgRef && !this.imageLoading) {
-      this.imageZoomNeedsInit = false;
-      this.initImageZoom();
-    }
-  }
-
   ngOnDestroy(): void {
-    this.destroyImageZoom();
     this.queryParamsSubscription?.unsubscribe();
     this.searchTermChangesSubscription?.unsubscribe();
-  }
-
-  onImageModalClosed(): void {
-    this.destroyImageZoom();
-  }
-
-  zoomIn(): void {
-    this.panzoomInstance?.zoomIn();
-  }
-
-  zoomOut(): void {
-    this.panzoomInstance?.zoomOut();
-  }
-
-  resetZoom(): void {
-    this.panzoomInstance?.reset();
-  }
-
-  private initImageZoom(): void {
-    const el = this.imageModalImgRef?.nativeElement;
-    if (!el) return;
-    this.destroyImageZoom();
-    this.panzoomInstance = Panzoom(el, {
-      maxScale: 5,
-      minScale: 1,
-      contain: 'outside',
-      step: 0.5,
-    });
-    el.addEventListener('wheel', this.onImageWheel, { passive: false });
-  }
-
-  private destroyImageZoom(): void {
-    const el = this.imageModalImgRef?.nativeElement;
-    el?.removeEventListener('wheel', this.onImageWheel);
-    this.panzoomInstance?.destroy();
-    this.panzoomInstance = null;
   }
 
   async deleteCard(card: Flashcard): Promise<void> {

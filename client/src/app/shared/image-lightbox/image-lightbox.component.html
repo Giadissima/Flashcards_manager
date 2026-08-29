@@ -1,0 +1,29 @@
+<app-modal
+  [(isOpen)]="isOpen"
+  [dialogClass]="'image-modal-dialog'"
+  [contentClass]="'image-modal-content'"
+  (closed)="onClosed()"
+>
+  @if (src) {
+  @if (loading) {
+  <div class="image-modal-loading">
+    <div class="spinner-border text-light" role="status">
+      <span class="visually-hidden">{{ 'common.loading' | transloco }}</span>
+    </div>
+  </div>
+  }
+  <img #image [src]="src" alt="" class="image-modal-img" [class.image-modal-img-loading]="loading"
+    (load)="onImageLoaded()" (error)="onImageLoaded()">
+  <div class="image-modal-zoom-controls">
+    <button type="button" class="btn btn-light btn-sm" (click)="zoomOut()" [attr.aria-label]="'common.zoomOut' | transloco">
+      <i class="bi bi-zoom-out"></i>
+    </button>
+    <button type="button" class="btn btn-light btn-sm" (click)="resetZoom()" [attr.aria-label]="'common.zoomReset' | transloco">
+      <i class="bi bi-aspect-ratio"></i>
+    </button>
+    <button type="button" class="btn btn-light btn-sm" (click)="zoomIn()" [attr.aria-label]="'common.zoomIn' | transloco">
+      <i class="bi bi-zoom-in"></i>
+    </button>
+  </div>
+  }
+</app-modal>

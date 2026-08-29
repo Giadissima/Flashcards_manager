@@ -29,7 +29,7 @@
         </div>
       </div>
       <div class="flashcard-body d-flex flex-column align-items-center text-center">
-        <div class="flashcard-text" [innerHTML]="getCardBody(card) | katexRenderer"></div>
+        <div class="flashcard-text" [innerHTML]="getCardBody(card) | katexRenderer" (zoomableImages)="lightbox.open($event)"></div>
         <div class="flashcard-actions justify-content-center">
           <button type="button" class="btn btn-primary" (click)="seeAnswer(card)">
             {{ getCardButtonText(card) }}
@@ -76,3 +76,4 @@
     [message]="t('test.runner.leaveConfirmMessage')" [confirmLabel]="t('common.yes')" [cancelLabel]="t('common.cancel')"
     (confirmed)="confirmLeave()" (cancelled)="cancelLeave()"></app-confirm-dialog>
 </ng-container>
+<app-image-lightbox #lightbox></app-image-lightbox>

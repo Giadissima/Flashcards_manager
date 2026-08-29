@@ -96,7 +96,7 @@
         </div>
       </div>
       <div class="flashcard-body">
-        <div class="flashcard-text" [innerHTML]="getCardBody(card) | katexRenderer" (click)="onFlashcardTextClick($event)"></div>
+        <div class="flashcard-text" [innerHTML]="getCardBody(card) | katexRenderer" (zoomableImages)="lightbox.open($event)"></div>
         <div class="flashcard-actions">
           <button class="btn btn-primary" (click)="seeAnswer(card)">
             {{ getCardButtonText(card) }}
@@ -137,34 +137,6 @@
 </div>
 </app-load-state>
 
-<app-modal
-  [(isOpen)]="isImageModalOpen"
-  [dialogClass]="'image-modal-dialog'"
-  [contentClass]="'image-modal-content'"
-  (closed)="onImageModalClosed()"
->
-  @if (selectedImageUrl) {
-  @if (imageLoading) {
-  <div class="image-modal-loading">
-    <div class="spinner-border text-light" role="status">
-      <span class="visually-hidden">{{ 'common.loading' | transloco }}</span>
-    </div>
-  </div>
-  }
-  <img #imageModalImg [src]="selectedImageUrl" alt="" class="image-modal-img" [class.image-modal-img-loading]="imageLoading"
-    (load)="onModalImageLoaded()" (error)="onModalImageLoaded()">
-  <div class="image-modal-zoom-controls">
-    <button type="button" class="btn btn-light btn-sm" (click)="zoomOut()" [attr.aria-label]="'home.zoomOut' | transloco">
-      <i class="bi bi-zoom-out"></i>
-    </button>
-    <button type="button" class="btn btn-light btn-sm" (click)="resetZoom()" [attr.aria-label]="'home.zoomReset' | transloco">
-      <i class="bi bi-aspect-ratio"></i>
-    </button>
-    <button type="button" class="btn btn-light btn-sm" (click)="zoomIn()" [attr.aria-label]="'home.zoomIn' | transloco">
-      <i class="bi bi-zoom-in"></i>
-    </button>
-  </div>
-  }
-</app-modal>
+<app-image-lightbox #lightbox></app-image-lightbox>
 
 <app-toast></app-toast>

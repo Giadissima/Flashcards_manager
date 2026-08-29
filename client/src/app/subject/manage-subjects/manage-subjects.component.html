@@ -71,7 +71,7 @@
           @if (isDescriptionExpanded(subject._id)) {
           <tr>
             <td colspan="4">
-              <div class="subject-description" [innerHTML]="subject.desc"></div>
+              <div class="subject-description" [innerHTML]="subject.desc" (zoomableImages)="lightbox.open($event)"></div>
             </td>
           </tr>
           }
@@ -87,3 +87,4 @@
     </div>
     </div>
     <app-toast></app-toast>
+<app-image-lightbox #lightbox></app-image-lightbox>

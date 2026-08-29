@@ -51,7 +51,10 @@
       "server": "Il server non è al momento raggiungibile. Riprova tra qualche istante.",
       "notFound": "La risorsa richiesta non esiste",
       "testNotFound": "Non è stato possibile recuperare il test"
-    }
+    },
+    "zoomIn": "Zoom avanti",
+    "zoomOut": "Zoom indietro",
+    "zoomReset": "Reimposta zoom"
   },
   "notFound": {
     "title": "404",
@@ -64,9 +67,6 @@
     "sortDate": "Data",
     "seeAnswer": "Vedi risposta",
     "seeQuestion": "Vedi domanda",
-    "zoomIn": "Zoom avanti",
-    "zoomOut": "Zoom indietro",
-    "zoomReset": "Reimposta zoom",
     "toast": {
       "cardDeleted": "Flashcard eliminata con successo",
       "deleteError": "Errore durante l'eliminazione",

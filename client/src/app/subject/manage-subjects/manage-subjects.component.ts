@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
+import { ImageLightboxComponent } from '../../shared/image-lightbox/image-lightbox.component';
 import { PaginatedList } from '../../shared/paginated-list';
+import { ZoomableImagesDirective } from '../../shared/zoomable-images.directive';
 import { Router } from '@angular/router';
 import { SearchInputComponent } from '../../shared/search-input/search-input.component';
 import { Subject } from '../../models/subject.dto';
@@ -15,7 +17,7 @@ import { hasHtmlContent } from '../../shared/html.util';
 @Component({
   selector: 'app-manage-subjects',
   standalone: true,
-  imports: [CommonModule, Toast, SearchInputComponent, TranslocoModule],
+  imports: [CommonModule, Toast, SearchInputComponent, TranslocoModule, ImageLightboxComponent, ZoomableImagesDirective],
   templateUrl: './manage-subjects.component.html',
   styleUrls: ['./manage-subjects.component.scss']
 })

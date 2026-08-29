@@ -9,7 +9,9 @@ import { Flashcard } from '../../models/flashcard.dto';
 import { FlashcardService } from '../../flashcard/flashcard.service';
 import { KatexRendererPipe } from '../../pipes/katex-renderer.pipe';
 import { LoadStateComponent } from '../../shared/load-state/load-state.component';
+import { ImageLightboxComponent } from '../../shared/image-lightbox/image-lightbox.component';
 import { PaginatedList } from '../../shared/paginated-list';
+import { ZoomableImagesDirective } from '../../shared/zoomable-images.directive';
 import * as cardView from '../../shared/flashcard-view.util';
 import { TestService } from '../test.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
@@ -17,7 +19,7 @@ import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 @Component({
   selector: 'app-test-runner',
   standalone: true,
-  imports: [CommonModule, DurationPipe, KatexRendererPipe, ConfirmDialogComponent, TranslocoModule, LoadStateComponent],
+  imports: [CommonModule, DurationPipe, KatexRendererPipe, ConfirmDialogComponent, TranslocoModule, LoadStateComponent, ImageLightboxComponent, ZoomableImagesDirective],
   templateUrl: './test-runner.html',
   styleUrls: ['./test-runner.scss']
 })
