@@ -54,6 +54,16 @@
      changes, this has to be updated too. */
   --navbar-height: 56px;
 
+  /* Status colours. The same in both themes on purpose: they are used as the
+     background of their own disc or as a border, never as text on the page
+     background. The green and the red are the ones the literals in
+     test-result.scss were already using - rgba(18,183,106,...) and
+     rgba(240,68,56,...) - and the orange matches the timer in test-runner.scss. */
+  --success-color: #12B76A;
+  --danger-color: #F04438;
+  --warning-color: #FF9500;
+  --white-color: #ffffff;
+
   /* Syncing Bootstrap core variables with the design system */
   --bs-primary: var(--primary-color);
   --bs-secondary: var(--secondary-color);
