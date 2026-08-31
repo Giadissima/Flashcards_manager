@@ -44,9 +44,9 @@
 
   <!-- Destra: Pulsante crea card e switch tema -->
   <div class="actions-container">
-    <button routerLink="/create-card" type="button" class="btn btn-primary create-card-btn">
+    <button routerLink="/create-card" type="button" class="btn btn-primary create-card-btn" [attr.aria-label]="'navbar.createCard' | transloco">
       <span>+</span>
-      {{ 'navbar.createCard' | transloco }}
+      <span class="label">{{ 'navbar.createCard' | transloco }}</span>
     </button>
     <button (click)="openSettings()" class="theme-switch-btn" type="button" [attr.aria-label]="'settings.title' | transloco">
       <span class="material-symbols-outlined">settings</span>

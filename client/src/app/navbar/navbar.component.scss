@@ -131,7 +131,7 @@ nav {
     pointer-events: auto;
   }
 
-@media (max-width: 550px) {
+@media (max-width: 560px) {
   .project-name {
     display: none;
   }
@@ -214,4 +214,8 @@ nav {
     opacity: 1;
     pointer-events: auto;
   }
+}
+
+@media (max-width: 370px) {
+  .create-card-btn .label { display: none; }
 }
