@@ -26,6 +26,11 @@
   --header-color: #f8f9fa;
   --sub-title-color: #f8f9faaf;
   --text-color: rgba(255, 255, 255, 0.7);
+  /* Same white/70% as --text-color, but written literally: the caret lives
+     inside a data: URL (see .form-select below), which is a separate document
+     and cannot read var() or currentColor from the page. Kept here so it stays
+     next to the colour it has to match. */
+  --select-caret-img: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='white' stroke-opacity='0.7' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
   --component-background: #1E1E1E;
   --on-primary-color: #ffffff;
   --on-accent-color: #f8f9fa;
@@ -153,6 +158,13 @@ h6 {
    background-image inside the padding box, not outside it. */
 .form-select {
   padding-right: calc(var(--spacing-unit) * 4.5);
+}
+
+/* Bootstrap draws the caret as a background-image SVG with a hard-coded dark
+   grey stroke, which all but disappears on the dark theme: it is swapped for
+   the light one defined among the theme tokens. */
+[data-theme='dark'] .form-select {
+  --bs-form-select-bg-img: var(--select-caret-img);
 }
 
 .form-label {
