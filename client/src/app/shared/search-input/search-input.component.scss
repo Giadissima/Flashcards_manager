@@ -1,0 +1,58 @@
+.search-input-container{
+  flex-wrap: nowrap;
+}
+
+/* Search bar: the icon always sits on the right, merged with the input into one
+   component. The input lives inside a wrapper (so the "X" can be overlaid on
+   it), so it is no longer a direct child of .input-group and Bootstrap's rules
+   rounding only the outer corners (:first-child/:last-child) no longer reach it:
+   the icon-side corners are therefore zeroed explicitly here instead of relying
+   on Bootstrap. */
+.search-icon {
+  background-color: var(--secondary-color);
+  border-left: 0px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  color: var(--header-color);
+}
+
+.search-input-wrapper {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0px;
+}
+
+.search-input-wrapper input {
+  padding-right: calc(var(--spacing-unit) * 4);
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.search-input-wrapper input::placeholder {
+  text-overflow: ellipsis;
+}
+
+/* "X" button to clear a search bar quickly: overlaid on the input (rather than
+   being an input-group-text of its own) so the field keeps its width. */
+.search-clear-btn {
+  position: absolute;
+  top: 50%;
+  right: calc(var(--spacing-unit) * 1.5);
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--text-color);
+  opacity: 0.6;
+  cursor: pointer;
+}
+
+.search-clear-btn:hover {
+  opacity: 1;
+}

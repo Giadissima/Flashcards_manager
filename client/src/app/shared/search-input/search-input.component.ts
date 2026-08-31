@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -13,6 +13,7 @@ import { TranslocoModule } from '@jsverse/transloco';
   standalone: true,
   imports: [CommonModule, FormsModule, TranslocoModule],
   templateUrl: './search-input.component.html',
+  styleUrl: './search-input.component.scss'
 })
 export class SearchInputComponent {
   @Input() value: string = '';
