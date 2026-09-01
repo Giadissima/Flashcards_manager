@@ -22,17 +22,12 @@
   min-width: 0px;
 }
 
+/* The ellipsis on a value or a placeholder too long for its field is not set
+   here: every .form-control gets it, in styles.scss. */
 .search-input-wrapper input {
   padding-right: calc(var(--spacing-unit) * 4);
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
-
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.search-input-wrapper input::placeholder {
-  text-overflow: ellipsis;
 }
 
 /* "X" button to clear a search bar quickly: overlaid on the input (rather than

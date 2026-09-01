@@ -153,6 +153,14 @@ h6 {
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
+/* A value or a placeholder longer than the field it is in is cut short with an
+   ellipsis rather than at whatever letter the edge falls on. Only single line
+   fields: a textarea wraps its text and has nothing to cut. */
+input.form-control,
+input.form-control::placeholder {
+  text-overflow: ellipsis;
+}
+
 /* Reserves room for the dropdown caret, otherwise a long label ends up under
    it: padding is needed here, not margin, because the caret is a
    background-image inside the padding box, not outside it. */
@@ -531,11 +539,23 @@ input:-webkit-autofill:active {
 }
 
 /* Placeholder from @tiptap/extension-placeholder: shows the sample text on the
-   first empty node through a pseudo-element, without taking up any height. */
+   first empty node through a pseudo-element, without taking up any height. It
+   is taken out of the flow by being positioned rather than floated, so that a
+   placeholder longer than the line is cut with an ellipsis instead of wrapping
+   onto lines the empty editor has no room for. The paragraph is what it is
+   positioned against, so it lines up with the text that will replace it. */
+.tiptap p.is-empty {
+  position: relative;
+}
+
 .tiptap p.is-empty::before {
   content: attr(data-placeholder);
-  float: left;
-  height: 0;
+  position: absolute;
+  left: 0;
+  right: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   color: var(--text-color);
   opacity: 0.5;
   pointer-events: none;
