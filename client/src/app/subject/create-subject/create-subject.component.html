@@ -1,54 +1,43 @@
 <div class="container-md" *transloco="let t">
-  <div class="card">
-    <div class="card-header p-4 d-flex align-items-center">
-      <div class="header-icon-container me-3">
-        <span class="material-symbols-outlined">library_add</span>
+  <app-page-card icon="library_add" [title]="'subject.create.title' | transloco" [subtitle]="'subject.create.subtitle' | transloco">
+    <form [formGroup]="subjectForm" (ngSubmit)="createSubject()" novalidate>
+
+      <div class="form-group">
+        <label for="name" class="form-label">{{ 'common.name' | transloco }}</label>
+        <input type="text" id="name" formControlName="name" class="form-control">
+        @if (subjectForm.get('name')?.touched && subjectForm.get('name')?.hasError('minlength')) {
+        <div class="invalid-feedback d-block">{{ 'subject.create.nameMinError' | transloco:{ min: charMinLength } }}
+        </div>
+        } @else if (subjectForm.get('name')?.touched && subjectForm.get('name')?.hasError('maxlength')) {
+        <div class="invalid-feedback d-block">{{ 'subject.create.nameMaxError' | transloco:{ max: nameMaxLength } }}
+        </div>
+        } @else if (subjectForm.get('name')?.touched && subjectForm.get('name')?.hasError('required')) {
+        <div class="invalid-feedback d-block">{{ 'subject.create.nameRequiredError' | transloco }}</div>
+        }
       </div>
-      <div>
-        <h2 class="card-title">{{ 'subject.create.title' | transloco }}</h2>
-        <h6 class="card-subtitle mb-2 text-body-secondary">{{ 'subject.create.subtitle' | transloco }}</h6>
+
+
+      <div class="form-group">
+        <label for="desc-editor" class="form-label">{{ 'common.description' | transloco }}</label>
+        <app-rich-text-editor [editor]="descEditor"></app-rich-text-editor>
+        @if (descLength > descMaxLength) {
+        <div class="invalid-feedback d-block">{{ 'subject.create.descMaxError' | transloco:{ max: descMaxLength,
+          current: descLength } }}</div>
+        }
       </div>
-    </div>
-    <div class="card-body">
-      <form [formGroup]="subjectForm" (ngSubmit)="createSubject()" novalidate>
 
-        <div class="form-group">
-          <label for="name" class="form-label">{{ 'common.name' | transloco }}</label>
-          <input type="text" id="name" formControlName="name" class="form-control">
-          @if (subjectForm.get('name')?.touched && subjectForm.get('name')?.hasError('minlength')) {
-          <div class="invalid-feedback d-block">{{ 'subject.create.nameMinError' | transloco:{ min: charMinLength } }}
-          </div>
-          } @else if (subjectForm.get('name')?.touched && subjectForm.get('name')?.hasError('maxlength')) {
-          <div class="invalid-feedback d-block">{{ 'subject.create.nameMaxError' | transloco:{ max: nameMaxLength } }}
-          </div>
-          } @else if (subjectForm.get('name')?.touched && subjectForm.get('name')?.hasError('required')) {
-          <div class="invalid-feedback d-block">{{ 'subject.create.nameRequiredError' | transloco }}</div>
-          }
-        </div>
+      <app-subject-icon-preview [previewUrl]="filePreviewUrl" [colorControl]="colorControl"
+        [colorTitle]="t('subject.create.iconColor')" [previewLabel]="t('subject.create.iconPreview')"
+        [fileLabel]="t('common.chooseFile')" (fileSelected)="onFileSelected($event)"
+        (reset)="resetIcon()"></app-subject-icon-preview>
 
-        
-        <div class="form-group">
-          <label for="desc-editor" class="form-label">{{ 'common.description' | transloco }}</label>
-          <app-rich-text-editor [editor]="descEditor"></app-rich-text-editor>
-          @if (descLength > descMaxLength) {
-          <div class="invalid-feedback d-block">{{ 'subject.create.descMaxError' | transloco:{ max: descMaxLength,
-            current: descLength } }}</div>
-          }
-        </div>
-
-        <app-subject-icon-preview [previewUrl]="filePreviewUrl" [colorControl]="colorControl"
-          [colorTitle]="t('subject.create.iconColor')" [previewLabel]="t('subject.create.iconPreview')"
-          [fileLabel]="t('common.chooseFile')" (fileSelected)="onFileSelected($event)"
-          (reset)="resetIcon()"></app-subject-icon-preview>
-
-        <div class="form-actions">
-          <button type="submit" class="btn"
-            [ngClass]="(subjectForm.invalid) || descLength > descMaxLength ? 'btn-outline-secondary' : 'btn-primary'"
-            [disabled]="subjectForm.invalid || descLength > descMaxLength">{{ 'subject.create.createButton' | transloco
-            }}</button>
-        </div>
-      </form>
-    </div>
-  </div>
+      <div class="form-actions">
+        <button type="submit" class="btn"
+          [ngClass]="(subjectForm.invalid) || descLength > descMaxLength ? 'btn-outline-secondary' : 'btn-primary'"
+          [disabled]="subjectForm.invalid || descLength > descMaxLength">{{ 'subject.create.createButton' | transloco
+          }}</button>
+      </div>
+    </form>
+  </app-page-card>
 </div>
 <app-toast></app-toast>

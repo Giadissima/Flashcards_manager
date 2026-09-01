@@ -11,6 +11,7 @@ import { CommonModule } from '@angular/common';
 import { Editor } from '@tiptap/core';
 import { createRichTextEditor } from '../../shared/rich-text-editor/editor.factory';
 import { FlashcardService } from '../flashcard.service';
+import { PageCardComponent } from '../../shared/page-card/page-card.component';
 import { RichTextEditorComponent } from '../../shared/rich-text-editor/rich-text-editor.component';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
@@ -29,7 +30,8 @@ import { toSubjectOptions, toTopicOptions } from '../../shared/select-options.ut
     Toast,
     RichTextEditorComponent,
     TranslocoModule,
-    SearchableSelectComponent
+    SearchableSelectComponent,
+    PageCardComponent,
   ],
   templateUrl: './create-flashcard.html',
 })

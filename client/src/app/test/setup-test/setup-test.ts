@@ -1,5 +1,6 @@
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
+import { PageCardComponent } from '../../shared/page-card/page-card.component';
 import { Question } from '../../models/test.dto';
 
 import { CommonModule } from '@angular/common';
@@ -27,7 +28,7 @@ export function atLeastOneValidator(controls: string[]): ValidatorFn {
 @Component({
   selector: 'app-setup-test',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, SearchableSelectComponent, TranslocoModule, Toast],
+  imports: [ReactiveFormsModule, CommonModule, SearchableSelectComponent, TranslocoModule, Toast, PageCardComponent],
   templateUrl: './setup-test.html',
   styleUrls: ['./setup-test.scss']
 })

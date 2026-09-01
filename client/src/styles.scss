@@ -645,6 +645,9 @@ $image-modal-height: calc(100vh - var(--navbar-height) - 32px - 64px);
   background-color: var(--background-color);
   width: 48px;
   height: 48px;
+  /* Without this the circle is squeezed into an ellipse as soon as the flex row
+     it lives in runs out of room (narrow screens, long titles). */
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: center;

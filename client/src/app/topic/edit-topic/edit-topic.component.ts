@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { NgxColorsComponent, NgxColorsTriggerDirective } from 'ngx-colors';
+import { PageCardComponent } from '../../shared/page-card/page-card.component';
 import { TopicService } from './../topic.service';
 import { ToastService } from '../../toast/toast.service';
 import { SubjectService } from '../../subject/subject.service';
@@ -19,7 +20,7 @@ import { toSubjectOptions } from '../../shared/select-options.util';
 @Component({
   selector: 'app-edit-topic',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, Toast, TranslocoModule, SearchableSelectComponent, NgxColorsComponent, NgxColorsTriggerDirective, LoadStateComponent],
+  imports: [ReactiveFormsModule, CommonModule, Toast, TranslocoModule, SearchableSelectComponent, NgxColorsComponent, NgxColorsTriggerDirective, LoadStateComponent, PageCardComponent],
   templateUrl: './edit-topic.component.html',
 })
 export class EditTopicComponent implements OnInit {

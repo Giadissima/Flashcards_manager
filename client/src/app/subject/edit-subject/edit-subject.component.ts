@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { Editor } from '@tiptap/core';
 import { createRichTextEditor } from '../../shared/rich-text-editor/editor.factory';
 import { LoadStateComponent } from '../../shared/load-state/load-state.component';
+import { PageCardComponent } from '../../shared/page-card/page-card.component';
 import { RichTextEditorComponent } from '../../shared/rich-text-editor/rich-text-editor.component';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../subject.service';
@@ -27,6 +28,7 @@ import { SubjectIconPreviewComponent } from '../subject-icon-preview/subject-ico
     TranslocoModule,
     SubjectIconPreviewComponent,
     LoadStateComponent,
+    PageCardComponent,
   ],
   templateUrl: './edit-subject.component.html',
 })

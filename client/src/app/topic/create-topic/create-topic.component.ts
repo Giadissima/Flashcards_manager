@@ -8,6 +8,7 @@ import {
 
 import { CommonModule } from '@angular/common';
 import { NgxColorsComponent, NgxColorsTriggerDirective } from 'ngx-colors';
+import { PageCardComponent } from '../../shared/page-card/page-card.component';
 import { TopicService } from '../topic.service';
 import { Router } from '@angular/router';
 import { Subject } from '../../models/subject.dto';
@@ -34,6 +35,7 @@ import { toSubjectOptions } from '../../shared/select-options.util';
     SearchableSelectComponent,
     NgxColorsComponent,
     NgxColorsTriggerDirective,
+    PageCardComponent,
   ],
   templateUrl: './create-topic.component.html',
 })

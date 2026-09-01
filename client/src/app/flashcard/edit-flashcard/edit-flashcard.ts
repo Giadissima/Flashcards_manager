@@ -9,6 +9,7 @@ import { createRichTextEditor } from '../../shared/rich-text-editor/editor.facto
 import { Flashcard } from '../../models/flashcard.dto';
 import { FlashcardService } from '../flashcard.service';
 import { LoadStateComponent } from '../../shared/load-state/load-state.component';
+import { PageCardComponent } from '../../shared/page-card/page-card.component';
 import { RichTextEditorComponent } from '../../shared/rich-text-editor/rich-text-editor.component';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
@@ -23,7 +24,7 @@ import { SearchableSelectComponent, SelectOption } from '../../shared/searchable
 @Component({
   selector: 'app-edit-flashcard',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, Toast, RichTextEditorComponent, TranslocoModule, SearchableSelectComponent, LoadStateComponent],
+  imports: [CommonModule, ReactiveFormsModule, Toast, RichTextEditorComponent, TranslocoModule, SearchableSelectComponent, LoadStateComponent, PageCardComponent],
   templateUrl: './edit-flashcard.html',
 })
 export class EditFlashcard implements OnInit, OnDestroy {

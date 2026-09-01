@@ -6,6 +6,7 @@ import { charMinLength, descMaxLength, nameMaxLength } from '../../../config/con
 import { CommonModule } from '@angular/common';
 import { Editor } from '@tiptap/core';
 import { createRichTextEditor } from '../../shared/rich-text-editor/editor.factory';
+import { PageCardComponent } from '../../shared/page-card/page-card.component';
 import { Router } from '@angular/router';
 import { SubjectService } from '../subject.service';
 import { defaultSubjectIconColor } from '../subject-icon.util';
@@ -24,6 +25,7 @@ import { RichTextEditorComponent } from '../../shared/rich-text-editor/rich-text
     TranslocoModule,
     RichTextEditorComponent,
     SubjectIconPreviewComponent,
+    PageCardComponent,
   ],
   templateUrl: './create-subject.component.html',
 })

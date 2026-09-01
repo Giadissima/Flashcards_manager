@@ -10,6 +10,7 @@ import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { CommonModule } from '@angular/common';
 import { DurationPipe } from '../../pipes/duration.pipe';
 import { FormsModule } from '@angular/forms';
+import { PageCardComponent } from '../../shared/page-card/page-card.component';
 import { PaginatedList } from '../../shared/paginated-list';
 import { toSubjectOptions, toTopicOptions } from '../../shared/select-options.util';
 import { Subject } from '../../models/subject.dto';
@@ -29,6 +30,7 @@ import { TopicService } from '../../topic/topic.service';
     FormsModule,
     SearchableSelectComponent,
     TranslocoModule,
+    PageCardComponent,
   ],
   templateUrl: './test-history.html',
   styleUrl: './test-history.scss',

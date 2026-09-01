@@ -1,0 +1,9 @@
+/* The heading can shrink (and wrap) so that a long translated title never
+   pushes the action out of the header. */
+.page-card-heading {
+  min-width: 0;
+}
+
+.card-title {
+  overflow-wrap: anywhere;
+}
