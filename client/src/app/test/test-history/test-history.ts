@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { FilterBarComponent } from '../../shared/filter-bar/filter-bar.component';
 import { PaginationComponent } from '../../shared/pagination/pagination.component';
 import {
@@ -27,7 +27,6 @@ import { TopicService } from '../../topic/topic.service';
   standalone: true,
   imports: [
     CommonModule,
-    RouterLink,
     DurationPipe,
     FormsModule,
     SearchableSelectComponent,

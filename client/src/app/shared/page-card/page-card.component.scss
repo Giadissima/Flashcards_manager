@@ -7,3 +7,23 @@
 .card-title {
   overflow-wrap: anywhere;
 }
+
+/* No action projected and none configured: the header must not keep a gap for it. */
+.card-action:empty {
+  display: none;
+}
+
+/* The header stacks below the sm breakpoint and stretches its items, which
+   turns a single action into a full-width bar heavier than the page title.
+   Here it stays as wide as its label and sits centred under the heading. */
+@media (max-width: 575.98px) {
+  .card-action {
+    align-self: center;
+    width: fit-content;
+  }
+}
+
+/* Reaches the configured action; a projected one styles its own icon. */
+.card-action .material-symbols-outlined {
+  font-size: 20px;
+}
