@@ -903,10 +903,15 @@ $image-modal-height: calc(100vh - var(--navbar-height) - 32px - 64px);
 
 .form-row {
   display: flex;
+  /* `flex: 1` alone would keep the fields side by side however narrow the
+     screen gets, squeezing them until their content sticks out. With a basis
+     to fall back on they hold a readable width and drop one under the other
+     as soon as two of them no longer fit. */
+  flex-wrap: wrap;
   gap: calc(var(--spacing-unit) * 2);
 
   .form-group {
-    flex: 1;
+    flex: 1 1 240px;
   }
 }
 
