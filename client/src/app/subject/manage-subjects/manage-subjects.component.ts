@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
 import { ImageLightboxComponent } from '../../shared/image-lightbox/image-lightbox.component';
+import { PageCardComponent } from '../../shared/page-card/page-card.component';
 import { PaginatedList } from '../../shared/paginated-list';
 import { ZoomableImagesDirective } from '../../shared/zoomable-images.directive';
 import { Router } from '@angular/router';
@@ -18,7 +19,7 @@ import { hasHtmlContent } from '../../shared/html.util';
 @Component({
   selector: 'app-manage-subjects',
   standalone: true,
-  imports: [CommonModule, Toast, SearchInputComponent, TranslocoModule, ImageLightboxComponent, ZoomableImagesDirective, ConfirmDialogComponent],
+  imports: [CommonModule, Toast, SearchInputComponent, TranslocoModule, ImageLightboxComponent, ZoomableImagesDirective, ConfirmDialogComponent, PageCardComponent],
   templateUrl: './manage-subjects.component.html',
   styleUrls: ['./manage-subjects.component.scss']
 })

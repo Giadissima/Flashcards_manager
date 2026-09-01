@@ -13,3 +13,45 @@
   border: 3px solid #ffffff;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2), 0 1px 1px 1px rgba(0, 0, 0, 0.14), 0 1px 1px 1px rgba(0, 0, 0, 0.12);
 }
+
+/* Phone layout: the rows are turned into cards by .table-stacked (global), which
+   also handles .cell-title, .cell-meta and .cell-actions. What is left here is
+   what only this table has: the topic colour, drawn as the stripe running down
+   the left edge of its card. */
+@media (max-width: 767.98px) {
+  /* The filters take the full card width once they are stacked. */
+  .subject-filter-col {
+    max-width: none;
+  }
+
+  .subject-filter-col + .subject-filter-col {
+    margin-top: calc(var(--spacing-unit) * 1.5);
+  }
+
+  .topics-table {
+    --stacked-gutter: calc(var(--spacing-unit) * 2);
+  }
+
+  /* The cell collapses: the hex value is noise on a phone and the swatch is
+     positioned against the row instead. */
+  .topic-color {
+    padding: 0;
+  }
+
+  .color-hex {
+    display: none;
+  }
+
+  .topic-color .color-preview {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 5px;
+    height: auto;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+}

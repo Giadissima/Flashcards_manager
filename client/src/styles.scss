@@ -284,6 +284,104 @@ input:-webkit-autofill:active {
   --bs-table-border-color: var(--border-color);
 }
 
+/* Stacked table: on phones a .table-stacked stops being a grid and every row
+   becomes a card, so cells with an incompressible width (icons, action
+   buttons) no longer push the table into a horizontal overflow. The column
+   header is repeated on each cell through its data-label attribute; cells
+   without one render no label. Rows keep a single markup in the template, all
+   the difference lives here.
+
+   Cells can opt into the card roles instead of the label/value pair:
+   .cell-title for the heading line, .cell-meta for a secondary line, and
+   .cell-actions for the buttons parked on the right of the card. A page that
+   draws something in the left gutter (a colour stripe, an avatar) sizes it
+   with --stacked-gutter. */
+@media (max-width: 768px) {
+  .table-stacked,
+  .table-stacked tbody,
+  .table-stacked tr,
+  .table-stacked td {
+    display: block;
+    width: 100%;
+  }
+
+  .table-stacked thead {
+    display: none;
+  }
+
+  .table-stacked tr {
+    position: relative;
+    overflow: hidden;
+    margin-bottom: calc(var(--spacing-unit) * 1.5);
+    /* Right padding is the room .cell-actions needs once it is pulled out of
+       the flow; left padding is the gutter of the leading visual. */
+    padding: calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 13) calc(var(--spacing-unit) * 1.5) var(--stacked-gutter, calc(var(--spacing-unit) * 2));
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    background-color: var(--component-background);
+  }
+
+  .table-stacked td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: calc(var(--spacing-unit) * 1.5);
+    padding: calc(var(--spacing-unit) * 0.5) 0;
+    border: 0;
+    text-align: right;
+  }
+
+  .table-stacked td::before {
+    content: attr(data-label);
+    flex: 0 0 auto;
+    font-weight: 600;
+    text-align: left;
+    color: var(--header-color);
+  }
+
+  .table-stacked td:not([data-label])::before {
+    content: none;
+  }
+
+  /* The line that identifies the row: it is the heading of the card, so it
+     carries no label and is never right-aligned. */
+  .table-stacked .cell-title {
+    justify-content: flex-start;
+    padding-bottom: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--header-color);
+    text-align: left;
+    overflow-wrap: anywhere;
+  }
+
+  .table-stacked .cell-meta {
+    justify-content: flex-start;
+    font-size: 0.875rem;
+    text-align: left;
+    overflow-wrap: anywhere;
+  }
+
+  .table-stacked .cell-actions {
+    position: absolute;
+    top: 50%;
+    right: calc(var(--spacing-unit) * 1.5);
+    width: auto;
+    padding: 0;
+    transform: translateY(-50%);
+  }
+
+  /* Comfortable touch targets for the icon-only buttons. */
+  .table-stacked .cell-actions .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
 /* Button Refinement */
 .btn {
   border-radius: var(--border-radius-md);

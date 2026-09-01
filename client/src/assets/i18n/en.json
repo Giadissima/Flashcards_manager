@@ -23,6 +23,8 @@
     "save": "Save Changes"
   },
   "common": {
+    "delete": "Delete",
+    "edit": "Edit",
     "previous": "Previous",
     "next": "Next",
     "pageOf": "Page {{current}} of {{total}}",

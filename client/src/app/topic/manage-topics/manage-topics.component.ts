@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
+import { PageCardComponent } from '../../shared/page-card/page-card.component';
 import { PaginatedList } from '../../shared/paginated-list';
 import { toSubjectOptions } from '../../shared/select-options.util';
 import { Router } from '@angular/router';
@@ -18,7 +19,7 @@ import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 @Component({
   selector: 'app-manage-topics',
   standalone: true,
-  imports: [CommonModule, Toast, SearchInputComponent, SearchableSelectComponent, TranslocoModule, ConfirmDialogComponent],
+  imports: [CommonModule, Toast, SearchInputComponent, SearchableSelectComponent, TranslocoModule, ConfirmDialogComponent, PageCardComponent],
   templateUrl: './manage-topics.component.html',
   styleUrls: ['./manage-topics.component.scss']
 })

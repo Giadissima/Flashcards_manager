@@ -1,87 +1,72 @@
 <div class="container md" *transloco="let t">
-  <div class="card">
-    <div class="card-header p-4 d-flex justify-content-between align-items-center">
-      <div class="d-flex align-items-center">
-        <div class="header-icon-container me-3">
-          <span class="material-symbols-outlined">
-            cards_stack
-          </span>
-        </div>
-        <div>
-          <h2 class="card-title">{{ 'topic.manage.title' | transloco }}</h2>
-          <h6 class="card-subtitle mb-2 text-body-secondary">{{ 'topic.manage.subtitle' | transloco }}</h6>
-        </div>
-      </div>
-      <button class="btn btn-primary d-flex align-items-center gap-2" (click)="createTopic()">
-        <span>+</span> {{ 'topic.manage.newTopicButton' | transloco }}
-      </button>
-    </div>
-    <div class="card-body">
+  <app-page-card icon="cards_stack" [title]="'topic.manage.title' | transloco" [subtitle]="'topic.manage.subtitle' | transloco">
+    <button card-actions class="btn btn-primary d-flex align-items-center justify-content-center gap-2" (click)="createTopic()">
+      <span>+</span> {{ 'topic.manage.newTopicButton' | transloco }}
+    </button>
 
-      <div class="filter-bar mb-4">
-        <div class="row align-items-center">
+    <div class="filter-bar mb-4">
+      <div class="row align-items-center">
 
-          <div class="col-md-6 subject-filter-col">
-            <div class="input-group">
-              <app-searchable-select
-                [options]="subjectOptions"
-                [value]="selectedSubjectId"
-                [allOptionLabel]="t('common.allSubjects')"
-                [placeholder]="t('common.allSubjects')"
-                (valueChange)="onSubjectSelected($event)"
-              ></app-searchable-select>
-            </div>
+        <div class="col-md-6 subject-filter-col">
+          <div class="input-group">
+            <app-searchable-select
+              [options]="subjectOptions"
+              [value]="selectedSubjectId"
+              [allOptionLabel]="t('common.allSubjects')"
+              [placeholder]="t('common.allSubjects')"
+              (valueChange)="onSubjectSelected($event)"
+            ></app-searchable-select>
           </div>
-
-          <div class="col-md-5 subject-filter-col">
-            <app-search-input
-              [value]="searchTerm"
-              [placeholder]="t('topic.manage.searchPlaceholder')"
-              (valueChange)="onSearchTermChange($event)"
-            ></app-search-input>
-          </div>
-
         </div>
-      </div>
 
-      <table class="table mt-3">
-        <thead>
-          <tr>
-            <th>{{ 'common.name' | transloco }}</th>
-            <th>{{ 'common.color' | transloco }}</th>
-            <th>{{ 'common.subject' | transloco }}</th>
-            <th>{{ 'common.actions' | transloco }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (topic of topics; track topic._id) {
-          <tr>
-            <td>{{ topic.name }}</td>
-            <td>
-              <span [style.backgroundColor]="topic.color" class="color-preview"></span>
-              {{ topic.color }}
-            </td>
-            <td>{{ getSubjectName(topic.subject_id) }}</td>
-            <td>
-              <button type="button" class="btn btn-outline-warning mx-1" (click)="editTopic(topic._id)">
-                <span class="material-symbols-outlined">edit</span>
-              </button>
-              <button type="button" class="btn btn-outline-danger mx-1" (click)="askDeleteTopic(topic._id)">
-                <span class="material-symbols-outlined">delete</span>
-              </button>
-            </td>
-          </tr>
-          }
-        </tbody>
-      </table>
+        <div class="col-md-5 subject-filter-col">
+          <app-search-input
+            [value]="searchTerm"
+            [placeholder]="t('topic.manage.searchPlaceholder')"
+            (valueChange)="onSearchTermChange($event)"
+          ></app-search-input>
+        </div>
 
-      <div class="d-flex justify-content-between align-items-center mt-4">
-        <button type="button" class="btn" (click)="previousPage()" [disabled]="currentPage === 1">{{ 'common.previous' | transloco }}</button>
-        <span>{{ 'common.pageOf' | transloco:{ current: currentPage, total: totalPages } }}</span>
-        <button type="button" class="btn" (click)="nextPage()" [disabled]="currentPage >= totalPages">{{ 'common.next' | transloco }}</button>
       </div>
     </div>
-  </div>
+
+    <table class="table table-stacked topics-table mt-3">
+      <thead>
+        <tr>
+          <th>{{ 'common.name' | transloco }}</th>
+          <th>{{ 'common.color' | transloco }}</th>
+          <th>{{ 'common.subject' | transloco }}</th>
+          <th>{{ 'common.actions' | transloco }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (topic of topics; track topic._id) {
+        <tr>
+          <td class="cell-title">{{ topic.name }}</td>
+          <td class="topic-color">
+            <span [style.backgroundColor]="topic.color" class="color-preview"></span>
+            <span class="color-hex">{{ topic.color }}</span>
+          </td>
+          <td class="cell-meta">{{ getSubjectName(topic.subject_id) }}</td>
+          <td class="cell-actions">
+            <button type="button" class="btn btn-outline-warning mx-1" (click)="editTopic(topic._id)" [attr.aria-label]="t('common.edit')">
+              <span class="material-symbols-outlined">edit</span>
+            </button>
+            <button type="button" class="btn btn-outline-danger mx-1" (click)="askDeleteTopic(topic._id)" [attr.aria-label]="t('common.delete')">
+              <span class="material-symbols-outlined">delete</span>
+            </button>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+
+    <div class="d-flex justify-content-between align-items-center mt-4">
+      <button type="button" class="btn" (click)="previousPage()" [disabled]="currentPage === 1">{{ 'common.previous' | transloco }}</button>
+      <span>{{ 'common.pageOf' | transloco:{ current: currentPage, total: totalPages } }}</span>
+      <button type="button" class="btn" (click)="nextPage()" [disabled]="currentPage >= totalPages">{{ 'common.next' | transloco }}</button>
+    </div>
+  </app-page-card>
 </div>
 <app-toast></app-toast>
 <ng-container *transloco="let t">

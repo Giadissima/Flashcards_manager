@@ -23,6 +23,8 @@
     "save": "Salva Modifiche"
   },
   "common": {
+    "delete": "Elimina",
+    "edit": "Modifica",
     "previous": "Precedente",
     "next": "Successivo",
     "pageOf": "Pagina {{current}} di {{total}}",

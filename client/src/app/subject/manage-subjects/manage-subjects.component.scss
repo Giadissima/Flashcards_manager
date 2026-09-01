@@ -10,3 +10,45 @@
   background-color: var(--background-color);
   border-radius: var(--border-radius-md);
 }
+
+/* Phone layout: the rows are turned into cards by .table-stacked (global), which
+   also handles .cell-title, .cell-meta and .cell-actions. What is left here is
+   what only this table has: the subject icon moved into the left gutter, and
+   the expanded description, which is a row of its own and has to read as the
+   continuation of the card above it rather than as a second card. */
+@media (max-width: 767.98px) {
+  .subjects-table {
+    /* Icon (40px) plus the space on either side of it. */
+    --stacked-gutter: calc(var(--spacing-unit) * 8);
+  }
+
+  .subject-icon-cell {
+    padding: 0;
+  }
+
+  .subject-icon-cell .subject-icon {
+    position: absolute;
+    top: 50%;
+    left: calc(var(--spacing-unit) * 1.5);
+    transform: translateY(-50%);
+  }
+
+  /* Bottom corners are squared off when a description is hanging below. */
+  .subjects-table tr:has(+ .description-row) {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .description-row {
+    margin-top: calc(var(--spacing-unit) * -1.5);
+    padding: 0 calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 1.5);
+    border-top: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+
+  .description-cell {
+    padding: 0;
+    text-align: left;
+  }
+}
