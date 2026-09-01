@@ -74,6 +74,8 @@
 }
 
 .badge-in-progress {
+  display: inline-block;
+  white-space: nowrap;
   margin-left: var(--spacing-unit);
   font-size: 12px;
   font-weight: 600;
