@@ -86,13 +86,19 @@
         </div>
         <div class="test-card-actions">
           @if (test.completedAt) {
-          <button type="button" class="btn btn-outline-primary" (click)="openTest(test)">{{ 'test.history.review' |
-            transloco }}</button>
+          <button type="button" class="btn btn-outline-primary" (click)="openTest(test)">
+            <span class="material-symbols-outlined">visibility</span>
+            {{ 'test.history.review' | transloco }}
+          </button>
           } @else {
-          <button type="button" class="btn btn-primary" (click)="resumeTest(test)">{{ 'test.history.resume' |
-            transloco }}</button>
-          <button type="button" class="btn btn-outline-danger" (click)="stopTest(test)">{{ 'test.history.terminate' |
-            transloco }}</button>
+          <button type="button" class="btn btn-primary" (click)="resumeTest(test)">
+            <span class="material-symbols-outlined">play_arrow</span>
+            {{ 'test.history.resume' | transloco }}
+          </button>
+          <button type="button" class="btn btn-outline-danger" (click)="stopTest(test)">
+            <span class="material-symbols-outlined">flag</span>
+            {{ 'test.history.terminate' | transloco }}
+          </button>
           }
         </div>
       </div>

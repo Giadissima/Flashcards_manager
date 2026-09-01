@@ -63,6 +63,19 @@
   display: flex;
   gap: var(--spacing-unit);
   flex-shrink: 0;
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: calc(var(--spacing-unit) * 0.75);
+  }
+
+  /* Sized down to the label it sits next to, so the icon reads as a marker of
+     the action and not as the action itself. */
+  .material-symbols-outlined {
+    font-size: 20px;
+  }
 }
 
 .test-date {
@@ -71,15 +84,22 @@
 }
 
 .test-score {
-  color: var(--text-color);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--header-color);
 }
 
+/* Stays at the weight of the rest of the line: it qualifies the score, it is
+   not a second score. */
 .wrong-count {
-  color: #dc3545;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--danger-color);
   margin-left: var(--spacing-unit);
 }
 
 .test-duration {
+  font-size: 14px;
   font-variant-numeric: tabular-nums;
   color: var(--text-color);
 }
@@ -98,9 +118,10 @@
   margin-left: var(--spacing-unit);
   font-size: 12px;
   font-weight: 600;
-  padding: 2px 8px;
+  padding: 1px 8px;
   border-radius: var(--border-radius-sm);
-  background-color: var(--secondary-color);
+  background-color: transparent;
+  border: 1px solid var(--secondary-color);
   color: var(--header-color);
 }
 
