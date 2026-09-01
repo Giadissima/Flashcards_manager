@@ -284,6 +284,12 @@ input:-webkit-autofill:active {
   --bs-table-border-color: var(--border-color);
 }
 
+/* The buttons of an actions cell are spaced by the cell, so the same spacing
+   holds once the row becomes a card. */
+.cell-actions .btn + .btn {
+  margin-left: calc(var(--spacing-unit) * 0.5);
+}
+
 /* Stacked table: on phones a .table-stacked stops being a grid and every row
    becomes a card, so cells with an incompressible width (icons, action
    buttons) no longer push the table into a horizontal overflow. The column
@@ -367,18 +373,31 @@ input:-webkit-autofill:active {
     position: absolute;
     top: 50%;
     right: calc(var(--spacing-unit) * 1.5);
+    /* The buttons carry their own spacing; the gap `.table-stacked td` sets
+       is for a label and its value. */
+    gap: 0;
     width: auto;
     padding: 0;
     transform: translateY(-50%);
   }
 
-  /* Comfortable touch targets for the icon-only buttons. */
+  /* Small buttons on the card, still large enough to be comfortable to tap.
+     These are the variables .btn-sm sets, applied without the class so the
+     template keeps a single markup. */
   .table-stacked .cell-actions .btn {
+    --bs-btn-padding-y: 0.25rem;
+    --bs-btn-padding-x: 0.5rem;
+    --bs-btn-font-size: 0.875rem;
+    --bs-btn-border-radius: var(--bs-border-radius-sm);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 44px;
-    min-height: 44px;
+    min-width: 36px;
+    min-height: 36px;
+  }
+
+  .table-stacked .cell-actions .material-symbols-outlined {
+    font-size: 1.125rem;
   }
 }
 

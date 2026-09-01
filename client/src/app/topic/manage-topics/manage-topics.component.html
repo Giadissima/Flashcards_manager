@@ -49,10 +49,10 @@
           </td>
           <td class="cell-meta">{{ getSubjectName(topic.subject_id) }}</td>
           <td class="cell-actions">
-            <button type="button" class="btn btn-outline-warning mx-1" (click)="editTopic(topic._id)" [attr.aria-label]="t('common.edit')">
+            <button type="button" class="btn btn-outline-warning" (click)="editTopic(topic._id)" [attr.aria-label]="t('common.edit')">
               <span class="material-symbols-outlined">edit</span>
             </button>
-            <button type="button" class="btn btn-outline-danger mx-1" (click)="askDeleteTopic(topic._id)" [attr.aria-label]="t('common.delete')">
+            <button type="button" class="btn btn-outline-danger" (click)="askDeleteTopic(topic._id)" [attr.aria-label]="t('common.delete')">
               <span class="material-symbols-outlined">delete</span>
             </button>
           </td>
