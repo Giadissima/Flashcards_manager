@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import { FilterBarComponent } from '../../shared/filter-bar/filter-bar.component';
 import { PaginationComponent } from '../../shared/pagination/pagination.component';
 import {
   SearchableSelectComponent,
@@ -33,6 +34,7 @@ import { TopicService } from '../../topic/topic.service';
     TranslocoModule,
     PageCardComponent,
     PaginationComponent,
+    FilterBarComponent,
   ],
   templateUrl: './test-history.html',
   styleUrl: './test-history.scss',
@@ -60,6 +62,15 @@ export class TestHistory extends PaginatedList implements OnInit {
   selectedTopicId: string | null = null;
   onlyWrong = false;
   selectedStatus: string | null = null;
+
+  get activeFilterCount(): number {
+    return [
+      this.selectedSubjectId,
+      this.selectedTopicId,
+      this.selectedStatus && this.selectedStatus !== 'all' ? this.selectedStatus : null,
+      this.onlyWrong || null,
+    ].filter(Boolean).length;
+  }
 
   get subjectOptions(): SelectOption[] {
     return toSubjectOptions(this.subjects);

@@ -4,23 +4,24 @@
       <span>+</span> {{ 'test.history.newTestButton' | transloco }}
     </a>
 
-    <div class="filter-bar mb-4">
+    <app-filter-bar [activeCount]="activeFilterCount" appearance="inset"
+      [caption]="'common.filters' | transloco">
       <div class="row gy-2 gx-3 align-items-center">
-        <div class="col-auto">
+        <div class="col-12 col-sm-auto">
           <label class="visually-hidden">{{ 'common.subject' | transloco }}</label>
           <app-searchable-select [options]="subjectOptions" [value]="selectedSubjectId"
             [allOptionLabel]="t('common.allSubjects')" [placeholder]="t('common.allSubjects')"
             (valueChange)="onSubjectSelected($event)"></app-searchable-select>
         </div>
 
-        <div class="col-auto">
+        <div class="col-12 col-sm-auto">
           <label class="visually-hidden">{{ 'common.topic' | transloco }}</label>
           <app-searchable-select [options]="topicOptions" [value]="selectedTopicId"
             [allOptionLabel]="t('common.allTopics')" [placeholder]="t('common.allTopics')"
             (valueChange)="onTopicSelected($event)"></app-searchable-select>
         </div>
 
-        <div class="col-auto">
+        <div class="col-12 col-sm-auto">
           <label for="statusFilter" class="visually-hidden">{{ 'test.history.statusLabel' | transloco }}</label>
           <app-searchable-select [options]="statusOptions" [value]="selectedStatus"
             [allOptionLabel]="t('test.history.statusAll')" [placeholder]="t('test.history.statusAll')"
@@ -28,7 +29,7 @@
 
         </div>
 
-        <div class="col-auto">
+        <div class="col-12 col-sm-auto">
           <div class="form-check mb-0">
             <input type="checkbox" class="form-check-input" id="onlyWrongFilter" [checked]="onlyWrong"
               (change)="onOnlyWrongChange($any($event.target).checked)">
@@ -37,7 +38,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </app-filter-bar>
 
     @if (stats && stats.totalTests > 0) {
     <div class="stats-summary mb-4">

@@ -1,8 +1,8 @@
 <app-load-state errorMessageKey="home.toast.flashcardsLoadError">
 <div class="container" *transloco="let t">
-  <div class="filter-bar mb-4">
+  <app-filter-bar [activeCount]="activeFilterCount" [caption]="t('common.filters')">
     <div class="row gy-2 gx-3 align-items-center">
-      <div class="col-auto">
+      <div class="col-12 col-sm-auto">
         <label class="visually-hidden">{{ 'common.subject' | transloco }}</label>
         <app-searchable-select
           [options]="subjectOptions"
@@ -13,7 +13,7 @@
           (valueChange)="onSubjectSelected($event)"
         ></app-searchable-select>
       </div>
-      <div class="col-auto">
+      <div class="col-12 col-sm-auto">
         <label class="visually-hidden">{{ 'common.topic' | transloco }}</label>
         <app-searchable-select
           [options]="topicOptions"
@@ -24,7 +24,7 @@
           (valueChange)="onTopicSelected($event)"
         ></app-searchable-select>
       </div>
-      <div class="col-auto">
+      <div class="col-12 col-sm-auto">
         <app-search-input
           [value]="searchTerm"
           [placeholder]="t('home.searchPlaceholder')"
@@ -32,7 +32,7 @@
           (valueChange)="onSearchTermChange($event)"
         ></app-search-input>
       </div>
-      <div class="col-auto">
+      <div class="col-12 col-sm-auto">
         <div class="btn-group" role="group">
           <button type="button" class="btn" (click)="setSortBy('title')"
             [class.btn-primary]="sortBy === 'title' && !isReloading" [class.btn-outline-primary]="sortBy !== 'title' && !isReloading"
@@ -63,7 +63,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </app-filter-bar>
 
   <div class="flashcard-grid-wrapper">
     @if (isReloading) {

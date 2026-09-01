@@ -38,6 +38,7 @@
     "description": "Descrizione",
     "actions": "Azioni",
     "chooseFile": "Scegli file",
+    "filters": "Filtri",
     "search": "Cerca",
     "clearSearch": "Cancella ricerca",
     "allSubjects": "Tutte le Materie",

@@ -3,6 +3,7 @@ import { Subject as RxSubject, Subscription, debounceTime } from 'rxjs';
 import { SearchableSelectComponent, SelectOption } from '../shared/searchable-select/searchable-select.component';
 import { SearchInputComponent } from '../shared/search-input/search-input.component';
 import { PaginationComponent } from '../shared/pagination/pagination.component';
+import { FilterBarComponent } from '../shared/filter-bar/filter-bar.component';
 
 import { CommonModule } from '@angular/common';
 import { Flashcard } from '../models/flashcard.dto';
@@ -26,7 +27,7 @@ import { ZoomableImagesDirective } from '../shared/zoomable-images.directive';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, Toast, KatexRendererPipe, SearchableSelectComponent, SearchInputComponent, TranslocoModule, ImageLightboxComponent, ZoomableImagesDirective, LoadStateComponent, PaginationComponent],
+  imports: [CommonModule, Toast, KatexRendererPipe, SearchableSelectComponent, SearchInputComponent, TranslocoModule, ImageLightboxComponent, ZoomableImagesDirective, LoadStateComponent, PaginationComponent, FilterBarComponent],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
@@ -41,6 +42,13 @@ export class Home extends PaginatedList implements OnInit, OnDestroy {
   searchTerm: string = '';
   sortBy: 'title' | 'createdAt' = 'title';
   sortDirection: 'asc' | 'desc' = 'asc';
+
+  // Sorting is left out: it always has a value, so it would never read as off.
+  get activeFilterCount(): number {
+    return [this.selectedSubjectId, this.selectedTopicId, this.searchTerm].filter(
+      Boolean,
+    ).length;
+  }
 
   override pageSize = 21;
 

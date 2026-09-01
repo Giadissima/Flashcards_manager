@@ -1,0 +1,19 @@
+<button type="button" class="btn filter-toggle d-sm-none mb-3"
+  [attr.aria-expanded]="open" [attr.aria-controls]="panelId" (click)="toggle()">
+  <span class="material-symbols-outlined">tune</span>
+  {{ 'common.filters' | transloco }}
+  @if (activeCount > 0) {
+  <span class="filter-count">{{ activeCount }}</span>
+  }
+</button>
+
+<div class="filter-bar mb-4" [id]="panelId" [class.filter-bar--collapsed]="!open"
+  [class.filter-bar--raised]="appearance === 'raised'" [class.filter-bar--inset]="appearance === 'inset'">
+  @if (caption) {
+  <p class="filter-caption">
+    <span class="material-symbols-outlined">tune</span>
+    {{ caption }}
+  </p>
+  }
+  <ng-content></ng-content>
+</div>

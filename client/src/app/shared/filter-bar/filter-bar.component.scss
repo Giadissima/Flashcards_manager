@@ -1,0 +1,81 @@
+:host {
+  display: block;
+}
+
+/* Block-level and only as wide as its content, so the auto margins can centre
+   it over the bar it opens. */
+.filter-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-unit);
+  width: fit-content;
+  margin-inline: auto;
+  /* Neutral on purpose: this opens a panel of settings, it is not one of the
+     actions of the page, and the theme colour is reserved for those. */
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--header-color);
+
+  &:hover,
+  &:focus-visible {
+    background-color: var(--inset-background);
+    border-color: var(--secondary-color);
+    color: var(--header-color);
+  }
+}
+
+.filter-count {
+  min-width: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background-color: var(--primary-color);
+  color: var(--white-color);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 20px;
+  text-align: center;
+}
+
+/* Sitting on the page background: lifted off it. */
+.filter-bar--raised {
+  box-shadow: var(--box-shadow-sm);
+}
+
+/* Sitting inside a card: the card is already the raised surface, so the bar is
+   pushed the other way instead, to read as a panel of settings rather than as
+   the first item of the content below it. */
+.filter-bar--inset {
+  background-color: var(--inset-background);
+  border: 1px solid var(--border-color);
+}
+
+.filter-caption {
+  /* On phones the toggle button is the label. */
+  display: none;
+  align-items: center;
+  gap: var(--spacing-unit);
+  margin: 0 0 calc(var(--spacing-unit) * 1.5) 0;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-color);
+
+  .material-symbols-outlined {
+    font-size: 18px;
+  }
+}
+
+@media (min-width: 576px) {
+  .filter-caption {
+    display: flex;
+  }
+}
+
+/* The bar is only taken out of the flow, never restyled: above this width the
+   toggle is hidden, so the class must not be able to hide anything. */
+@media (max-width: 575.98px) {
+  .filter-bar--collapsed {
+    display: none;
+  }
+}
