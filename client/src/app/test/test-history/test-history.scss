@@ -42,6 +42,9 @@
 
 .test-card {
   display: flex;
+  /* Bootstrap sets flex-direction: column on .card, so the row this layout is
+     built around has to be asked for explicitly. */
+  flex-direction: row;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
@@ -52,6 +55,7 @@
 .test-card-main {
   display: flex;
   flex-direction: column;
+  min-width: 0;
   gap: calc(var(--spacing-unit) * 0.5);
 }
 
@@ -80,6 +84,14 @@
   color: var(--text-color);
 }
 
+/* Score and duration are two lines of their own here; on phones they fold into
+   a single line (see the media query below). */
+.test-card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--spacing-unit) * 0.5);
+}
+
 .badge-in-progress {
   display: inline-block;
   white-space: nowrap;
@@ -90,4 +102,35 @@
   border-radius: var(--border-radius-sm);
   background-color: var(--secondary-color);
   color: var(--header-color);
+}
+
+/* Phone layout. The page is built for a row of filters and cards split between
+   text on the left and buttons on the right; below this width there is room
+   for neither, so the filters and the cards both become single columns and the
+   stats grid is packed into two rows instead of four. */
+@media (max-width: 575.98px) {
+  .stats-summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .stat-value {
+    font-size: 22px;
+  }
+
+  .test-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  /* Duration trails the score as a secondary metadata rather than taking a
+     line of its own. */
+  .test-card-meta {
+    flex-direction: row;
+    align-items: baseline;
+    gap: calc(var(--spacing-unit) * 1.5);
+  }
+
+  .test-card-actions button {
+    flex: 1;
+  }
 }

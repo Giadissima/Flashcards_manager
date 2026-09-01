@@ -74,13 +74,15 @@
             <span class="badge-in-progress">{{ 'test.history.inProgress' | transloco }}</span>
             }
           </div>
-          <div class="test-score">
-            {{ getCorrectCount(test) }} / {{ test.questions.length }} {{ 'test.history.correctSuffix' | transloco }}
-            @if (getWrongCount(test) > 0) {
-            <span class="wrong-count">({{ getWrongCount(test) }} {{ 'test.history.wrongSuffix' | transloco }})</span>
-            }
+          <div class="test-card-meta">
+            <div class="test-score">
+              {{ getCorrectCount(test) }} / {{ test.questions.length }} {{ 'test.history.correctSuffix' | transloco }}
+              @if (getWrongCount(test) > 0) {
+              <span class="wrong-count">({{ getWrongCount(test) }} {{ 'test.history.wrongSuffix' | transloco }})</span>
+              }
+            </div>
+            <div class="test-duration">{{ test.elapsed_time | duration }}</div>
           </div>
-          <div class="test-duration">{{ test.elapsed_time | duration }}</div>
         </div>
         <div class="test-card-actions">
           @if (test.completedAt) {
