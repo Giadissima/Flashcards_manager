@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { PaginationComponent } from '../../shared/pagination/pagination.component';
 
 import { CommonModule } from '@angular/common';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
@@ -19,7 +20,7 @@ import { hasHtmlContent } from '../../shared/html.util';
 @Component({
   selector: 'app-manage-subjects',
   standalone: true,
-  imports: [CommonModule, Toast, SearchInputComponent, TranslocoModule, ImageLightboxComponent, ZoomableImagesDirective, ConfirmDialogComponent, PageCardComponent],
+  imports: [CommonModule, Toast, SearchInputComponent, TranslocoModule, ImageLightboxComponent, ZoomableImagesDirective, ConfirmDialogComponent, PageCardComponent, PaginationComponent],
   templateUrl: './manage-subjects.component.html',
   styleUrls: ['./manage-subjects.component.scss']
 })

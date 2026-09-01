@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Subject as RxSubject, Subscription, debounceTime } from 'rxjs';
 import { SearchableSelectComponent, SelectOption } from '../shared/searchable-select/searchable-select.component';
 import { SearchInputComponent } from '../shared/search-input/search-input.component';
+import { PaginationComponent } from '../shared/pagination/pagination.component';
 
 import { CommonModule } from '@angular/common';
 import { Flashcard } from '../models/flashcard.dto';
@@ -25,7 +26,7 @@ import { ZoomableImagesDirective } from '../shared/zoomable-images.directive';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, Toast, KatexRendererPipe, SearchableSelectComponent, SearchInputComponent, TranslocoModule, ImageLightboxComponent, ZoomableImagesDirective, LoadStateComponent],
+  imports: [CommonModule, Toast, KatexRendererPipe, SearchableSelectComponent, SearchInputComponent, TranslocoModule, ImageLightboxComponent, ZoomableImagesDirective, LoadStateComponent, PaginationComponent],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })

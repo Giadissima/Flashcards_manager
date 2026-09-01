@@ -1,6 +1,7 @@
 import { ActivatedRoute, Router } from '@angular/router';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Subscription, interval } from 'rxjs';
+import { PaginationComponent } from '../../shared/pagination/pagination.component';
 
 import { CommonModule } from '@angular/common';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
@@ -19,7 +20,7 @@ import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 @Component({
   selector: 'app-test-runner',
   standalone: true,
-  imports: [CommonModule, DurationPipe, KatexRendererPipe, ConfirmDialogComponent, TranslocoModule, LoadStateComponent, ImageLightboxComponent, ZoomableImagesDirective],
+  imports: [CommonModule, DurationPipe, KatexRendererPipe, ConfirmDialogComponent, TranslocoModule, LoadStateComponent, ImageLightboxComponent, ZoomableImagesDirective, PaginationComponent],
   templateUrl: './test-runner.html',
   styleUrls: ['./test-runner.scss']
 })

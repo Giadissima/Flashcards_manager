@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import { PaginationComponent } from '../../shared/pagination/pagination.component';
 import {
   SearchableSelectComponent,
   SelectOption,
@@ -31,6 +32,7 @@ import { TopicService } from '../../topic/topic.service';
     SearchableSelectComponent,
     TranslocoModule,
     PageCardComponent,
+    PaginationComponent,
   ],
   templateUrl: './test-history.html',
   styleUrl: './test-history.scss',

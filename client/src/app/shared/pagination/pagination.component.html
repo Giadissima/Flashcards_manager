@@ -1,0 +1,7 @@
+<div class="d-flex justify-content-between align-items-center mt-4" *transloco="let t">
+  <button type="button" class="btn" (click)="previous.emit()"
+    [disabled]="currentPage <= 1 || disabled">{{ t('common.previous') }}</button>
+  <span>{{ 'common.pageOf' | transloco:{ current: currentPage, total: totalPages } }}</span>
+  <button type="button" class="btn" (click)="next.emit()"
+    [disabled]="currentPage >= totalPages || disabled">{{ t('common.next') }}</button>
+</div>

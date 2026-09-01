@@ -66,11 +66,8 @@
       </tbody>
     </table>
 
-    <div class="d-flex justify-content-between align-items-center mt-4">
-      <button type="button" class="btn" (click)="previousPage()" [disabled]="currentPage === 1">{{ 'common.previous' | transloco }}</button>
-      <span>{{ 'common.pageOf' | transloco:{ current: currentPage, total: totalPages } }}</span>
-      <button type="button" class="btn" (click)="nextPage()" [disabled]="currentPage >= totalPages">{{ 'common.next' | transloco }}</button>
-    </div>
+    <app-pagination [currentPage]="currentPage" [totalPages]="totalPages"
+      (previous)="previousPage()" (next)="nextPage()"></app-pagination>
   </app-page-card>
     <app-toast></app-toast>
 <app-image-lightbox #lightbox></app-image-lightbox>
