@@ -1,5 +1,43 @@
+/* The styles of this component live here, with one exception: the rules on
+   .tiptap stay global, in styles.scss. That markup is built by ProseMirror at
+   runtime and is never in this template, so the scoping attribute of the
+   component would never reach it. */
+
 .latex-inline-icon {
   width: 1.7em;
   height: 1.7em;
   vertical-align: -0.45em;
+}
+
+.tiptap-editor-custom {
+  color: var(--header-color) !important;
+}
+
+.editor-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(var(--spacing-unit) * 1.25);
+  margin-bottom: calc(var(--spacing-unit) * 0.75);
+
+  .btn-group .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: calc(var(--spacing-unit) * 0.5);
+  }
+
+  .dropdown-menu {
+    --bs-dropdown-bg: var(--component-background);
+    --bs-dropdown-color: var(--text-color);
+    --bs-dropdown-border-color: var(--border-color);
+    --bs-dropdown-link-color: var(--text-color);
+    --bs-dropdown-link-hover-bg: var(--primary-color);
+    --bs-dropdown-link-hover-color: var(--on-primary-color);
+    --bs-dropdown-link-active-bg: var(--primary-color);
+    --bs-dropdown-link-active-color: var(--on-primary-color);
+  }
+}
+
+.editor-toolbar .material-symbols-outlined {
+  font-size: 20px;
 }

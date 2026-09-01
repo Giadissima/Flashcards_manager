@@ -273,7 +273,6 @@ input:-webkit-autofill:active {
 }
 
 
-
 /* ---------------------------------- */
 /* 5. Bootstrap Overrides             */
 /* ---------------------------------- */
@@ -891,35 +890,6 @@ $image-modal-height: calc(100vh - var(--navbar-height) - 32px - 64px);
   }
 }
 
-.tiptap-editor-custom{
-  color: var(--header-color) !important;
-}
-
-.editor-toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: calc(var(--spacing-unit) * 1.25);
-  margin-bottom: calc(var(--spacing-unit) * 0.75);
-
-  .btn-group .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: calc(var(--spacing-unit) * 0.5);
-  }
-
-  .dropdown-menu {
-    --bs-dropdown-bg: var(--component-background);
-    --bs-dropdown-color: var(--text-color);
-    --bs-dropdown-border-color: var(--border-color);
-    --bs-dropdown-link-color: var(--text-color);
-    --bs-dropdown-link-hover-bg: var(--primary-color);
-    --bs-dropdown-link-hover-color: var(--on-primary-color);
-    --bs-dropdown-link-active-bg: var(--primary-color);
-    --bs-dropdown-link-active-color: var(--on-primary-color);
-  }
-}
-
 
 .form-actions {
   display: flex;
@@ -945,6 +915,3 @@ $image-modal-height: calc(100vh - var(--navbar-height) - 32px - 64px);
   font-size: 18px;
 }
 
-.editor-toolbar .material-symbols-outlined {
-  font-size: 20px;
-}
