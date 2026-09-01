@@ -1,7 +1,18 @@
-<div class="d-flex justify-content-between align-items-center mt-4" *transloco="let t">
-  <button type="button" class="btn" (click)="previous.emit()"
-    [disabled]="currentPage <= 1 || disabled">{{ t('common.previous') }}</button>
-  <span>{{ 'common.pageOf' | transloco:{ current: currentPage, total: totalPages } }}</span>
-  <button type="button" class="btn" (click)="next.emit()"
-    [disabled]="currentPage >= totalPages || disabled">{{ t('common.next') }}</button>
+<div class="pagination-bar" *transloco="let t">
+  <button type="button" class="pagination-step" (click)="previous.emit()"
+    [disabled]="currentPage <= 1 || disabled" [title]="t('common.previous')"
+    [attr.aria-label]="t('common.previous')">
+    <span class="material-symbols-outlined">chevron_left</span>
+    <span class="pagination-label">{{ t('common.previous') }}</span>
+  </button>
+
+  <span class="pagination-position" aria-live="polite">{{ 'common.pageOf' | transloco:{ current: currentPage, total:
+    totalPages } }}</span>
+
+  <button type="button" class="pagination-step" (click)="next.emit()"
+    [disabled]="currentPage >= totalPages || disabled" [title]="t('common.next')"
+    [attr.aria-label]="t('common.next')">
+    <span class="pagination-label">{{ t('common.next') }}</span>
+    <span class="material-symbols-outlined">chevron_right</span>
+  </button>
 </div>

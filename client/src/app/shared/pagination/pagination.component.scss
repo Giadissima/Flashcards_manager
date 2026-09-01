@@ -1,0 +1,80 @@
+:host {
+  display: block;
+}
+
+.pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--spacing-unit) * 2);
+  margin-top: calc(var(--spacing-unit) * 4);
+}
+
+.pagination-step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--spacing-unit) * 0.75);
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 calc(var(--spacing-unit) * 2);
+  border: 1.4px solid var(--border-color);
+  /* Half the height, so the ends stay round whether the button holds an icon
+     and a word or the icon alone. */
+  border-radius: 22px;
+  background-color: var(--component-background);
+  color: var(--header-color);
+  font-family: var(--font-family);
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s, color 0.2s;
+}
+
+/* Only where there is a pointer that can hover: a touch screen leaves the last
+   button tapped in its hover state until something else is touched, which read
+   as the page still being loaded. */
+@media (hover: hover) {
+  .pagination-step:hover:not(:disabled) {
+    border-color: var(--primary-color);
+    background-color: var(--primary-color);
+    color: var(--on-primary-color);
+  }
+}
+
+/* What a finger gets instead: the colour only while the button is held down. */
+.pagination-step:active:not(:disabled) {
+  border-color: var(--primary-color);
+  background-color: var(--primary-color);
+  color: var(--on-primary-color);
+}
+
+.pagination-step:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.pagination-step .material-symbols-outlined {
+  font-size: 22px;
+}
+
+/* Wide enough for the longest position it will hold, so the buttons stay put
+   as the page number gains a digit. */
+.pagination-position {
+  min-width: 10ch;
+  color: var(--header-color);
+  font-weight: 600;
+  text-align: center;
+}
+
+/* A phone keeps the arrows alone: the words are what the control can least
+   afford of its width, and the aria-label carries them for anyone who needs
+   them read out. */
+@media (max-width: 768px) {
+  .pagination-label {
+    display: none;
+  }
+
+  .pagination-step {
+    padding: 0;
+  }
+}
