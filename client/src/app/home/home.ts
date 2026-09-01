@@ -23,11 +23,12 @@ import { TopicService } from '../topic/topic.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { ImageLightboxComponent } from '../shared/image-lightbox/image-lightbox.component';
 import { ZoomableImagesDirective } from '../shared/zoomable-images.directive';
+import { ContentOverflowDirective } from '../shared/content-overflow.directive';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, Toast, KatexRendererPipe, SearchableSelectComponent, SearchInputComponent, TranslocoModule, ImageLightboxComponent, ZoomableImagesDirective, LoadStateComponent, PaginationComponent, FilterBarComponent],
+  imports: [CommonModule, Toast, KatexRendererPipe, SearchableSelectComponent, SearchInputComponent, TranslocoModule, ImageLightboxComponent, ZoomableImagesDirective, ContentOverflowDirective, LoadStateComponent, PaginationComponent, FilterBarComponent],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
@@ -54,6 +55,13 @@ export class Home extends PaginatedList implements OnInit, OnDestroy {
 
   // Maps a flashcard _id to whether its answer, instead of its question, is shown
   showAnswerMap: Record<string, boolean> = {};
+  // Maps a flashcard _id to whether the user expanded its question past the clamp
+  expandedMap: Record<string, boolean> = {};
+  // Maps a flashcard _id to whether its clamped question is actually cut off:
+  // reported by the container itself (see ContentOverflowDirective), because
+  // whether a given text overflows depends on the rendered width and on images
+  // that are still loading, neither of which is known here.
+  overflowMap: Record<string, boolean> = {};
 
   private queryParamsSubscription?: Subscription;
   // Debounces search-box typing: each keystroke updates searchTerm immediately (so
@@ -226,6 +234,43 @@ export class Home extends PaginatedList implements OnInit, OnDestroy {
   // Switches between "See answer" and "See question"
   getCardButtonText(card: Flashcard): string {
     return this.transloco.translate(this.showAnswerMap[card._id] ? 'home.seeQuestion' : 'home.seeAnswer');
+  }
+
+  // The question is clamped by default: in the grid it is scanned, not read, so
+  // a long one would push the cards out of step for no gain. The answer never
+  // is - it was already asked for by clicking "See answer", and hiding part of
+  // it behind a second click would be a toll on a request already made.
+  isClamped(card: Flashcard): boolean {
+    return !this.showAnswerMap[card._id] && !this.expandedMap[card._id];
+  }
+
+  // The clamp is on every question, so the container can be measured at all;
+  // the blurred cut is only drawn once something is actually hidden by it,
+  // otherwise it would sit at the bottom of the box and veil text that is
+  // entirely visible - the box grows with the card, the content does not.
+  isCut(card: Flashcard): boolean {
+    return this.isClamped(card) && !!this.overflowMap[card._id];
+  }
+
+  isExpanded(card: Flashcard): boolean {
+    return !!this.expandedMap[card._id];
+  }
+
+  canExpand(card: Flashcard): boolean {
+    return !this.showAnswerMap[card._id] && !!this.overflowMap[card._id];
+  }
+
+  onContentOverflow(card: Flashcard, overflows: boolean): void {
+    // Only the clamped state measures anything: expanded, the container is as
+    // tall as its content and would always report "fits", which would drop the
+    // collapse control and clamp the card again on the next pass.
+    if (!this.isClamped(card)) return;
+    this.overflowMap[card._id] = overflows;
+  }
+
+  toggleExpanded(card: Flashcard): void {
+    if (!card._id) return;
+    this.expandedMap[card._id] = !this.expandedMap[card._id];
   }
 
   seeAnswer(card: Flashcard): void {

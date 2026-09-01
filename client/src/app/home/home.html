@@ -76,7 +76,7 @@
     <div class="flashcard-grid">
     @for (card of flashcards; track card._id) {
     <div class="card flashcard flashcard-topic-color" [style.border-top-color]="getCardColor(card)">
-      <div class="flashcard-title d-flex align-items-center gap-2">
+      <div class="flashcard-title">
         <img [src]="getCardSubjectIconUrl(card)" alt="" class="flashcard-subject-icon">
         <div>
           <h5 class="card-title mb-0">{{ card.title }}</h5>
@@ -84,18 +84,26 @@
         </div>
       </div>
       <div class="flashcard-body">
-        <div class="flashcard-text" [innerHTML]="getCardBody(card) | katexRenderer" (zoomableImages)="lightbox.open($event)"></div>
+        <div class="flashcard-text" [class.is-clamped]="isClamped(card)" [class.is-cut]="isCut(card)"
+          [innerHTML]="getCardBody(card) | katexRenderer" (zoomableImages)="lightbox.open($event)"
+          (contentOverflow)="onContentOverflow(card, $event)"></div>
+        @if (canExpand(card)) {
+        <button type="button" class="btn btn-link flashcard-expand" (click)="toggleExpanded(card)">
+          {{ (isExpanded(card) ? 'home.collapse' : 'home.expand') | transloco }}
+        </button>
+        }
         <div class="flashcard-actions">
-          <button class="btn btn-primary" (click)="seeAnswer(card)">
+          <button class="btn btn-primary btn-with-icon" (click)="seeAnswer(card)">
+            <span class="material-symbols-outlined">visibility</span>
             {{ getCardButtonText(card) }}
           </button>
-          <button type="button" class="btn btn-outline-danger" (click)="deleteCard(card)">
+          <button type="button" class="btn btn-icon-ghost btn-danger-hover" (click)="deleteCard(card)">
             <span class="material-symbols-outlined">delete</span>
           </button>
-          <button type="button" class="btn btn-outline-warning" (click)="modifyCard(card)">
+          <button type="button" class="btn btn-icon-ghost" (click)="modifyCard(card)">
             <span class="material-symbols-outlined">edit</span>
           </button>
-          <button type="button" class="btn btn-outline-success" (click)="copyCard(card)">
+          <button type="button" class="btn btn-icon-ghost" (click)="copyCard(card)">
             <span class="material-symbols-outlined">content_copy</span>
           </button>
         </div>

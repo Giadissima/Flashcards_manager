@@ -13,6 +13,8 @@
       [lockValues]="{ alpha: 1, clamp: true }"></ngx-colors>
     }
   </div>
-  <label for="icon" class="btn btn-secondary">{{ fileLabel }}</label>
+  <label for="icon" class="btn btn-secondary btn-with-icon">
+    <span class="material-symbols-outlined">upload_file</span>{{ fileLabel }}
+  </label>
   <input type="file" id="icon" #icon accept="image/*" (change)="fileSelected.emit($event)" class="visually-hidden">
 </div>

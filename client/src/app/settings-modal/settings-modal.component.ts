@@ -52,8 +52,8 @@ import { AppLanguage, storeLanguage } from '../shared/language';
       </div>
 
       <ng-container modal-footer>
-        <button type="button" class="btn btn-outline-secondary" (click)="cancel()">{{ 'settings.cancel' | transloco }}</button>
-        <button type="button" class="btn btn-primary" (click)="save()">{{ 'settings.save' | transloco }}</button>
+        <button type="button" class="btn btn-outline-secondary btn-with-icon" (click)="cancel()"><span class="material-symbols-outlined">close</span>{{ 'settings.cancel' | transloco }}</button>
+        <button type="button" class="btn btn-primary btn-with-icon" (click)="save()"><span class="material-symbols-outlined">save</span>{{ 'settings.save' | transloco }}</button>
       </ng-container>
     </app-modal>
   `,

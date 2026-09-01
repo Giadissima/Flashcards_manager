@@ -2,6 +2,25 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
   gap: calc(var(--spacing-unit) * 3);
+  /* Each card closes on its own content instead of being stretched to the
+     tallest one in its row: stretching plus the actions pinned to the bottom
+     (margin-top: auto) opens a gap in the middle of the short cards, which
+     reads as missing content. Left ragged on purpose - the empty space moves
+     below the short cards, where it reads as spacing. */
+  align-items: start;
+
+  /* The shared .flashcard is height: 100% for the test runner, where the card
+     has to fill its pane. Here the percentage resolves against the grid area,
+     which is still as tall as the row, and would undo align-items: start. */
+  .flashcard {
+    height: auto;
+    /* A floor, not a fixed height: cards holding a one-line question would
+       otherwise come out as thin strips next to their neighbours. Everything
+       above it still grows with its content, and the actions stay pinned to the
+       bottom (margin-top: auto), so the short cards line their buttons up. */
+    min-height: 240px;
+  }
+
 }
 
 .flashcard-grid-wrapper {
@@ -19,12 +38,9 @@
   background: color-mix(in srgb, var(--background-color) 70%, transparent);
 }
 
+/* Layout and centring come from the shared .flashcard-actions in styles.scss;
+   only the size of the buttons is specific to the grid. */
 .flashcard-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-unit);
-  margin-top: auto; /* Pushes actions to the bottom */
-
   .btn {
     padding: var(--spacing-unit) calc(var(--spacing-unit) * 1.5);
     /* Make icon buttons smaller */
@@ -32,6 +48,99 @@
         width: 20px;
         height: 20px;
     }
+  }
+
+  /* The three secondary actions carry no border and no fill: an outlined box
+     around each one reads before the glyph inside it does, and three of them in
+     a row pull the eye away from the single primary action. The glyph alone is
+     enough to find them; the surface only appears under the pointer, where the
+     button has to confirm it is a target. Same padding as the primary button,
+     so the row lines up along one height. */
+  .btn-icon-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-color);
+    background-color: transparent;
+    border-color: transparent;
+
+    .material-symbols-outlined {
+      font-size: 20px;
+    }
+
+    &:hover,
+    &:focus-visible {
+      color: var(--header-color);
+      background-color: var(--inset-background);
+      border-color: transparent;
+    }
+  }
+
+  /* Delete keeps its warning, but only at the moment it matters: under the
+     pointer, not while the card is simply being read. */
+  .btn-danger-hover {
+    &:hover,
+    &:focus-visible {
+      color: var(--danger-color);
+      background-color: color-mix(in srgb, var(--danger-color) 12%, transparent);
+    }
+  }
+}
+
+/* A long question is cut instead of being shown whole: in the grid a question
+   is scanned, not read, and one card three times the height of its neighbours
+   sets the height of the whole row. The cut is blurred rather than hard, so it
+   reads as "there is more" and not as a card that ends mid-sentence. */
+.flashcard-text.is-clamped {
+  position: relative;
+  /* About four lines. Deliberately close to the height a one-line question
+     already gives the card (see min-height above): a cut card should stand a
+     little taller than its neighbours, not twice as tall - the row is meant to
+     stay scannable. Images keep their natural size and are cut by this clamp
+     like any other content, rather than being shrunk.
+
+     Given in lines, not pixels: a pixel height lands wherever it happens to
+     fall and leaves the last line sliced through the middle. The em value is
+     the fallback for browsers without the lh unit, at the 1.5 line height the
+     body sets. */
+  max-height: 6em;
+  max-height: 4lh;
+  overflow: hidden;
+
+  /* The band sits on the last strip of visible text and blurs what shows
+     through it. The mask ramps the blur up towards the cut, so the text goes
+     out of focus gradually instead of hitting a sharp edge; the gradient
+     underneath fades it into the card so the very last pixels are unreadable
+     rather than merely soft. */
+  &.is-cut::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0 0;
+    /* One line: the band veils the last one whole, so nothing is left half
+       readable at the edge. */
+    height: 1.5em;
+    height: 1lh;
+    pointer-events: none;
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    background: linear-gradient(to bottom, transparent, var(--component-background));
+    mask-image: linear-gradient(to bottom, transparent, #000 70%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 70%);
+  }
+}
+
+/* Sized down and kept in text colour: it is a way back into the card, not a
+   second action competing with "See answer". */
+.flashcard-expand {
+  align-self: flex-start;
+  padding: calc(var(--spacing-unit) * 0.5) 0;
+  font-size: 0.85rem;
+  color: var(--text-color);
+  text-decoration: underline;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--header-color);
   }
 }
 

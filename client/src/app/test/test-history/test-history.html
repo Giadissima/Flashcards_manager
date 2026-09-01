@@ -65,20 +65,37 @@
       @for (test of tests; track test._id) {
       <div class="card test-card">
         <div class="test-card-main">
-          <div class="test-date">
-            {{ (test.completedAt ?? test.updatedAt ?? test.createdAt) | date:'medium' }}
+          @if (test.subject_name) {
+          <div class="test-subject">
+            {{ test.subject_name }}@if (test.topic_name) { · {{ test.topic_name }}}
+          </div>
+          }
+          <div class="test-score">
+            {{ getCorrectCount(test) }} / {{ test.questions.length }} {{ 'test.history.correctSuffix' | transloco }}
+            @if (getWrongCount(test) > 0) {
+            <span class="wrong-count">({{ getWrongCount(test) }} {{ 'test.history.wrongSuffix' | transloco }})</span>
+            }
+          </div>
+          <!-- Decorative: it draws the proportion the line above already states. -->
+          <div class="score-bar" aria-hidden="true">
+            <span class="score-bar-correct" [style.width.%]="getCorrectPercent(test)"></span>
+            <span class="score-bar-wrong" [style.width.%]="getWrongPercent(test)"></span>
+          </div>
+          <div class="test-card-meta">
+            <span class="test-date">
+              {{ (test.completedAt ?? test.updatedAt ?? test.createdAt) | date:'medium' }}
+            </span>
+            <!-- Bare digits next to a date read as anything: the icon says which
+                 of the two numbers is a length of time, and the title spells it
+                 out for a pointer and for a screen reader. -->
+            <span class="test-duration" [title]="t('test.history.durationLabel')"
+              [attr.aria-label]="t('test.history.durationLabel')">
+              <span class="material-symbols-outlined">timer</span>
+              {{ test.elapsed_time | duration }}
+            </span>
             @if (!test.completedAt) {
             <span class="badge-in-progress">{{ 'test.history.inProgress' | transloco }}</span>
             }
-          </div>
-          <div class="test-card-meta">
-            <div class="test-score">
-              {{ getCorrectCount(test) }} / {{ test.questions.length }} {{ 'test.history.correctSuffix' | transloco }}
-              @if (getWrongCount(test) > 0) {
-              <span class="wrong-count">({{ getWrongCount(test) }} {{ 'test.history.wrongSuffix' | transloco }})</span>
-              }
-            </div>
-            <div class="test-duration">{{ test.elapsed_time | duration }}</div>
           </div>
         </div>
         <div class="test-card-actions">

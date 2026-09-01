@@ -15,8 +15,8 @@ import { ModalComponent } from '../modal/modal.component';
     <app-modal [isOpen]="isOpen" [title]="title" [showFooter]="true" (closed)="onCancel()">
       <p class="mb-0">{{ message }}</p>
       <ng-container modal-footer>
-        <button type="button" class="btn btn-outline-secondary" (click)="onCancel()">{{ cancelLabel }}</button>
-        <button type="button" class="btn btn-primary" (click)="onConfirm()">{{ confirmLabel }}</button>
+        <button type="button" class="btn btn-outline-secondary btn-with-icon" (click)="onCancel()"><span class="material-symbols-outlined">close</span>{{ cancelLabel }}</button>
+        <button type="button" class="btn btn-primary btn-with-icon" (click)="onConfirm()"><span class="material-symbols-outlined">check</span>{{ confirmLabel }}</button>
       </ng-container>
     </app-modal>
   `

@@ -2,6 +2,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Subscription, interval } from 'rxjs';
 import { PaginationComponent } from '../../shared/pagination/pagination.component';
+import { PageCardComponent } from '../../shared/page-card/page-card.component';
 
 import { CommonModule } from '@angular/common';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
@@ -20,7 +21,7 @@ import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 @Component({
   selector: 'app-test-runner',
   standalone: true,
-  imports: [CommonModule, DurationPipe, KatexRendererPipe, ConfirmDialogComponent, TranslocoModule, LoadStateComponent, ImageLightboxComponent, ZoomableImagesDirective, PaginationComponent],
+  imports: [CommonModule, DurationPipe, KatexRendererPipe, ConfirmDialogComponent, TranslocoModule, LoadStateComponent, ImageLightboxComponent, ZoomableImagesDirective, PaginationComponent, PageCardComponent],
   templateUrl: './test-runner.html',
   styleUrls: ['./test-runner.scss']
 })
@@ -31,10 +32,10 @@ export class TestRunner extends PaginatedList implements OnInit {
   elapsed_time: number = 0; // in secondi
   timerSub!: Subscription;
 
-  // Grid of flashcards, 9 per page (3x3). The test is never held in memory as
+  // A column of 10 flashcards per page. The test is never held in memory as
   // a whole (it may have hundreds of questions): only the total count is known,
   // and one page at a time is fetched from the server.
-  override pageSize = 9;
+  override pageSize = 10;
   pageFlashcards: Flashcard[] = [];
 
   // Maps flashcard_id to the answer given, for the cards already seen
@@ -49,6 +50,12 @@ export class TestRunner extends PaginatedList implements OnInit {
   subjectName = '';
   testStartDate?: Date;
   answeredCount = 0;
+
+  /** Share of the test already answered, for the progress bar in the header. */
+  get progressPercent(): number {
+    if (!this.totalCount) return 0;
+    return Math.round((this.answeredCount / this.totalCount) * 100);
+  }
 
   constructor(
     private route: ActivatedRoute,

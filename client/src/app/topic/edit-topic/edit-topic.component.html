@@ -29,9 +29,9 @@
       </div>
 
       <div class="form-actions">
-        <button type="submit" class="btn btn-primary"
+        <button type="submit" class="btn btn-primary btn-with-icon"
         [ngClass]="editForm.invalid ? 'btn-outline-secondary' : 'btn-primary'"
-        [disabled]="editForm.invalid">{{ 'topic.edit.saveChanges' | transloco }}</button>
+        [disabled]="editForm.invalid"><span class="material-symbols-outlined">save</span>{{ 'topic.edit.saveChanges' | transloco }}</button>
       </div>
     </form>
   </app-page-card>

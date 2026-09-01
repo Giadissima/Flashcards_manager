@@ -78,44 +78,99 @@
   }
 }
 
+/* Demoted to a caption. It used to carry the same 600 weight and the same
+   heading colour as the score right below it, so the row opened with two equal
+   voices and the eye had no first stop. */
 .test-date {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-color);
+}
+
+/* Which test this is, above the number saying how it went - the same
+   "subject . topic" line a flashcard carries under its title. Small, because it
+   labels the score rather than competing with it. */
+.test-subject {
+  font-size: 14px;
   font-weight: 600;
+  color: var(--text-color);
+  margin-bottom: calc(var(--spacing-unit) * 0.25);
+}
+
+/* What the page is actually consulted for, so it leads the row. */
+.test-score {
+  font-size: 22px;
+  font-weight: 700;
   color: var(--header-color);
 }
 
-.test-score {
-  font-size: 17px;
-  font-weight: 600;
-  color: var(--header-color);
+/* The proportion the line above states in words, in the green and the red the
+   review page uses for a right and a wrong answer. Deliberately not a pass/fail
+   colour: this app defines no passing mark, so the bar reports the split and
+   judges nothing. The leftover of the track is what has no answer at all. */
+.score-bar {
+  display: flex;
+  width: 100%;
+  max-width: 220px;
+  height: 6px;
+  margin-top: calc(var(--spacing-unit) * 0.5);
+  background-color: var(--inset-background);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  overflow: hidden;
+}
+
+.score-bar-correct {
+  background-color: var(--success-color);
+}
+
+.score-bar-wrong {
+  background-color: var(--danger-color);
 }
 
 /* Stays at the weight of the rest of the line: it qualifies the score, it is
    not a second score. */
 .wrong-count {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 400;
   color: var(--danger-color);
   margin-left: var(--spacing-unit);
 }
 
 .test-duration {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--spacing-unit) * 0.5);
   font-size: 14px;
   font-variant-numeric: tabular-nums;
   color: var(--text-color);
+
+  /* Down to the size of the digits it marks: it is a label, not a second
+     reading of the value. The glyph would otherwise inherit the line height of
+     the row, which makes its box taller than itself and lifts it off centre. */
+  .material-symbols-outlined {
+    font-size: 16px;
+    line-height: 1;
+  }
 }
 
-/* Score and duration are two lines of their own here; on phones they fold into
-   a single line (see the media query below). */
+/* Date, duration and the in-progress badge read as one caption line under the
+   score, and wrap together when the card is narrow. */
 .test-card-meta {
   display: flex;
-  flex-direction: column;
-  gap: calc(var(--spacing-unit) * 0.5);
+  flex-wrap: wrap;
+  /* Centred, not baseline-aligned: .test-duration is an inline-flex box, and a
+     flex box hands out the baseline of its first child - the timer glyph - so
+     the date was being lined up against the icon instead of against the digits
+     next to it. */
+  align-items: center;
+  gap: calc(var(--spacing-unit) * 1.5);
+  margin-top: var(--spacing-unit);
 }
 
 .badge-in-progress {
   display: inline-block;
   white-space: nowrap;
-  margin-left: var(--spacing-unit);
   font-size: 12px;
   font-weight: 600;
   padding: 1px 8px;
@@ -141,14 +196,6 @@
   .test-card {
     flex-direction: column;
     align-items: stretch;
-  }
-
-  /* Duration trails the score as a secondary metadata rather than taking a
-     line of its own. */
-  .test-card-meta {
-    flex-direction: row;
-    align-items: baseline;
-    gap: calc(var(--spacing-unit) * 1.5);
   }
 
   .test-card-actions button {

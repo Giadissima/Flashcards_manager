@@ -71,6 +71,8 @@
     "sortDate": "Data",
     "seeAnswer": "Vedi risposta",
     "seeQuestion": "Vedi domanda",
+    "expand": "Espandi",
+    "collapse": "Riduci",
     "toast": {
       "cardDeleted": "Flashcard eliminata con successo",
       "deleteError": "Errore durante l'eliminazione",
@@ -260,6 +262,7 @@
       "statsTotalTime": "Tempo totale di studio",
       "noTests": "Nessun test svolto ancora.",
       "inProgress": "In corso",
+      "durationLabel": "Durata del test",
       "correctSuffix": "corrette",
       "wrongSuffix": "errate",
       "review": "Rivedi",

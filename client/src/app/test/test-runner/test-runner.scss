@@ -1,34 +1,39 @@
-.test-info-box {
-  background-color: var(--accent-color);
-  color: var(--on-accent-color);
-  border-radius: var(--border-radius-lg);
-  box-shadow: var(--box-shadow-md);
-  padding: calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 3);
-  text-align: center;
-  width: 100%;
-  max-width: 700px;
-  --bs-secondary-color: color-mix(in srgb, var(--on-accent-color) 75%, transparent);
-
-  .test-info-subject {
-    font-size: 1.5rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-  }
-
-  .test-info-date,
-  .test-info-progress {
-    font-size: 0.85rem;
-  }
+/* The run is a single column of questions: the page is narrowed to the width
+   that column wants, instead of leaving a 700px card adrift in a 1200px
+   container. */
+.test-runner-container {
+  max-width: 820px;
 }
 
-.flashcard-actions {
+/* Answered / total is what the page is checked against while running, so it is
+   shown as a bar and not only as a sentence. */
+.test-progress-label {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+  justify-content: space-between;
+  align-items: baseline;
   gap: var(--spacing-unit);
-  margin-top: auto;
-  /* Pushes actions to the bottom */
+  margin-bottom: var(--spacing-unit);
+  font-weight: 600;
+  color: var(--header-color);
+}
+
+.test-progress-percent {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-color);
+}
+
+.test-progress-track {
+  height: 8px;
+  border-radius: var(--border-radius-sm);
+  background-color: var(--inset-background);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+}
+
+.test-progress-fill {
+  height: 100%;
+  background-color: var(--primary-color);
+  transition: width 0.2s ease;
 }
 
 .flashcard-subject-icon {
@@ -44,9 +49,11 @@
 }
 
 .flashcard {
-  max-width: 700px;
   width: 100%;
-  min-height: 305px;
+  /* A floor, not a stretcher: this is about the height a card with a one-line
+     question reaches on its own, so a very short body still reads as a card
+     without opening a gap above the buttons. */
+  min-height: 220px;
 
   .card-title {
     font-size: 1.5rem;
@@ -56,8 +63,23 @@
     padding: calc(var(--spacing-unit) * 3) calc(var(--spacing-unit) * 3) calc(var(--spacing-unit) * 2);
   }
 
+  /* One card at a time in a single column, so there is no row of siblings to
+     line the buttons up with (which is what margin-top: auto buys the grid on
+     the home page). The room a short question leaves over is split above and
+     below the content instead of piling up between the text and the buttons. */
   .flashcard-body {
     padding: 0 calc(var(--spacing-unit) * 3) calc(var(--spacing-unit) * 3);
+    justify-content: center;
+    gap: calc(var(--spacing-unit) * 2);
+  }
+
+  .flashcard-text {
+    flex-grow: 0;
+    margin-bottom: 0;
+  }
+
+  .flashcard-actions {
+    margin-top: 0;
   }
 
   .flashcard-text {
@@ -69,6 +91,27 @@
     font-size: 1.1rem;
     padding: 0.5rem 1.1rem;
   }
+}
+
+/* Same language the review page uses for an answered question (see
+   .question-card in test-result.scss): a coloured left edge and a tint, so a
+   card that has already been answered is recognised while scrolling and not
+   only by looking at its two buttons. */
+.flashcard.card--correct,
+.flashcard.card--incorrect {
+  border-left: 5px solid;
+}
+
+/* Edge only, no tint on the card: the answer is already stated by the filled
+   check or cross below it, and a third statement of it was covering the topic
+   colour the user picked - which is the one thing on the card that identifies
+   what is being studied. */
+.flashcard.card--correct {
+  border-left-color: var(--success-color);
+}
+
+.flashcard.card--incorrect {
+  border-left-color: var(--danger-color);
 }
 
 .icon-wrapper {
@@ -87,55 +130,89 @@
 }
 
 
-.icons-wrapper {
-  position: fixed;
+/* Elapsed time is passive information here - the run has no deadline - but it
+   has to stay findable while a long page scrolls, so it is fixed under the
+   navbar. A pill and not a disc: the value grows from 09:34 to 1:09:34, and a
+   circle can only take those two extra characters by shrinking the digits (they
+   were 11px, smaller than the icon above them) or by growing itself, which is
+   what used to move the whole thing at the hour mark. */
+/* Sticky inside the column rather than fixed to the window: on a wide screen a
+   viewport-anchored pill ended up floating hundreds of pixels away from the
+   card, belonging to nothing. Sticky follows the scroll just the same and lines
+   up with the right edge of the content whatever the window is doing - no vw
+   arithmetic, and no drift caused by the scrollbar. The slot is zero-height so
+   it claims no room in the flow. */
+.test-timer-slot {
+  position: sticky;
   top: calc(var(--navbar-height) + var(--spacing-unit));
-  right: calc(var(--spacing-unit) * 3);
   z-index: 1030;
-  display: block;
-  width: fit-content;
+  height: 0;
+  display: flex;
+  justify-content: flex-end;
+  /* The slot is zero-height, and a flex container stretches its children by
+     default: without this the pill is squashed to that same zero height and its
+     background collapses to a band. It keeps its own height and overflows the
+     slot, which is the point. */
+  align-items: flex-start;
+}
 
-  .circle-wrapper {
-    display: inline-flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  
-    border-radius: 50%;
-    border: solid 2px white;
-    color: white;
-    
+.test-timer {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-unit);
+  /* Tighter on the pause side, which carries its own round hit area. */
+  padding: calc(var(--spacing-unit) * 0.5) calc(var(--spacing-unit) * 0.5)
+           calc(var(--spacing-unit) * 0.5) calc(var(--spacing-unit) * 1.5);
+
+  /* Orange is what this app already uses for elapsed time (the "time" stat of
+     the result page): the token, not the literal it was written with. */
+  background: var(--warning-color);
+  color: var(--white-color);
+  border: solid 2px var(--white-color);
+  border-radius: 999px;
+  box-shadow: var(--box-shadow-md);
+}
+
+.test-timer-icon {
+  font-size: 18px;
+}
+
+.test-timer-value {
+  font-size: 16px;
+  font-weight: 700;
+  /* Fixed-width digits: the value changes every second and the pill must not
+     breathe with it. */
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.test-timer-pause {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: var(--primary-color);
+  /* .btn brings its own colour: the button keeps the one of the pill. */
+  --bs-btn-color: var(--white-color);
+  --bs-btn-hover-color: var(--white-color);
+
+  .material-symbols-outlined {
+    font-size: 20px;
   }
-  
-  .pause-play-icon {
-    position: absolute;
-    right: -15px;
-    bottom: 0px;
-    padding: 0px;
-    background: var(--primary-color);
-    .material-symbols-outlined{
-      font-size: 24px;
-    }
-  }
-  
-  .timer-icon{
-    background: #FF9500;
-    width: 60px;
-    height: 60px;
-    font-size: 11px;
-    .material-symbols-outlined{
-      font-size: 24px;
-    }
+}
+
+/* On a phone the pill sits over the card header: the icon is the part the
+   orange and the digits already say twice. */
+@media (max-width: 575.98px) {
+  .test-timer {
+    padding-left: var(--spacing-unit);
   }
 
-  &.timer-over-hour {
-    .timer-icon {
-      width: 70px;
-      height: 70px;
-    }
-
-    .pause-play-icon {
-      right: -17px;
-    }
+  .test-timer-icon {
+    display: none;
   }
 }

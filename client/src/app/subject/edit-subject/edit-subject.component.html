@@ -29,9 +29,9 @@
         (reset)="resetIcon()"></app-subject-icon-preview>
 
       <div class="form-actions">
-        <button type="submit" class="btn"
+        <button type="submit" class="btn btn-with-icon"
         [ngClass]="(editForm.invalid || descLength > descMaxLength) ? 'btn-outline-secondary' : 'btn-primary'"
-        [disabled]="editForm.invalid || descLength > descMaxLength">{{ 'subject.edit.saveChanges' | transloco }}</button>
+        [disabled]="editForm.invalid || descLength > descMaxLength"><span class="material-symbols-outlined">save</span>{{ 'subject.edit.saveChanges' | transloco }}</button>
       </div>
     </form>
   </app-page-card>

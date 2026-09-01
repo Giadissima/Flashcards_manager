@@ -78,7 +78,8 @@
     <div class="questions-review-header">
       <h2>{{ 'test.result.questionsReview' | transloco }}</h2>
       @if (stats.wrong > 0) {
-      <button type="button" class="btn btn-outline-primary" (click)="toggleShowOnlyWrong()">
+      <button type="button" class="btn btn-outline-primary btn-with-icon" (click)="toggleShowOnlyWrong()">
+        <span class="material-symbols-outlined">filter_alt</span>
         {{ (showOnlyWrong ? 'test.result.showAll' : 'test.result.showOnlyWrong') | transloco }}
       </button>
       }

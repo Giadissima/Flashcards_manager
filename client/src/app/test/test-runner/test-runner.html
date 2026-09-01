@@ -1,37 +1,51 @@
-<div class="container mt-4">
-  <app-load-state errorMessageKey="test.runner.getTestError" notFoundMessageKey="common.error.testNotFound">
-  <div class="icons-wrapper" [class.timer-over-hour]="elapsed_time >= 3600">
-    <div class="circle-wrapper timer-icon">
-      <span class="material-symbols-outlined">timer</span>
-      <span>
-        {{elapsed_time | duration}}
-      </span>
-    </div>
-    <div class="circle-wrapper pause-play-icon btn">
-      <span class="material-symbols-outlined">pause</span>
+<app-load-state errorMessageKey="test.runner.getTestError" notFoundMessageKey="common.error.testNotFound">
+<div class="container test-runner-container mt-4" *transloco="let t">
+  <!-- The only pause control of the page: it follows the timer it acts on, so
+       the bottom row keeps the two actions that leave the test for good. -->
+  <div class="test-timer-slot">
+    <div class="test-timer">
+      <span class="material-symbols-outlined test-timer-icon">timer</span>
+      <span class="test-timer-value">{{ elapsed_time | duration }}</span>
+      <button type="button" class="test-timer-pause btn" [attr.aria-label]="t('test.runner.pause')"
+        (click)="requestPause()">
+        <span class="material-symbols-outlined">pause</span>
+      </button>
     </div>
   </div>
-  <div class="d-flex flex-column align-items-center">
-    <div class="test-info-box mb-4">
-      <div class="test-info-subject">{{ subjectName }}</div>
-      <div class="test-info-date text-muted">{{ 'test.runner.startedOn' | transloco }} {{ testStartDate |
-        date:'dd/MM/yyyy HH:mm' }}</div>
-      <div class="test-info-progress text-muted">{{ 'test.runner.progress' | transloco:{ answered: answeredCount, total:
-        totalCount } }}</div>
+
+  <app-page-card icon="quiz" [title]="subjectName"
+    [subtitle]="testStartDate ? t('test.runner.startedOn') + ' ' + (testStartDate | date:'dd/MM/yyyy HH:mm') : ''"
+    bodyClass="p-4">
+    <!-- The number checked most often during a run, so it is the first thing in
+         the body and it is drawn, not only counted. -->
+    <div class="test-progress mb-4">
+      <div class="test-progress-label">
+        <span>{{ 'test.runner.progress' | transloco:{ answered: answeredCount, total: totalCount } }}</span>
+        <span class="test-progress-percent">{{ progressPercent }}%</span>
+      </div>
+      <div class="test-progress-track" role="progressbar" [attr.aria-valuenow]="answeredCount" aria-valuemin="0"
+        [attr.aria-valuemax]="totalCount">
+        <div class="test-progress-fill" [style.width.%]="progressPercent"></div>
+      </div>
     </div>
+
+    <div class="d-flex flex-column">
     @for (card of pageFlashcards; track card._id) {
-    <div class="card flashcard flashcard-topic-color mb-3" [style.border-top-color]="getCardColor(card)">
-      <div class="flashcard-title d-flex align-items-center justify-content-center gap-2">
+    <div class="card flashcard flashcard-topic-color mb-3" [style.border-top-color]="getCardColor(card)"
+      [class.card--correct]="isCorrectAnswer(card) === true"
+      [class.card--incorrect]="isCorrectAnswer(card) === false">
+      <div class="flashcard-title">
         <img [src]="getCardSubjectIconUrl(card)" alt="" class="flashcard-subject-icon">
         <div>
           <h5 class="card-title mb-0">{{ card.title }}</h5>
           <div class="flashcard-meta text-muted">{{ getCardSubjectName(card) }} · {{ getCardTopicName(card) }}</div>
         </div>
       </div>
-      <div class="flashcard-body d-flex flex-column align-items-center text-center">
+      <div class="flashcard-body">
         <div class="flashcard-text" [innerHTML]="getCardBody(card) | katexRenderer" (zoomableImages)="lightbox.open($event)"></div>
-        <div class="flashcard-actions justify-content-center">
-          <button type="button" class="btn btn-primary" (click)="seeAnswer(card)">
+        <div class="flashcard-actions">
+          <button type="button" class="btn btn-primary btn-with-icon" (click)="seeAnswer(card)">
+            <span class="material-symbols-outlined">visibility</span>
             {{ getCardButtonText(card) }}
           </button>
           <button type="button" class="icon-wrapper btn" [class.btn-outline-secondary]="isCorrectAnswer(card) !== true"
@@ -50,21 +64,20 @@
       </div>
     </div>
     }
-  </div>
+    </div>
 
-  <app-pagination [currentPage]="currentPage" [totalPages]="totalPages"
-    (previous)="previousPage()" (next)="nextPage()"></app-pagination>
+    <app-pagination [currentPage]="currentPage" [totalPages]="totalPages"
+      (previous)="previousPage()" (next)="nextPage()"></app-pagination>
 
-  <div class="d-flex justify-content-center gap-2 mt-4">
-    <button type="button" class="btn btn-outline-primary" (click)="requestGoHome()">{{ 'test.runner.backHome' |
-      transloco }}</button>
-    <button type="button" class="btn btn-outline-secondary" (click)="requestPause()">{{ 'test.runner.pause' | transloco
-      }}</button>
-    <button type="button" class="btn btn-primary" id="finishTest" (click)="finishTest()">{{ 'test.runner.endTest' |
-      transloco }}</button>
-  </div>
-  </app-load-state>
+    <div class="d-flex justify-content-center gap-2 mt-4">
+      <button type="button" class="btn btn-outline-secondary btn-with-icon" (click)="requestGoHome()"><span class="material-symbols-outlined">home</span>{{ 'test.runner.backHome' |
+        transloco }}</button>
+      <button type="button" class="btn btn-primary btn-with-icon" id="finishTest" (click)="finishTest()"><span class="material-symbols-outlined">flag</span>{{ 'test.runner.endTest' |
+        transloco }}</button>
+    </div>
+  </app-page-card>
 </div>
+</app-load-state>
 
 <ng-container *transloco="let t">
   <app-confirm-dialog [isOpen]="showLeaveConfirm" [title]="t('test.runner.leaveConfirmTitle')"

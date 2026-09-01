@@ -71,6 +71,8 @@
     "sortDate": "Date",
     "seeAnswer": "See answer",
     "seeQuestion": "See question",
+    "expand": "Expand",
+    "collapse": "Collapse",
     "toast": {
       "cardDeleted": "Card successfully deleted",
       "deleteError": "Error deleting card",
@@ -260,6 +262,7 @@
       "statsTotalTime": "Total study time",
       "noTests": "No tests taken yet.",
       "inProgress": "In progress",
+      "durationLabel": "Test duration",
       "correctSuffix": "correct",
       "wrongSuffix": "wrong",
       "review": "Review",

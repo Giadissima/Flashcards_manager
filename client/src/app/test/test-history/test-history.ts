@@ -202,6 +202,22 @@ export class TestHistory extends PaginatedList implements OnInit {
     return test.questions.filter((q) => q.is_correct === false).length;
   }
 
+  // Shares of the whole test, so the two bars sit inside a track whose leftover
+  // is what has no answer: the unanswered tail of a run still in progress, or
+  // the questions left blank by a test that was ended early.
+  getCorrectPercent(test: Test): number {
+    return this.toPercent(this.getCorrectCount(test), test);
+  }
+
+  getWrongPercent(test: Test): number {
+    return this.toPercent(this.getWrongCount(test), test);
+  }
+
+  private toPercent(count: number, test: Test): number {
+    const total = test.questions.length;
+    return total ? (count / total) * 100 : 0;
+  }
+
   openTest(test: Test): void {
     if (!test._id) return;
     this.router.navigate(['/test-result', test._id]);

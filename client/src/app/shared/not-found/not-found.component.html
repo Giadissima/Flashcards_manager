@@ -1,5 +1,5 @@
 <div class="not-found-container d-flex flex-column align-items-center justify-content-center text-center">
   <div class="not-found-code">{{ 'notFound.title' | transloco }}</div>
   <p class="not-found-message">{{ messageKey | transloco }}</p>
-  <button type="button" class="btn btn-primary" (click)="goHome()">{{ 'notFound.backHome' | transloco }}</button>
+  <button type="button" class="btn btn-primary btn-with-icon" (click)="goHome()"><span class="material-symbols-outlined">home</span>{{ 'notFound.backHome' | transloco }}</button>
 </div>

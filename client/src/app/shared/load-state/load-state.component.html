@@ -11,10 +11,10 @@
     <p class="mb-3">{{ displayedErrorKey | transloco }}</p>
     <div class="d-flex justify-content-center gap-2">
       @if (showBackHome) {
-      <button type="button" class="btn btn-outline-primary" (click)="goHome()">{{ 'common.backHome' | transloco }}</button>
+      <button type="button" class="btn btn-outline-primary btn-with-icon" (click)="goHome()"><span class="material-symbols-outlined">home</span>{{ 'common.backHome' | transloco }}</button>
       }
       @if (showRetry) {
-      <button type="button" class="btn btn-primary" (click)="retry()">{{ 'common.retry' | transloco }}</button>
+      <button type="button" class="btn btn-primary btn-with-icon" (click)="retry()"><span class="material-symbols-outlined">refresh</span>{{ 'common.retry' | transloco }}</button>
       }
     </div>
   </div>

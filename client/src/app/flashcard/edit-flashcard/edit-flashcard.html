@@ -82,8 +82,8 @@
       </div>
 
       <div class="form-actions">
-        <button type="submit" class="btn btn-primary"
-          [ngClass]="editForm.invalid ? 'btn-outline-secondary' : 'btn-primary'" [disabled]="editForm.invalid">{{
+        <button type="submit" class="btn btn-primary btn-with-icon"
+          [ngClass]="editForm.invalid ? 'btn-outline-secondary' : 'btn-primary'" [disabled]="editForm.invalid"><span class="material-symbols-outlined">save</span>{{
           'flashcard.edit.saveChanges' | transloco }}</button>
       </div>
     </form>

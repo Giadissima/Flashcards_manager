@@ -490,8 +490,21 @@ input:-webkit-autofill:active {
   overflow: hidden;
 }
 
+/* The heading of a card - icon, title, meta - starts at the left edge, on the
+   same line the body text below it starts from: title and question then share
+   one left margin, which is the edge the eye returns to. The row of actions
+   below stays centred (see .flashcard-actions). Encoded here rather than with
+   utility classes on each template, so home and the test runner cannot drift
+   apart. */
 .flashcard-title {
   padding: calc(var(--spacing-unit) * 2);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--spacing-unit);
+  /* The card centres its text; stated here so the title and the meta line
+     under it are not pulled back to the middle of the space left over. */
+  text-align: left;
 }
 
 .flashcard-title h5 {
@@ -508,10 +521,28 @@ input:-webkit-autofill:active {
   flex-direction: column;
 }
 
+/* Body copy, so it stays ragged-right and never centred: a definition or a
+   list is read over several lines, and centring moves the left edge the eye
+   comes back to at every one of them. Stated explicitly because the card around
+   it is centred and would otherwise pass text-align down. */
 .flashcard-text {
   flex-grow: 1;
   white-space: pre-wrap;
+  text-align: left;
   margin-bottom: calc(var(--spacing-unit) * 2);
+}
+
+/* A short row of controls: centring costs nothing to read and keeps the card
+   symmetrical under the heading. Each page still sizes its own buttons. */
+.flashcard-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-unit);
+  /* Pushes the actions to the bottom, so cards of different text length still
+     line their buttons up. */
+  margin-top: auto;
 }
 
 /* A display-mode formula ($$...$$) is a block with its own width and never
@@ -782,6 +813,25 @@ $image-modal-height: calc(100vh - var(--navbar-height) - 32px - 64px);
    instead. */
 .filter-bar .col-auto:has(.form-select) {
   flex: 1 1 auto;
+}
+
+/* A button that carries an icon next to its label. The layout was repeated as
+   utility classes on every such button (d-inline-flex align-items-center gap-2),
+   which every new button had to remember; here it is one class to add. Buttons
+   that are nothing but an icon are deliberately left out: they size their own
+   glyph (see .icon-wrapper in the test runner, .flashcard-actions on the home
+   grid) and a rule reaching them would override it. */
+.btn-with-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-unit);
+
+  /* Sized down to the label it sits next to, so the icon reads as a marker of
+     the action and not as the action itself. */
+  .material-symbols-outlined {
+    font-size: 20px;
+  }
 }
 
 /* Wrapper for the round icon in a card header */
