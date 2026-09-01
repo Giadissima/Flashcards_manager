@@ -44,22 +44,20 @@
 
   <!-- Destra: Pulsante crea card e switch tema -->
   <div class="actions-container">
-    <button routerLink="/create-card" type="button" class="btn btn-primary create-card-btn" [attr.aria-label]="'navbar.createCard' | transloco">
-      <span>+</span>
+    <button routerLink="/create-card" type="button" class="btn btn-primary create-card-btn"
+      [attr.aria-label]="'navbar.createCard' | transloco">
+      <span class="material-symbols-outlined">
+        add
+      </span>
       <span class="label">{{ 'navbar.createCard' | transloco }}</span>
     </button>
-    <button (click)="openSettings()" class="theme-switch-btn" type="button" [attr.aria-label]="'settings.title' | transloco">
+    <button (click)="openSettings()" class="theme-switch-btn" type="button"
+      [attr.aria-label]="'settings.title' | transloco">
       <span class="material-symbols-outlined">settings</span>
     </button>
     <!-- Hamburger button: shown below the breakpoint, opens the menu as a drawer from the right -->
-    <button
-      type="button"
-      class="hamburger-btn"
-      [class.open]="isMobileMenuOpen"
-      (click)="toggleMobileMenu()"
-      [attr.aria-label]="'navbar.menu' | transloco"
-      [attr.aria-expanded]="isMobileMenuOpen"
-    >
+    <button type="button" class="hamburger-btn" [class.open]="isMobileMenuOpen" (click)="toggleMobileMenu()"
+      [attr.aria-label]="'navbar.menu' | transloco" [attr.aria-expanded]="isMobileMenuOpen">
       <span class="hamburger-line"></span>
       <span class="hamburger-line"></span>
       <span class="hamburger-line"></span>
@@ -67,5 +65,6 @@
   </div>
 </nav>
 
-<app-settings-modal [(isOpen)]="isSettingsOpen" (openImportExport)="onOpenImportExportFromSettings()"></app-settings-modal>
+<app-settings-modal [(isOpen)]="isSettingsOpen"
+  (openImportExport)="onOpenImportExportFromSettings()"></app-settings-modal>
 <app-import-export-modal [(isOpen)]="isImportExportOpen" (back)="onImportExportBack()"></app-import-export-modal>
