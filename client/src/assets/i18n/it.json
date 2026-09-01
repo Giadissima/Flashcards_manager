@@ -85,6 +85,8 @@
   "editor": {
     "undo": "Annulla",
     "redo": "Ripeti",
+    "moreTools": "Altri strumenti",
+    "fewerTools": "Meno strumenti",
     "paragraph": "Testo normale",
     "headingMenu": "Stile testo",
     "heading1": "Titolo 1",

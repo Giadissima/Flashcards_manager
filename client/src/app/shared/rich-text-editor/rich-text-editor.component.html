@@ -1,102 +1,127 @@
-<div class="editor-toolbar" *transloco="let t">
-  <div class="btn-group" role="group">
+<div class="editor-toolbar" [class.is-expanded]="showExtraTools" *transloco="let t">
+  <!-- Phone layout: the toolbar is two rows, and each row has to break as a
+       whole rather than in the middle of a group of buttons, so a row is one
+       element. On a wider screen the two are `display: contents` and the
+       groups go back to the order and the pairing they have always had, which
+       is why some of them carry a join- class. -->
+  <div class="btn-group editor-toolbar-history" role="group">
     <button (click)="editor.chain().focus().undo().run()" [disabled]="!editor.can().undo()"
       class="btn btn-outline-secondary" type="button" [title]="t('editor.undo')"><span class="material-symbols-outlined">undo</span></button>
     <button (click)="editor.chain().focus().redo().run()" [disabled]="!editor.can().redo()"
       class="btn btn-outline-secondary" type="button" [title]="t('editor.redo')"><span class="material-symbols-outlined">redo</span></button>
   </div>
-  <div class="btn-group" role="group">
-    <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown"
-      aria-expanded="false" [title]="t('editor.headingMenu')">
-      <span class="material-symbols-outlined">{{ currentBlockIcon }}</span>
-    </button>
-    <ul class="dropdown-menu">
-      <li><button (click)="editor.chain().focus().setParagraph().run()" [class.active]="!editor.isActive('heading')"
-          class="dropdown-item" type="button">
-          <span class="material-symbols-outlined me-2">format_paragraph</span>{{ t('editor.paragraph') }}</button></li>
-      <li><button (click)="editor.chain().focus().toggleHeading({ level: 1 }).run()"
-          [class.active]="editor.isActive('heading', { level: 1 })" class="dropdown-item" type="button">
-          <span class="material-symbols-outlined me-2">format_h1</span>{{ t('editor.heading1') }}</button></li>
-      <li><button (click)="editor.chain().focus().toggleHeading({ level: 2 }).run()"
-          [class.active]="editor.isActive('heading', { level: 2 })" class="dropdown-item" type="button">
-          <span class="material-symbols-outlined me-2">format_h2</span>{{ t('editor.heading2') }}</button></li>
-      <li><button (click)="editor.chain().focus().toggleHeading({ level: 3 }).run()"
-          [class.active]="editor.isActive('heading', { level: 3 })" class="dropdown-item" type="button">
-          <span class="material-symbols-outlined me-2">format_h3</span>{{ t('editor.heading3') }}</button></li>
-    </ul>
+
+  <div class="editor-toolbar-main">
+    <div class="btn-group join-right" role="group">
+      <button (click)="editor.chain().focus().toggleBold().run()" [class.btn-outline-secondary]="!editor.isActive('bold')"
+        [class.btn-secondary]="editor.isActive('bold')" class="btn" type="button" [title]="t('editor.bold')"><span class="material-symbols-outlined">format_bold</span></button>
+      <button (click)="editor.chain().focus().toggleItalic().run()"
+        [class.btn-outline-secondary]="!editor.isActive('italic')" [class.btn-secondary]="editor.isActive('italic')"
+        class="btn" type="button" [title]="t('editor.italic')"><span class="material-symbols-outlined">format_italic</span></button>
+    </div>
+    <div class="btn-group join-right" role="group">
+      <button (click)="editor.chain().focus().toggleBulletList().run()"
+        [class.btn-outline-secondary]="!editor.isActive('bulletList')"
+        [class.btn-secondary]="editor.isActive('bulletList')" class="btn" type="button"
+        [title]="t('editor.bulletList')"><span class="material-symbols-outlined">format_list_bulleted</span></button>
+    </div>
+    <div class="btn-group join-right" role="group">
+      <button (click)="toggleLink()" [class.btn-outline-secondary]="!editor.isActive('link')"
+        [class.btn-secondary]="editor.isActive('link')" class="btn" type="button" [title]="t('editor.link')"><span class="material-symbols-outlined">link</span></button>
+    </div>
+    <div class="btn-group editor-toolbar-toggle" role="group">
+      <button type="button" class="btn btn-outline-secondary" (click)="toggleExtraTools()"
+        [attr.aria-expanded]="showExtraTools"
+        [title]="showExtraTools ? t('editor.fewerTools') : t('editor.moreTools')">
+        <span class="material-symbols-outlined">{{ showExtraTools ? 'expand_less' : 'more_horiz' }}</span>
+      </button>
+    </div>
   </div>
-  <div class="btn-group" role="group">
-    <button (click)="editor.chain().focus().toggleBold().run()" [class.btn-outline-secondary]="!editor.isActive('bold')"
-      [class.btn-secondary]="editor.isActive('bold')" class="btn" type="button" [title]="t('editor.bold')"><span class="material-symbols-outlined">format_bold</span></button>
-    <button (click)="editor.chain().focus().toggleItalic().run()"
-      [class.btn-outline-secondary]="!editor.isActive('italic')" [class.btn-secondary]="editor.isActive('italic')"
-      class="btn" type="button" [title]="t('editor.italic')"><span class="material-symbols-outlined">format_italic</span></button>
-    <button (click)="editor.chain().focus().toggleUnderline().run()"
-      [class.btn-outline-secondary]="!editor.isActive('underline')" [class.btn-secondary]="editor.isActive('underline')"
-      class="btn" type="button" [title]="t('editor.underline')"><span class="material-symbols-outlined">format_underlined</span></button>
-    <button (click)="editor.chain().focus().toggleStrike().run()"
-      [class.btn-outline-secondary]="!editor.isActive('strike')" [class.btn-secondary]="editor.isActive('strike')"
-      class="btn" type="button" [title]="t('editor.strike')"><span class="material-symbols-outlined">strikethrough_s</span></button>
-    <button (click)="editor.chain().focus().toggleCode().run()" [class.btn-outline-secondary]="!editor.isActive('code')"
-      [class.btn-secondary]="editor.isActive('code')" class="btn" type="button" [title]="t('editor.code')"><span class="material-symbols-outlined">code</span></button>
+
+  <div class="editor-toolbar-extras">
+    <div class="btn-group" role="group">
+      <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown"
+        aria-expanded="false" [title]="t('editor.headingMenu')">
+        <span class="material-symbols-outlined">{{ currentBlockIcon }}</span>
+      </button>
+      <ul class="dropdown-menu">
+        <li><button (click)="editor.chain().focus().setParagraph().run()" [class.active]="!editor.isActive('heading')"
+            class="dropdown-item" type="button">
+            <span class="material-symbols-outlined me-2">format_paragraph</span>{{ t('editor.paragraph') }}</button></li>
+        <li><button (click)="editor.chain().focus().toggleHeading({ level: 1 }).run()"
+            [class.active]="editor.isActive('heading', { level: 1 })" class="dropdown-item" type="button">
+            <span class="material-symbols-outlined me-2">format_h1</span>{{ t('editor.heading1') }}</button></li>
+        <li><button (click)="editor.chain().focus().toggleHeading({ level: 2 }).run()"
+            [class.active]="editor.isActive('heading', { level: 2 })" class="dropdown-item" type="button">
+            <span class="material-symbols-outlined me-2">format_h2</span>{{ t('editor.heading2') }}</button></li>
+        <li><button (click)="editor.chain().focus().toggleHeading({ level: 3 }).run()"
+            [class.active]="editor.isActive('heading', { level: 3 })" class="dropdown-item" type="button">
+            <span class="material-symbols-outlined me-2">format_h3</span>{{ t('editor.heading3') }}</button></li>
+      </ul>
+    </div>
+    <div class="btn-group join-left" role="group">
+      <button (click)="editor.chain().focus().toggleUnderline().run()"
+        [class.btn-outline-secondary]="!editor.isActive('underline')" [class.btn-secondary]="editor.isActive('underline')"
+        class="btn" type="button" [title]="t('editor.underline')"><span class="material-symbols-outlined">format_underlined</span></button>
+      <button (click)="editor.chain().focus().toggleStrike().run()"
+        [class.btn-outline-secondary]="!editor.isActive('strike')" [class.btn-secondary]="editor.isActive('strike')"
+        class="btn" type="button" [title]="t('editor.strike')"><span class="material-symbols-outlined">strikethrough_s</span></button>
+      <button (click)="editor.chain().focus().toggleCode().run()" [class.btn-outline-secondary]="!editor.isActive('code')"
+        [class.btn-secondary]="editor.isActive('code')" class="btn" type="button" [title]="t('editor.code')"><span class="material-symbols-outlined">code</span></button>
+    </div>
+    <div class="btn-group join-left" role="group">
+      <button (click)="editor.chain().focus().toggleOrderedList().run()"
+        [class.btn-outline-secondary]="!editor.isActive('orderedList')"
+        [class.btn-secondary]="editor.isActive('orderedList')" class="btn" type="button"
+        [title]="t('editor.orderedList')"><span class="material-symbols-outlined">format_list_numbered</span></button>
+    </div>
+    <div class="btn-group" role="group">
+      <button (click)="editor.chain().focus().toggleBlockquote().run()"
+        [class.btn-outline-secondary]="!editor.isActive('blockquote')"
+        [class.btn-secondary]="editor.isActive('blockquote')" class="btn" type="button"
+        [title]="t('editor.blockquote')"><span class="material-symbols-outlined">format_quote</span></button>
+      <button (click)="editor.chain().focus().toggleCodeBlock().run()"
+        [class.btn-outline-secondary]="!editor.isActive('codeBlock')" [class.btn-secondary]="editor.isActive('codeBlock')"
+        class="btn" type="button" [title]="t('editor.codeBlock')"><span class="material-symbols-outlined">code_blocks</span></button>
+      <button (click)="editor.chain().focus().setHorizontalRule().run()" class="btn btn-outline-secondary" type="button"
+        [title]="t('editor.horizontalLine')"><span class="material-symbols-outlined">horizontal_rule</span></button>
+    </div>
+    <div class="btn-group join-left" role="group">
+      <label [for]="imageInputId" class="btn btn-outline-secondary mb-0" [title]="t('flashcard.create.insertImage')">
+        <span class="material-symbols-outlined">image</span>
+      </label>
+    </div>
+    <div class="btn-group" role="group">
+      <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown"
+        aria-expanded="false" [title]="t('editor.latexGroupTitle')">
+        <span class="material-symbols-outlined">function</span>
+      </button>
+      <ul class="dropdown-menu">
+        <li><button (click)="editor.commands.insertContent('$')" class="dropdown-item" type="button">
+            <svg class="me-2 latex-inline-icon" viewBox="0 0 200 180" xmlns="http://www.w3.org/2000/svg">
+              <rect x="30" y="30" width="140" height="16" rx="8" fill="currentColor" />
+              <rect x="30" y="80" width="35" height="16" rx="8" fill="currentColor" />
+              <rect x="135" y="80" width="35" height="16" rx="8" fill="currentColor" />
+              <svg x="63" y="51" width="74" height="74" viewBox="0 -960 960 960">
+                <path fill="currentColor"
+                  d="M400-240v-80h62l105-120-105-120h-66l-64 344q-8 45-37 70.5T221-120q-45 0-73-24t-28-64q0-32 17-51.5t43-19.5q25 0 42.5 17t17.5 41q0 5-.5 9t-1.5 9q5-1 8.5-5.5T252-221l62-339H200v-80h129l21-114q7-38 37.5-62t72.5-24q44 0 72 26t28 65q0 30-17 49.5T500-680q-25 0-42.5-17T440-739q0-5 .5-9t1.5-9q-6 2-9 6t-5 12l-17 99h189v80h-32l52 59 52-59h-32v-80h200v80h-62L673-440l105 120h62v80H640v-80h32l-52-60-52 60h32v80H400Z" />
+              </svg>
+              <rect x="30" y="130" width="140" height="16" rx="8" fill="currentColor" />
+            </svg>{{ t('editor.latexInline') }}</button></li>
+        <li><button (click)="editor.commands.insertContent('$$')" class="dropdown-item" type="button">
+            <svg class="me-2 latex-inline-icon" viewBox="0 0 200 180" xmlns="http://www.w3.org/2000/svg">
+              <rect x="30" y="14" width="140" height="14" rx="7" fill="currentColor" />
+              <rect x="45" y="48" width="110" height="72" rx="4" fill="none" stroke="currentColor" stroke-width="8" />
+              <svg x="72" y="56" width="56" height="56" viewBox="0 -960 960 960">
+                <path fill="currentColor"
+                  d="M400-240v-80h62l105-120-105-120h-66l-64 344q-8 45-37 70.5T221-120q-45 0-73-24t-28-64q0-32 17-51.5t43-19.5q25 0 42.5 17t17.5 41q0 5-.5 9t-1.5 9q5-1 8.5-5.5T252-221l62-339H200v-80h129l21-114q7-38 37.5-62t72.5-24q44 0 72 26t28 65q0 30-17 49.5T500-680q-25 0-42.5-17T440-739q0-5 .5-9t1.5-9q-6 2-9 6t-5 12l-17 99h189v80h-32l52 59 52-59h-32v-80h200v80h-62L673-440l105 120h62v80H640v-80h32l-52-60-52 60h32v80H400Z" />
+              </svg>
+              <rect x="30" y="136" width="140" height="14" rx="7" fill="currentColor" />
+            </svg>{{ t('editor.latexBlock') }}</button></li>
+      </ul>
+    </div>
   </div>
-  <div class="btn-group" role="group">
-    <button (click)="editor.chain().focus().toggleBulletList().run()"
-      [class.btn-outline-secondary]="!editor.isActive('bulletList')"
-      [class.btn-secondary]="editor.isActive('bulletList')" class="btn" type="button"
-      [title]="t('editor.bulletList')"><span class="material-symbols-outlined">format_list_bulleted</span></button>
-    <button (click)="editor.chain().focus().toggleOrderedList().run()"
-      [class.btn-outline-secondary]="!editor.isActive('orderedList')"
-      [class.btn-secondary]="editor.isActive('orderedList')" class="btn" type="button"
-      [title]="t('editor.orderedList')"><span class="material-symbols-outlined">format_list_numbered</span></button>
-  </div>
-  <div class="btn-group" role="group">
-    <button (click)="editor.chain().focus().toggleBlockquote().run()"
-      [class.btn-outline-secondary]="!editor.isActive('blockquote')"
-      [class.btn-secondary]="editor.isActive('blockquote')" class="btn" type="button"
-      [title]="t('editor.blockquote')"><span class="material-symbols-outlined">format_quote</span></button>
-    <button (click)="editor.chain().focus().toggleCodeBlock().run()"
-      [class.btn-outline-secondary]="!editor.isActive('codeBlock')" [class.btn-secondary]="editor.isActive('codeBlock')"
-      class="btn" type="button" [title]="t('editor.codeBlock')"><span class="material-symbols-outlined">code_blocks</span></button>
-    <button (click)="editor.chain().focus().setHorizontalRule().run()" class="btn btn-outline-secondary" type="button"
-      [title]="t('editor.horizontalLine')"><span class="material-symbols-outlined">horizontal_rule</span></button>
-  </div>
-  <div class="btn-group" role="group">
-    <button (click)="toggleLink()" [class.btn-outline-secondary]="!editor.isActive('link')"
-      [class.btn-secondary]="editor.isActive('link')" class="btn" type="button" [title]="t('editor.link')"><span class="material-symbols-outlined">link</span></button>
-    <label [for]="imageInputId" class="btn btn-outline-secondary mb-0" [title]="t('flashcard.create.insertImage')">
-      <span class="material-symbols-outlined">image</span>
-    </label>
-  </div>
+
   <input type="file" [id]="imageInputId" accept="image/*" hidden (change)="onImageSelected($event)">
-  <div class="btn-group" role="group">
-    <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown"
-      aria-expanded="false" [title]="t('editor.latexGroupTitle')">
-      <span class="material-symbols-outlined">function</span>
-    </button>
-    <ul class="dropdown-menu">
-      <li><button (click)="editor.commands.insertContent('$')" class="dropdown-item" type="button">
-          <svg class="me-2 latex-inline-icon" viewBox="0 0 200 180" xmlns="http://www.w3.org/2000/svg">
-            <rect x="30" y="30" width="140" height="16" rx="8" fill="currentColor" />
-            <rect x="30" y="80" width="35" height="16" rx="8" fill="currentColor" />
-            <rect x="135" y="80" width="35" height="16" rx="8" fill="currentColor" />
-            <svg x="63" y="51" width="74" height="74" viewBox="0 -960 960 960">
-              <path fill="currentColor"
-                d="M400-240v-80h62l105-120-105-120h-66l-64 344q-8 45-37 70.5T221-120q-45 0-73-24t-28-64q0-32 17-51.5t43-19.5q25 0 42.5 17t17.5 41q0 5-.5 9t-1.5 9q5-1 8.5-5.5T252-221l62-339H200v-80h129l21-114q7-38 37.5-62t72.5-24q44 0 72 26t28 65q0 30-17 49.5T500-680q-25 0-42.5-17T440-739q0-5 .5-9t1.5-9q-6 2-9 6t-5 12l-17 99h189v80h-32l52 59 52-59h-32v-80h200v80h-62L673-440l105 120h62v80H640v-80h32l-52-60-52 60h32v80H400Z" />
-            </svg>
-            <rect x="30" y="130" width="140" height="16" rx="8" fill="currentColor" />
-          </svg>{{ t('editor.latexInline') }}</button></li>
-      <li><button (click)="editor.commands.insertContent('$$')" class="dropdown-item" type="button">
-          <svg class="me-2 latex-inline-icon" viewBox="0 0 200 180" xmlns="http://www.w3.org/2000/svg">
-            <rect x="30" y="14" width="140" height="14" rx="7" fill="currentColor" />
-            <rect x="45" y="48" width="110" height="72" rx="4" fill="none" stroke="currentColor" stroke-width="8" />
-            <svg x="72" y="56" width="56" height="56" viewBox="0 -960 960 960">
-              <path fill="currentColor"
-                d="M400-240v-80h62l105-120-105-120h-66l-64 344q-8 45-37 70.5T221-120q-45 0-73-24t-28-64q0-32 17-51.5t43-19.5q25 0 42.5 17t17.5 41q0 5-.5 9t-1.5 9q5-1 8.5-5.5T252-221l62-339H200v-80h129l21-114q7-38 37.5-62t72.5-24q44 0 72 26t28 65q0 30-17 49.5T500-680q-25 0-42.5-17T440-739q0-5 .5-9t1.5-9q-6 2-9 6t-5 12l-17 99h189v80h-32l52 59 52-59h-32v-80h200v80h-62L673-440l105 120h62v80H640v-80h32l-52-60-52 60h32v80H400Z" />
-            </svg>
-            <rect x="30" y="136" width="140" height="14" rx="7" fill="currentColor" />
-          </svg>{{ t('editor.latexBlock') }}</button></li>
-    </ul>
-  </div>
 </div>
 <tiptap-editor [editor]="editor" class="tiptap-editor-custom"></tiptap-editor>

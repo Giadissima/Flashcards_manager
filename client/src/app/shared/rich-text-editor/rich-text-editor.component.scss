@@ -20,7 +20,7 @@
   gap: calc(var(--spacing-unit) * 1.25);
   margin-bottom: calc(var(--spacing-unit) * 0.75);
 
-  .btn-group .btn {
+  .btn {
     display: inline-flex;
     align-items: center;
     gap: calc(var(--spacing-unit) * 0.5);
@@ -40,4 +40,149 @@
 
 .editor-toolbar .material-symbols-outlined {
   font-size: 20px;
+}
+
+/* The toolbar folds itself on a phone: only the controls used while writing
+   stay on the first row, the rest waits behind the toggle, which the wide
+   layout does not draw at all. */
+.editor-toolbar-toggle {
+  display: none;
+}
+
+/* Wide layout: the rows the phone needs are not boxes here, so the toolbar
+   lays out the groups itself, in the reading order it has always had. Two
+   groups the phone puts on different rows used to be a single one, and a
+   join- pair draws them joined again. */
+@media (min-width: 768.01px) {
+  .editor-toolbar-main,
+  .editor-toolbar-extras {
+    display: contents;
+  }
+
+  .editor-toolbar-history {
+    order: 1;
+  }
+
+  .editor-toolbar-extras > :nth-child(1) {
+    order: 2; /* text style */
+  }
+
+  .editor-toolbar-main > :nth-child(1) {
+    order: 3; /* bold, italic */
+  }
+
+  .editor-toolbar-extras > :nth-child(2) {
+    order: 4; /* underline, strikethrough, code */
+  }
+
+  .editor-toolbar-main > :nth-child(2) {
+    order: 5; /* bullet list */
+  }
+
+  .editor-toolbar-extras > :nth-child(3) {
+    order: 6; /* ordered list */
+  }
+
+  .editor-toolbar-extras > :nth-child(4) {
+    order: 7; /* blockquote, code block, rule */
+  }
+
+  .editor-toolbar-main > :nth-child(3) {
+    order: 8; /* link */
+  }
+
+  .editor-toolbar-extras > :nth-child(5) {
+    order: 9; /* image */
+  }
+
+  .editor-toolbar-extras > :nth-child(6) {
+    order: 10; /* LaTeX */
+  }
+
+  /* Pulled back over the gap of the toolbar and over the border the two
+     groups then share. */
+  .join-left {
+    margin-left: calc(var(--spacing-unit) * -1.25 - var(--bs-border-width));
+  }
+
+  .join-right > .btn:last-child {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .join-left > .btn:first-child {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .editor-toolbar {
+    /* A long answer scrolls the toolbar away, so it stays pinned to the top of
+       its own editor. */
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    /* Down the middle of the first row: history on one side, writing on the
+       other. */
+    column-gap: calc(var(--spacing-unit) * 0.75);
+    row-gap: calc(var(--spacing-unit) * 0.5);
+    padding-bottom: calc(var(--spacing-unit) * 0.5);
+    background-color: var(--component-background);
+  }
+
+  /* A row is one item of the toolbar, so when it runs out of width it goes
+     down whole instead of breaking between two of its buttons. */
+  .editor-toolbar-main,
+  .editor-toolbar-extras {
+    display: flex;
+    flex-wrap: wrap;
+    /* A row too long for the screen breaks into two, which have to read as two
+       rows and not as one block: the buttons are joined side to side, never
+       one on top of the other. */
+    row-gap: calc(var(--spacing-unit) * 0.5);
+  }
+
+  /* The second row is a row of its own whether it was just opened or not, so
+     none of it ever slides up next to the first. */
+  .editor-toolbar-extras {
+    flex-basis: 100%;
+    /* Where this row breaks depends on the width of the screen, and a pill cut
+       in half would leave a squared-off end wherever that happens to be. Its
+       groups are drawn one pill each instead, so a break falls between two of
+       them and the row reads the same on any phone. */
+    column-gap: calc(var(--spacing-unit) * 0.5);
+  }
+
+  .editor-toolbar:not(.is-expanded) .editor-toolbar-extras {
+    display: none;
+  }
+
+  .editor-toolbar-toggle {
+    display: inline-flex;
+  }
+
+  /* The first row is one pill: it is short enough never to break, so its
+     groups are joined and only its two ends keep a rounded corner. */
+  .editor-toolbar-main > .btn-group + .btn-group {
+    margin-left: calc(-1 * var(--bs-border-width));
+  }
+
+  .editor-toolbar-main > .btn-group:not(:last-child) > .btn:last-child {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .editor-toolbar-main > .btn-group:not(:first-child) > .btn:first-child {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  .editor-toolbar .btn:hover,
+  .editor-toolbar .btn:focus,
+  .editor-toolbar .btn-secondary {
+    /* On top of its neighbour, so the border being lit is the whole one. */
+    position: relative;
+    z-index: 1;
+  }
 }

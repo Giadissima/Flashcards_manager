@@ -23,6 +23,13 @@ export class RichTextEditorComponent {
 
   @Input({ required: true }) editor!: Editor;
 
+  /**
+   * Phone layout: the toolbar only has room for one row, so everything past
+   * undo/redo, bold/italic, the bullet list, the link and the image is folded
+   * away and this opens it. The wide layout shows the lot and ignores it.
+   */
+  showExtraTools = false;
+
   constructor(
     private fileService: FileService,
     private toastService: ToastService,
@@ -39,6 +46,10 @@ export class RichTextEditorComponent {
       if (this.editor.isActive('heading', { level })) return `format_h${level}`;
     }
     return 'format_paragraph';
+  }
+
+  toggleExtraTools(): void {
+    this.showExtraTools = !this.showExtraTools;
   }
 
   toggleLink(): void {

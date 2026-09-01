@@ -85,6 +85,8 @@
   "editor": {
     "undo": "Undo",
     "redo": "Redo",
+    "moreTools": "More tools",
+    "fewerTools": "Fewer tools",
     "paragraph": "Paragraph",
     "headingMenu": "Text style",
     "heading1": "Heading 1",
