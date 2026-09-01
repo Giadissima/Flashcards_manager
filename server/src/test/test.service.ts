@@ -1,10 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { BasePaginatedResult } from 'src/common.dto';
 import {
   assertValidObjectId,
   deleteByIdOrThrow,
-  findByIdOrThrow,
 } from 'src/common/mongo.util';
 
 import { Test, TestDocument } from './test.schema';
@@ -21,7 +20,40 @@ import { FlashcardsService } from 'src/flashcards/flashcards.service';
 const ENTITY = 'Test';
 
 @Injectable()
-export class TestService {
+export class TestService implements OnModuleInit {
+  private readonly logger = new Logger(TestService.name);
+
+  /**
+   * Tests created before subject_id/topic_id were stored on the test carry
+   * neither, which would leave them without a subject on every screen and out
+   * of every filter by subject. They are filled in once, from the flashcards of
+   * their questions - the way those two values used to be resolved on read.
+   * Once done, the check below is a single indexed query at startup.
+   */
+  async onModuleInit(): Promise<void> {
+    const pending = await this.testModel
+      .find({ subject_id: { $exists: false } }, { questions: 1 })
+      .exec();
+    if (!pending.length) return;
+
+    for (const test of pending) {
+      const { subject_id, topic_id } =
+        await this.flashcardService.getSubjectAndTopic(
+          test.questions.map((q) => q.flashcard_id),
+        );
+      // A test whose flashcards were all deleted resolves to nothing: it is
+      // still marked, with null, so it is not looked at again at every startup.
+      await this.testModel
+        .updateOne(
+          { _id: test._id },
+          { $set: { subject_id: subject_id ?? null, topic_id: topic_id ?? null } },
+        )
+        .exec();
+    }
+
+    this.logger.log(`Backfilled subject and topic on ${pending.length} test(s)`);
+  }
+
   update(id: string, test: TestDocument) {
     assertValidObjectId(id);
     return this.testModel.findByIdAndUpdate(id, test);
@@ -101,7 +133,12 @@ export class TestService {
   }
   // TODO find a way to filter only the questions that have no category
   async create(test: TestCreateRequest): Promise<TestDocument> {
-    return new this.testModel(test).save();
+    // Resolved here, once, instead of on every read of the test: what the test
+    // is about cannot change afterwards, since its questions are fixed.
+    const { subject_id, topic_id } = await this.flashcardService.getSubjectAndTopic(
+      test.questions.map((q) => q.flashcard_id),
+    );
+    return new this.testModel({ ...test, subject_id, topic_id }).save();
   }
 
   updateelapsed_time(id: string, time: number) {
@@ -151,48 +188,64 @@ export class TestService {
       });
     }
 
-    // subject_id/topic_id are not stored on the test: the subject and topic a test
-    // belongs to are resolved through the flashcards of its questions.
-    // In some historical documents questions.flashcard_id is stored as a string
-    // instead of an ObjectId, so it must be converted before the $lookup or it
-    // would never match flashcard._id, which is an ObjectId
-    if (filter.subject_id || filter.topic_id) {
+    // Both are stored on the test itself, so no join is needed to filter by
+    // them. topic_id is only set on tests whose questions share one topic,
+    // which is exactly the set a filter by topic should return.
+    if (filter.subject_id) {
       pipeline.push({
-        $addFields: {
-          flashcardIds: {
-            $map: {
-              input: '$questions',
-              as: 'q',
-              in: { $toObjectId: '$$q.flashcard_id' },
-            },
-          },
-        },
+        $match: { subject_id: new Types.ObjectId(filter.subject_id) },
       });
-
+    }
+    if (filter.topic_id) {
       pipeline.push({
-        $lookup: {
-          from: 'flashcard',
-          localField: 'flashcardIds',
-          foreignField: '_id',
-          as: 'matchedFlashcards',
-        },
+        $match: { topic_id: new Types.ObjectId(filter.topic_id) },
       });
-
-      const flashcardMatch: Record<string, any> = {};
-      if (filter.subject_id) {
-        flashcardMatch['matchedFlashcards.subject_id'] = new Types.ObjectId(
-          filter.subject_id,
-        );
-      }
-      if (filter.topic_id) {
-        flashcardMatch['matchedFlashcards.topic_id'] = new Types.ObjectId(
-          filter.topic_id,
-        );
-      }
-      pipeline.push({ $match: flashcardMatch });
     }
 
     return pipeline;
+  }
+
+  /**
+   * Turns the subject and topic stored on a test into their names. Shared by
+   * the paginated list and by the single test, so both describe a test the
+   * same way; the list pushes it after $skip/$limit, so it only touches the
+   * tests of the page being returned.
+   */
+  private subjectAndTopicStages(): PipelineStage.FacetPipelineStage[] {
+    return [
+      // $lookup is Mongo's join: for each test coming through, it reads the
+      // documents of another collection whose 'foreignField' matches this
+      // one's 'localField', and attaches them under 'as' - always as an array,
+      // even when a single document matches. The inner pipeline keeps only the
+      // name, which is all that travels back.
+      {
+        $lookup: {
+          from: 'subject',
+          localField: 'subject_id',
+          foreignField: '_id',
+          as: 'testSubjects',
+          pipeline: [{ $project: { name: 1 } }],
+        },
+      },
+      {
+        $lookup: {
+          from: 'topic',
+          localField: 'topic_id',
+          foreignField: '_id',
+          as: 'testTopics',
+          pipeline: [{ $project: { name: 1 } }],
+        },
+      },
+      {
+        $addFields: {
+          subject_name: { $arrayElemAt: ['$testSubjects.name', 0] },
+          // Null rather than missing, so a test spanning several topics is
+          // told apart from one whose topic was deleted only by the name.
+          topic_name: { $ifNull: [{ $arrayElemAt: ['$testTopics.name', 0] }, null] },
+        },
+      },
+      { $project: { testSubjects: 0, testTopics: 0 } },
+    ];
   }
 
   async findAll(
@@ -219,118 +272,7 @@ export class TestService {
           },
           { $skip: filter.skip },
           { $limit: filter.limit },
-          // The subject and the topic of a test are not stored on it either:
-          // like the filter above, they are resolved through the flashcards of
-          // its questions. These stages sit after $skip/$limit on purpose, so
-          // they only touch the tests of the page being returned.
-          {
-            $addFields: {
-              pageFlashcardIds: {
-                $map: {
-                  input: '$questions',
-                  as: 'q',
-                  in: { $toObjectId: '$$q.flashcard_id' },
-                },
-              },
-            },
-          },
-          // $lookup is Mongo's join: for each test coming through, it reads
-          // the documents of another collection whose 'foreignField' matches
-          // this one's 'localField', and attaches them under 'as' - always as
-          // an array, even when a single document matches.
-          {
-            $lookup: {
-              from: 'flashcard',
-              localField: 'pageFlashcardIds',
-              foreignField: '_id',
-              as: 'testMeta',
-              // A $lookup normally hands back every matched document whole.
-              // 'pipeline' lets the matches be processed inside the lookup, on
-              // the database side, so that only the result of that processing
-              // is attached to the test. It is worth it here: a test can hold
-              // hundreds of questions, and without this every one of their
-              // flashcards - question and answer text included - would travel
-              // back only to be reduced to the two values below. One row per
-              // test comes out instead.
-              pipeline: [
-                // $group is SQL's GROUP BY with the aggregate functions folded
-                // into the same stage. '_id' is the grouping key, and null means
-                // no key at all: every matched flashcard collapses into a single
-                // row, the way a COUNT(*) with no GROUP BY does. Every other
-                // field has to go through an accumulator ($sum, $first,
-                // $addToSet, ...) - unlike SQL, a plain column cannot be carried
-                // through untouched.
-                {
-                  $group: {
-                    _id: null,
-                    // $first takes the value of the first document to arrive.
-                    // That is only meaningful because a test is built from a
-                    // single subject, so every card carries the same one; with
-                    // no $sort before it, the "first" document is otherwise in
-                    // no defined order.
-                    subject_id: { $first: '$subject_id' },
-                    // $addToSet is a DISTINCT: it collects the differing values
-                    // and drops repeats. The topic is not unique the way the
-                    // subject is - a test set up by subject spans every topic of
-                    // that subject - so what matters here is how many distinct
-                    // ones come out.
-                    topic_ids: { $addToSet: '$topic_id' },
-                  },
-                },
-              ],
-            },
-          },
-          {
-            $addFields: {
-              subjectId: { $arrayElemAt: ['$testMeta.subject_id', 0] }, // lookup always returns an array, so we need to deconstruct it
-              topicIds: { $arrayElemAt: ['$testMeta.topic_ids', 0] },
-            },
-          },
-          {
-            $lookup: {
-              from: 'subject',
-              localField: 'subjectId',
-              foreignField: '_id',
-              as: 'testSubjects',
-              pipeline: [{ $project: { name: 1 } }],
-            },
-          },
-          {
-            $lookup: {
-              from: 'topic',
-              localField: 'topicIds',
-              foreignField: '_id',
-              as: 'testTopics',
-              pipeline: [{ $project: { name: 1 } }],
-            },
-          },
-          {
-            $addFields: {
-              subject_name: { $arrayElemAt: ['$testSubjects.name', 0] },
-              // Sent only when the whole test shares one topic: with several of
-              // them no single name would be true, so none is sent and the row
-              // shows the subject alone.
-              topic_name: {
-                $cond: [
-                  { $eq: [{ $size: { $ifNull: ['$topicIds', []] } }, 1] },
-                  { $arrayElemAt: ['$testTopics.name', 0] },
-                  null,
-                ],
-              },
-            },
-          },
-          {
-            $project: {
-              matchedFlashcards: 0,
-              flashcardIds: 0,
-              pageFlashcardIds: 0,
-              testMeta: 0,
-              subjectId: 0,
-              topicIds: 0,
-              testSubjects: 0,
-              testTopics: 0,
-            },
-          },
+          ...this.subjectAndTopicStages(),
         ],
         totalCount: [{ $count: 'count' }],
       },
@@ -392,7 +334,19 @@ export class TestService {
     };
   }
 
-  findOne(id: string): Promise<TestDocument> {
-    return findByIdOrThrow<TestDocument>(this.testModel, id, ENTITY);
+  async findOne(id: string): Promise<TestDocument> {
+    assertValidObjectId(id);
+
+    const [test] = await this.testModel
+      .aggregate<TestDocument>([
+        { $match: { _id: new Types.ObjectId(id) } },
+        ...this.subjectAndTopicStages(),
+      ])
+      .exec();
+
+    if (!test) {
+      throw new NotFoundException(`${ENTITY} with id ${id} not found`);
+    }
+    return test;
   }
 }

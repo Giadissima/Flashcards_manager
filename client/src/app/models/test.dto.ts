@@ -7,8 +7,8 @@ export interface Test {
   elapsed_time?: number;
   questions: Question[];
 
-  // Resolved by the server through the flashcards of the questions, not stored
-  // on the test. topic_name is only set when every question shares one topic.
+  // Names resolved by the server from the subject and topic stored on the test.
+  // topic_name is only set when every question of the test shares one topic.
   subject_name?: string;
   topic_name?: string | null;
 }

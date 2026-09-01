@@ -65,6 +65,42 @@ export class FlashcardsService {
       .exec();
   }
 
+  /**
+   * The subject the given flashcards belong to, and their topic when they all
+   * share one. A test is built from a single subject, so the subject is taken
+   * from the first card; the topic is only meaningful when the whole set has
+   * the same one, since a test set up by subject spans every topic of it.
+   *
+   * Used when a test is created, to store on it what it is about.
+   */
+  async getSubjectAndTopic(ids: (string | Types.ObjectId)[]): Promise<{
+    subject_id?: Types.ObjectId;
+    topic_id?: Types.ObjectId;
+  }> {
+    if (!ids.length) return {};
+
+    const [result] = await this.flashcardModel
+      .aggregate<{ subject_id?: Types.ObjectId; topic_ids: Types.ObjectId[] }>([
+        { $match: { _id: { $in: ids.map((id) => new Types.ObjectId(id)) } } },
+        {
+          $group: {
+            _id: null,
+            subject_id: { $first: '$subject_id' },
+            // A DISTINCT: what matters is how many different topics come out.
+            topic_ids: { $addToSet: '$topic_id' },
+          },
+        },
+      ])
+      .exec();
+
+    if (!result) return {};
+    return {
+      subject_id: result.subject_id ?? undefined,
+      topic_id:
+        result.topic_ids.length === 1 ? (result.topic_ids[0] ?? undefined) : undefined,
+    };
+  }
+
   count(filter: CountFlashcardsDTO): Promise<number> {
     return this.flashcardModel
       .countDocuments(this.buildObjectIdQuery(filter))

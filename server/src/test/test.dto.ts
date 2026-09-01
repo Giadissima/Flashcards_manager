@@ -25,7 +25,7 @@ export class TestStatsFilterDto {
   @IsOptional()
   @IsMongoId()
   @ApiProperty({
-    description: 'Filter by subject ID (via the flashcards in the test)',
+    description: 'Filter by subject ID (stored on the test when it is created)',
     required: false,
   })
   subject_id?: string;
@@ -33,7 +33,7 @@ export class TestStatsFilterDto {
   @IsOptional()
   @IsMongoId()
   @ApiProperty({
-    description: 'Filter by topic ID (via the flashcards in the test)',
+    description: 'Filter by topic ID, matching only tests whose questions all share it',
     required: false,
   })
   topic_id?: string;
