@@ -13,17 +13,20 @@
     </div>
     <!-- One flex item whatever it holds, so the header layout has a single
          thing to place and the phone rules below have a single target. -->
-    <div class="card-action"><ng-content select="[card-actions]"></ng-content>@if (actionLabel) {
-      @if (actionLink) {
-      <a [routerLink]="actionLink" class="btn btn-primary d-inline-flex align-items-center gap-2">
-        <span class="material-symbols-outlined">{{ actionIcon }}</span>{{ actionLabel }}
+    <div class="card-action">
+      @for (a of actions; track a.label) {
+      @if (a.link) {
+      <a [routerLink]="a.link" class="btn btn-with-icon" [ngClass]="buttonClass(a)">
+        <span class="material-symbols-outlined">{{ a.icon ?? 'add' }}</span>{{ a.label }}
       </a>
       } @else {
-      <button type="button" class="btn btn-primary d-inline-flex align-items-center gap-2" (click)="action.emit()">
-        <span class="material-symbols-outlined">{{ actionIcon }}</span>{{ actionLabel }}
+      <button type="button" class="btn btn-with-icon" [ngClass]="buttonClass(a)" [disabled]="a.disabled"
+        (click)="action.emit(a)">
+        <span class="material-symbols-outlined">{{ a.icon ?? 'add' }}</span>{{ a.label }}
       </button>
       }
-      }</div>
+      }
+    </div>
   </div>
   <div class="card-body" [ngClass]="bodyClass">
     <ng-content></ng-content>

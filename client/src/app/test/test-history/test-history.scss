@@ -1,37 +1,15 @@
+/* Panel, items and labels come from .stats-panel in styles.scss; only the
+   layout of the four numbers is specific to this page. */
 .stats-summary {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: calc(var(--spacing-unit) * 2);
-  /* Same colour as the card it sits in would make it disappear: these are the
-     numbers the page exists for, so the panel is tinted with the theme colour
-     and outlined. */
-  background-color: var(--highlight-background);
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-lg);
-  box-shadow: var(--box-shadow-sm);
-  padding: calc(var(--spacing-unit) * 3);
 }
 
-.stat-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-/* The tinted panel already carries the theme colour: the numbers read better
-   in the heading colour, and the theme colour stays a cue for what is
-   clickable. */
+/* Larger than the shared size: here the numbers are the whole panel, with no
+   score above them to lead it. */
 .stat-value {
   font-size: 28px;
-  font-weight: 700;
-  color: var(--header-color);
-}
-
-.stat-label {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-color);
 }
 
 .test-list {
@@ -108,25 +86,6 @@
    review page uses for a right and a wrong answer. Deliberately not a pass/fail
    colour: this app defines no passing mark, so the bar reports the split and
    judges nothing. The leftover of the track is what has no answer at all. */
-.score-bar {
-  display: flex;
-  width: 100%;
-  max-width: 220px;
-  height: 6px;
-  margin-top: calc(var(--spacing-unit) * 0.5);
-  background-color: var(--inset-background);
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-sm);
-  overflow: hidden;
-}
-
-.score-bar-correct {
-  background-color: var(--success-color);
-}
-
-.score-bar-wrong {
-  background-color: var(--danger-color);
-}
 
 /* Stays at the weight of the rest of the line: it qualifies the score, it is
    not a second score. */
@@ -175,7 +134,9 @@
   font-weight: 600;
   padding: 1px 8px;
   border-radius: var(--border-radius-sm);
-  background-color: transparent;
+  /* The same veil the panels and the bars use, so a run still open is marked
+     with the theme colour the page marks everything else with. */
+  background-color: var(--primary-tint-soft);
   border: 1px solid var(--secondary-color);
   color: var(--header-color);
 }

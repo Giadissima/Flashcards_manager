@@ -1,5 +1,5 @@
 /* The heading can shrink (and wrap) so that a long translated title never
-   pushes the action out of the header. */
+   pushes the actions out of the header. */
 .page-card-heading {
   min-width: 0;
 }
@@ -8,22 +8,25 @@
   overflow-wrap: anywhere;
 }
 
-/* No action projected and none configured: the header must not keep a gap for it. */
+.card-action {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-unit);
+}
+
+/* No action configured: the header must not keep a gap for it. */
 .card-action:empty {
   display: none;
 }
 
 /* The header stacks below the sm breakpoint and stretches its items, which
-   turns a single action into a full-width bar heavier than the page title.
-   Here it stays as wide as its label and sits centred under the heading. */
+   turns the actions into full-width bars heavier than the page title. Here they
+   stay as wide as their labels, one per line, centred under the heading. */
 @media (max-width: 575.98px) {
   .card-action {
+    flex-direction: column;
+    align-items: center;
     align-self: center;
     width: fit-content;
   }
-}
-
-/* Reaches the configured action; a projected one styles its own icon. */
-.card-action .material-symbols-outlined {
-  font-size: 20px;
 }

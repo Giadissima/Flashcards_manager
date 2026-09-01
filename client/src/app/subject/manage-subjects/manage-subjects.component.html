@@ -1,6 +1,6 @@
 <div class="container md" *transloco="let t">
   <app-page-card icon="book_2" [title]="'subject.manage.title' | transloco" [subtitle]="'subject.manage.subtitle' | transloco"
-    [actionLabel]="t('subject.manage.newSubjectButton')" (action)="createSubject()">
+    [actions]="[{ label: t('subject.manage.newSubjectButton') }]" (action)="createSubject()">
     <div class="filter-bar mb-4">
       <div class="row align-items-center">
         <div class="col-md-4">

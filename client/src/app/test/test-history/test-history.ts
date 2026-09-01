@@ -2,6 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FilterBarComponent } from '../../shared/filter-bar/filter-bar.component';
 import { PaginationComponent } from '../../shared/pagination/pagination.component';
+import { ScoreBarComponent } from '../../shared/score-bar/score-bar.component';
+import {
+  SegmentedFilterComponent,
+  SegmentedOption,
+} from '../../shared/segmented-filter/segmented-filter.component';
 import {
   SearchableSelectComponent,
   SelectOption,
@@ -18,6 +23,7 @@ import { toSubjectOptions, toTopicOptions } from '../../shared/select-options.ut
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
 import { TestService } from '../test.service';
+import { getTestScore, getTestSubjectLabel } from '../test-view.util';
 import { ToastService } from '../../toast/toast.service';
 import { Topic } from '../../models/topic.dto';
 import { TopicService } from '../../topic/topic.service';
@@ -34,6 +40,8 @@ import { TopicService } from '../../topic/topic.service';
     PageCardComponent,
     PaginationComponent,
     FilterBarComponent,
+    ScoreBarComponent,
+    SegmentedFilterComponent,
   ],
   templateUrl: './test-history.html',
   styleUrl: './test-history.scss',
@@ -53,6 +61,10 @@ export class TestHistory extends PaginatedList implements OnInit {
   tests: Test[] = [];
   override pageSize = 20;
   stats: TestStats | null = null;
+
+  /* The same stats without the status filter: they are what the three status
+     choices are labelled with, so picking one must not empty the other two. */
+  statusStats: TestStats | null = null;
 
   subjects: Subject[] = [];
   allTopics: Topic[] = [];
@@ -85,15 +97,29 @@ export class TestHistory extends PaginatedList implements OnInit {
     this.loadSubjects();
     this.loadTopics();
   }
-  get statusOptions(): SelectOption[] {
+  /* Three fixed choices, all worth reading at a glance: a strip states them,
+     where a select would hide two of the three behind a click. */
+  get statusOptions(): SegmentedOption[] {
+    const total = this.statusStats?.totalTests;
+    const completed = this.statusStats?.completedTests;
     return [
+      {
+        value: 'all',
+        label: this.transloco.translate('test.history.statusAll'),
+        count: total,
+      },
       {
         value: 'completed',
         label: this.transloco.translate('test.history.statusCompleted'),
+        count: completed,
       },
       {
         value: 'inProgress',
         label: this.transloco.translate('test.history.statusToComplete'),
+        count:
+          total !== undefined && completed !== undefined
+            ? total - completed
+            : undefined,
       },
     ];
   }
@@ -170,9 +196,20 @@ export class TestHistory extends PaginatedList implements OnInit {
   }
 
   loadStats(): void {
-    this.testService
-      .getStats(this.activeFilters)
-      .then((stats) => (this.stats = stats));
+    const filters = this.activeFilters;
+    this.testService.getStats(filters).then((stats) => {
+      this.stats = stats;
+      // With no status picked the two are the same request: the counts on the
+      // strip come from the stats just read instead of asking for them again.
+      if (filters.completed === undefined) this.statusStats = stats;
+    });
+
+    if (filters.completed !== undefined) {
+      const { completed, ...withoutStatus } = filters;
+      this.testService
+        .getStats(withoutStatus)
+        .then((stats) => (this.statusStats = stats));
+    }
   }
 
   loadTests(): void {
@@ -195,27 +232,16 @@ export class TestHistory extends PaginatedList implements OnInit {
   }
 
   getCorrectCount(test: Test): number {
-    return test.questions.filter((q) => q.is_correct === true).length;
+    return getTestScore(test).correct;
   }
 
   getWrongCount(test: Test): number {
-    return test.questions.filter((q) => q.is_correct === false).length;
+    return getTestScore(test).wrong;
   }
 
-  // Shares of the whole test, so the two bars sit inside a track whose leftover
-  // is what has no answer: the unanswered tail of a run still in progress, or
-  // the questions left blank by a test that was ended early.
-  getCorrectPercent(test: Test): number {
-    return this.toPercent(this.getCorrectCount(test), test);
-  }
-
-  getWrongPercent(test: Test): number {
-    return this.toPercent(this.getWrongCount(test), test);
-  }
-
-  private toPercent(count: number, test: Test): number {
-    const total = test.questions.length;
-    return total ? (count / total) * 100 : 0;
+  /** "Subject · Topic", the line the result page puts in its own subtitle. */
+  getSubjectLabel(test: Test): string {
+    return getTestSubjectLabel(test);
   }
 
   openTest(test: Test): void {

@@ -1,6 +1,6 @@
 <div class="container md" *transloco="let t">
   <app-page-card icon="history" [title]="'test.history.title' | transloco" [subtitle]="'test.history.subtitle' | transloco"
-    bodyClass="p-4" [actionLabel]="t('test.history.newTestButton')" actionLink="/setup-test">
+    bodyClass="p-4" [actions]="[{ label: t('test.history.newTestButton'), link: '/setup-test' }]">
     <app-filter-bar [activeCount]="activeFilterCount" appearance="inset"
       [caption]="'common.filters' | transloco">
       <div class="row gy-2 gx-3 align-items-center">
@@ -19,10 +19,9 @@
         </div>
 
         <div class="col-12 col-sm-auto">
-          <label for="statusFilter" class="visually-hidden">{{ 'test.history.statusLabel' | transloco }}</label>
-          <app-searchable-select [options]="statusOptions" [value]="selectedStatus"
-            [allOptionLabel]="t('test.history.statusAll')" [placeholder]="t('test.history.statusAll')"
-            (valueChange)="onStatusChange($event)"></app-searchable-select>
+          <app-segmented-filter [options]="statusOptions" [value]="selectedStatus ?? 'all'"
+            [label]="t('test.history.statusLabel')"
+            (valueChange)="onStatusChange($event)"></app-segmented-filter>
 
         </div>
 
@@ -38,7 +37,7 @@
     </app-filter-bar>
 
     @if (stats && stats.totalTests > 0) {
-    <div class="stats-summary mb-4">
+    <div class="stats-panel stats-summary mb-4">
       <div class="stat-item">
         <span class="stat-value">{{ stats.totalTests }}</span>
         <span class="stat-label">{{ 'test.history.statsTestsDone' | transloco }}</span>
@@ -65,10 +64,8 @@
       @for (test of tests; track test._id) {
       <div class="card test-card">
         <div class="test-card-main">
-          @if (test.subject_name) {
-          <div class="test-subject">
-            {{ test.subject_name }}@if (test.topic_name) { · {{ test.topic_name }}}
-          </div>
+          @if (getSubjectLabel(test); as subjectLabel) {
+          <div class="test-subject">{{ subjectLabel }}</div>
           }
           <div class="test-score">
             {{ getCorrectCount(test) }} / {{ test.questions.length }} {{ 'test.history.correctSuffix' | transloco }}
@@ -76,11 +73,8 @@
             <span class="wrong-count">({{ getWrongCount(test) }} {{ 'test.history.wrongSuffix' | transloco }})</span>
             }
           </div>
-          <!-- Decorative: it draws the proportion the line above already states. -->
-          <div class="score-bar" aria-hidden="true">
-            <span class="score-bar-correct" [style.width.%]="getCorrectPercent(test)"></span>
-            <span class="score-bar-wrong" [style.width.%]="getWrongPercent(test)"></span>
-          </div>
+          <app-score-bar [correct]="getCorrectCount(test)" [wrong]="getWrongCount(test)"
+            [total]="test.questions.length" size="sm"></app-score-bar>
           <div class="test-card-meta">
             <span class="test-date">
               {{ (test.completedAt ?? test.updatedAt ?? test.createdAt) | date:'medium' }}

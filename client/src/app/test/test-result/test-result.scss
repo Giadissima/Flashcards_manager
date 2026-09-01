@@ -3,26 +3,129 @@
   padding-bottom: calc(var(--spacing-unit) * 8);
 }
 
-.header {
+/* Panel and numbers come from .stats-panel in styles.scss; the column and the
+   rule under the score are what this page adds to it. */
+.result-summary {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: calc(var(--spacing-unit) * 4);
+  flex-direction: column;
+  gap: calc(var(--spacing-unit) * 3);
 }
 
-.test-meta {
+/* The caption of the filter bar, sized up: this one is not labelling a row of
+   controls but a 44px number, and it sits right on top of it - the gap is
+   small on purpose, so the two read as one block and not as two rows. */
+.result-caption {
+  margin: 0 0 calc(var(--spacing-unit) * 0.5) 0;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   color: var(--text-color);
-  margin: 0;
+  text-align: center;
 }
 
-.questions-review-header {
-  display: flex;
-  justify-content: space-between;
+.result-score {
+  text-align: center;
+  margin-bottom: calc(var(--spacing-unit) * 1.5);
+}
+
+.score-value {
+  font-size: 44px;
+  font-weight: 700;
+  line-height: 1;
+  /* Not the theme colour: the bar under it is what carries meaning through
+     colour here, and the theme colour stays a cue for what is clickable. */
+  color: var(--header-color);
+}
+
+.score-total {
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.result-stats {
+  border-top: 1px solid var(--border-color);
+  padding-top: calc(var(--spacing-unit) * 3);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: calc(var(--spacing-unit) * 2);
+}
+
+/* The shared value is a bare number; here it leads with the icon of its slice
+   of the bar. */
+.stat-value {
+  display: inline-flex;
   align-items: center;
+  gap: calc(var(--spacing-unit) * 0.75);
+  /* A duration is the one value here that is not a single digit: it wraps
+     inside its column instead of stretching it. */
+  overflow-wrap: anywhere;
+}
+
+/* Ties the count to its slice of the bar above. The glyph is coloured rather
+   than sitting on a filled disc: four discs made the panel read as four
+   separate cards, which is what it stopped being. The duration keeps a neutral
+   icon, since it is not a slice of anything. */
+.stat-icon {
+  font-size: 22px;
+  flex-shrink: 0;
+  /* Cap height rather than the baseline, so a glyph with no descender is not
+     pushed up next to the digits it labels. */
+  align-self: center;
+  color: var(--sub-title-color);
+
+  &--correct { color: var(--success-color); }
+  &--wrong { color: var(--danger-color); }
+  &--blank { color: var(--sub-title-color); }
+}
+
+.questions-review-title {
+  margin: 0 0 calc(var(--spacing-unit) * 2) 0;
+}
+
+.review-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(var(--spacing-unit) * 2);
+}
+
+/* Reads as the covered answer it stands in for - same box, same size - and not
+   as a button of the page. */
+.answer-reveal {
+  width: 100%;
+  justify-content: flex-start;
+  padding: var(--spacing-unit) calc(var(--spacing-unit) * 1.5);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--border-radius-md);
+  background-color: var(--inset-background);
+  color: var(--text-color);
+  font-style: italic;
+
+  &:hover {
+    border-style: solid;
+    color: var(--header-color);
+  }
+}
+
+.question-card {
+  border-left: 5px solid var(--border-color);
   margin-bottom: calc(var(--spacing-unit) * 2);
 
-  h2 {
-    margin: 0;
+  .card-body {
+    padding: calc(var(--spacing-unit) * 2.5);
+  }
+
+  /* Edge only, no tint: the same language the runner uses for an answered
+     card, and a tinted card behind a tinted answer box was two statements of
+     one fact. */
+  &.card--correct {
+    border-left-color: var(--success-color);
+  }
+
+  &.card--incorrect {
+    border-left-color: var(--danger-color);
   }
 }
 
@@ -31,144 +134,29 @@
   margin-bottom: var(--spacing-unit);
 }
 
-.summary-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: calc(var(--spacing-unit) * 3);
+.question-text {
+  font-weight: 600;
+  margin-bottom: calc(var(--spacing-unit) * 2);
+  color: var(--header-color);
 }
 
-.score-card {
-  grid-column: 1 / -1; // Full width
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: calc(var(--spacing-unit) * 4);
-
-  .score {
-    font-size: 48px;
-    font-weight: 700;
-    color: var(--primary-color);
-    line-height: 1;
-
-    span {
-      font-size: 24px;
-      font-weight: 500;
-      color: var(--text-color);
-    }
-  }
-
-  .percentage {
-    font-size: 20px;
+.answer-block {
+  p {
+    margin: 0 0 calc(var(--spacing-unit) * 0.5) 0;
+    font-size: 14px;
     font-weight: 600;
+    color: var(--text-color);
+  }
+
+  .answer {
+    display: block;
+    font-style: italic;
     color: var(--header-color);
-    margin-top: var(--spacing-unit);
-  }
-}
-
-.progress-bar {
-  width: 100%;
-  max-width: 300px;
-  height: 12px;
-  background-color: var(--secondary-color);
-  border-radius: 6px;
-  overflow: hidden;
-  margin-top: calc(var(--spacing-unit) * 2);
-
-  &-inner {
-    height: 100%;
-    background-color: var(--primary-color);
-    border-radius: 6px;
-    transition: width 0.5s ease-in-out;
-  }
-}
-
-.stat-card {
-  display: flex;
-  align-items: center;
-  gap: calc(var(--spacing-unit) * 2);
-  padding: calc(var(--spacing-unit) * 2.5);
-
-  .icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    color: var(--white-color);
-  }
-
-  .details {
-    h4 {
-      margin-bottom: var(--spacing-unit);
-      font-size: 16px;
-      color: var(--text-color);
-    }
-    p {
-      font-size: 20px;
-      font-weight: 600;
-    }
-  }
-
-  &--correct .icon { background-color: var(--success-color); }
-  &--wrong .icon { background-color: var(--danger-color); }
-  &--blank .icon { background-color: var(--text-color); }
-  &--time .icon { background-color: var(--warning-color); }
-}
-
-.questions-review {
-  margin-top: calc(var(--spacing-unit) * 5);
-}
-
-.question-card {
-  border-left: 5px solid;
-  margin-bottom: calc(var(--spacing-unit) * 2.5);
-
-  .card-body {
-    padding: calc(var(--spacing-unit) * 2.5);
-  }
-
-  &.card--correct {
-    border-left-color: var(--success-color);
-    background-color: rgba(18, 183, 106, 0.1);
-  }
-
-  &.card--incorrect {
-    border-left-color: var(--danger-color);
-    background-color: rgba(240, 68, 56, 0.1);
-  }
-
-  .question-text {
-    font-weight: 600;
-    margin-bottom: calc(var(--spacing-unit) * 2);
-    color: var(--header-color);
-  }
-
-  .answer-block {
-    p {
-      margin: 0 0 calc(var(--spacing-unit) * 0.5) 0;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text-color);
-    }
-    .answer {
-      font-style: italic;
-      color: var(--header-color);
-      padding: var(--spacing-unit) calc(var(--spacing-unit) * 1.5);
-      background-color: rgba(255, 255, 255, 0.6);
-      border-radius: var(--border-radius-md);
-      display: block;
-    }
-  }
-
-  .correct-answer {
-    margin-top: var(--spacing-unit);
-    .answer {
-      background-color: rgba(18, 183, 106, 0.15);
-      border: 1px solid var(--success-color);
-    }
+    padding: var(--spacing-unit) calc(var(--spacing-unit) * 1.5);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    /* The label above it already says this is the right answer: painting it
+       green as well made every card look correct, wrong ones included. */
+    background-color: var(--inset-background);
   }
 }

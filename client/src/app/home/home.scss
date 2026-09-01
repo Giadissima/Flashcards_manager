@@ -82,7 +82,7 @@
     &:hover,
     &:focus-visible {
       color: var(--danger-color);
-      background-color: color-mix(in srgb, var(--danger-color) 12%, transparent);
+      background-color: var(--danger-tint);
     }
   }
 }

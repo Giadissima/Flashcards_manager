@@ -1,113 +1,110 @@
 <app-load-state errorMessageKey="test.result.getTestError" notFoundMessageKey="common.error.testNotFound">
-<div class="container mt-4" *transloco="let t">
+<div class="container md" *transloco="let t">
+  <!-- Opened from the history, a result would otherwise say when it was taken
+       but never what it was about, which is the first thing being looked for. -->
+  <!-- A result is read to find out what went wrong, and the next thing wanted
+       is a run on exactly those questions: that is the action of this page, and
+       going home is the one beside it. -->
+  <app-page-card icon="fact_check" [title]="t('test.result.title')" [subtitle]="subtitle" bodyClass="p-4"
+    [actions]="headerActions" (action)="repeatWrong()">
 
-  <!-- Header -->
-  <div class="header">
-    <div>
-      <h1>{{ 'test.result.title' | transloco }}</h1>
-      @if (completedAt || createdAt) {
-      <p class="test-meta">
-        {{ completedAt ? t('test.result.completed') : t('test.result.started') }} {{ t('test.result.onDate') }} {{ (completedAt ?? createdAt) | date:'medium' }}
-      </p>
-      }
-    </div>
-    <a routerLink="/" class="btn btn-primary">
-      <span class="material-symbols-outlined">home</span>
-      {{ 'test.result.backHome' | transloco }}
-    </a>
-  </div>
+    <!-- The score is what the page is opened for, so it leads the body: the
+         ratio, and one bar that splits it into right, wrong and unanswered.
+         The counts below are that bar's legend, which is why they carry an
+         icon in its colour and nothing else does. -->
+    @if (test) {
+    <div class="stats-panel result-summary mb-4">
+      <!-- The panel is a block of bare numbers: without a word on it, what they
+           count has to be worked out from the labels underneath. -->
+      <h2 class="result-caption">{{ t('test.result.scoreCaption') }}</h2>
 
-  <!-- Main Grid Layout -->
-  @if (test) {
-  <div class="summary-grid">
-    
-    <!-- Score Card -->
-    <div class="card score-card">
-      <div class="score">
-        {{ stats.correct }} <span>/ {{ test.questions.length }}</span>
+      <div class="result-score">
+        <div class="score-value">
+          {{ stats.correct }}<span class="score-total"> / {{ test.questions.length }}</span>
+        </div>
       </div>
-      <div class="percentage">
-        {{ (stats.correct / test.questions.length) * 100 | number:'1.0-0' }}% {{ 'test.result.correctPercent' | transloco }}
-      </div>
-      <div class="progress-bar">
-        <div class="progress-bar-inner" [style.width.%]="(stats.correct / test.questions.length) * 100"></div>
-      </div>
-    </div>
 
-    <!-- Stat: Correct Answers -->
-    <div class="card stat-card stat-card--correct">
-      <div class="icon"><span class="material-symbols-outlined">check</span></div>
-      <div class="details">
-        <h4>{{ 'test.result.correct' | transloco }}</h4>
-        <p>{{ stats.correct }}</p>
-      </div>
-    </div>
+      <app-score-bar [correct]="stats.correct" [wrong]="stats.wrong"
+        [total]="test.questions.length"></app-score-bar>
 
-    <!-- Stat: Wrong Answers -->
-    <div class="card stat-card stat-card--wrong">
-      <div class="icon"><span class="material-symbols-outlined">close</span></div>
-      <div class="details">
-        <h4>{{ 'test.result.wrong' | transloco }}</h4>
-        <p>{{ stats.wrong }}</p>
-      </div>
-    </div>
-
-    <!-- Stat: Blank Answers -->
-    <div class="card stat-card stat-card--blank">
-      <div class="icon"><span class="material-symbols-outlined">remove</span></div>
-      <div class="details">
-        <h4>{{ 'test.result.blank' | transloco }}</h4>
-        <p>{{ stats.blank }}</p>
-      </div>
-    </div>
-
-    <!-- Stat: Duration -->
-    <div class="card stat-card stat-card--time">
-      <div class="icon"><span class="material-symbols-outlined">schedule</span></div>
-      <div class="details">
-        <h4>{{ 'test.result.duration' | transloco }}</h4>
-        <p>{{ elapsed_time | durationLong }}</p>
-      </div>
-    </div>
-  </div>
-  }
-
-  <!-- Questions Review -->
-  @if(questions && questions.length){
-    <div class="questions-review" >
-    <div class="questions-review-header">
-      <h2>{{ 'test.result.questionsReview' | transloco }}</h2>
-      @if (stats.wrong > 0) {
-      <button type="button" class="btn btn-outline-primary btn-with-icon" (click)="toggleShowOnlyWrong()">
-        <span class="material-symbols-outlined">filter_alt</span>
-        {{ (showOnlyWrong ? 'test.result.showAll' : 'test.result.showOnlyWrong') | transloco }}
-      </button>
-      }
-    </div>
-
-    @for (q of filteredQuestions; track q.id) {
-    <div class="card question-card"
-        [ngClass]="{
-          'card--correct': q.is_correct === 'true',
-          'card--incorrect': q.is_correct === 'false'
-        }">
-      <div class="card-body">
-        <h5 class="question-title">{{ q.title }}</h5>
-        <div class="question-text" [innerHTML]="q.question | katexRenderer" (zoomableImages)="lightbox.open($event)"></div>
-
-        <div class="answer-block correct-answer">
-          <p>{{ 'test.result.correctAnswerLabel' | transloco }}</p>
-          <div class="answer" [innerHTML]="q.answer | katexRenderer" (zoomableImages)="lightbox.open($event)"></div>
+      <div class="result-stats">
+        <div class="stat-item">
+          <span class="stat-value">
+            <span class="material-symbols-outlined stat-icon stat-icon--correct">check</span>{{ stats.correct }}
+          </span>
+          <span class="stat-label">{{ t('test.result.correct') }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">
+            <span class="material-symbols-outlined stat-icon stat-icon--wrong">close</span>{{ stats.wrong }}
+          </span>
+          <span class="stat-label">{{ t('test.result.wrong') }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">
+            <span class="material-symbols-outlined stat-icon stat-icon--blank">remove</span>{{ stats.blank }}
+          </span>
+          <span class="stat-label">{{ t('test.result.blank') }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">
+            <span class="material-symbols-outlined stat-icon">timer</span>{{ elapsed_time | durationLong }}
+          </span>
+          <span class="stat-label">{{ t('test.result.duration') }}</span>
         </div>
       </div>
     </div>
-    } @empty {
-    <p>{{ 'test.result.noWrongQuestions' | transloco }}</p>
     }
+
+    @if (questions && questions.length) {
+    <div class="questions-review">
+      <h3 class="questions-review-title">{{ t('test.result.questionsReview') }}</h3>
+
+      <!-- The same bar the history page filters with, so both pages are set up
+           the same way and both fold their controls away on a phone. -->
+      <app-filter-bar [activeCount]="activeFilterCount" appearance="inset" [caption]="t('common.filters')">
+        <div class="review-filters">
+          <app-segmented-filter [options]="outcomeOptions" [value]="outcome"
+            [label]="t('test.result.outcomeFilterLabel')"
+            (valueChange)="onOutcomeChange($event)"></app-segmented-filter>
+
+          <div class="form-check mb-0">
+            <input type="checkbox" class="form-check-input" id="hideAnswers" [checked]="hideAnswers"
+              (change)="onHideAnswersChange($any($event.target).checked)">
+            <label class="form-check-label" for="hideAnswers">{{ t('test.result.hideAnswers') }}</label>
+          </div>
+        </div>
+      </app-filter-bar>
+
+      @for (q of filteredQuestions; track q.id) {
+      <div class="card question-card"
+          [ngClass]="{
+            'card--correct': q.is_correct === 'true',
+            'card--incorrect': q.is_correct === 'false'
+          }">
+        <div class="card-body">
+          <h5 class="question-title">{{ q.title }}</h5>
+          <div class="question-text" [innerHTML]="q.question | katexRenderer" (zoomableImages)="lightbox.open($event)"></div>
+
+          <div class="answer-block">
+            <p>{{ t('test.result.correctAnswerLabel') }}</p>
+            @if (isAnswerVisible(q.id)) {
+            <div class="answer" [innerHTML]="q.answer | katexRenderer" (zoomableImages)="lightbox.open($event)"></div>
+            } @else {
+            <button type="button" class="btn answer-reveal btn-with-icon" (click)="revealAnswer(q.id)">
+              <span class="material-symbols-outlined">visibility</span>
+              {{ t('test.result.showAnswer') }}
+            </button>
+            }
+          </div>
+        </div>
+      </div>
+      } @empty {
+      <p>{{ t('test.result.noQuestionsForFilter') }}</p>
+      }
     </div>
-  }
+    }
+  </app-page-card>
 </div>
 </app-load-state>
 <app-image-lightbox #lightbox></app-image-lightbox>
-
-

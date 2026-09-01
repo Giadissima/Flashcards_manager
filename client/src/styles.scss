@@ -14,8 +14,6 @@
   --component-background: #f8f9fa;
   /* Surface of a panel nested inside a card: settings, filters. */
   --inset-background: #F5EFFF;
-  /* Surface of a panel that reports the user's own numbers. */
-  --highlight-background: #EBEAFA;
   --on-primary-color: #000000;
   --on-accent-color: #f8f9fa;
 }
@@ -36,10 +34,9 @@
      next to the colour it has to match. */
   --select-caret-img: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='white' stroke-opacity='0.7' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
   --component-background: #1E1E1E;
-  /* Both are a step *lighter* than the card: in a dark theme depth reads by
-     lightening, and the page background (#121212) is too hard a break. */
+  /* A step *lighter* than the card: in a dark theme depth reads by lightening,
+     and the page background (#121212) is too hard a break. */
   --inset-background: #262626;
-  --highlight-background: #29342A;
   --on-primary-color: #ffffff;
   --on-accent-color: #f8f9fa;
 }
@@ -76,6 +73,25 @@
   --danger-color: #F04438;
   --warning-color: #FF9500;
   --white-color: #ffffff;
+
+  /* Veils: a colour of the palette laid over whatever is behind it, for a
+     surface picked out by the colour without being filled with it - a chosen
+     filter, a row being warned about. Mixed with 'transparent' rather than
+     with a surface colour, so the same token works on a card, on a filter
+     panel and on the page background alike. They are derived here, after the
+     themes above, so each one resolves against the palette in force. */
+  --primary-tint-soft: color-mix(in srgb, var(--primary-color) 12%, transparent);
+  --primary-tint: color-mix(in srgb, var(--primary-color) 22%, transparent);
+  --primary-tint-strong: color-mix(in srgb, var(--primary-color) 32%, transparent);
+  --danger-tint: color-mix(in srgb, var(--danger-color) 12%, transparent);
+
+  /* Surface of a panel that reports the user's own numbers, and the empty part
+     of any bar drawing them. Both were their own colour before - two literals
+     per theme for the panel, the inset surface for the tracks - and both are
+     the softest of the veils above: named here so the summary panels, the
+     progress bar of a run and the score bars cannot drift apart. */
+  --highlight-background: var(--primary-tint-soft);
+  --track-background: var(--primary-tint-soft);
 
   /* Syncing Bootstrap core variables with the design system */
   --bs-primary: var(--primary-color);
@@ -532,8 +548,10 @@ input:-webkit-autofill:active {
   margin-bottom: calc(var(--spacing-unit) * 2);
 }
 
-/* A short row of controls: centring costs nothing to read and keeps the card
-   symmetrical under the heading. Each page still sizes its own buttons. */
+/* Centred by default, which is what the test runner wants: one wide card at a
+   time, at the centre of the screen, with nothing beside it to look crooked
+   against. The home grid overrides it (see .flashcard-grid in home.scss), where
+   the cards are scanned in a column. Each page still sizes its own buttons. */
 .flashcard-actions {
   display: flex;
   flex-wrap: wrap;
@@ -813,6 +831,40 @@ $image-modal-height: calc(100vh - var(--navbar-height) - 32px - 64px);
    instead. */
 .filter-bar .col-auto:has(.form-select) {
   flex: 1 1 auto;
+}
+
+/* A panel reporting the user's own numbers - the stats of the history, the
+   score of a result. The card it sits in is the same colour, so the panel is
+   veiled with the theme colour and outlined; the numbers read in the heading
+   colour, and the theme colour stays a cue for what is clickable. The pages
+   lay the items out themselves (a grid of four, a column with a rule), which
+   is all that differs between them. */
+.stats-panel {
+  background-color: var(--highlight-background);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--box-shadow-sm);
+  padding: calc(var(--spacing-unit) * 3);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: calc(var(--spacing-unit) * 0.5);
+}
+
+.stat-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--header-color);
+}
+
+.stat-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-color);
 }
 
 /* A button that carries an icon next to its label. The layout was repeated as
