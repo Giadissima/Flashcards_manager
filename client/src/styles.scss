@@ -12,6 +12,10 @@
   --sub-title-color: #344054af;
   --text-color: #667085;
   --component-background: #f8f9fa;
+  /* Surface of a panel nested inside a card: settings, filters. */
+  --inset-background: #F5EFFF;
+  /* Surface of a panel that reports the user's own numbers. */
+  --highlight-background: #EBEAFA;
   --on-primary-color: #000000;
   --on-accent-color: #f8f9fa;
 }
@@ -32,6 +36,10 @@
      next to the colour it has to match. */
   --select-caret-img: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='white' stroke-opacity='0.7' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
   --component-background: #1E1E1E;
+  /* Both are a step *lighter* than the card: in a dark theme depth reads by
+     lightening, and the page background (#121212) is too hard a break. */
+  --inset-background: #262626;
+  --highlight-background: #29342A;
   --on-primary-color: #ffffff;
   --on-accent-color: #f8f9fa;
 }

@@ -2,10 +2,14 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: calc(var(--spacing-unit) * 2);
-  background-color: var(--component-background);
+  /* Same colour as the card it sits in would make it disappear: these are the
+     numbers the page exists for, so the panel is tinted with the theme colour
+     and outlined. */
+  background-color: var(--highlight-background);
+  border: 1px solid var(--border-color);
   border-radius: var(--border-radius-lg);
   box-shadow: var(--box-shadow-sm);
-  padding: calc(var(--spacing-unit) * 2.5);
+  padding: calc(var(--spacing-unit) * 3);
 }
 
 .stat-item {
@@ -15,10 +19,13 @@
   text-align: center;
 }
 
+/* The tinted panel already carries the theme colour: the numbers read better
+   in the heading colour, and the theme colour stays a cue for what is
+   clickable. */
 .stat-value {
   font-size: 28px;
   font-weight: 700;
-  color: var(--primary-color);
+  color: var(--header-color);
 }
 
 .stat-label {
