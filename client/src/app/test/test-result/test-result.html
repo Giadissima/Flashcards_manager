@@ -56,7 +56,7 @@
     </div>
     }
 
-    @if (questions && questions.length) {
+    @if (test && test.questions.length) {
     <div class="questions-review">
       <h3 class="questions-review-title">{{ t('test.result.questionsReview') }}</h3>
 
@@ -76,7 +76,7 @@
         </div>
       </app-filter-bar>
 
-      @for (q of filteredQuestions; track q.id) {
+      @for (q of pageQuestions; track q.id) {
       <div class="card question-card"
           [ngClass]="{
             'card--correct': q.is_correct === 'true',
@@ -102,6 +102,9 @@
       } @empty {
       <p>{{ t('test.result.noQuestionsForFilter') }}</p>
       }
+
+      <app-pagination [currentPage]="currentPage" [totalPages]="totalPages" [disabled]="loadingPage"
+        (previous)="previousPage()" (next)="nextPage()"></app-pagination>
     </div>
     }
   </app-page-card>

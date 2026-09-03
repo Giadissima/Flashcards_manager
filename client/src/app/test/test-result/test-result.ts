@@ -19,19 +19,31 @@ import {
 } from '../../shared/segmented-filter/segmented-filter.component';
 import { ToastService } from '../../toast/toast.service';
 import { ZoomableImagesDirective } from '../../shared/zoomable-images.directive';
-import { Test } from '../../models/test.dto';
+import { PaginatedList } from '../../shared/paginated-list';
+import { PaginationComponent } from '../../shared/pagination/pagination.component';
+import { Question, Test } from '../../models/test.dto';
 import { getTestScore, getTestSubjectLabel } from '../test-view.util';
 import { TestService } from '../test.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 
+/** A question of the test as the review shows it, with its flashcard resolved. */
+interface ReviewQuestion {
+  id: string;
+  title: string;
+  /** 'true' | 'false' | 'blank': the outcome, as the template compares it. */
+  is_correct: string;
+  question: string;
+  answer: string;
+}
+
 @Component({
   selector: 'app-test-result',
   standalone: true,
-  imports: [CommonModule, DurationLongPipe, NgClass, KatexRendererPipe, TranslocoModule, LoadStateComponent, PageCardComponent, FilterBarComponent, ScoreBarComponent, SegmentedFilterComponent, ImageLightboxComponent, ZoomableImagesDirective],
+  imports: [CommonModule, DurationLongPipe, NgClass, KatexRendererPipe, TranslocoModule, LoadStateComponent, PageCardComponent, FilterBarComponent, ScoreBarComponent, SegmentedFilterComponent, PaginationComponent, ImageLightboxComponent, ZoomableImagesDirective],
   templateUrl: './test-result.html',
   styleUrl: './test-result.scss'
 })
-export class TestResult {
+export class TestResult extends PaginatedList {
   @ViewChild(LoadStateComponent, { static: true }) loadState!: LoadStateComponent;
 
   testId!: string;
@@ -49,16 +61,17 @@ export class TestResult {
 
   /** Held while the repeat test is being created, so it cannot be asked twice. */
   repeating = false;
-  questions: {
-        id: string,
-        title: string,
-        is_correct: string,
-        question: string,
-        answer: string,
-        // False when the flashcard behind the question no longer exists: such a
-        // question can be read, but there is nothing left to test on.
-        available: boolean
-      }[] = [];
+
+  // A test can hold hundreds of questions, and every one of them costs a
+  // request for its flashcard. The review is paged like the run itself is: the
+  // test carries the outcome of every question, so the filter and its counts
+  // are answered without leaving the page, and only the cards of the page being
+  // read are fetched.
+  override pageSize = 10;
+  pageQuestions: ReviewQuestion[] = [];
+
+  /** Holds the pagination while the page it asked for is being fetched. */
+  loadingPage = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -68,7 +81,9 @@ export class TestResult {
     private toastService: ToastService,
     private router: Router,
     @Inject(LOCALE_ID) private locale: string
-  ){}
+  ){
+    super();
+  }
 
   ngOnInit(): void {
       this.route.paramMap.subscribe(params => {
@@ -92,36 +107,55 @@ export class TestResult {
     this.completedAt = this.test.completedAt;
     this.createdAt = this.test.createdAt;
 
-    // load questions' array
-    await this.loadQuestions();
+    await this.loadPage();
   }
 
-  async loadQuestions() {
-  if (!this.test || !this.test.questions) return;
+  /**
+   * The questions the filter leaves, in the order the test asked them. Only
+   * their ids and outcome: the flashcards behind them are read one page at a
+   * time, in loadPage.
+   */
+  private get selectedQuestions(): Question[] {
+    const questions = this.test?.questions ?? [];
+    if (this.outcome === 'wrong') return questions.filter((q) => q.is_correct === false);
+    if (this.outcome === 'blank') return questions.filter((q) => q.is_correct === undefined);
+    return questions;
+  }
 
-  this.questions = await Promise.all(
-    this.test.questions.map(async (q) => {
-      // A flashcard can be deleted while tests still reference it: the review
-      // shows "not available" for that question rather than failing as a whole.
-      const flashcard = await this.flashcardService
-        .getById(q.flashcard_id)
-        .catch(() => null);
-      let res;
-      if(q.is_correct === true) res = 'true';
-      else if(q.is_correct === false) res = 'false';
-      else res = 'blank';
-      return {
-        available: flashcard !== null,
-        id: flashcard?._id ?? q.flashcard_id,
-        title: flashcard?.title ?? this.transloco.translate('test.result.titleNotAvailable'),
-        is_correct: res,
-        question: flashcard?.question ?? this.transloco.translate('test.result.questionNotAvailable'),
-        answer: flashcard?.answer ?? this.transloco.translate('test.result.answerNotAvailable')
+  async loadPage(): Promise<void> {
+    if (!this.test) return;
 
-      };
-    })
-  );
-}
+    const selected = this.selectedQuestions;
+    this.totalCount = selected.length;
+    const pageQuestions = selected.slice(this.pageSkip, this.pageSkip + this.pageSize);
+
+    this.loadingPage = true;
+    try {
+      this.pageQuestions = await Promise.all(
+        pageQuestions.map(async (q) => {
+          // A flashcard can be deleted while tests still reference it: the
+          // review shows "not available" for that question rather than failing
+          // as a whole.
+          const flashcard = await this.flashcardService
+            .getById(q.flashcard_id)
+            .catch(() => null);
+          return {
+            id: flashcard?._id ?? q.flashcard_id,
+            title: flashcard?.title ?? this.transloco.translate('test.result.titleNotAvailable'),
+            is_correct: q.is_correct === true ? 'true' : q.is_correct === false ? 'false' : 'blank',
+            question: flashcard?.question ?? this.transloco.translate('test.result.questionNotAvailable'),
+            answer: flashcard?.answer ?? this.transloco.translate('test.result.answerNotAvailable'),
+          };
+        })
+      );
+    } finally {
+      this.loadingPage = false;
+    }
+  }
+
+  protected override onPageChange(): void {
+    this.loadPage();
+  }
 
   /**
    * What the test was about and when it was taken: the subject and the topic,
@@ -146,16 +180,10 @@ export class TestResult {
     return parts.join(' — ');
   }
 
-  get filteredQuestions() {
-    if (this.outcome === 'wrong') return this.questions.filter((q) => q.is_correct === 'false');
-    if (this.outcome === 'blank') return this.questions.filter((q) => q.is_correct === 'blank');
-    return this.questions;
-  }
-
   /** The counts are the point of the strip: they say what filtering would leave. */
   get outcomeOptions(): SegmentedOption[] {
     return [
-      { value: 'all', label: this.transloco.translate('test.result.outcomeAll'), count: this.questions.length },
+      { value: 'all', label: this.transloco.translate('test.result.outcomeAll'), count: this.test?.questions.length ?? 0 },
       { value: 'wrong', label: this.transloco.translate('test.result.outcomeWrong'), count: this.stats.wrong },
       { value: 'blank', label: this.transloco.translate('test.result.outcomeBlank'), count: this.stats.blank },
     ];
@@ -168,6 +196,10 @@ export class TestResult {
 
   onOutcomeChange(value: string): void {
     this.outcome = value as 'all' | 'wrong' | 'blank';
+    // The pages of one outcome are not the pages of another: what was page 3 of
+    // every question is past the end of the four wrong ones.
+    this.currentPage = 1;
+    this.loadPage();
   }
 
   onHideAnswersChange(hide: boolean): void {
@@ -207,11 +239,16 @@ export class TestResult {
     return actions;
   }
 
-  /** The wrong questions still backed by a flashcard: what a repeat can be built on. */
+  /**
+   * The flashcards a repeat would be built on. Read from the test rather than
+   * from the page on screen, so the button offers every wrong question and not
+   * only the ones currently listed. A flashcard deleted since is left out of
+   * the run by the runner, the way it already is for any other test.
+   */
   get wrongFlashcardIds(): string[] {
-    return this.questions
-      .filter((q) => q.is_correct === 'false' && q.available)
-      .map((q) => q.id);
+    return (this.test?.questions ?? [])
+      .filter((q) => q.is_correct === false)
+      .map((q) => q.flashcard_id);
   }
 
   /**
