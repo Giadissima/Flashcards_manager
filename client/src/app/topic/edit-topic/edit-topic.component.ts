@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 import { NgxColorsComponent, NgxColorsTriggerDirective } from 'ngx-colors';
 import { PageCardComponent } from '../../shared/page-card/page-card.component';
 import { TopicService } from './../topic.service';
-import { ToastService } from '../../toast/toast.service';
+import { ToastService } from '../../shared/toast/toast.service';
 import { SubjectService } from '../../subject/subject.service';
 import { Subject } from '../../models/subject.dto';
 

@@ -16,7 +16,7 @@ import { PaginatedList } from '../../shared/paginated-list';
 import { ZoomableImagesDirective } from '../../shared/zoomable-images.directive';
 import * as cardView from '../../shared/flashcard-view.util';
 import { TestService } from '../test.service';
-import { ToastService } from '../../toast/toast.service';
+import { ToastService } from '../../shared/toast/toast.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 
 @Component({

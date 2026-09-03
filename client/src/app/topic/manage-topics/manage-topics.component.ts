@@ -11,7 +11,7 @@ import { SearchInputComponent } from '../../shared/search-input/search-input.com
 import { SearchableSelectComponent, SelectOption } from '../../shared/searchable-select/searchable-select.component';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
-import { ToastService } from '../../toast/toast.service';
+import { ToastService } from '../../shared/toast/toast.service';
 import { Topic } from '../../models/topic.dto';
 import { TopicService } from '../topic.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';

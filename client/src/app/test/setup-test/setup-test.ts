@@ -11,7 +11,7 @@ import { SearchableSelectComponent, SelectOption } from '../../shared/searchable
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
 import { TestService } from '../test.service';
-import { ToastService } from '../../toast/toast.service';
+import { ToastService } from '../../shared/toast/toast.service';
 import { Topic } from '../../models/topic.dto';
 import { TopicService } from '../../topic/topic.service';
 import { toSubjectOptions, toTopicOptions } from '../../shared/select-options.util';

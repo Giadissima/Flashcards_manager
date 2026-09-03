@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { Editor } from '@tiptap/core';
 import { FileService } from '../file/file.service';
 import { TiptapEditorDirective } from 'ngx-tiptap';
-import { ToastService } from '../../toast/toast.service';
+import { ToastService } from '../toast/toast.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { getFileUrl } from '../file/file-url.util';
 

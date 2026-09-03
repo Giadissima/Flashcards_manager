@@ -3,7 +3,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { ImportExportService } from './import-export.service';
 import { Subject } from '../models/subject.dto';
 import { SubjectService } from '../subject/subject.service';
-import { ToastService } from '../toast/toast.service';
+import { ToastService } from '../shared/toast/toast.service';
 import { SearchableSelectComponent, SelectOption } from '../shared/searchable-select/searchable-select.component';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { ModalComponent } from '../shared/modal/modal.component';

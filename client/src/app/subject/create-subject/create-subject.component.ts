@@ -11,7 +11,7 @@ import { Router } from '@angular/router';
 import { SubjectService } from '../subject.service';
 import { defaultSubjectIconColor } from '../subject-icon.util';
 import { SubjectIconPreviewComponent } from '../subject-icon-preview/subject-icon-preview.component';
-import { ToastService } from '../../toast/toast.service';
+import { ToastService } from '../../shared/toast/toast.service';
 import { RichTextEditorComponent } from '../../shared/rich-text-editor/rich-text-editor.component';
 
 @Component({

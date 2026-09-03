@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { NavbarComponent } from './navbar/navbar.component';
 import { RouterOutlet } from '@angular/router';
-import { Toast } from './toast/toast';
+import { Toast } from './shared/toast/toast';
 
 @Component({
   selector: 'app-root',

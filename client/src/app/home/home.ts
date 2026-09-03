@@ -16,7 +16,7 @@ import { toSubjectOptions, toTopicOptions } from '../shared/select-options.util'
 import * as cardView from '../shared/flashcard-view.util';
 import { Subject } from '../models/subject.dto';
 import { SubjectService } from '../subject/subject.service';
-import { ToastService } from '../toast/toast.service';
+import { ToastService } from '../shared/toast/toast.service';
 import { Topic } from '../models/topic.dto';
 import { TopicService } from '../topic/topic.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';

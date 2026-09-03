@@ -24,7 +24,7 @@ import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
 import { TestService } from '../test.service';
 import { getTestScore, getTestSubjectLabel } from '../test-view.util';
-import { ToastService } from '../../toast/toast.service';
+import { ToastService } from '../../shared/toast/toast.service';
 import { Topic } from '../../models/topic.dto';
 import { TopicService } from '../../topic/topic.service';
 

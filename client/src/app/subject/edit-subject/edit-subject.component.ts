@@ -10,7 +10,7 @@ import { PageCardComponent } from '../../shared/page-card/page-card.component';
 import { RichTextEditorComponent } from '../../shared/rich-text-editor/rich-text-editor.component';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../subject.service';
-import { ToastService } from '../../toast/toast.service';
+import { ToastService } from '../../shared/toast/toast.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { charMinLength, nameMaxLength, descMaxLength } from '../../../config/config';
 import { buildDefaultSubjectIconSvgMarkup, defaultSubjectIconColor, getSubjectIconUrl } from '../subject-icon.util';

@@ -17,7 +17,7 @@ import {
   SegmentedFilterComponent,
   SegmentedOption,
 } from '../../shared/segmented-filter/segmented-filter.component';
-import { ToastService } from '../../toast/toast.service';
+import { ToastService } from '../../shared/toast/toast.service';
 import { ZoomableImagesDirective } from '../../shared/zoomable-images.directive';
 import { PaginatedList } from '../../shared/paginated-list';
 import { PaginationComponent } from '../../shared/pagination/pagination.component';

@@ -13,7 +13,7 @@ import { TopicService } from '../topic.service';
 import { Router } from '@angular/router';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
-import { ToastService } from '../../toast/toast.service';
+import { ToastService } from '../../shared/toast/toast.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import {
   SearchableSelectComponent,
