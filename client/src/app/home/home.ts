@@ -76,6 +76,9 @@ export class Home extends PaginatedList implements OnInit, OnDestroy {
   // true while a filter/sort/page change is reloading data; disables the filter
   // controls so a slow response can't be overtaken by a second, out-of-order one.
   isReloading = false;
+  // Set when the reload under way was caused by paging, so it can end at the top
+  // of the new page. See reloadOnFilterChange.
+  private scrollToTopAfterReload = false;
 
   get subjectOptions(): SelectOption[] {
     return toSubjectOptions(this.subjects);
@@ -153,6 +156,17 @@ export class Home extends PaginatedList implements OnInit, OnDestroy {
       this.reloadFlashcards(),
     ]);
     this.isReloading = false;
+
+    // After the new cards are in, not when the button was clicked: paging
+    // reloads the grid in place, so jumping first would scroll over the cards
+    // of the previous page. Instantly, with no smooth scrolling: the pages
+    // replace one another rather than being travelled through, so the animation
+    // would only be time spent before the page can be read - and large-area
+    // motion is exactly what people who ask for reduced motion cannot take.
+    if (this.scrollToTopAfterReload) {
+      this.scrollToTopAfterReload = false;
+      window.scrollTo(0, 0);
+    }
   }
 
   private updateQueryParams(): void {
@@ -185,8 +199,12 @@ export class Home extends PaginatedList implements OnInit, OnDestroy {
     this.totalCount = data.count;
   }
 
-  // Paging goes through the URL: the queryParamMap subscription reloads.
+  // Paging goes through the URL: the queryParamMap subscription reloads. On a
+  // narrow screen the grid is one card per column and a page is long, so the
+  // next page would otherwise open wherever the previous one ended - metres
+  // below its first card.
   protected override onPageChange(): void {
+    this.scrollToTopAfterReload = true;
     this.updateQueryParams();
   }
 
