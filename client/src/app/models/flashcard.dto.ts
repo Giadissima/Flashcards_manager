@@ -12,3 +12,8 @@ export interface Flashcard {
   subject_id?: string | Subject; // populated by the server, a plain id on the way back
 }
 
+/** One of the flashcards drawn for a new test, with the topic it is on. */
+export interface RandomFlashcard {
+  _id: string;
+  topic_id: string;
+}

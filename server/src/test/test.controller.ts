@@ -102,6 +102,15 @@ export class TestController {
     );
   }
 
+  @ApiOperation({
+    description:
+      'get the topics the questions of a test are on, with the flashcards of each',
+  })
+  @Get(':id/topics')
+  getTopics(@Param('id') id: string) {
+    return this.testService.getTopics(id);
+  }
+
   @Patch(':id/time')
   updateelapsed_time(@Param('id') id: string, @Query('time') time: number) {
     return this.testService.updateelapsed_time(id, time);

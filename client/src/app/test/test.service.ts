@@ -3,7 +3,7 @@ import { PaginatedResponse, TestFilter } from '../models/http.dto';
 
 import { Injectable } from '@angular/core';
 import { RestClientService } from '../api/rest-api.service';
-import { Question, Test, TestStats } from '../models/test.dto';
+import { Question, Test, TestStats, TestTopic } from '../models/test.dto';
 
 @Injectable({
   providedIn: 'root'
@@ -34,6 +34,11 @@ private baseUrl = 'test';
   // One page of questions of the test (skip/limit)
   getQuestionsPage(testId: string, skip: number, limit: number): Promise<Question[]> {
     return this.restClient.get(`${this.baseUrl}/${testId}/questions`, { skip, limit });
+  }
+
+  // The topics the questions of the test are on, each with its flashcards
+  getTopics(testId: string): Promise<TestTopic[]> {
+    return this.restClient.get<TestTopic[]>(`${this.baseUrl}/${testId}/topics`);
   }
 
   // Marks the test as completed without reading back and rewriting the whole document

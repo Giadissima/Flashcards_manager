@@ -1,3 +1,4 @@
+import { Types } from 'mongoose';
 import { IsArray, IsBoolean, IsMongoId, IsOptional, IsString, ValidateNested } from "class-validator";
 
 import { ApiProperty, IntersectionType } from "@nestjs/swagger";
@@ -10,6 +11,10 @@ export class QuestionDto {
 
   @IsOptional()
   is_correct?: boolean;
+
+  @IsOptional()
+  @IsMongoId()
+  topic_id?: string;
 }
 
 export class TestCreateRequest {
@@ -67,4 +72,11 @@ export interface TestStats {
   completedTests: number;
   totalTimeSpentSeconds: number;
   averageScorePercent: number;
+}
+
+/** One of the topics the questions of a test are on. */
+export interface TestTopic {
+  _id: Types.ObjectId;
+  name: string;
+  color?: string;
 }

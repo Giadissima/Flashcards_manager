@@ -16,6 +16,19 @@ export interface Test {
 export type Question = {
   flashcard_id: string;
   is_correct?: boolean;
+  // The topic of the flashcard, stored on the question when the test is
+  // created: it is what the review filters by, without reading the cards.
+  topic_id?: string;
+}
+
+/**
+ * One of the topics the questions of a test are on: what the review of a test
+ * spanning several topics filters by.
+ */
+export interface TestTopic {
+  _id: string;
+  name: string;
+  color?: string;
 }
 
 export interface TestStats {

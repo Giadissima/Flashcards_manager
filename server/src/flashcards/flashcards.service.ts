@@ -1,6 +1,7 @@
 import {
   CountFlashcardsDTO,
   ModifyFlashcardDto,
+  RandomFlashcard,
   RandomFlashcardsDTO,
 } from './flashcards.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -55,29 +56,39 @@ export class FlashcardsService {
     );
   }
 
-  getRandom(filter: RandomFlashcardsDTO): Promise<{ _id: string }[]> {
+  /**
+   * The flashcards a new test is built from, with the topic of each: the test
+   * keeps every topic it touches, and taking them from the cards that were
+   * drawn saves reading those same cards again to find out.
+   */
+  getRandom(filter: RandomFlashcardsDTO): Promise<RandomFlashcard[]> {
     return this.flashcardModel
-      .aggregate<{ _id: string }>([
+      .aggregate<RandomFlashcard>([
         { $match: this.buildObjectIdQuery(filter) },
         { $sample: { size: filter.numFlashcard || defaultRandomSampleSize } },
-        { $project: { _id: { $toString: '$_id' } } },
+        {
+          $project: {
+            _id: { $toString: '$_id' },
+            topic_id: { $toString: '$topic_id' },
+          },
+        },
       ])
       .exec();
   }
 
   /**
-   * The subject the given flashcards belong to, and their topic when they all
-   * share one. A test is built from a single subject, so the subject is taken
-   * from the first card; the topic is only meaningful when the whole set has
-   * the same one, since a test set up by subject spans every topic of it.
+   * The subject the given flashcards belong to, and every topic they are on. A
+   * test is built from a single subject, so the subject is taken from the first
+   * card; the topics are all of them, in no particular order, since a set built
+   * from a whole subject spans as many as it has.
    *
    * Used when a test is created, to store on it what it is about.
    */
   async getSubjectAndTopic(ids: (string | Types.ObjectId)[]): Promise<{
     subject_id?: Types.ObjectId;
-    topic_id?: Types.ObjectId;
+    topic_id: Types.ObjectId[];
   }> {
-    if (!ids.length) return {};
+    if (!ids.length) return { topic_id: [] };
 
     const [result] = await this.flashcardModel
       .aggregate<{ subject_id?: Types.ObjectId; topic_ids: Types.ObjectId[] }>([
@@ -93,11 +104,12 @@ export class FlashcardsService {
       ])
       .exec();
 
-    if (!result) return {};
+    if (!result) return { topic_id: [] };
     return {
       subject_id: result.subject_id ?? undefined,
-      topic_id:
-        result.topic_ids.length === 1 ? (result.topic_ids[0] ?? undefined) : undefined,
+      // A card with no topic contributes a null to the set: it is not a topic
+      // the test is on, and it cannot be offered as one either.
+      topic_id: result.topic_ids.filter((id): id is Types.ObjectId => !!id),
     };
   }
 

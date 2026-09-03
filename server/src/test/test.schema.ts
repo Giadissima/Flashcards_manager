@@ -10,6 +10,12 @@ export class Question {
 
   @Prop({ required: false, default: undefined })
   is_correct?: boolean;
+
+  // The topic of the flashcard, kept on the question itself: the review of a
+  // test filters by topic, and reading it back from hundreds of cards - some of
+  // which may be deleted by then - is a join the question can carry instead.
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Topic', required: false })
+  topic_id?: Types.ObjectId;
 }
 
 // Built from the class, and not the class itself: passing the class to @Prop
@@ -45,10 +51,17 @@ export class Test {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Subject', required: false })
   subject_id?: Types.ObjectId;
 
-  // Only set when every question of the test shares one topic: a test set up by
-  // subject spans several, and no single one of them would be true.
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Topic', required: false })
-  topic_id?: Types.ObjectId;
+  // Every topic the questions of the test are on, so a test set up by subject
+  // states all of them instead of none. A test on a single topic holds an array
+  // of one, which is what a filter by topic matches either way: Mongo compares
+  // a value against each element of an array.
+  @Prop({
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: 'Topic',
+    required: false,
+    default: undefined,
+  })
+  topic_id?: Types.ObjectId[];
 }
 
 export const TestSchema = SchemaFactory.createForClass(Test);

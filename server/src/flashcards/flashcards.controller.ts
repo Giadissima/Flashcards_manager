@@ -17,6 +17,7 @@ import { BasePaginatedResult, ListFilterRequest } from 'src/common.dto';
 import {
   CountFlashcardsDTO,
   ModifyFlashcardDto,
+  RandomFlashcard,
   RandomFlashcardsDTO,
 } from './flashcards.dto';
 import { FlashcardDocument } from './flashcards.schema';
@@ -43,7 +44,7 @@ export class FlashcardsController {
     description: 'get random flashcards from db to create a new test',
   })
   @Get('random')
-  getRandom(@Query() filters: RandomFlashcardsDTO): Promise<{ _id: string }[]> {
+  getRandom(@Query() filters: RandomFlashcardsDTO): Promise<RandomFlashcard[]> {
     return this.flashcardsService.getRandom(filters);
   }
 

@@ -12,7 +12,7 @@ export interface TestScore {
  * left blank. Shared by the history rows and the result page, which state the
  * same three numbers and must not count them differently.
  */
-export function getTestScore(test: Test): TestScore {
+export function getTestScore(test: Pick<Test, 'questions'>): TestScore {
   return test.questions.reduce<TestScore>(
     (score, question) => {
       if (question.is_correct === true) score.correct++;

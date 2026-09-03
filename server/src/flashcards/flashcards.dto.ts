@@ -83,3 +83,9 @@ export class RandomFlashcardsDTO extends CountFlashcardsDTO {
   })
   numFlashcard?: number = 10;
 }
+
+/** One of the flashcards drawn for a new test, with the topic it is on. */
+export interface RandomFlashcard {
+  _id: string;
+  topic_id: string;
+}

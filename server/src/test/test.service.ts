@@ -14,6 +14,7 @@ import {
   TestFilterDto,
   TestStats,
   TestStatsFilterDto,
+  TestTopic,
 } from './test.dto';
 import { FlashcardsService } from 'src/flashcards/flashcards.service';
 
@@ -29,10 +30,22 @@ export class TestService implements OnModuleInit {
    * of every filter by subject. They are filled in once, from the flashcards of
    * their questions - the way those two values used to be resolved on read.
    * Once done, the check below is a single indexed query at startup.
+   *
+   * A test spanning several topics is in the same position: the old shape held
+   * one topic or none, so it was written without the field, and it would stay
+   * out of every filter by topic now that all of them are kept.
    */
   async onModuleInit(): Promise<void> {
     const pending = await this.testModel
-      .find({ subject_id: { $exists: false } }, { questions: 1 })
+      .find(
+        {
+          $or: [
+            { subject_id: { $exists: false } },
+            { topic_id: { $exists: false } },
+          ],
+        },
+        { questions: 1 },
+      )
       .exec();
     if (!pending.length) return;
 
@@ -42,11 +55,12 @@ export class TestService implements OnModuleInit {
           test.questions.map((q) => q.flashcard_id),
         );
       // A test whose flashcards were all deleted resolves to nothing: it is
-      // still marked, with null, so it is not looked at again at every startup.
+      // still marked, with null and an empty list, so it is not looked at again
+      // at every startup.
       await this.testModel
         .updateOne(
           { _id: test._id },
-          { $set: { subject_id: subject_id ?? null, topic_id: topic_id ?? null } },
+          { $set: { subject_id: subject_id ?? null, topic_id } },
         )
         .exec();
     }
@@ -122,6 +136,40 @@ export class TestService implements OnModuleInit {
     return result.questions;
   }
 
+  /**
+   * The topics the questions of a test are on, named. Read from the questions
+   * themselves, which carry their topic, so the flashcards are not touched: the
+   * review filters by topic and the cards behind the questions are only fetched
+   * one page at a time.
+   *
+   * A topic that has been deleted since drops out rather than being listed
+   * without a name: what comes back is a list of choices, and a choice with no
+   * label cannot be offered.
+   */
+  async getTopics(id: string): Promise<TestTopic[]> {
+    assertValidObjectId(id);
+
+    if (!(await this.testModel.exists({ _id: new Types.ObjectId(id) })))
+      throw new NotFoundException('test not found');
+
+    return this.testModel.aggregate<TestTopic>([
+      { $match: { _id: new Types.ObjectId(id) } },
+      { $unwind: '$questions' },
+      { $group: { _id: '$questions.topic_id' } },
+      {
+        $lookup: {
+          from: 'topic',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'topic',
+        },
+      },
+      { $unwind: '$topic' },
+      { $project: { _id: 1, name: '$topic.name', color: '$topic.color' } },
+      { $sort: { name: 1 } },
+    ]);
+  }
+
   // Marks the test as completed without having the client read back and
   // rewrite the whole document, the 'questions' array included
   completeTest(id: string, elapsed_time: number) {
@@ -189,8 +237,10 @@ export class TestService implements OnModuleInit {
     }
 
     // Both are stored on the test itself, so no join is needed to filter by
-    // them. topic_id is only set on tests whose questions share one topic,
-    // which is exactly the set a filter by topic should return.
+    // them. topic_id holds every topic of the test, and Mongo compares a value
+    // against each element of an array: a filter by topic returns every test
+    // that touches it, a single-topic one and a test built from the whole
+    // subject alike.
     if (filter.subject_id) {
       pipeline.push({
         $match: { subject_id: new Types.ObjectId(filter.subject_id) },
@@ -239,9 +289,18 @@ export class TestService implements OnModuleInit {
       {
         $addFields: {
           subject_name: { $arrayElemAt: ['$testSubjects.name', 0] },
-          // Null rather than missing, so a test spanning several topics is
-          // told apart from one whose topic was deleted only by the name.
-          topic_name: { $ifNull: [{ $arrayElemAt: ['$testTopics.name', 0] }, null] },
+          // The name of the one topic, when there is one: a test spanning
+          // several has no single name that would be true of it, and states
+          // none rather than the first of them. Counted on the ids of the test
+          // and not on the topics found, so a deleted topic leaves the test
+          // without a name instead of promoting the survivor.
+          topic_name: {
+            $cond: [
+              { $eq: [{ $size: { $ifNull: ['$topic_id', []] } }, 1] },
+              { $ifNull: [{ $arrayElemAt: ['$testTopics.name', 0] }, null] },
+              null,
+            ],
+          },
         },
       },
       { $project: { testSubjects: 0, testTopics: 0 } },

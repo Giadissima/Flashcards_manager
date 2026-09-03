@@ -149,9 +149,10 @@ export class SetupTest implements OnInit {
 
   async createTest(query: RandomCardFIlter): Promise<void> {
     try {
-      let flashcard: {_id:string}[] = await this.flashcardService.getRandom(query);
-      const questions: Question[] = flashcard.map(fc => ({
+      const flashcards = await this.flashcardService.getRandom(query);
+      const questions: Question[] = flashcards.map(fc => ({
         flashcard_id: fc._id,
+        topic_id: fc.topic_id,
       }));
       const test = await this.testService.create({questions});
       this.router.navigate(['/test', test!._id]);

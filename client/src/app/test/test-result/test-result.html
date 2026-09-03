@@ -64,6 +64,14 @@
            the same way and both fold their controls away on a phone. -->
       <app-filter-bar [activeCount]="activeFilterCount" appearance="inset" [caption]="t('common.filters')">
         <div class="review-filters">
+          <!-- Only on a test that spans more than one topic: on any other, the
+               single choice it would offer is already in the subtitle. -->
+          @if (showTopicFilter) {
+          <app-searchable-select [options]="topicOptions" [value]="selectedTopicId"
+            [allOptionLabel]="t('common.allTopics')" [placeholder]="t('common.allTopics')"
+            (valueChange)="onTopicSelected($event)"></app-searchable-select>
+          }
+
           <app-segmented-filter [options]="outcomeOptions" [value]="outcome"
             [label]="t('test.result.outcomeFilterLabel')"
             (valueChange)="onOutcomeChange($event)"></app-segmented-filter>

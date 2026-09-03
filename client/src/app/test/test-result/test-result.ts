@@ -21,7 +21,11 @@ import { ToastService } from '../../shared/toast/toast.service';
 import { ZoomableImagesDirective } from '../../shared/zoomable-images.directive';
 import { PaginatedList } from '../../shared/paginated-list';
 import { PaginationComponent } from '../../shared/pagination/pagination.component';
-import { Question, Test } from '../../models/test.dto';
+import {
+  SearchableSelectComponent,
+  SelectOption,
+} from '../../shared/searchable-select/searchable-select.component';
+import { Question, Test, TestTopic } from '../../models/test.dto';
 import { getTestScore, getTestSubjectLabel } from '../test-view.util';
 import { TestService } from '../test.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
@@ -39,7 +43,7 @@ interface ReviewQuestion {
 @Component({
   selector: 'app-test-result',
   standalone: true,
-  imports: [CommonModule, DurationLongPipe, NgClass, KatexRendererPipe, TranslocoModule, LoadStateComponent, PageCardComponent, FilterBarComponent, ScoreBarComponent, SegmentedFilterComponent, PaginationComponent, ImageLightboxComponent, ZoomableImagesDirective],
+  imports: [CommonModule, DurationLongPipe, NgClass, KatexRendererPipe, TranslocoModule, LoadStateComponent, PageCardComponent, FilterBarComponent, ScoreBarComponent, SegmentedFilterComponent, SearchableSelectComponent, PaginationComponent, ImageLightboxComponent, ZoomableImagesDirective],
   templateUrl: './test-result.html',
   styleUrl: './test-result.scss'
 })
@@ -54,6 +58,14 @@ export class TestResult extends PaginatedList {
   completedAt?: Date;
   /** Which questions the review lists: every one of them, or one outcome. */
   outcome: 'all' | 'wrong' | 'blank' = 'all';
+
+  /* The topics the questions are on, and the one being read. A test built from
+     a whole subject spans several of them, and its review is then a run through
+     material that was never studied together: the filter is offered only when
+     there is more than one to pick, since on a single-topic test it would be a
+     control with one choice. */
+  topics: TestTopic[] = [];
+  selectedTopicId: string | null = null;
 
   /** Turns the review into a pass of study: the answers are asked for, one by one. */
   hideAnswers = false;
@@ -103,6 +115,7 @@ export class TestResult extends PaginatedList {
 
     // setup html variables
     this.stats = getTestScore(this.test);
+    await this.loadTopics();
     this.elapsed_time = this.test.elapsed_time ?? 0;
     this.completedAt = this.test.completedAt;
     this.createdAt = this.test.createdAt;
@@ -110,13 +123,48 @@ export class TestResult extends PaginatedList {
     await this.loadPage();
   }
 
+  /** The names to offer: every question already carries the topic it is on. */
+  private async loadTopics(): Promise<void> {
+    this.topics = await this.testService.getTopics(this.testId);
+  }
+
+  /** Offered only when there is something to choose between. */
+  get showTopicFilter(): boolean {
+    return this.topics.length > 1;
+  }
+
+  get topicOptions(): SelectOption[] {
+    return this.topics.map((topic) => ({
+      value: topic._id,
+      label: topic.name,
+      color: topic.color,
+    }));
+  }
+
   /**
-   * The questions the filter leaves, in the order the test asked them. Only
+   * The questions of the topic being read, or all of them. The outcome filter
+   * and the counts on its strip are both taken from here, so the strip states
+   * what picking an outcome would leave within the topic on screen and not
+   * within the whole test.
+   *
+   * A question of a test created before the topic was kept on it is on no topic
+   * at all, so picking one leaves it out: it is only listed with no topic
+   * chosen, which is also the only state such a test can be in - it offers no
+   * topics to pick from.
+   */
+  private get topicQuestions(): Question[] {
+    const questions = this.test?.questions ?? [];
+    if (!this.selectedTopicId) return questions;
+    return questions.filter((q) => q.topic_id === this.selectedTopicId);
+  }
+
+  /**
+   * The questions the filters leave, in the order the test asked them. Only
    * their ids and outcome: the flashcards behind them are read one page at a
    * time, in loadPage.
    */
   private get selectedQuestions(): Question[] {
-    const questions = this.test?.questions ?? [];
+    const questions = this.topicQuestions;
     if (this.outcome === 'wrong') return questions.filter((q) => q.is_correct === false);
     if (this.outcome === 'blank') return questions.filter((q) => q.is_correct === undefined);
     return questions;
@@ -182,16 +230,29 @@ export class TestResult extends PaginatedList {
 
   /** The counts are the point of the strip: they say what filtering would leave. */
   get outcomeOptions(): SegmentedOption[] {
+    const questions = this.topicQuestions;
+    const counts = getTestScore({ questions });
     return [
-      { value: 'all', label: this.transloco.translate('test.result.outcomeAll'), count: this.test?.questions.length ?? 0 },
-      { value: 'wrong', label: this.transloco.translate('test.result.outcomeWrong'), count: this.stats.wrong },
-      { value: 'blank', label: this.transloco.translate('test.result.outcomeBlank'), count: this.stats.blank },
+      { value: 'all', label: this.transloco.translate('test.result.outcomeAll'), count: questions.length },
+      { value: 'wrong', label: this.transloco.translate('test.result.outcomeWrong'), count: counts.wrong },
+      { value: 'blank', label: this.transloco.translate('test.result.outcomeBlank'), count: counts.blank },
     ];
   }
 
   /** Shown on the collapsed filter bar of a phone, so it still says it is filtering. */
   get activeFilterCount(): number {
-    return (this.outcome === 'all' ? 0 : 1) + (this.hideAnswers ? 1 : 0);
+    return (
+      (this.outcome === 'all' ? 0 : 1) +
+      (this.selectedTopicId ? 1 : 0) +
+      (this.hideAnswers ? 1 : 0)
+    );
+  }
+
+  onTopicSelected(id: string | null | undefined): void {
+    this.selectedTopicId = id ?? null;
+    // As for the outcome: the pages of one topic are not the pages of another.
+    this.currentPage = 1;
+    this.loadPage();
   }
 
   onOutcomeChange(value: string): void {

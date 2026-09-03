@@ -1,6 +1,6 @@
 import { CardFilter, PaginatedResponse, RandomCardFIlter } from '../models/http.dto';
 
-import { Flashcard } from '../models/flashcard.dto';
+import { Flashcard, RandomFlashcard } from '../models/flashcard.dto';
 import { Injectable } from '@angular/core';
 import { RestClientService } from '../api/rest-api.service';
 
@@ -20,9 +20,10 @@ export class FlashcardService {
       );
     }
 
-    // Reads one page of flashcards
-  getRandom(filter: RandomCardFIlter): Promise<{_id: string}[]> {
-      return this.restClient.get<{_id: string}[]>(
+  // The drawn flashcards carry the topic each is on: the test is built from
+  // them, and it keeps every topic it touches.
+  getRandom(filter: RandomCardFIlter): Promise<RandomFlashcard[]> {
+      return this.restClient.get<RandomFlashcard[]>(
         this.baseUrl + '/random',
         filter
       );

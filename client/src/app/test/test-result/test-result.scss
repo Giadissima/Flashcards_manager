@@ -91,6 +91,20 @@
   gap: calc(var(--spacing-unit) * 2);
 }
 
+/* The select fills whatever it is put in, which in a row of controls is the
+   whole row: it is given a width of its own here, and takes the full one back
+   when the row breaks into a column on a phone. */
+.review-filters app-searchable-select {
+  width: 220px;
+  max-width: 100%;
+}
+
+@media (max-width: 575.98px) {
+  .review-filters app-searchable-select {
+    width: 100%;
+  }
+}
+
 /* Reads as the covered answer it stands in for - same box, same size - and not
    as a button of the page. */
 .answer-reveal {
