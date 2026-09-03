@@ -245,7 +245,9 @@
       "atLeastOneError": "Please select at least a subject or a topic.",
       "noFlashcardsError": "No flashcards found for the selected subject/topic.",
       "startButton": "Start Test",
-      "createError": "Unable to create the test"
+      "createError": "Unable to create the test",
+      "addTopic": "Add topic",
+      "removeTopic": "Remove topic"
     },
     "history": {
       "title": "Test History",
@@ -319,7 +321,8 @@
       "toast": {
         "exited": "Test paused, your progress is saved"
       }
-    }
+    },
+    "topicCount": "{{count}} topics"
   },
   "importExport": {
     "title": "Import / Export Flashcards",

@@ -143,9 +143,42 @@
   }
 }
 
+/* Title and topic on one line, with the chip pushed to the end: it labels the
+   card rather than continuing its title, and on a narrow card it drops below
+   instead of squeezing the title. */
+.question-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--spacing-unit);
+}
+
 .question-title {
   color: var(--header-color);
   margin-bottom: var(--spacing-unit);
+}
+
+/* The same dot the topic select uses for its options, so a topic is recognised
+   by its colour in both places. */
+.topic-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--spacing-unit) * 0.75);
+  padding: calc(var(--spacing-unit) * 0.25) calc(var(--spacing-unit) * 1.25);
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  background: var(--inset-background);
+  color: var(--text-color);
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.topic-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .question-text {

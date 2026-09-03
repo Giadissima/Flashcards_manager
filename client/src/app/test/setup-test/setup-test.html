@@ -15,14 +15,32 @@
 
       <div class="mb-3">
         <label class="form-label">{{ 'test.setup.topicLabel' | transloco }}</label>
-        <app-searchable-select
-          [options]="topicOptions"
-          [value]="testForm.get('topic_id')?.value"
-          [allOptionLabel]="t('test.setup.selectTopic')"
-          [placeholder]="t('test.setup.selectTopic')"
-          (valueChange)="onTopicSelected($event)"
-          (blurred)="onSelectBlur('topic_id')"
-        ></app-searchable-select>
+        <div class="topic-rows" formArrayName="topic_ids">
+          @for (control of topicControls.controls; track $index) {
+          <div class="topic-row">
+            <app-searchable-select
+              [options]="topicOptionsFor($index)"
+              [value]="control.value"
+              [allOptionLabel]="t('test.setup.selectTopic')"
+              [placeholder]="t('test.setup.selectTopic')"
+              (valueChange)="onTopicSelected($index, $event)"
+            ></app-searchable-select>
+            <!-- Every row but the first can be taken away; the first stays, so
+                 there is always a topic select on the page. -->
+            @if ($index > 0) {
+            <button type="button" class="btn btn-outline-danger topic-remove"
+              [attr.aria-label]="t('test.setup.removeTopic')" [title]="t('test.setup.removeTopic')"
+              (click)="removeTopic($index)">
+              <span class="material-symbols-outlined">close</span>
+            </button>
+            }
+          </div>
+          }
+        </div>
+        <button type="button" class="btn btn-link btn-with-icon topic-add p-0"
+          [disabled]="!canAddTopic" (click)="addTopic()">
+          <span class="material-symbols-outlined">add</span>{{ 'test.setup.addTopic' | transloco }}
+        </button>
       </div>
 
       <div class="mb-3">

@@ -71,14 +71,6 @@ export class TestController {
     );
   }
 
-  @Get(':test_id/question/:question_index')
-  getQuestion(
-    @Param('test_id') test_id: string,
-    @Param('question_index') question_index: number,
-  ) {
-    return this.testService.getQuestion(test_id, question_index);
-  }
-
   @ApiOperation({
     description:
       'get the total number of questions of a test, without loading the questions array',
@@ -119,11 +111,6 @@ export class TestController {
   @Patch(':id/complete')
   complete(@Param('id') id: string, @Query('time') time: number) {
     return this.testService.completeTest(id, Number(time));
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() test: TestDocument) {
-    return this.testService.update(id, test);
   }
 
   @ApiOperation({ description: 'Delete one Flashcard from db' })

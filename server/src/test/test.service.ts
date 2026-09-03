@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException, OnModuleInit } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { BasePaginatedResult } from 'src/common.dto';
 import {
@@ -21,74 +21,11 @@ import { FlashcardsService } from 'src/flashcards/flashcards.service';
 const ENTITY = 'Test';
 
 @Injectable()
-export class TestService implements OnModuleInit {
-  private readonly logger = new Logger(TestService.name);
-
-  /**
-   * Tests created before subject_id/topic_id were stored on the test carry
-   * neither, which would leave them without a subject on every screen and out
-   * of every filter by subject. They are filled in once, from the flashcards of
-   * their questions - the way those two values used to be resolved on read.
-   * Once done, the check below is a single indexed query at startup.
-   *
-   * A test spanning several topics is in the same position: the old shape held
-   * one topic or none, so it was written without the field, and it would stay
-   * out of every filter by topic now that all of them are kept.
-   */
-  async onModuleInit(): Promise<void> {
-    const pending = await this.testModel
-      .find(
-        {
-          $or: [
-            { subject_id: { $exists: false } },
-            { topic_id: { $exists: false } },
-          ],
-        },
-        { questions: 1 },
-      )
-      .exec();
-    if (!pending.length) return;
-
-    for (const test of pending) {
-      const { subject_id, topic_id } =
-        await this.flashcardService.getSubjectAndTopic(
-          test.questions.map((q) => q.flashcard_id),
-        );
-      // A test whose flashcards were all deleted resolves to nothing: it is
-      // still marked, with null and an empty list, so it is not looked at again
-      // at every startup.
-      await this.testModel
-        .updateOne(
-          { _id: test._id },
-          { $set: { subject_id: subject_id ?? null, topic_id } },
-        )
-        .exec();
-    }
-
-    this.logger.log(`Backfilled subject and topic on ${pending.length} test(s)`);
-  }
-
-  update(id: string, test: TestDocument) {
-    assertValidObjectId(id);
-    return this.testModel.findByIdAndUpdate(id, test);
-  }
+export class TestService {
   constructor(
     @InjectModel(Test.name) private testModel: Model<Test>,
     private readonly flashcardService: FlashcardsService,
   ) {}
-
-  async getQuestion(test_id: string, index: number) {
-    const test = await this.testModel
-      .findById(test_id)
-      .select({ questions: { $slice: [index, 1] } })
-      .lean();
-
-    if (!test || !test.questions || test.questions.length === 0)
-      throw new NotFoundException(`Error searching question sended`); // TODO controllare l'inglese
-
-    const flashcardId = test.questions[0].flashcard_id;
-    return this.flashcardService.findOne(flashcardId.toString());
-  }
 
   // Total number of questions in the test, without pulling the whole
   // 'questions' array into memory: $size is computed by Mongo and only the
@@ -181,9 +118,17 @@ export class TestService implements OnModuleInit {
   }
   // TODO find a way to filter only the questions that have no category
   async create(test: TestCreateRequest): Promise<TestDocument> {
-    // Resolved here, once, instead of on every read of the test: what the test
-    // is about cannot change afterwards, since its questions are fixed.
-    const { subject_id, topic_id } = await this.flashcardService.getSubjectAndTopic(
+    // The questions arrive with the topic each is on, so the topics of the test
+    // are read off them rather than looked up again: one rule for what a test
+    // is about, and no second answer to disagree with the questions. Resolved
+    // here, once, instead of on every read: what the test is about cannot
+    // change afterwards, since its questions are fixed.
+    const topic_id = [
+      ...new Set(test.questions.map((q) => q.topic_id).filter(Boolean)),
+    ];
+    // The subject is the one thing a question does not carry, and a test has
+    // exactly one: it is still read from the cards.
+    const subject_id = await this.flashcardService.getSubject(
       test.questions.map((q) => q.flashcard_id),
     );
     return new this.testModel({ ...test, subject_id, topic_id }).save();
@@ -283,24 +228,17 @@ export class TestService implements OnModuleInit {
           localField: 'topic_id',
           foreignField: '_id',
           as: 'testTopics',
-          pipeline: [{ $project: { name: 1 } }],
+          pipeline: [{ $project: { name: 1 } }, { $sort: { name: 1 } }],
         },
       },
       {
         $addFields: {
           subject_name: { $arrayElemAt: ['$testSubjects.name', 0] },
-          // The name of the one topic, when there is one: a test spanning
-          // several has no single name that would be true of it, and states
-          // none rather than the first of them. Counted on the ids of the test
-          // and not on the topics found, so a deleted topic leaves the test
-          // without a name instead of promoting the survivor.
-          topic_name: {
-            $cond: [
-              { $eq: [{ $size: { $ifNull: ['$topic_id', []] } }, 1] },
-              { $ifNull: [{ $arrayElemAt: ['$testTopics.name', 0] }, null] },
-              null,
-            ],
-          },
+          // Every name, in order, and the reader decides what to make of them:
+          // one is stated, several are counted. A deleted topic drops out here
+          // rather than being carried as a blank, so a test says as many topics
+          // as it can still name.
+          topic_names: '$testTopics.name',
         },
       },
       { $project: { testSubjects: 0, testTopics: 0 } },

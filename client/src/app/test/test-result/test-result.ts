@@ -38,6 +38,8 @@ interface ReviewQuestion {
   is_correct: string;
   question: string;
   answer: string;
+  /** The topic of the question, named, on a test that is on more than one. */
+  topic?: TestTopic;
 }
 
 @Component({
@@ -193,6 +195,12 @@ export class TestResult extends PaginatedList {
             is_correct: q.is_correct === true ? 'true' : q.is_correct === false ? 'false' : 'blank',
             question: flashcard?.question ?? this.transloco.translate('test.result.questionNotAvailable'),
             answer: flashcard?.answer ?? this.transloco.translate('test.result.answerNotAvailable'),
+            // Only worth a chip when the test spans more than one: on a test
+            // with a single topic every card would repeat what the subtitle
+            // above already says once.
+            topic: this.showTopicFilter
+              ? this.topics.find((t) => t._id === q.topic_id)
+              : undefined,
           };
         })
       );
@@ -213,7 +221,7 @@ export class TestResult extends PaginatedList {
   get subtitle(): string {
     const parts: string[] = [];
 
-    const subject = this.test ? getTestSubjectLabel(this.test) : '';
+    const subject = this.test ? getTestSubjectLabel(this.test, this.transloco) : '';
     if (subject) parts.push(subject);
 
     const date = this.completedAt ?? this.createdAt;
@@ -284,7 +292,7 @@ export class TestResult extends PaginatedList {
    */
   get headerActions(): PageCardAction[] {
     const actions: PageCardAction[] = [];
-    if (this.wrongFlashcardIds.length) {
+    if (this.wrongQuestions.length) {
       actions.push({
         label: this.transloco.translate('test.result.repeatWrong'),
         icon: 'replay',
@@ -301,15 +309,15 @@ export class TestResult extends PaginatedList {
   }
 
   /**
-   * The flashcards a repeat would be built on. Read from the test rather than
-   * from the page on screen, so the button offers every wrong question and not
-   * only the ones currently listed. A flashcard deleted since is left out of
-   * the run by the runner, the way it already is for any other test.
+   * The questions a repeat would be built on, carried over whole - the topic of
+   * each included, so the new test is on the same topics as the questions it
+   * repeats. Read from the test rather than from the page on screen, so the
+   * button offers every wrong question and not only the ones currently listed.
+   * A flashcard deleted since is left out of the run by the runner, the way it
+   * already is for any other test.
    */
-  get wrongFlashcardIds(): string[] {
-    return (this.test?.questions ?? [])
-      .filter((q) => q.is_correct === false)
-      .map((q) => q.flashcard_id);
+  get wrongQuestions(): Question[] {
+    return (this.test?.questions ?? []).filter((q) => q.is_correct === false);
   }
 
   /**
@@ -318,13 +326,16 @@ export class TestResult extends PaginatedList {
    * decided, so there is nothing left to set up.
    */
   async repeatWrong(): Promise<void> {
-    const ids = this.wrongFlashcardIds;
-    if (!ids.length || this.repeating) return;
+    const wrong = this.wrongQuestions;
+    if (!wrong.length || this.repeating) return;
 
     this.repeating = true;
     try {
       const test = await this.testService.create({
-        questions: ids.map((flashcard_id) => ({ flashcard_id })),
+        questions: wrong.map(({ flashcard_id, topic_id }) => ({
+          flashcard_id,
+          topic_id,
+        })),
       });
       this.router.navigate(['/test', test._id]);
     } catch (err) {

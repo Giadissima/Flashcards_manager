@@ -31,7 +31,7 @@ export class FlashcardService {
 
 
   // Counts the flashcards matching the filters
-  count(filter: Pick<RandomCardFIlter, 'subject_id' | 'topic_id'>): Promise<number> {
+  count(filter: Pick<RandomCardFIlter, 'subject_id' | 'topic_ids'>): Promise<number> {
     return this.restClient.get<number>(
       this.baseUrl + '/count',
       filter

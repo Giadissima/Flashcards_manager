@@ -55,3 +55,42 @@
     border-top: 1.4px solid var(--border-color);
   }
 }
+
+/* One select per chosen topic, stacked, each with the button that removes it
+   sitting at its end. The select grows, the button keeps its size. */
+.topic-rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-unit);
+}
+
+.topic-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-unit);
+
+  app-searchable-select {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+}
+
+.topic-remove {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(var(--spacing-unit) * 0.75);
+  line-height: 1;
+}
+
+/* A quiet text-and-icon action under the list, not a second primary button
+   competing with "start test". */
+.topic-add {
+  margin-top: var(--spacing-unit);
+  text-decoration: none;
+
+  &:disabled {
+    opacity: 0.5;
+  }
+}

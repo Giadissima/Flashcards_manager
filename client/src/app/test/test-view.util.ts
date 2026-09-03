@@ -1,4 +1,5 @@
 import { Test } from '../models/test.dto';
+import { TranslocoService } from '@jsverse/transloco';
 
 export interface TestScore {
   correct: number;
@@ -26,11 +27,23 @@ export function getTestScore(test: Pick<Test, 'questions'>): TestScore {
 
 /**
  * "Subject · Topic" - what a test was about, the same line a flashcard carries
- * under its title. The topic is only sent by the server when the whole test
- * shares one, and the subject is missing on a test whose flashcards were all
- * deleted: either way what is known is shown, and nothing else.
+ * under its title. A test spanning several topics has no single name that would
+ * be true of it, so it states how many instead of naming one of them; the
+ * subject is missing on a test whose flashcards were all deleted, and then what
+ * is known is shown and nothing else.
  */
-export function getTestSubjectLabel(test: Test): string {
+export function getTestSubjectLabel(
+  test: Test,
+  transloco: TranslocoService,
+): string {
   if (!test.subject_name) return '';
-  return test.topic_name ? `${test.subject_name} · ${test.topic_name}` : test.subject_name;
+
+  const topics = test.topic_names ?? [];
+  if (!topics.length) return test.subject_name;
+
+  const topic =
+    topics.length === 1
+      ? topics[0]
+      : transloco.translate('test.topicCount', { count: topics.length });
+  return `${test.subject_name} · ${topic}`;
 }

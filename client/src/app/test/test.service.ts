@@ -3,7 +3,7 @@ import { PaginatedResponse, TestFilter } from '../models/http.dto';
 
 import { Injectable } from '@angular/core';
 import { RestClientService } from '../api/rest-api.service';
-import { Question, Test, TestStats, TestTopic } from '../models/test.dto';
+import { Question, Test, TestCreateRequest, TestStats, TestTopic } from '../models/test.dto';
 
 @Injectable({
   providedIn: 'root'
@@ -62,13 +62,8 @@ private baseUrl = 'test';
   }
 
   // Creates a test
-  create(test: Test): Promise<Test> {
+  create(test: TestCreateRequest): Promise<Test> {
     return this.restClient.post(this.baseUrl, test);
-  }
-
-  // Updates a test
-  update(id: string, test: Test): Promise<void> {
-    return this.restClient.patch(this.baseUrl + '/' + id, test);
   }
 
   // Deletes a test

@@ -4,12 +4,18 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const configService = app.get(ConfigService);
+
+  // Parse query strings with qs, so bracketed keys such as topic_ids[]=a become
+  // arrays. The default 'simple' parser leaves them as literal property names,
+  // which the whitelisting ValidationPipe then rejects.
+  app.set('query parser', 'extended');
 
   app.use(morgan('dev'));
 

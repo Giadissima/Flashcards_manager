@@ -245,7 +245,9 @@
       "atLeastOneError": "Seleziona almeno una materia o un argomento.",
       "noFlashcardsError": "Nessuna flashcard trovata per la materia/argomento selezionati.",
       "startButton": "Avvia Test",
-      "createError": "Impossibile creare il test"
+      "createError": "Impossibile creare il test",
+      "addTopic": "Aggiungi argomento",
+      "removeTopic": "Rimuovi argomento"
     },
     "history": {
       "title": "Storico Test",
@@ -319,7 +321,8 @@
       "toast": {
         "exited": "Test messo in pausa, i progressi sono salvati"
       }
-    }
+    },
+    "topicCount": "{{count}} argomenti"
   },
   "importExport": {
     "title": "Import / Export Flashcard",

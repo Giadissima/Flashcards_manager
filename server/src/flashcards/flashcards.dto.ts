@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
+  IsArray,
   IsInt,
   IsMongoId,
   IsOptional,
@@ -60,13 +61,17 @@ export class CountFlashcardsDTO {
   })
   subject_id?: string;
 
+  // A test can be built from several topics of the subject, so the filter takes
+  // a list. An empty or absent list means every topic - the whole subject.
   @IsOptional()
-  @IsMongoId()
+  @IsArray()
+  @IsMongoId({ each: true })
   @ApiProperty({
-    description: 'Filter by topic ID',
+    description: 'Filter by topic IDs; empty means every topic of the subject',
     required: false,
+    type: [String],
   })
-  topic_id?: string;
+  topic_ids?: string[];
 }
 
 export class RandomFlashcardsDTO extends CountFlashcardsDTO {

@@ -77,40 +77,26 @@ export class FlashcardsService {
   }
 
   /**
-   * The subject the given flashcards belong to, and every topic they are on. A
-   * test is built from a single subject, so the subject is taken from the first
-   * card; the topics are all of them, in no particular order, since a set built
-   * from a whole subject spans as many as it has.
+   * The subject the given flashcards belong to. A test is built from a single
+   * subject, so it is taken from the first card that answers.
    *
-   * Used when a test is created, to store on it what it is about.
+   * Used when a test is created, to store on it what it is about. Its topics
+   * are not asked for here: the questions of a test carry the topic each is on,
+   * which is where the test reads them from.
    */
-  async getSubjectAndTopic(ids: (string | Types.ObjectId)[]): Promise<{
-    subject_id?: Types.ObjectId;
-    topic_id: Types.ObjectId[];
-  }> {
-    if (!ids.length) return { topic_id: [] };
+  async getSubject(
+    ids: (string | Types.ObjectId)[],
+  ): Promise<Types.ObjectId | undefined> {
+    if (!ids.length) return undefined;
 
     const [result] = await this.flashcardModel
-      .aggregate<{ subject_id?: Types.ObjectId; topic_ids: Types.ObjectId[] }>([
+      .aggregate<{ subject_id?: Types.ObjectId }>([
         { $match: { _id: { $in: ids.map((id) => new Types.ObjectId(id)) } } },
-        {
-          $group: {
-            _id: null,
-            subject_id: { $first: '$subject_id' },
-            // A DISTINCT: what matters is how many different topics come out.
-            topic_ids: { $addToSet: '$topic_id' },
-          },
-        },
+        { $group: { _id: null, subject_id: { $first: '$subject_id' } } },
       ])
       .exec();
 
-    if (!result) return { topic_id: [] };
-    return {
-      subject_id: result.subject_id ?? undefined,
-      // A card with no topic contributes a null to the set: it is not a topic
-      // the test is on, and it cannot be offered as one either.
-      topic_id: result.topic_ids.filter((id): id is Types.ObjectId => !!id),
-    };
+    return result?.subject_id ?? undefined;
   }
 
   count(filter: CountFlashcardsDTO): Promise<number> {
@@ -136,8 +122,12 @@ export class FlashcardsService {
     if (filter.subject_id) {
       query.subject_id = new Types.ObjectId(filter.subject_id);
     }
-    if (filter.topic_id) {
-      query.topic_id = new Types.ObjectId(filter.topic_id);
+    // Any of the chosen topics: a test built from several is the union of their
+    // cards. No topic given leaves the subject to stand on its own.
+    if (filter.topic_ids?.length) {
+      query.topic_id = {
+        $in: filter.topic_ids.map((id) => new Types.ObjectId(id)),
+      };
     }
     return query;
   }

@@ -25,7 +25,9 @@ export interface CardFilter extends SimplePaginatedResponse {
   title?: string;
 }
 
-export type RandomCardFIlter = Pick<CardFilter, 'subject_id' | 'topic_id'> & {
+export type RandomCardFIlter = Pick<CardFilter, 'subject_id'> & {
+  // Several topics of the subject at once; empty or absent means all of them.
+  topic_ids?: string[];
   numFlashcard?: number;
 };
 

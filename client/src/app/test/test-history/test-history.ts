@@ -253,7 +253,7 @@ export class TestHistory extends PaginatedList implements OnInit, OnDestroy {
 
   /** "Subject · Topic", the line the result page puts in its own subtitle. */
   getSubjectLabel(test: Test): string {
-    return getTestSubjectLabel(test);
+    return getTestSubjectLabel(test, this.transloco);
   }
 
   openTest(test: Test): void {
@@ -352,14 +352,12 @@ export class TestHistory extends PaginatedList implements OnInit, OnDestroy {
   }
 
   // Closes an unfinished test without answering the remaining questions:
-  // they stay blank, as if the test had been ended early
+  // they stay blank, as if the test had been ended early. The same endpoint the
+  // runner ends a test with, keeping the time already on the test.
   async stopTest(test: Test): Promise<void> {
     if (!test._id) return;
     try {
-      await this.testService.update(test._id, {
-        ...test,
-        completedAt: new Date(),
-      });
+      await this.testService.completeTest(test._id, test.elapsed_time ?? 0);
       this.toast.show(
         this.transloco.translate('test.history.toast.terminated'),
         'success',
