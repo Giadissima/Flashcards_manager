@@ -270,7 +270,10 @@
       "terminate": "End",
       "toast": {
         "terminated": "Test ended",
-        "terminateError": "Unable to end the test"
+        "terminateError": "Unable to end the test",
+        "deleted": "Test deleted",
+        "deleteError": "Unable to delete the test",
+        "undo": "Undo"
       }
     },
     "result": {

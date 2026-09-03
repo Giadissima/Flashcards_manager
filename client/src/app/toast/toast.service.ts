@@ -8,11 +8,18 @@ export interface ToastData {
   type: ToastType;
   actionLabel?: string;
   onAction?: () => void;
+  onDismiss?: () => void;
 }
 
 export interface ToastOptions {
   actionLabel?: string;
   onAction?: () => void;
+  /**
+   * Run when the toast is closed by its own button, and only then: the reader
+   * is done with it before its time is up. Not called when it hides on its own
+   * or when it is replaced, which the caller's own timing already covers.
+   */
+  onDismiss?: () => void;
   duration?: number;
 }
 
@@ -31,7 +38,7 @@ export class ToastService {
     if (this.hideTimeout) {
       clearTimeout(this.hideTimeout);
     }
-    this._toastMessage.next({ message, type, actionLabel: options?.actionLabel, onAction: options?.onAction });
+    this._toastMessage.next({ message, type, actionLabel: options?.actionLabel, onAction: options?.onAction, onDismiss: options?.onDismiss });
     this.hideTimeout = setTimeout(() => this._toastMessage.next(null), options?.duration ?? 3000); // auto-hide
   }
 

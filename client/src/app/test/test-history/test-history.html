@@ -98,6 +98,13 @@
             <span class="material-symbols-outlined">visibility</span>
             {{ 'test.history.review' | transloco }}
           </button>
+          <!-- Only on a test that is over: one still in progress is not
+               finished with, and the action next to it there is the one that
+               ends it. -->
+          <button type="button" class="btn btn-outline-danger test-card-delete" (click)="deleteTest(test)"
+            [attr.aria-label]="t('common.delete')" [title]="t('common.delete')">
+            <span class="material-symbols-outlined">delete</span>
+          </button>
           } @else {
           <button type="button" class="btn btn-primary" (click)="resumeTest(test)">
             <span class="material-symbols-outlined">play_arrow</span>

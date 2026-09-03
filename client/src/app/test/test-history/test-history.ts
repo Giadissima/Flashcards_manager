@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FilterBarComponent } from '../../shared/filter-bar/filter-bar.component';
 import { PaginationComponent } from '../../shared/pagination/pagination.component';
@@ -46,7 +46,7 @@ import { TopicService } from '../../topic/topic.service';
   templateUrl: './test-history.html',
   styleUrl: './test-history.scss',
 })
-export class TestHistory extends PaginatedList implements OnInit {
+export class TestHistory extends PaginatedList implements OnInit, OnDestroy {
   constructor(
     private testService: TestService,
     private subjectService: SubjectService,
@@ -57,6 +57,16 @@ export class TestHistory extends PaginatedList implements OnInit {
   ) {
     super();
   }
+
+  /* How long the row stays gone before the deletion is actually sent, and how
+     long the toast offering to take it back is on screen: the same number, so
+     the option disappears exactly when it stops being available. */
+  private static readonly UNDO_WINDOW_MS = 5000;
+
+  /* Tests taken off the list and not deleted on the server yet, by id, each
+     with the timer that will delete it. They are held out of every page read
+     while they wait, so a reload of the list does not put them back. */
+  private pendingDeletions = new Map<string, ReturnType<typeof setTimeout>>();
 
   tests: Test[] = [];
   override pageSize = 20;
@@ -222,7 +232,9 @@ export class TestHistory extends PaginatedList implements OnInit {
         ...this.activeFilters,
       })
       .then((data) => {
-        this.tests = data.data;
+        this.tests = data.data.filter(
+          (t) => !t._id || !this.pendingDeletions.has(t._id),
+        );
         this.totalCount = data.count;
       });
   }
@@ -254,6 +266,89 @@ export class TestHistory extends PaginatedList implements OnInit {
   resumeTest(test: Test): void {
     if (!test._id) return;
     this.router.navigate(['/test', test._id]);
+  }
+
+  // The row goes as soon as the button is pressed and the server is told only
+  // once the window to take it back has passed: the deletion is what the user
+  // asked for, so it is carried out without a dialog in the way, and undoing it
+  // is putting a row back rather than rebuilding a test that no longer exists.
+  deleteTest(test: Test): void {
+    const id = test._id;
+    if (!id) return;
+
+    const index = this.tests.indexOf(test);
+    this.tests = this.tests.filter((t) => t._id !== id);
+    this.pendingDeletions.set(
+      id,
+      setTimeout(() => this.commitDelete(id), TestHistory.UNDO_WINDOW_MS),
+    );
+
+    this.toast.show(
+      this.transloco.translate('test.history.toast.deleted'),
+      'success',
+      {
+        actionLabel: this.transloco.translate('test.history.toast.undo'),
+        onAction: () => this.undoDelete(test, index),
+        // Closing the toast is deciding: the offer to take it back was the only
+        // reason to wait, so the deletion is sent without sitting out the rest
+        // of the window.
+        onDismiss: () => this.commitDelete(id),
+        duration: TestHistory.UNDO_WINDOW_MS,
+      },
+    );
+  }
+
+  private undoDelete(test: Test, index: number): void {
+    const id = test._id;
+    if (!id) return;
+    const timer = this.pendingDeletions.get(id);
+    // Nothing to take back: the window has passed and the test is already gone.
+    if (timer === undefined) return;
+
+    clearTimeout(timer);
+    this.pendingDeletions.delete(id);
+    // Back where it was, unless the list has been reloaded meanwhile and is
+    // now shorter than it was.
+    this.tests.splice(Math.min(index, this.tests.length), 0, test);
+  }
+
+  private async commitDelete(id: string): Promise<void> {
+    const timer = this.pendingDeletions.get(id);
+    // Already sent: the window can be closed early from the toast, and the
+    // timer it was racing has to find nothing left to do.
+    if (timer === undefined) return;
+    clearTimeout(timer);
+    this.pendingDeletions.delete(id);
+
+    try {
+      await this.testService.delete(id);
+      // Deleting the last test of a page would otherwise leave the reader on a
+      // page that no longer exists, empty and past the end of the list.
+      if (this.tests.length === 0 && this.currentPage > 1) this.currentPage--;
+      this.loadTests();
+      this.loadStats();
+    } catch (err) {
+      console.error('Error deleting test', err);
+      this.toast.show(
+        this.transloco.translate('test.history.toast.deleteError'),
+        'error',
+      );
+      // The row is on screen again: it was never deleted.
+      this.loadTests();
+    }
+  }
+
+  // Leaving the page closes the window early rather than cancelling it: the
+  // user asked for the deletion and did not take it back, and a timer waiting
+  // on a screen nobody is looking at would be lost to the first reload.
+  ngOnDestroy(): void {
+    for (const [id, timer] of this.pendingDeletions) {
+      clearTimeout(timer);
+      this.testService
+        .delete(id)
+        .catch((err) => console.error('Error deleting test', err));
+    }
+    this.pendingDeletions.clear();
   }
 
   // Closes an unfinished test without answering the remaining questions:

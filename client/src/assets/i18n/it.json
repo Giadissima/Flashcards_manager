@@ -270,7 +270,10 @@
       "terminate": "Termina",
       "toast": {
         "terminated": "Test terminato",
-        "terminateError": "Impossibile terminare il test"
+        "terminateError": "Impossibile terminare il test",
+        "deleted": "Test eliminato",
+        "deleteError": "Impossibile eliminare il test",
+        "undo": "Annulla"
       }
     },
     "result": {

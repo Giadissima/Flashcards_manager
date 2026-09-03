@@ -56,6 +56,17 @@
   }
 }
 
+/* The one button of the row with no label. Deleting is not what the card is
+   for - reviewing it is - so it does not take a word of its own next to the
+   action that is: the icon and the tooltip say it, and the square keeps it out
+   of the rhythm of the labelled ones. */
+.test-card-delete {
+  flex-shrink: 0;
+  aspect-ratio: 1;
+  padding-inline: 0;
+  width: 42px;
+}
+
 /* Demoted to a caption. It used to carry the same 600 weight and the same
    heading colour as the score right below it, so the row opened with two equal
    voices and the eye had no first stop. */
@@ -161,5 +172,10 @@
 
   .test-card-actions button {
     flex: 1;
+  }
+
+  /* Stays the size of its icon while the labelled buttons share the row. */
+  .test-card-actions .test-card-delete {
+    flex: 0 0 auto;
   }
 }
