@@ -1,14 +1,16 @@
 <app-load-state errorMessageKey="test.runner.getTestError" notFoundMessageKey="common.error.testNotFound">
 <div class="container test-runner-container mt-4" *transloco="let t">
-  <!-- The only pause control of the page: it follows the timer it acts on, so
-       the bottom row keeps the two actions that leave the test for good. -->
+  <!-- Pause acts on the clock and on nothing else, so it lives on the clock:
+       the run stays on screen and the same button starts the time again. The
+       actions that leave the page are the two at the bottom. -->
   <div class="test-timer-slot">
-    <div class="test-timer">
+    <div class="test-timer" [class.test-timer--paused]="isPaused">
       <span class="material-symbols-outlined test-timer-icon">timer</span>
       <span class="test-timer-value">{{ elapsed_time | duration }}</span>
-      <button type="button" class="test-timer-pause btn" [attr.aria-label]="t('test.runner.pause')"
-        (click)="requestPause()">
-        <span class="material-symbols-outlined">pause</span>
+      <button type="button" class="test-timer-pause btn"
+        [attr.aria-label]="isPaused ? t('test.runner.resume') : t('test.runner.pause')"
+        (click)="togglePause()">
+        <span class="material-symbols-outlined">{{ isPaused ? 'play_arrow' : 'pause' }}</span>
       </button>
     </div>
   </div>
@@ -70,9 +72,9 @@
       (previous)="previousPage()" (next)="nextPage()"></app-pagination>
 
     <div class="d-flex justify-content-center gap-2 mt-4">
-      <button type="button" class="btn btn-outline-secondary btn-with-icon" (click)="requestGoHome()"><span class="material-symbols-outlined">home</span>{{ 'test.runner.backHome' |
+      <button type="button" class="btn btn-outline-secondary btn-with-icon" (click)="exitTest()"><span class="material-symbols-outlined">logout</span>{{ 'test.runner.exit' |
         transloco }}</button>
-      <button type="button" class="btn btn-primary btn-with-icon" id="finishTest" (click)="finishTest()"><span class="material-symbols-outlined">flag</span>{{ 'test.runner.endTest' |
+      <button type="button" class="btn btn-primary btn-with-icon" id="finishTest" (click)="requestFinish()"><span class="material-symbols-outlined">flag</span>{{ 'test.runner.endTest' |
         transloco }}</button>
     </div>
   </app-page-card>
@@ -80,8 +82,8 @@
 </app-load-state>
 
 <ng-container *transloco="let t">
-  <app-confirm-dialog [isOpen]="showLeaveConfirm" [title]="t('test.runner.leaveConfirmTitle')"
-    [message]="t('test.runner.leaveConfirmMessage')" [confirmLabel]="t('common.yes')" [cancelLabel]="t('common.cancel')"
-    (confirmed)="confirmLeave()" (cancelled)="cancelLeave()"></app-confirm-dialog>
+  <app-confirm-dialog [isOpen]="showFinishConfirm" [title]="t('test.runner.endConfirmTitle')"
+    [message]="finishConfirmMessage" [confirmLabel]="t('test.runner.endTest')" [cancelLabel]="t('common.cancel')"
+    (confirmed)="confirmFinish()" (cancelled)="cancelFinish()"></app-confirm-dialog>
 </ng-container>
 <app-image-lightbox #lightbox></app-image-lightbox>

@@ -16,6 +16,11 @@
   --inset-background: #F5EFFF;
   --on-primary-color: #000000;
   --on-accent-color: #f8f9fa;
+  /* Neutral grey for a control that is switched off - a stopped timer, and
+     anything else that has to read as "not running". The palette has no grey
+     of its own: --secondary-color is a colour (lilac here, green in the dark
+     theme) and would say the opposite. Dark enough to carry white text. */
+  --muted-color: #667085;
 }
 
 [data-theme='dark'] {
@@ -39,6 +44,8 @@
   --inset-background: #262626;
   --on-primary-color: #ffffff;
   --on-accent-color: #f8f9fa;
+  /* See the light theme: a grey that stays visible against #121212. */
+  --muted-color: #5C6470;
 }
 
 .btn-dark { // this button is transparent and used for icons

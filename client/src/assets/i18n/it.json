@@ -303,14 +303,19 @@
     "runner": {
       "seeAnswer": "Vedi risposta",
       "seeQuestion": "Vedi domanda",
-      "backHome": "Torna alla Home",
       "pause": "Pausa",
       "endTest": "Termina Test",
-      "leaveConfirmTitle": "Uscire dal test?",
-      "leaveConfirmMessage": "I tuoi progressi saranno salvati, vuoi continuare?",
       "getTestError": "Non è stato possibile recuperare il test",
       "startedOn": "Iniziato il",
-      "progress": "{{answered}} / {{total}} risposte"
+      "progress": "{{answered}} / {{total}} risposte",
+      "exit": "Esci",
+      "resume": "Riprendi",
+      "endConfirmTitle": "Terminare il test?",
+      "endConfirmMessage": "Hai risposto a {{answered}} domande su {{total}}. Le {{remaining}} rimanenti resteranno senza risposta e il test non potrà più essere ripreso.",
+      "endConfirmMessageAll": "Hai risposto a tutte le domande. Il test verrà chiuso e vedrai il risultato.",
+      "toast": {
+        "exited": "Test messo in pausa, i progressi sono salvati"
+      }
     }
   },
   "importExport": {

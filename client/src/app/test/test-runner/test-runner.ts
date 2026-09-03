@@ -16,6 +16,7 @@ import { PaginatedList } from '../../shared/paginated-list';
 import { ZoomableImagesDirective } from '../../shared/zoomable-images.directive';
 import * as cardView from '../../shared/flashcard-view.util';
 import { TestService } from '../test.service';
+import { ToastService } from '../../toast/toast.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 
 @Component({
@@ -44,8 +45,10 @@ export class TestRunner extends PaginatedList implements OnInit {
   // Maps flashcard_id to whether its answer, instead of its question, is shown
   showAnswerMap: Record<string, boolean> = {};
 
-  showLeaveConfirm = false;
-  private pendingDestination: string[] = [];
+  /** The timer is stopped and the run stays on screen, waiting to be resumed. */
+  isPaused = false;
+
+  showFinishConfirm = false;
 
   subjectName = '';
   testStartDate?: Date;
@@ -57,12 +60,32 @@ export class TestRunner extends PaginatedList implements OnInit {
     return Math.round((this.answeredCount / this.totalCount) * 100);
   }
 
+  /** Questions still without an answer: what ending the test now would leave blank. */
+  get unansweredCount(): number {
+    return this.totalCount - this.answeredCount;
+  }
+
+  // The dialog states what ending the test costs, instead of asking whether the
+  // user is sure: the questions left over stay blank and the test can no longer
+  // be resumed, only reviewed.
+  get finishConfirmMessage(): string {
+    if (this.unansweredCount <= 0) {
+      return this.transloco.translate('test.runner.endConfirmMessageAll');
+    }
+    return this.transloco.translate('test.runner.endConfirmMessage', {
+      answered: this.answeredCount,
+      total: this.totalCount,
+      remaining: this.unansweredCount,
+    });
+  }
+
   constructor(
     private route: ActivatedRoute,
     private flashcardService: FlashcardService,
     private testService: TestService,
     private router: Router,
-    private transloco: TranslocoService
+    private transloco: TranslocoService,
+    private toast: ToastService
   ) {
     super();
   }
@@ -80,7 +103,7 @@ export class TestRunner extends PaginatedList implements OnInit {
   }
 
   updateTimer() {
-    if(!this.testId) return;
+    if(!this.testId || this.isPaused) return;
     this.elapsed_time++;
     if(this.elapsed_time % 30 == 0)
       this.testService.updateElapsedTime(this.testId, this.elapsed_time)
@@ -183,37 +206,46 @@ export class TestRunner extends PaginatedList implements OnInit {
     this.showAnswerMap[card._id] = !this.showAnswerMap[card._id];
   }
 
-  async finishTest() {
-    if(!this.testId) return;
-    await this.testService.completeTest(this.testId, this.elapsed_time);
-    this.router.navigate(['/test-result',this.testId],);
+  // Stops the clock without leaving the page: nothing else about the run
+  // changes, so the elapsed time is written out right away and the same button
+  // starts it again.
+  togglePause(): void {
+    this.isPaused = !this.isPaused;
+    if (this.isPaused && this.testId) {
+      this.testService
+        .updateElapsedTime(this.testId, this.elapsed_time)
+        .catch(err => console.error('Errore salvataggio progressi', err));
+    }
   }
 
-  // Opens the confirmation dialog before leaving a test that is not over yet
-  requestPause(): void {
-    this.pendingDestination = ['/test-result'];
-    this.showLeaveConfirm = true;
-  }
-
-  requestGoHome(): void {
-    this.pendingDestination = ['/home'];
-    this.showLeaveConfirm = true;
-  }
-
-  cancelLeave(): void {
-    this.showLeaveConfirm = false;
-  }
-
-  // Saves the elapsed time, then leaves without closing the test: it stays in
-  // progress and can be resumed later, even from another device, since the state
-  // lives on the server and not in the client.
-  async confirmLeave(): Promise<void> {
-    this.showLeaveConfirm = false;
+  // Leaves the run without closing it: every answer is already on the server,
+  // so there is nothing to confirm and nothing to lose. The test stays in
+  // progress and the history it lands on is where it is resumed from, even from
+  // another device.
+  async exitTest(): Promise<void> {
     if (this.testId) {
       await this.testService
         .updateElapsedTime(this.testId, this.elapsed_time)
         .catch(err => console.error('Errore salvataggio progressi', err));
     }
-    this.router.navigate(this.pendingDestination);
+    this.toast.show(this.transloco.translate('test.runner.toast.exited'), 'success');
+    this.router.navigate(['/test-result']);
+  }
+
+  // The one action of the page that cannot be undone, and the only one that
+  // asks before going through with it
+  requestFinish(): void {
+    this.showFinishConfirm = true;
+  }
+
+  cancelFinish(): void {
+    this.showFinishConfirm = false;
+  }
+
+  async confirmFinish(): Promise<void> {
+    this.showFinishConfirm = false;
+    if (!this.testId) return;
+    await this.testService.completeTest(this.testId, this.elapsed_time);
+    this.router.navigate(['/test-result', this.testId]);
   }
 }

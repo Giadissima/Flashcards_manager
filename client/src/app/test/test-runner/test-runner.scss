@@ -195,14 +195,21 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  background: var(--primary-color);
-  /* .btn brings its own colour: the button keeps the one of the pill. */
+  background: var(--success-color);
+  /* .btn brings its own colour: the button keeps the one set here. */
   --bs-btn-color: var(--white-color);
   --bs-btn-hover-color: var(--white-color);
 
   .material-symbols-outlined {
     font-size: 20px;
   }
+}
+
+/* A stopped clock has to look stopped: the digits do not move any more, so the
+   orange that says "time is running" gives way to grey. The button keeps its
+   green - it is the one control of the pill either way. */
+.test-timer--paused {
+  background: var(--muted-color);
 }
 
 /* On a phone the pill sits over the card header: the icon is the part the

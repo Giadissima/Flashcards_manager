@@ -303,14 +303,19 @@
     "runner": {
       "seeAnswer": "See answer",
       "seeQuestion": "See question",
-      "backHome": "Back to Home",
       "pause": "Pause",
       "endTest": "End test",
-      "leaveConfirmTitle": "Leave the test?",
-      "leaveConfirmMessage": "Your progress will be saved, do you want to continue?",
       "getTestError": "Unable to retrieve the test",
       "startedOn": "Started on",
-      "progress": "{{answered}} / {{total}} answered"
+      "progress": "{{answered}} / {{total}} answered",
+      "exit": "Exit",
+      "resume": "Resume",
+      "endConfirmTitle": "End the test?",
+      "endConfirmMessage": "You answered {{answered}} questions out of {{total}}. The remaining {{remaining}} will stay unanswered and the test can no longer be resumed.",
+      "endConfirmMessageAll": "You answered every question. The test will be closed and you will see the result.",
+      "toast": {
+        "exited": "Test paused, your progress is saved"
+      }
     }
   },
   "importExport": {
