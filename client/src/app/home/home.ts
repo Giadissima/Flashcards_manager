@@ -16,7 +16,6 @@ import { toSubjectOptions, toTopicOptions } from '../shared/select-options.util'
 import * as cardView from '../shared/flashcard-view.util';
 import { Subject } from '../models/subject.dto';
 import { SubjectService } from '../subject/subject.service';
-import { Toast } from '../toast/toast';
 import { ToastService } from '../toast/toast.service';
 import { Topic } from '../models/topic.dto';
 import { TopicService } from '../topic/topic.service';
@@ -28,7 +27,7 @@ import { ContentOverflowDirective } from '../shared/content-overflow.directive';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, Toast, KatexRendererPipe, SearchableSelectComponent, SearchInputComponent, TranslocoModule, ImageLightboxComponent, ZoomableImagesDirective, ContentOverflowDirective, LoadStateComponent, PaginationComponent, FilterBarComponent],
+  imports: [CommonModule, KatexRendererPipe, SearchableSelectComponent, SearchInputComponent, TranslocoModule, ImageLightboxComponent, ZoomableImagesDirective, ContentOverflowDirective, LoadStateComponent, PaginationComponent, FilterBarComponent],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })

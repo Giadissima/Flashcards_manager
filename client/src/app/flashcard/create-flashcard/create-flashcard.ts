@@ -15,7 +15,6 @@ import { PageCardComponent } from '../../shared/page-card/page-card.component';
 import { RichTextEditorComponent } from '../../shared/rich-text-editor/rich-text-editor.component';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
-import { Toast } from "../../toast/toast";
 import { ToastService } from '../../toast/toast.service';
 import { Topic } from '../../models/topic.dto';
 import { TopicService } from '../../topic/topic.service';
@@ -27,7 +26,6 @@ import { toSubjectOptions, toTopicOptions } from '../../shared/select-options.ut
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    Toast,
     RichTextEditorComponent,
     TranslocoModule,
     SearchableSelectComponent,

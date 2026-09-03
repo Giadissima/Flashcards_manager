@@ -10,7 +10,6 @@ import { SubjectService } from '../../subject/subject.service';
 import { Subject } from '../../models/subject.dto';
 
 import { LoadStateComponent } from '../../shared/load-state/load-state.component';
-import { Toast } from '../../toast/toast';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { SearchableSelectComponent, SelectOption } from '../../shared/searchable-select/searchable-select.component';
 import { charMinLength, nameMaxLength } from '../../../config/config';
@@ -20,7 +19,7 @@ import { toSubjectOptions } from '../../shared/select-options.util';
 @Component({
   selector: 'app-edit-topic',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, Toast, TranslocoModule, SearchableSelectComponent, NgxColorsComponent, NgxColorsTriggerDirective, LoadStateComponent, PageCardComponent],
+  imports: [ReactiveFormsModule, CommonModule, TranslocoModule, SearchableSelectComponent, NgxColorsComponent, NgxColorsTriggerDirective, LoadStateComponent, PageCardComponent],
   templateUrl: './edit-topic.component.html',
 })
 export class EditTopicComponent implements OnInit {

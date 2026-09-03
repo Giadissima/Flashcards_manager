@@ -11,7 +11,6 @@ import { SearchInputComponent } from '../../shared/search-input/search-input.com
 import { SearchableSelectComponent, SelectOption } from '../../shared/searchable-select/searchable-select.component';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
-import { Toast } from '../../toast/toast';
 import { ToastService } from '../../toast/toast.service';
 import { Topic } from '../../models/topic.dto';
 import { TopicService } from '../topic.service';
@@ -20,7 +19,7 @@ import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 @Component({
   selector: 'app-manage-topics',
   standalone: true,
-  imports: [CommonModule, Toast, SearchInputComponent, SearchableSelectComponent, TranslocoModule, ConfirmDialogComponent, PageCardComponent, PaginationComponent],
+  imports: [CommonModule, SearchInputComponent, SearchableSelectComponent, TranslocoModule, ConfirmDialogComponent, PageCardComponent, PaginationComponent],
   templateUrl: './manage-topics.component.html',
   styleUrls: ['./manage-topics.component.scss']
 })

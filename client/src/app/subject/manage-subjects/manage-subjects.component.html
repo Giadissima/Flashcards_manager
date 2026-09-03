@@ -66,7 +66,6 @@
     <app-pagination [currentPage]="currentPage" [totalPages]="totalPages"
       (previous)="previousPage()" (next)="nextPage()"></app-pagination>
   </app-page-card>
-    <app-toast></app-toast>
 <app-image-lightbox #lightbox></app-image-lightbox>
 <ng-container *transloco="let t">
   <app-confirm-dialog [isOpen]="showDeleteConfirm" [title]="t('common.confirmDelete')"

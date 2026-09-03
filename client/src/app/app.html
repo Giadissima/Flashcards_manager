@@ -1,3 +1,7 @@
 <app-navbar></app-navbar>
 
 <router-outlet></router-outlet>
+
+<!-- One outlet for the whole app: every page raises its toasts through the
+     service, and none of them has to remember to draw them. -->
+<app-toast></app-toast>

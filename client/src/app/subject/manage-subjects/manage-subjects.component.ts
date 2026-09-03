@@ -11,7 +11,6 @@ import { Router } from '@angular/router';
 import { SearchInputComponent } from '../../shared/search-input/search-input.component';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from './../subject.service';
-import { Toast } from '../../toast/toast';
 import { ToastService } from '../../toast/toast.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { getSubjectIconUrl } from '../subject-icon.util';
@@ -20,7 +19,7 @@ import { hasHtmlContent } from '../../shared/html.util';
 @Component({
   selector: 'app-manage-subjects',
   standalone: true,
-  imports: [CommonModule, Toast, SearchInputComponent, TranslocoModule, ImageLightboxComponent, ZoomableImagesDirective, ConfirmDialogComponent, PageCardComponent, PaginationComponent],
+  imports: [CommonModule, SearchInputComponent, TranslocoModule, ImageLightboxComponent, ZoomableImagesDirective, ConfirmDialogComponent, PageCardComponent, PaginationComponent],
   templateUrl: './manage-subjects.component.html',
   styleUrls: ['./manage-subjects.component.scss']
 })

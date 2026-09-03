@@ -13,7 +13,6 @@ import { TopicService } from '../topic.service';
 import { Router } from '@angular/router';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
-import { Toast } from '../../toast/toast';
 import { ToastService } from '../../toast/toast.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import {
@@ -30,7 +29,6 @@ import { toSubjectOptions } from '../../shared/select-options.util';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    Toast,
     TranslocoModule,
     SearchableSelectComponent,
     NgxColorsComponent,

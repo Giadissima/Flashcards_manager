@@ -11,7 +11,6 @@ import { SearchableSelectComponent, SelectOption } from '../../shared/searchable
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
 import { TestService } from '../test.service';
-import { Toast } from '../../toast/toast';
 import { ToastService } from '../../toast/toast.service';
 import { Topic } from '../../models/topic.dto';
 import { TopicService } from '../../topic/topic.service';
@@ -28,7 +27,7 @@ export function atLeastOneValidator(controls: string[]): ValidatorFn {
 @Component({
   selector: 'app-setup-test',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, SearchableSelectComponent, TranslocoModule, Toast, PageCardComponent],
+  imports: [ReactiveFormsModule, CommonModule, SearchableSelectComponent, TranslocoModule, PageCardComponent],
   templateUrl: './setup-test.html',
   styleUrls: ['./setup-test.scss']
 })
