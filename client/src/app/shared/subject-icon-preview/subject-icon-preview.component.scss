@@ -1,15 +1,23 @@
-.current-icon {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 1px solid var(--border-color);
-}
-
+/* Big enough for the picked icon to be judged at a glance - it is the whole
+   point of the preview - while still reading as a preview and not as the
+   picture itself. The swatch below is placed off it, so it is a variable. */
 .icon-preview-wrapper {
+  --icon-preview-size: 88px;
+
   position: relative;
   display: block;
   width: fit-content;
+  /* Keeps the upload button off the circle: without it the two touch, and the
+     button reads as part of the preview rather than as the way to change it. */
+  margin-bottom: calc(var(--spacing-unit) * 2);
+}
+
+.current-icon {
+  width: var(--icon-preview-size, 88px);
+  height: var(--icon-preview-size, 88px);
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--border-color);
 }
 
 .cancel-btn {
@@ -22,8 +30,9 @@
   height: 24px;
 }
 
+/* Sat on the lower edge of the circle, so it follows its size. */
 .rainbow-swatch {
   position: absolute;
-  top: 40px;
+  top: calc(var(--icon-preview-size) - 24px);
   right: -11px;
 }
