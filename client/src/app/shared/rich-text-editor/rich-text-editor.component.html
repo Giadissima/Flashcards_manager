@@ -6,33 +6,35 @@
        is why some of them carry a join- class. -->
   <div class="btn-group editor-toolbar-history" role="group">
     <button (click)="editor.chain().focus().undo().run()" [disabled]="!editor.can().undo()"
-      class="btn btn-outline-secondary" type="button" [title]="t('editor.undo')"><span class="material-symbols-outlined">undo</span></button>
+      class="btn btn-outline-secondary" type="button" [title]="t('editor.undo')"><span
+        class="material-symbols-outlined">undo</span></button>
     <button (click)="editor.chain().focus().redo().run()" [disabled]="!editor.can().redo()"
-      class="btn btn-outline-secondary" type="button" [title]="t('editor.redo')"><span class="material-symbols-outlined">redo</span></button>
+      class="btn btn-outline-secondary" type="button" [title]="t('editor.redo')"><span
+        class="material-symbols-outlined">redo</span></button>
   </div>
 
   <div class="editor-toolbar-main">
     <div class="btn-group join-right" role="group">
-      <button (click)="editor.chain().focus().toggleBold().run()" [class.btn-outline-secondary]="!editor.isActive('bold')"
-        [class.btn-secondary]="editor.isActive('bold')" class="btn" type="button" [title]="t('editor.bold')"><span class="material-symbols-outlined">format_bold</span></button>
+      <button (click)="editor.chain().focus().toggleBold().run()"
+        [ngClass]="editor.isActive('bold') ? 'btn-secondary' : 'btn-outline-secondary'" class="btn" type="button"
+        [title]="t('editor.bold')"><span class="material-symbols-outlined">format_bold</span></button>
       <button (click)="editor.chain().focus().toggleItalic().run()"
-        [class.btn-outline-secondary]="!editor.isActive('italic')" [class.btn-secondary]="editor.isActive('italic')"
-        class="btn" type="button" [title]="t('editor.italic')"><span class="material-symbols-outlined">format_italic</span></button>
+        [ngClass]="editor.isActive('italic') ? 'btn-secondary' : 'btn-outline-secondary'" class="btn" type="button"
+        [title]="t('editor.italic')"><span class="material-symbols-outlined">format_italic</span></button>
     </div>
     <div class="btn-group join-right" role="group">
-      <button (click)="editor.chain().focus().toggleBulletList().run()"
-        [class.btn-outline-secondary]="!editor.isActive('bulletList')"
-        [class.btn-secondary]="editor.isActive('bulletList')" class="btn" type="button"
+      <button (click)="editor.chain().focus().toggleBulletList().run()" class="btn" type="button"
+        [ngClass]="editor.isActive('bulletList') ? 'btn-secondary' : 'btn-outline-secondary'"
         [title]="t('editor.bulletList')"><span class="material-symbols-outlined">format_list_bulleted</span></button>
     </div>
     <div class="btn-group join-right" role="group">
-      <button (click)="toggleLink()" [class.btn-outline-secondary]="!editor.isActive('link')"
-        [class.btn-secondary]="editor.isActive('link')" class="btn" type="button" [title]="t('editor.link')"><span class="material-symbols-outlined">link</span></button>
+      <button (click)="toggleLink()" [ngClass]="editor.isActive('link') ? 'btn-secondary' : 'btn-outline-secondary'"
+        class="btn" type="button" [title]="t('editor.link')"><span
+          class="material-symbols-outlined">link</span></button>
     </div>
     <div class="btn-group editor-toolbar-toggle" role="group">
       <button type="button" class="btn btn-outline-secondary" (click)="toggleExtraTools()"
-        [attr.aria-expanded]="showExtraTools"
-        [title]="showExtraTools ? t('editor.fewerTools') : t('editor.moreTools')">
+        [attr.aria-expanded]="showExtraTools" [title]="showExtraTools ? t('editor.fewerTools') : t('editor.moreTools')">
         <span class="material-symbols-outlined">{{ showExtraTools ? 'expand_less' : 'more_horiz' }}</span>
       </button>
     </div>
@@ -47,7 +49,8 @@
       <ul class="dropdown-menu">
         <li><button (click)="editor.chain().focus().setParagraph().run()" [class.active]="!editor.isActive('heading')"
             class="dropdown-item" type="button">
-            <span class="material-symbols-outlined me-2">format_paragraph</span>{{ t('editor.paragraph') }}</button></li>
+            <span class="material-symbols-outlined me-2">format_paragraph</span>{{ t('editor.paragraph') }}</button>
+        </li>
         <li><button (click)="editor.chain().focus().toggleHeading({ level: 1 }).run()"
             [class.active]="editor.isActive('heading', { level: 1 })" class="dropdown-item" type="button">
             <span class="material-symbols-outlined me-2">format_h1</span>{{ t('editor.heading1') }}</button></li>
@@ -60,29 +63,28 @@
       </ul>
     </div>
     <div class="btn-group join-left" role="group">
-      <button (click)="editor.chain().focus().toggleUnderline().run()"
-        [class.btn-outline-secondary]="!editor.isActive('underline')" [class.btn-secondary]="editor.isActive('underline')"
-        class="btn" type="button" [title]="t('editor.underline')"><span class="material-symbols-outlined">format_underlined</span></button>
-      <button (click)="editor.chain().focus().toggleStrike().run()"
-        [class.btn-outline-secondary]="!editor.isActive('strike')" [class.btn-secondary]="editor.isActive('strike')"
-        class="btn" type="button" [title]="t('editor.strike')"><span class="material-symbols-outlined">strikethrough_s</span></button>
-      <button (click)="editor.chain().focus().toggleCode().run()" [class.btn-outline-secondary]="!editor.isActive('code')"
-        [class.btn-secondary]="editor.isActive('code')" class="btn" type="button" [title]="t('editor.code')"><span class="material-symbols-outlined">code</span></button>
+      <button class="btn" type="button" (click)="editor.chain().focus().toggleUnderline().run()"
+        [ngClass]="editor.isActive('underline') ? 'btn-secondary' : 'btn-outline-secondary'"
+        [title]="t('editor.underline')"><span class="material-symbols-outlined">format_underlined</span></button>
+      <button class="btn" type="button" (click)="editor.chain().focus().toggleStrike().run()"
+        [ngClass]="editor.isActive('strike') ? 'btn-secondary' : 'btn-outline-secondary'"
+        [title]="t('editor.strike')"><span class="material-symbols-outlined">strikethrough_s</span></button>
+      <button (click)="editor.chain().focus().toggleCode().run()"
+        [ngClass]="editor.isActive('code') ? 'btn-secondary' : 'btn-outline-secondary'" class="btn" type="button"
+        [title]="t('editor.code')"><span class="material-symbols-outlined">code</span></button>
     </div>
     <div class="btn-group join-left" role="group">
-      <button (click)="editor.chain().focus().toggleOrderedList().run()"
-        [class.btn-outline-secondary]="!editor.isActive('orderedList')"
-        [class.btn-secondary]="editor.isActive('orderedList')" class="btn" type="button"
+      <button class="btn" type="button" (click)=" editor.chain().focus().toggleOrderedList().run()"
+        [ngClass]="editor.isActive('orderedList') ? 'btn-secondary' : 'btn-outline-secondary'"
         [title]="t('editor.orderedList')"><span class="material-symbols-outlined">format_list_numbered</span></button>
     </div>
     <div class="btn-group" role="group">
       <button (click)="editor.chain().focus().toggleBlockquote().run()"
-        [class.btn-outline-secondary]="!editor.isActive('blockquote')"
-        [class.btn-secondary]="editor.isActive('blockquote')" class="btn" type="button"
+        [ngClass]="editor.isActive('blockquote') ? 'btn-secondary' : 'btn-outline-secondary'" class="btn" type="button"
         [title]="t('editor.blockquote')"><span class="material-symbols-outlined">format_quote</span></button>
       <button (click)="editor.chain().focus().toggleCodeBlock().run()"
-        [class.btn-outline-secondary]="!editor.isActive('codeBlock')" [class.btn-secondary]="editor.isActive('codeBlock')"
-        class="btn" type="button" [title]="t('editor.codeBlock')"><span class="material-symbols-outlined">code_blocks</span></button>
+        [ngClass]="editor.isActive('codeBlock') ? 'btn-secondary' : 'btn-outline-secondary'" class="btn" type="button"
+        [title]="t('editor.codeBlock')"><span class="material-symbols-outlined">code_blocks</span></button>
       <button (click)="editor.chain().focus().setHorizontalRule().run()" class="btn btn-outline-secondary" type="button"
         [title]="t('editor.horizontalLine')"><span class="material-symbols-outlined">horizontal_rule</span></button>
     </div>

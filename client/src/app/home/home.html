@@ -35,8 +35,7 @@
       <div class="col-12 col-sm-auto">
         <div class="btn-group" role="group">
           <button type="button" class="btn" (click)="setSortBy('title')"
-            [class.btn-primary]="sortBy === 'title' && !isReloading" [class.btn-outline-primary]="sortBy !== 'title' && !isReloading"
-            [class.btn-secondary]="sortBy === 'title' && isReloading" [class.btn-outline-secondary]="sortBy !== 'title' && isReloading"
+            [ngClass]="sortBy === 'title' ? 'btn-primary' : 'btn-outline-primary'"
             [disabled]="isReloading">
             {{ 'home.sortName' | transloco }}
             @if (sortBy === 'title') {
@@ -48,8 +47,7 @@
             }
           </button>
           <button type="button" class="btn" (click)="setSortBy('createdAt')"
-            [class.btn-primary]="sortBy === 'createdAt' && !isReloading" [class.btn-outline-primary]="sortBy !== 'createdAt' && !isReloading"
-            [class.btn-secondary]="sortBy === 'createdAt' && isReloading" [class.btn-outline-secondary]="sortBy !== 'createdAt' && isReloading"
+            [ngClass]="sortBy === 'createdAt'? 'btn-primary' : 'btn-outline-primary'"
             [disabled]="isReloading">
             {{ 'home.sortDate' | transloco }}
             @if (sortBy === 'createdAt') {

@@ -1,92 +1,93 @@
 <app-load-state errorMessageKey="flashcard.toast.loadError">
-<div class="container-md" *transloco="let t">
-  <app-page-card icon="edit_document" [title]="'flashcard.edit.title' | transloco" [subtitle]="'flashcard.edit.subtitle' | transloco">
-    <form [formGroup]="editForm" (ngSubmit)="updateCard()" novalidate> <!-- TODO informarsi sul no validate -->
-      <div class="form-group">
-        <label for="title" class="form-label">{{ 'flashcard.create.titleLabel' | transloco }}</label>
-        <input type="text" formControlName="title" class="form-control"
-          [placeholder]="t('flashcard.create.titlePlaceholder')"
-          [class.is-invalid]="editForm.get('title')?.invalid && editForm.get('title')?.touched">
-        @if(editForm.get('title')?.hasError('minlength')){
-        <div class="invalid-feedback d-block">
-          {{ 'flashcard.create.titleMinError' | transloco }}
-        </div>
-        } @else {
-        @if(editForm.get('title')?.hasError('maxlength')){
-        <div class="invalid-feedback d-block">
-          {{ 'flashcard.create.titleMaxError' | transloco }}
-        </div>
-        }
-        @else {
-        @if(editForm.get('title')?.touched && editForm.get('title')?.hasError('required')){
-        <div class="invalid-feedback d-block">{{ 'flashcard.create.titleRequiredError' | transloco }}</div>
-        }
-        }
-        }
-      </div>
-
-      <div class="form-group">
-        <label for="question-editor" class="form-label">{{ 'flashcard.create.questionLabel' | transloco }}</label>
-        <app-rich-text-editor [editor]="questionEditor"></app-rich-text-editor>
-        @if(editForm.get('question')?.touched && editForm.get('question')?.hasError('minlength')){
-        <div class="invalid-feedback d-block">
-          {{ 'flashcard.create.questionMinError' | transloco }}
-        </div>
-        } @else if (editForm.get('question')?.hasError('maxlength')) {
-        <div class="invalid-feedback d-block">
-          {{ 'flashcard.create.questionMaxError' | transloco }}
-        </div>
-        }
-        @else if (editForm.get('question')?.touched && editForm.get('question')?.hasError('required')) {
-        <div class="invalid-feedback d-block">{{ 'flashcard.create.questionRequiredError' | transloco }}</div>
-        }
-      </div>
-
-      <div class="form-group">
-        <label for="answer-editor" class="form-label">{{ 'flashcard.create.answerLabel' | transloco }}</label>
-        <app-rich-text-editor [editor]="answerEditor"></app-rich-text-editor>
-        @if(editForm.get('answer')?.touched && editForm.get('answer')?.hasError('minlength')){
-        <div class="invalid-feedback d-block">
-          {{ 'flashcard.create.answerMinError' | transloco }}
-        </div>
-        } @else if (editForm.get('answer')?.hasError('maxlength')) {
-        <div class="invalid-feedback d-block">
-          {{ 'flashcard.create.answerMaxError' | transloco }}
-        </div>
-        }
-        @else if (editForm.get('answer')?.touched && editForm.get('answer')?.hasError('required')) {
-        <div class="invalid-feedback d-block">{{ 'flashcard.create.answerRequiredError' | transloco }}</div>
-        }
-      </div>
-
-      <div class="form-row">
+  <div class="container-md" *transloco="let t">
+    <app-page-card icon="edit_document" [title]="'flashcard.edit.title' | transloco"
+      [subtitle]="'flashcard.edit.subtitle' | transloco">
+      <form [formGroup]="editForm" (ngSubmit)="updateCard()" novalidate> <!-- TODO informarsi sul no validate -->
         <div class="form-group">
-          <label for="subject" class="form-label">{{ 'flashcard.create.subjectLabel' | transloco }}</label>
-          <app-searchable-select [options]="subjectOptions" [value]="editForm.get('subject_id')?.value"
-            [placeholder]="t('common.chooseSubject')"
-            (valueChange)="editForm.get('subject_id')?.setValue($event)"></app-searchable-select>
-          @if (editForm.get('subject_id')?.touched && editForm.get('subject_id')?.hasError('required')) {
-          <div class="invalid-feedback d-block">{{ 'flashcard.create.subjectRequiredError' | transloco }}</div>
+          <label for="title" class="form-label">{{ 'flashcard.create.titleLabel' | transloco }}</label>
+          <input type="text" formControlName="title" class="form-control"
+            [placeholder]="t('flashcard.create.titlePlaceholder')"
+            [class.is-invalid]="editForm.get('title')?.invalid && editForm.get('title')?.touched">
+          @if(editForm.get('title')?.hasError('minlength')){
+          <div class="invalid-feedback d-block">
+            {{ 'flashcard.create.titleMinError' | transloco }}
+          </div>
+          } @else {
+          @if(editForm.get('title')?.hasError('maxlength')){
+          <div class="invalid-feedback d-block">
+            {{ 'flashcard.create.titleMaxError' | transloco }}
+          </div>
+          }
+          @else {
+          @if(editForm.get('title')?.touched && editForm.get('title')?.hasError('required')){
+          <div class="invalid-feedback d-block">{{ 'flashcard.create.titleRequiredError' | transloco }}</div>
+          }
+          }
           }
         </div>
 
         <div class="form-group">
-          <label for="topic" class="form-label">{{ 'flashcard.create.topicLabel' | transloco }}</label>
-          <app-searchable-select [options]="topicOptions" [value]="editForm.get('topic_id')?.value"
-            [placeholder]="t('common.chooseTopic')"
-            (valueChange)="editForm.get('topic_id')?.setValue($event)"></app-searchable-select>
-          @if (editForm.get('topic_id')?.touched && editForm.get('topic_id')?.hasError('required')) {
-          <div class="invalid-feedback d-block">{{ 'flashcard.create.topicRequiredError' | transloco }}</div>
+          <label for="question-editor" class="form-label">{{ 'flashcard.create.questionLabel' | transloco }}</label>
+          <app-rich-text-editor [editor]="questionEditor"></app-rich-text-editor>
+          @if(editForm.get('question')?.touched && editForm.get('question')?.hasError('minlength')){
+          <div class="invalid-feedback d-block">
+            {{ 'flashcard.create.questionMinError' | transloco }}
+          </div>
+          } @else if (editForm.get('question')?.hasError('maxlength')) {
+          <div class="invalid-feedback d-block">
+            {{ 'flashcard.create.questionMaxError' | transloco }}
+          </div>
+          }
+          @else if (editForm.get('question')?.touched && editForm.get('question')?.hasError('required')) {
+          <div class="invalid-feedback d-block">{{ 'flashcard.create.questionRequiredError' | transloco }}</div>
           }
         </div>
-      </div>
 
-      <div class="form-actions">
-        <button type="submit" class="btn btn-primary btn-with-icon"
-          [ngClass]="editForm.invalid ? 'btn-outline-secondary' : 'btn-primary'" [disabled]="editForm.invalid"><span class="material-symbols-outlined">save</span>{{
-          'flashcard.edit.saveChanges' | transloco }}</button>
-      </div>
-    </form>
-  </app-page-card>
-</div>
+        <div class="form-group">
+          <label for="answer-editor" class="form-label">{{ 'flashcard.create.answerLabel' | transloco }}</label>
+          <app-rich-text-editor [editor]="answerEditor"></app-rich-text-editor>
+          @if(editForm.get('answer')?.touched && editForm.get('answer')?.hasError('minlength')){
+          <div class="invalid-feedback d-block">
+            {{ 'flashcard.create.answerMinError' | transloco }}
+          </div>
+          } @else if (editForm.get('answer')?.hasError('maxlength')) {
+          <div class="invalid-feedback d-block">
+            {{ 'flashcard.create.answerMaxError' | transloco }}
+          </div>
+          }
+          @else if (editForm.get('answer')?.touched && editForm.get('answer')?.hasError('required')) {
+          <div class="invalid-feedback d-block">{{ 'flashcard.create.answerRequiredError' | transloco }}</div>
+          }
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="subject" class="form-label">{{ 'flashcard.create.subjectLabel' | transloco }}</label>
+            <app-searchable-select [options]="subjectOptions" [value]="editForm.get('subject_id')?.value"
+              [placeholder]="t('common.chooseSubject')"
+              (valueChange)="editForm.get('subject_id')?.setValue($event)"></app-searchable-select>
+            @if (editForm.get('subject_id')?.touched && editForm.get('subject_id')?.hasError('required')) {
+            <div class="invalid-feedback d-block">{{ 'flashcard.create.subjectRequiredError' | transloco }}</div>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="topic" class="form-label">{{ 'flashcard.create.topicLabel' | transloco }}</label>
+            <app-searchable-select [options]="topicOptions" [value]="editForm.get('topic_id')?.value"
+              [placeholder]="t('common.chooseTopic')"
+              (valueChange)="editForm.get('topic_id')?.setValue($event)"></app-searchable-select>
+            @if (editForm.get('topic_id')?.touched && editForm.get('topic_id')?.hasError('required')) {
+            <div class="invalid-feedback d-block">{{ 'flashcard.create.topicRequiredError' | transloco }}</div>
+            }
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary btn-with-icon" [disabled]="editForm.invalid">
+            <span class="material-symbols-outlined">save</span>{{
+            'flashcard.edit.saveChanges' | transloco }}</button>
+        </div>
+      </form>
+    </app-page-card>
+  </div>
 </app-load-state>

@@ -1,10 +1,12 @@
 <div class="container-md" *transloco="let t">
-  <app-page-card icon="add_box" [title]="'flashcard.create.title' | transloco" [subtitle]="'flashcard.create.subtitle' | transloco">
+  <app-page-card icon="add_box" [title]="'flashcard.create.title' | transloco"
+    [subtitle]="'flashcard.create.subtitle' | transloco">
     <form [formGroup]="cardForm" (ngSubmit)="addCard()" novalidate>
 
       <div class="form-group">
         <label for="title" class="form-label">{{ 'flashcard.create.titleLabel' | transloco }}</label>
-        <input type="text" id="title" formControlName="title" class="form-control" [placeholder]="t('flashcard.create.titlePlaceholder')">
+        <input type="text" id="title" formControlName="title" class="form-control"
+          [placeholder]="t('flashcard.create.titlePlaceholder')">
         @if(cardForm.get('title')?.hasError('minlength')){
         <div class="invalid-feedback d-block">
           {{ 'flashcard.create.titleMinError' | transloco }}
@@ -57,15 +59,13 @@
         <div class="form-group">
           <label for="subject" class="form-label">{{ 'flashcard.create.subjectLabel' | transloco }}</label>
           <app-searchable-select [options]="subjectOptions" [value]="selectedSubjectId"
-            [placeholder]="t('common.chooseSubject')"
-            (valueChange)="onSubjectSelected($event)"></app-searchable-select>
+            [placeholder]="t('common.chooseSubject')" (valueChange)="onSubjectSelected($event)"></app-searchable-select>
         </div>
 
         <div class="form-group">
           <label for="topic" class="form-label">{{ 'flashcard.create.topicLabel' | transloco }}</label>
           <app-searchable-select [options]="topicOptions" [value]="selectedTopicId"
-            [placeholder]="t('common.chooseTopic')"
-            (valueChange)="onTopicSelected($event)"></app-searchable-select>
+            [placeholder]="t('common.chooseTopic')" (valueChange)="onTopicSelected($event)"></app-searchable-select>
           @if (cardForm.get('topic_id')?.touched && cardForm.get('topic_id')?.hasError('required')) {
           <div class="invalid-feedback d-block">{{ 'flashcard.create.topicRequiredError' | transloco }}</div>
           }
@@ -73,9 +73,8 @@
       </div>
 
       <div class="form-actions">
-        <button type="submit" class="btn btn-primary btn-with-icon"
-        [ngClass]="cardForm.invalid ? 'btn-outline-secondary' : 'btn-primary'"
-        [disabled]="cardForm.invalid"><span class="material-symbols-outlined">add</span>{{ 'flashcard.create.addButton' | transloco }}</button>
+        <button type="submit" class="btn btn-primary btn-with-icon" [disabled]="cardForm.invalid"><span
+            class="material-symbols-outlined">add</span>{{ 'flashcard.create.addButton' | transloco }}</button>
       </div>
     </form>
   </app-page-card>

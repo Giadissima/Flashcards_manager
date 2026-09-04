@@ -1,39 +1,39 @@
 <app-load-state errorMessageKey="topic.toast.loadError">
-<div class="container-md" *transloco="let t">
-  <app-page-card icon="edit" [title]="'topic.edit.title' | transloco" [subtitle]="'topic.edit.subtitle' | transloco">
-    <form [formGroup]="editForm" (ngSubmit)="updateTopic()" novalidate>
+  <div class="container-md" *transloco="let t">
+    <app-page-card icon="edit" [title]="'topic.edit.title' | transloco" [subtitle]="'topic.edit.subtitle' | transloco">
+      <form [formGroup]="editForm" (ngSubmit)="updateTopic()" novalidate>
 
-      <div class="form-group">
-        <label for="name" class="form-label">{{ 'common.name' | transloco }}</label>
-        <input type="text" id="name" formControlName="name" class="form-control">
-        @if (editForm.get('name')?.touched && editForm.get('name')?.hasError('minlength')) {
-        <div class="invalid-feedback d-block">{{ 'topic.create.nameMinError' | transloco }}</div>
-        } @else if (editForm.get('name')?.hasError('maxlength')) {
-        <div class="invalid-feedback d-block">{{ 'topic.create.nameMaxError' | transloco }}</div>
-        } @else if (editForm.get('name')?.touched && editForm.get('name')?.hasError('required')) {
-        <div class="invalid-feedback d-block">{{ 'topic.create.nameRequiredError' | transloco }}</div>
-        }
-      </div>
+        <div class="form-group">
+          <label for="name" class="form-label">{{ 'common.name' | transloco }}</label>
+          <input type="text" id="name" formControlName="name" class="form-control">
+          @if (editForm.get('name')?.touched && editForm.get('name')?.hasError('minlength')) {
+          <div class="invalid-feedback d-block">{{ 'topic.create.nameMinError' | transloco }}</div>
+          } @else if (editForm.get('name')?.hasError('maxlength')) {
+          <div class="invalid-feedback d-block">{{ 'topic.create.nameMaxError' | transloco }}</div>
+          } @else if (editForm.get('name')?.touched && editForm.get('name')?.hasError('required')) {
+          <div class="invalid-feedback d-block">{{ 'topic.create.nameRequiredError' | transloco }}</div>
+          }
+        </div>
 
-      <div class="form-group">
-        <label for="color" class="form-label">{{ 'common.color' | transloco }}</label>
-        <ngx-colors ngxColorsTrigger id="color" formControlName="color" class="big-ngx-colors"
-          [allowedModels]="['HEXA', 'RGBA']" [theme]="(themeService.theme$ | async) ?? 'light'" [lockValues]="{ alpha: 1, clamp: true }"></ngx-colors>
-      </div>
+        <div class="form-group">
+          <label for="color" class="form-label">{{ 'common.color' | transloco }}</label>
+          <ngx-colors ngxColorsTrigger id="color" formControlName="color" class="big-ngx-colors"
+            [allowedModels]="['HEXA', 'RGBA']" [theme]="(themeService.theme$ | async) ?? 'light'"
+            [lockValues]="{ alpha: 1, clamp: true }"></ngx-colors>
+        </div>
 
-      <div class="form-group">
-        <label for="subject" class="form-label">{{ 'common.subject' | transloco }}</label>
-        <app-searchable-select [options]="subjectOptions" [value]="editForm.get('subject_id')?.value"
-          [placeholder]="t('common.chooseSubject')"
-          (valueChange)="editForm.get('subject_id')?.setValue($event)"></app-searchable-select>
-      </div>
+        <div class="form-group">
+          <label for="subject" class="form-label">{{ 'common.subject' | transloco }}</label>
+          <app-searchable-select [options]="subjectOptions" [value]="editForm.get('subject_id')?.value"
+            [placeholder]="t('common.chooseSubject')"
+            (valueChange)="editForm.get('subject_id')?.setValue($event)"></app-searchable-select>
+        </div>
 
-      <div class="form-actions">
-        <button type="submit" class="btn btn-primary btn-with-icon"
-        [ngClass]="editForm.invalid ? 'btn-outline-secondary' : 'btn-primary'"
-        [disabled]="editForm.invalid"><span class="material-symbols-outlined">save</span>{{ 'topic.edit.saveChanges' | transloco }}</button>
-      </div>
-    </form>
-  </app-page-card>
-</div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary btn-with-icon" [disabled]="editForm.invalid"><span
+              class="material-symbols-outlined">save</span>{{ 'topic.edit.saveChanges' | transloco }}</button>
+        </div>
+      </form>
+    </app-page-card>
+  </div>
 </app-load-state>

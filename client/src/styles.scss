@@ -14,12 +14,9 @@
   --component-background: #f8f9fa;
   /* Surface of a panel nested inside a card: settings, filters. */
   --inset-background: #F5EFFF;
-  --on-primary-color: #000000;
   --on-accent-color: #f8f9fa;
   /* Neutral grey for a control that is switched off - a stopped timer, and
-     anything else that has to read as "not running". The palette has no grey
-     of its own: --secondary-color is a colour (lilac here, green in the dark
-     theme) and would say the opposite. Dark enough to carry white text. */
+     anything else that has to read as "not running". */
   --muted-color: #667085;
 }
 
@@ -42,7 +39,6 @@
   /* A step *lighter* than the card: in a dark theme depth reads by lightening,
      and the page background (#121212) is too hard a break. */
   --inset-background: #262626;
-  --on-primary-color: #ffffff;
   --on-accent-color: #f8f9fa;
   /* See the light theme: a grey that stays visible against #121212. */
   --muted-color: #5C6470;
@@ -55,6 +51,13 @@
 
 :root {
   --font-family: 'Nunito', sans-serif;
+
+  /* How far a filled button darkens its own resting colour on hover and while
+     pressed. Named here so every button walks the same ramp: the states of one
+     button stay in a single colour family instead of hopping between palette
+     tokens. */
+  --hover-percent: 88%;
+  --active-percent: 78%;
 
   /* Spacing & Radius */
   --spacing-unit: 8px;
@@ -453,19 +456,28 @@ input:-webkit-autofill:active {
   box-shadow: 0 4px 12px var(--border-color) !important;
 }
 
+/* Bootstrap's focus ring is blue - the one colour this palette does not use.
+   The accent colour replaces it for every button, so holding one down no
+   longer flashes blue. */
+.btn {
+  --bs-btn-focus-box-shadow: 0 0 0 0.25rem var(--accent-color);
+  --bs-btn-color: var(--header-color);
+  --bs-btn-hover-color: var(--header-color);
+  --bs-btn-active-color: var(--header-color);
+}
+
 .btn-primary {
   --bs-btn-bg: var(--primary-color);
   --bs-btn-border-color: var(--primary-color);
-  --bs-btn-hover-bg: var(--accent-color);
-  --bs-btn-hover-border-color: var(--accent-color);
-  color: #fff;
+  --bs-btn-hover-bg: color-mix(in srgb, var(--primary-color) var(--hover-percent), #000);
+  --bs-btn-hover-border-color: color-mix(in srgb, var(--primary-color) var(--hover-percent), #000);
+  --bs-btn-active-bg: color-mix(in srgb, var(--primary-color) var(--active-percent), #000);
+  --bs-btn-active-border-color: color-mix(in srgb, var(--primary-color) var(--active-percent), #000);
 }
 
-.btn-secondary {
-  --bs-btn-bg: var(--secondary-color);
-  --bs-btn-border-color: var(--secondary-color);
-  --bs-btn-hover-bg: var(--primary-color);
-  color: var(--header-color);
+.btn-outline-secondary {
+  --bs-btn-active-bg: var(--muted-color);
+  --bs-btn-active-border-color: var(--muted-color);
 }
 
 /* Outline Button Refinement */
@@ -475,19 +487,37 @@ input:-webkit-autofill:active {
   --bs-btn-border-color: var(--primary-color);
 
   /* Hover State */
-  --bs-btn-hover-bg: var(--accent-color);
-  --bs-btn-hover-border-color: var(--accent-color);
-  --bs-btn-hover-color: var(--component-background);
+  --bs-btn-hover-bg: var(--primary-color);
+  --bs-btn-hover-border-color: var(--primary-color);
 
   /* Active State (When clicked or toggled) */
-  --bs-btn-active-bg: var(--primary-color);
-  --bs-btn-active-border-color: var(--primary-color);
-  --bs-btn-active-color: var(--on-primary-color);
+  --bs-btn-active-bg: color-mix(in srgb, var(--primary-color) var(--active-percent), #000);
+  --bs-btn-active-border-color: color-mix(in srgb, var(--primary-color) var(--active-percent), #000);
 }
 
-.btn-outline-primary:hover:not(:disabled) {
-  background-color: var(--accent-color);
-  color: var(--component-background);
+.btn-outline-success {
+  --bs-btn-color: var(--success-color);
+  --bs-btn-hover-color: var(--header-color);
+  --bs-btn-active-color: var(--header-color);
+}
+
+.btn-outline-danger {
+  --bs-btn-color: var(--danger-color);
+  --bs-btn-hover-color: var(--header-color);
+  --bs-btn-active-color: var(--header-color);
+}
+
+.btn-outline-warning {
+  --bs-btn-color: var(--warning-color);
+  --bs-btn-hover-color: var(--header-color);
+  --bs-btn-active-color: var(--header-color);
+}
+
+// override bootstrap's btn disabled styles
+.btn.disabled, .btn:disabled, fieldset:disabled .btn {
+    --bs-btn-disabled-color: var(--muted-color);
+    --bs-btn-disabled-border-color: var(--muted-color);
+    --bs-btn-disabled-bg: transparent;
 }
 
 /* ---------------------------------- */
@@ -552,7 +582,6 @@ input:-webkit-autofill:active {
   flex-grow: 1;
   white-space: pre-wrap;
   text-align: left;
-  margin-bottom: calc(var(--spacing-unit) * 2);
 }
 
 /* Centred by default, which is what the test runner wants: one wide card at a
@@ -1003,7 +1032,7 @@ $image-modal-height: calc(100vh - var(--navbar-height) - 32px - 64px);
 .dropdown-content a:hover,
 .dropdown-content a:focus {
   background-color: var(--primary-color);
-  color: var(--on-primary-color);
+  color: var(--header-color);
   outline: none;
 }
 

@@ -28,6 +28,7 @@ import { TranslocoModule } from '@jsverse/transloco';
   standalone: true,
   imports: [ModalComponent, TranslocoModule],
   templateUrl: './image-lightbox.component.html',
+  styleUrl: './image-lightbox.component.scss',
 })
 export class ImageLightboxComponent implements AfterViewChecked, OnDestroy {
   @ViewChild('image') imageRef?: ElementRef<HTMLImageElement>;

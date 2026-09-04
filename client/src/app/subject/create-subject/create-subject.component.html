@@ -1,5 +1,6 @@
 <div class="container-md" *transloco="let t">
-  <app-page-card icon="library_add" [title]="'subject.create.title' | transloco" [subtitle]="'subject.create.subtitle' | transloco">
+  <app-page-card icon="library_add" [title]="'subject.create.title' | transloco"
+    [subtitle]="'subject.create.subtitle' | transloco">
     <form [formGroup]="subjectForm" (ngSubmit)="createSubject()" novalidate>
 
       <div class="form-group">
@@ -32,9 +33,9 @@
         (reset)="resetIcon()"></app-subject-icon-preview>
 
       <div class="form-actions">
-        <button type="submit" class="btn btn-with-icon"
-          [ngClass]="(subjectForm.invalid) || descLength > descMaxLength ? 'btn-outline-secondary' : 'btn-primary'"
-          [disabled]="subjectForm.invalid || descLength > descMaxLength"><span class="material-symbols-outlined">add</span>{{ 'subject.create.createButton' | transloco
+        <button type="submit" class="btn btn-primary btn-with-icon"
+          [disabled]="subjectForm.invalid || descLength > descMaxLength"><span
+            class="material-symbols-outlined">add</span>{{ 'subject.create.createButton' | transloco
           }}</button>
       </div>
     </form>
