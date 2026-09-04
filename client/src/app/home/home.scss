@@ -59,10 +59,9 @@
 
 /* A long question is cut instead of being shown whole: in the grid a question
    is scanned, not read, and one card three times the height of its neighbours
-   sets the height of the whole row. The cut is blurred rather than hard, so it
+   sets the height of the whole row. The cut is faded rather than hard, so it
    reads as "there is more" and not as a card that ends mid-sentence. */
 .flashcard-text.is-clamped {
-  position: relative;
   /* About four lines. Deliberately close to the height a one-line question
      already gives the card (see min-height above): a cut card should stand a
      little taller than its neighbours, not twice as tall - the row is meant to
@@ -77,25 +76,23 @@
   max-height: 4lh;
   overflow: hidden;
 
-  /* The band sits on the last strip of visible text and blurs what shows
-     through it. The mask ramps the blur up towards the cut, so the text goes
-     out of focus gradually instead of hitting a sharp edge; the gradient
-     underneath fades it into the card so the very last pixels are unreadable
-     rather than merely soft. */
-  &.is-cut::after {
-    content: '';
-    position: absolute;
-    inset: auto 0 0 0;
-    /* One line: the band veils the last one whole, so nothing is left half
-       readable at the edge. */
-    height: 1.5em;
-    height: 1lh;
-    pointer-events: none;
-    backdrop-filter: blur(3px);
-    -webkit-backdrop-filter: blur(3px);
-    background: linear-gradient(to bottom, transparent, var(--component-background));
-    mask-image: linear-gradient(to bottom, transparent, #000 70%);
-    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 70%);
+  /* The content is faded out towards the cut instead of being covered by a
+     blurred band. A band is a rectangle of some chosen height, and no height
+     is right for every card: the body mixes plain text with much taller lines
+     (a formula, an image), so wherever the band starts, a tall line cut by the
+     clamp keeps its top sharp above it and the band's own start shows up as
+     blur beginning in the middle of a line - which is what reflowing the grid
+     kept exposing. A mask has no edge to place: the content goes to fully
+     transparent exactly at the cut, whatever happens to land there, and the
+     fade is continuous, so there is no point where it can be seen to begin. */
+  &.is-cut {
+    /* Roughly the last line and a half - enough for the fade to read as one,
+       short enough not to eat into what the card is still showing. The em
+       value is the fallback for browsers without the lh unit. */
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 2.25em), transparent);
+    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 2.25em), transparent);
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 1.5lh), transparent);
+    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 1.5lh), transparent);
   }
 }
 
