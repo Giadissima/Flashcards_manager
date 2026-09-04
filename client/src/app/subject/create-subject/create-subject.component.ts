@@ -10,7 +10,7 @@ import { PageCardComponent } from '../../shared/page-card/page-card.component';
 import { Router } from '@angular/router';
 import { SubjectService } from '../subject.service';
 import { defaultSubjectIconColor } from '../subject-icon.util';
-import { SubjectIconPreviewComponent } from '../subject-icon-preview/subject-icon-preview.component';
+import { SubjectIconPreviewComponent } from '../../shared/subject-icon-preview/subject-icon-preview.component';
 import { ToastService } from '../../shared/toast/toast.service';
 import { RichTextEditorComponent } from '../../shared/rich-text-editor/rich-text-editor.component';
 
@@ -69,16 +69,14 @@ export class CreateSubjectComponent implements OnInit, OnDestroy {
     }
   }
 
-  onFileSelected(event: Event): void {
-    const element = event.currentTarget as HTMLInputElement;
-    let fileList: FileList | null = element.files;
-    if (fileList && fileList.length) {
-      if (this.selectedFile && this.filePreviewUrl) {
-        URL.revokeObjectURL(this.filePreviewUrl);
-      }
-      this.selectedFile = fileList[0];
-      this.filePreviewUrl = URL.createObjectURL(this.selectedFile);
+  // Already cropped by app-subject-icon-preview: what arrives here is the icon
+  // as it will be stored, not the file the user picked.
+  onFileSelected(file: File): void {
+    if (this.selectedFile && this.filePreviewUrl) {
+      URL.revokeObjectURL(this.filePreviewUrl);
     }
+    this.selectedFile = file;
+    this.filePreviewUrl = URL.createObjectURL(file);
   }
 
   resetIcon(): void {

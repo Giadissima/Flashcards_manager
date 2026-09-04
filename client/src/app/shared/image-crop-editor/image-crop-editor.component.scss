@@ -1,0 +1,42 @@
+.crop-hint {
+  margin-bottom: calc(var(--spacing-unit) * 1.5);
+  font-size: 0.9rem;
+}
+
+/* The library sizes itself on the space it is given, so the height is capped
+   here rather than left to the image: a tall picture would otherwise push the
+   controls and the buttons of the dialog off the screen. */
+.crop-area {
+  display: flex;
+  justify-content: center;
+
+  /* The library dims what falls outside the crop with these three variables,
+     and its defaults are built for a white page: left alone, the dark theme
+     would get a white veil over the image. */
+  --cropper-overlay-color: var(--component-background);
+  --cropper-outline-color: rgba(0, 0, 0, 0.45);
+  --cropper-color: var(--text-color);
+
+  image-cropper {
+    display: block;
+    width: 100%;
+    max-height: 55vh;
+  }
+}
+
+/* Same row of three as the lightbox, under the image instead of over it: here
+   the frame is a working area, not a picture to be left unobstructed. */
+.crop-zoom-controls {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-unit);
+  margin-top: calc(var(--spacing-unit) * 1.5);
+}
+
+/* Under the buttons, as wide as the frame: the buttons step through the zoom,
+   the slider shows where it currently sits and allows to go straight there. */
+.crop-zoom-slider {
+  display: block;
+  width: 100%;
+  margin-top: var(--spacing-unit);
+}

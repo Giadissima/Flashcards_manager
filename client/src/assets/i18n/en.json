@@ -58,7 +58,12 @@
     "zoomIn": "Zoom in",
     "zoomOut": "Zoom out",
     "zoomReset": "Reset zoom",
-    "confirmDelete": "Confirm deletion"
+    "confirmDelete": "Confirm deletion",
+    "cropImage": "Adjust the icon",
+    "cropHint": "Drag the image to move it, and use the controls to zoom.",
+    "cropConfirm": "Use this crop",
+    "cropLoadError": "This image could not be opened",
+    "zoomLevel": "Zoom level"
   },
   "notFound": {
     "title": "404",

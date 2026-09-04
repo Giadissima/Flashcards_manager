@@ -14,7 +14,7 @@ import { ToastService } from '../../shared/toast/toast.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { charMinLength, nameMaxLength, descMaxLength } from '../../../config/config';
 import { buildDefaultSubjectIconSvgMarkup, defaultSubjectIconColor, getSubjectIconUrl } from '../subject-icon.util';
-import { SubjectIconPreviewComponent } from '../subject-icon-preview/subject-icon-preview.component';
+import { SubjectIconPreviewComponent } from '../../shared/subject-icon-preview/subject-icon-preview.component';
 
 @Component({
   selector: 'app-edit-subject',
@@ -104,13 +104,11 @@ export class EditSubjectComponent implements OnInit, OnDestroy {
     this.previewUrl = this.subject.icon ? getSubjectIconUrl(this.subject) : null;
   }
 
-  onFileSelected(event: Event): void {
-    const element = event.currentTarget as HTMLInputElement;
-    const fileList = element.files;
-    if (fileList && fileList.length) {
-      this.resetToDefault = false;
-      this.setSelectedFile(fileList[0]);
-    }
+  // Already cropped by app-subject-icon-preview: what arrives here is the icon
+  // as it will be stored, not the file the user picked.
+  onFileSelected(file: File): void {
+    this.resetToDefault = false;
+    this.setSelectedFile(file);
   }
 
   // Goes back to the live preview, which follows the colour picker: any picked

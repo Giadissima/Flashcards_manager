@@ -58,7 +58,12 @@
     "zoomIn": "Zoom avanti",
     "zoomOut": "Zoom indietro",
     "zoomReset": "Reimposta zoom",
-    "confirmDelete": "Conferma eliminazione"
+    "confirmDelete": "Conferma eliminazione",
+    "cropImage": "Regola l'icona",
+    "cropHint": "Trascina l'immagine per spostarla e usa i controlli per lo zoom.",
+    "cropConfirm": "Usa questo ritaglio",
+    "cropLoadError": "Non è stato possibile aprire questa immagine",
+    "zoomLevel": "Livello di zoom"
   },
   "notFound": {
     "title": "404",

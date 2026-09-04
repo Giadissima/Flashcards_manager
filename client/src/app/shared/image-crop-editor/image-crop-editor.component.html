@@ -1,0 +1,38 @@
+<app-modal [(isOpen)]="isOpen" [title]="'common.cropImage' | transloco" [showFooter]="true"
+  [closeOnBackdropClick]="false" (closed)="onClosed()">
+  @if (imageFile) {
+  <p class="crop-hint text-muted">{{ 'common.cropHint' | transloco }}</p>
+  <div class="crop-area" (wheel)="onWheel($event)">
+    <image-cropper #cropper [imageFile]="imageFile" [maintainAspectRatio]="true" [aspectRatio]="1"
+      [roundCropper]="true" [hideResizeSquares]="true" [allowMoveImage]="true" [transform]="transform"
+      (transformChange)="transform = $event" [output]="'blob'" [format]="'png'" [resizeToWidth]="outputSize"
+      [onlyScaleDown]="true" [backgroundColor]="'transparent'" (imageCropped)="onImageCropped($event)"
+      (loadImageFailed)="onLoadFailed()"></image-cropper>
+  </div>
+  @if (loadFailed) {
+  <p class="text-danger mb-0">{{ 'common.cropLoadError' | transloco }}</p>
+  }
+  <div class="crop-zoom-controls">
+    <button type="button" class="btn btn-secondary btn-sm" (click)="zoomOut()"
+      [attr.aria-label]="'common.zoomOut' | transloco">
+      <span class="material-symbols-outlined">zoom_out</span>
+    </button>
+    <button type="button" class="btn btn-secondary btn-sm" (click)="resetZoom()"
+      [attr.aria-label]="'common.zoomReset' | transloco">
+      <span class="material-symbols-outlined">aspect_ratio</span>
+    </button>
+    <button type="button" class="btn btn-secondary btn-sm" (click)="zoomIn()"
+      [attr.aria-label]="'common.zoomIn' | transloco">
+      <span class="material-symbols-outlined">zoom_in</span>
+    </button>
+  </div>
+  <input type="range" class="form-range crop-zoom-slider" [min]="minScale" [max]="maxScale" [step]="scaleStep"
+    [value]="transform.scale ?? 1" (input)="onScaleInput($event)" [attr.aria-label]="'common.zoomLevel' | transloco">
+  }
+  <ng-container modal-footer>
+    <button type="button" class="btn btn-outline-secondary" (click)="cancel()">{{ 'common.cancel' | transloco }}</button>
+    <button type="button" class="btn btn-primary" (click)="confirm()" [disabled]="!imageFile || loadFailed">
+      <span class="material-symbols-outlined">crop</span>{{ 'common.cropConfirm' | transloco }}
+    </button>
+  </ng-container>
+</app-modal>

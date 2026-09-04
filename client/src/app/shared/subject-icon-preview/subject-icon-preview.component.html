@@ -16,5 +16,6 @@
   <label for="icon" class="btn btn-outline-primary">
     <span class="material-symbols-outlined">upload_file</span>{{ fileLabel }}
   </label>
-  <input type="file" id="icon" #icon accept="image/*" (change)="fileSelected.emit($event)" class="visually-hidden">
+  <input type="file" id="icon" #icon accept="image/*" (change)="onFileChosen($event, icon)" class="visually-hidden">
+  <app-image-crop-editor (cropped)="onCropped($event)"></app-image-crop-editor>
 </div>
