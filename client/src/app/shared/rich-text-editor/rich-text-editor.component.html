@@ -94,36 +94,80 @@
       </label>
     </div>
     <div class="btn-group" role="group">
-      <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown"
-        aria-expanded="false" [title]="t('editor.latexGroupTitle')">
+      <button type="button" class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"
+        [ngClass]="editingMath ? 'btn-secondary' : 'btn-outline-secondary'" [title]="t('editor.latexGroupTitle')">
         <span class="material-symbols-outlined">function</span>
       </button>
       <ul class="dropdown-menu">
-        <li><button (click)="editor.commands.insertContent('$')" class="dropdown-item" type="button">
-            <svg class="me-2 latex-inline-icon" viewBox="0 0 200 180" xmlns="http://www.w3.org/2000/svg">
-              <rect x="30" y="30" width="140" height="16" rx="8" fill="currentColor" />
-              <rect x="30" y="80" width="35" height="16" rx="8" fill="currentColor" />
-              <rect x="135" y="80" width="35" height="16" rx="8" fill="currentColor" />
-              <svg x="63" y="51" width="74" height="74" viewBox="0 -960 960 960">
-                <path fill="currentColor"
-                  d="M400-240v-80h62l105-120-105-120h-66l-64 344q-8 45-37 70.5T221-120q-45 0-73-24t-28-64q0-32 17-51.5t43-19.5q25 0 42.5 17t17.5 41q0 5-.5 9t-1.5 9q5-1 8.5-5.5T252-221l62-339H200v-80h129l21-114q7-38 37.5-62t72.5-24q44 0 72 26t28 65q0 30-17 49.5T500-680q-25 0-42.5-17T440-739q0-5 .5-9t1.5-9q-6 2-9 6t-5 12l-17 99h189v80h-32l52 59 52-59h-32v-80h200v80h-62L673-440l105 120h62v80H640v-80h32l-52-60-52 60h32v80H400Z" />
-              </svg>
-              <rect x="30" y="130" width="140" height="16" rx="8" fill="currentColor" />
-            </svg>{{ t('editor.latexInline') }}</button></li>
-        <li><button (click)="editor.commands.insertContent('$$')" class="dropdown-item" type="button">
-            <svg class="me-2 latex-inline-icon" viewBox="0 0 200 180" xmlns="http://www.w3.org/2000/svg">
-              <rect x="30" y="14" width="140" height="14" rx="7" fill="currentColor" />
-              <rect x="45" y="48" width="110" height="72" rx="4" fill="none" stroke="currentColor" stroke-width="8" />
-              <svg x="72" y="56" width="56" height="56" viewBox="0 -960 960 960">
-                <path fill="currentColor"
-                  d="M400-240v-80h62l105-120-105-120h-66l-64 344q-8 45-37 70.5T221-120q-45 0-73-24t-28-64q0-32 17-51.5t43-19.5q25 0 42.5 17t17.5 41q0 5-.5 9t-1.5 9q5-1 8.5-5.5T252-221l62-339H200v-80h129l21-114q7-38 37.5-62t72.5-24q44 0 72 26t28 65q0 30-17 49.5T500-680q-25 0-42.5-17T440-739q0-5 .5-9t1.5-9q-6 2-9 6t-5 12l-17 99h189v80h-32l52 59 52-59h-32v-80h200v80h-62L673-440l105 120h62v80H640v-80h32l-52-60-52 60h32v80H400Z" />
-              </svg>
-              <rect x="30" y="136" width="140" height="14" rx="7" fill="currentColor" />
-            </svg>{{ t('editor.latexBlock') }}</button></li>
+        <li><button (click)="insertMath(false)" class="dropdown-item" type="button">
+            <ng-container *ngTemplateOutlet="inlineFormulaIcon; context: { spaced: true }"></ng-container>{{
+            t('editor.latexInline') }}</button></li>
+        <li><button (click)="insertMath(true)" class="dropdown-item" type="button">
+            <ng-container *ngTemplateOutlet="blockFormulaIcon; context: { spaced: true }"></ng-container>{{
+            t('editor.latexBlock') }}</button></li>
       </ul>
     </div>
   </div>
 
+  <!-- The formula bar. A formula is one atom of the document, drawn by KaTeX,
+       so there is nothing inside it to type into: the box in the text shows the
+       result, this row holds the LaTeX behind it. It opens on whichever formula
+       is selected - the one the toolbar has just inserted, or the one that has
+       been clicked - and closes as soon as the cursor goes back to the text. -->
+  <div class="math-bar" *ngIf="editingMath">
+    <div class="input-group input-group-sm">
+      <span class="input-group-text"><span class="material-symbols-outlined">function</span></span>
+      <input #mathInput type="text" class="form-control math-source" spellcheck="false" autocomplete="off"
+        [attr.aria-label]="t('editor.latexSource')" [placeholder]="t('editor.latexPlaceholder')"
+        (input)="onMathInput(mathInput.value)" (keydown.enter)="finishMath($event)"
+        (keydown.escape)="cancelMath($event)" (keydown.arrowleft)="leaveMathLeft($event)"
+        (keydown.arrowright)="leaveMathRight($event)">
+      <button type="button" class="btn btn-outline-secondary" (click)="toggleMathDisplay()"
+        [title]="mathIsBlock ? t('editor.latexToInline') : t('editor.latexToBlock')">
+        <ng-container *ngTemplateOutlet="mathIsBlock ? inlineFormulaIcon : blockFormulaIcon"></ng-container>
+      </button>
+      <button type="button" class="btn btn-outline-secondary" (click)="deleteMath()"
+        [title]="t('editor.latexRemove')"><span class="material-symbols-outlined">delete</span></button>
+      <button type="button" class="btn btn-secondary" (click)="finishMath()" [title]="t('editor.latexDone')"><span
+          class="material-symbols-outlined">check</span></button>
+    </div>
+    <!-- mousedown is stopped rather than click: pressing a button would take
+         the focus off the field, and with it the caret the symbol is written
+         at. -->
+    <div class="math-symbols">
+      <button *ngFor="let symbol of mathSymbols" type="button" class="btn btn-outline-secondary math-symbol"
+        [title]="symbol.latex" (mousedown)="$event.preventDefault()"
+        (click)="insertMathSymbol(symbol)">{{ symbol.label }}</button>
+    </div>
+  </div>
+
   <input type="file" [id]="imageInputId" accept="image/*" hidden (change)="onImageSelected($event)">
+
+  <!-- The two shapes a formula can take, drawn once for the menu that inserts
+       one and for the button that switches an open formula between them. -->
+  <ng-template #inlineFormulaIcon let-spaced="spaced">
+    <svg class="latex-inline-icon" [class.me-2]="spaced" viewBox="0 0 200 180" xmlns="http://www.w3.org/2000/svg">
+      <rect x="30" y="30" width="140" height="16" rx="8" fill="currentColor" />
+      <rect x="30" y="80" width="35" height="16" rx="8" fill="currentColor" />
+      <rect x="135" y="80" width="35" height="16" rx="8" fill="currentColor" />
+      <svg x="63" y="51" width="74" height="74" viewBox="0 -960 960 960">
+        <path fill="currentColor"
+          d="M400-240v-80h62l105-120-105-120h-66l-64 344q-8 45-37 70.5T221-120q-45 0-73-24t-28-64q0-32 17-51.5t43-19.5q25 0 42.5 17t17.5 41q0 5-.5 9t-1.5 9q5-1 8.5-5.5T252-221l62-339H200v-80h129l21-114q7-38 37.5-62t72.5-24q44 0 72 26t28 65q0 30-17 49.5T500-680q-25 0-42.5-17T440-739q0-5 .5-9t1.5-9q-6 2-9 6t-5 12l-17 99h189v80h-32l52 59 52-59h-32v-80h200v80h-62L673-440l105 120h62v80H640v-80h32l-52-60-52 60h32v80H400Z" />
+      </svg>
+      <rect x="30" y="130" width="140" height="16" rx="8" fill="currentColor" />
+    </svg>
+  </ng-template>
+
+  <ng-template #blockFormulaIcon let-spaced="spaced">
+    <svg class="latex-inline-icon" [class.me-2]="spaced" viewBox="0 0 200 180" xmlns="http://www.w3.org/2000/svg">
+      <rect x="30" y="14" width="140" height="14" rx="7" fill="currentColor" />
+      <rect x="45" y="48" width="110" height="72" rx="4" fill="none" stroke="currentColor" stroke-width="8" />
+      <svg x="72" y="56" width="56" height="56" viewBox="0 -960 960 960">
+        <path fill="currentColor"
+          d="M400-240v-80h62l105-120-105-120h-66l-64 344q-8 45-37 70.5T221-120q-45 0-73-24t-28-64q0-32 17-51.5t43-19.5q25 0 42.5 17t17.5 41q0 5-.5 9t-1.5 9q5-1 8.5-5.5T252-221l62-339H200v-80h129l21-114q7-38 37.5-62t72.5-24q44 0 72 26t28 65q0 30-17 49.5T500-680q-25 0-42.5-17T440-739q0-5 .5-9t1.5-9q-6 2-9 6t-5 12l-17 99h189v80h-32l52 59 52-59h-32v-80h200v80h-62L673-440l105 120h62v80H640v-80h32l-52-60-52 60h32v80H400Z" />
+      </svg>
+      <rect x="30" y="136" width="140" height="14" rx="7" fill="currentColor" />
+    </svg>
+  </ng-template>
 </div>
 <tiptap-editor [editor]="editor" class="tiptap-editor-custom"></tiptap-editor>

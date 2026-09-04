@@ -1,7 +1,7 @@
 import { Editor, Extensions } from '@tiptap/core';
 
 import Image from '@tiptap/extension-image';
-import { MathExtension } from '@aarkue/tiptap-math-extension';
+import { InlineMath } from './math.extension';
 import Placeholder from '@tiptap/extension-placeholder';
 import StarterKit from '@tiptap/starter-kit';
 
@@ -27,10 +27,7 @@ export function createRichTextEditor(
 ): Editor {
   const { placeholder, withImage = true, onUpdate, onBlur } = options;
 
-  const extensions: Extensions = [
-    StarterKit,
-    MathExtension.configure({ evaluation: false }),
-  ];
+  const extensions: Extensions = [StarterKit, InlineMath];
 
   if (withImage) {
     extensions.push(Image.configure({ inline: false }));

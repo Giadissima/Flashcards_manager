@@ -109,7 +109,13 @@
     "linkPrompt": "Inserisci l'URL del link",
     "latexGroupTitle": "Formule matematiche (LaTeX)",
     "latexInline": "Formula in linea",
-    "latexBlock": "Formula in blocco"
+    "latexBlock": "Formula in blocco",
+    "latexSource": "Formula LaTeX",
+    "latexPlaceholder": "Scrivi la formula, es. \frac{a}{b}",
+    "latexToInline": "Riportala nella riga",
+    "latexToBlock": "Mettila su una riga a sé",
+    "latexRemove": "Elimina formula",
+    "latexDone": "Fatto"
   },
   "flashcard": {
     "create": {

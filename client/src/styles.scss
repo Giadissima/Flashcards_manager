@@ -725,6 +725,47 @@ fieldset:disabled .btn {
   pointer-events: none;
 }
 
+/* A formula inside the editor. It is a single atom of the document - KaTeX
+   draws it and there is nothing inside it to type into - so clicking it opens
+   the formula bar of the toolbar, which is where its LaTeX is written. These
+   rules live here, and not in the component sheet, for the reason given at the
+   top of rich-text-editor.component.scss: ProseMirror builds this markup at
+   runtime and it never carries the scoping attribute of the component. */
+.tiptap .tiptap-math {
+  cursor: pointer;
+  border-radius: var(--border-radius-sm);
+  padding: 0 2px;
+}
+
+/* The box a formula shows while it is still empty, which is how every formula
+   starts: the toolbar puts one down and the bar fills it in. Without it there
+   would be nothing on the page to see or to click, since a formula with no
+   LaTeX in it renders to nothing at all. */
+.tiptap .tiptap-math.is-empty {
+  display: inline-block;
+  width: 1.1em;
+  height: 1.1em;
+  vertical-align: -0.2em;
+  border: 1.5px dashed var(--primary-color);
+}
+
+/* An empty formula that is going to be rendered on a line of its own shows the
+   room it will take there, rather than a box sitting in the middle of a line. */
+.tiptap .tiptap-math.is-empty.is-block {
+  display: block;
+  width: 3em;
+  height: 1.7em;
+  margin: calc(var(--spacing-unit) * 1.5) auto;
+}
+
+/* The formula the bar is open on. ProseMirror marks a selected node with this
+   class and draws its own blue outline over it, which belongs to neither
+   theme. */
+.tiptap .tiptap-math.ProseMirror-selectednode {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 1px;
+}
+
 /* ngx-colors renders a 26x26px swatch by default (set through :host in its own
    component): too small to read as a clickable input. !important is required to
    beat the :host rule, which outranks a plain global type selector. */

@@ -42,6 +42,38 @@
   font-size: 20px;
 }
 
+/* A row of its own at the end of the toolbar, on any screen: near the buttons
+   that open it, and above the text, so the formula being written and the
+   result it draws stay in sight together. On a phone it also rides the sticky
+   toolbar, which puts it clear of the on-screen keyboard. */
+.math-bar {
+  flex-basis: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--spacing-unit) * 0.5);
+}
+
+/* LaTeX is written character by character, and a monospaced face is what keeps
+   a brace, a backslash and an underscore apart while it is. */
+.math-source {
+  font-family: var(--bs-font-monospace);
+}
+
+.math-symbols {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--spacing-unit) * 0.5);
+}
+
+/* Square-ish and all the same width, so the palette reads as a grid of symbols
+   rather than as a line of buttons of assorted lengths. */
+.math-symbol {
+  justify-content: center;
+  min-width: calc(var(--spacing-unit) * 4.5);
+  padding: calc(var(--spacing-unit) * 0.25) calc(var(--spacing-unit) * 0.5);
+  line-height: 1.5;
+}
+
 /* The toolbar folds itself on a phone: only the controls used while writing
    stay on the first row, the rest waits behind the toggle, which the wide
    layout does not draw at all. */
@@ -97,6 +129,10 @@
 
   .editor-toolbar-extras > :nth-child(6) {
     order: 10; /* LaTeX */
+  }
+
+  .math-bar {
+    order: 11;
   }
 
   /* Pulled back over the gap of the toolbar and over the border the two
