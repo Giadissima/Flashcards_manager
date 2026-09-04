@@ -55,42 +55,6 @@
         height: 20px;
     }
   }
-
-  /* The three secondary actions carry no border and no fill: an outlined box
-     around each one reads before the glyph inside it does, and three of them in
-     a row pull the eye away from the single primary action. The glyph alone is
-     enough to find them; the surface only appears under the pointer, where the
-     button has to confirm it is a target. Same padding as the primary button,
-     so the row lines up along one height. */
-  .btn-icon-ghost {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-color);
-    background-color: transparent;
-    border-color: transparent;
-
-    .material-symbols-outlined {
-      font-size: 20px;
-    }
-
-    &:hover,
-    &:focus-visible {
-      color: var(--header-color);
-      background-color: var(--inset-background);
-      border-color: transparent;
-    }
-  }
-
-  /* Delete keeps its warning, but only at the moment it matters: under the
-     pointer, not while the card is simply being read. */
-  .btn-danger-hover {
-    &:hover,
-    &:focus-visible {
-      color: var(--danger-color);
-      background-color: var(--danger-tint);
-    }
-  }
 }
 
 /* A long question is cut instead of being shown whole: in the grid a question

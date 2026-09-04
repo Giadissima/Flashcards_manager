@@ -29,7 +29,7 @@
           <td class="cell-title">{{ subject.name }}</td>
           <td class="cell-meta">
             @if (hasDescription(subject)) {
-            <button type="button" class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1" (click)="toggleDescription(subject._id)">
+            <button type="button" class="btn btn-sm btn-outline-secondary" (click)="toggleDescription(subject._id)">
               <span class="material-symbols-outlined">
                 {{ isDescriptionExpanded(subject._id) ? 'expand_less' : 'expand_more' }}
               </span>

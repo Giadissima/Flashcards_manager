@@ -44,11 +44,6 @@
   --muted-color: #5C6470;
 }
 
-.btn-dark { // this button is transparent and used for icons
-  --bs-btn-bg: rgba(255, 255, 255, 0);
-  --bs-btn-border-color: rgba(255, 255, 255, 0)
-}
-
 :root {
   --font-family: 'Nunito', sans-serif;
 
@@ -327,7 +322,7 @@ input:-webkit-autofill:active {
 
 /* The buttons of an actions cell are spaced by the cell, so the same spacing
    holds once the row becomes a card. */
-.cell-actions .btn + .btn {
+.cell-actions .btn+.btn {
   margin-left: calc(var(--spacing-unit) * 0.5);
 }
 
@@ -344,6 +339,7 @@ input:-webkit-autofill:active {
    draws something in the left gutter (a colour stripe, an avatar) sizes it
    with --stacked-gutter. */
 @media (max-width: 768px) {
+
   .table-stacked,
   .table-stacked tbody,
   .table-stacked tr,
@@ -449,21 +445,55 @@ input:-webkit-autofill:active {
   transition: all 0.2s ease-in-out;
   outline: none;
   box-shadow: none;
-}
 
-.btn:hover:not(:disabled) {
-  /* Subtle lift effect and soft shadow */
-  box-shadow: 0 4px 12px var(--border-color) !important;
-}
-
-/* Bootstrap's focus ring is blue - the one colour this palette does not use.
+  /* Bootstrap's focus ring is blue - the one colour this palette does not use.
    The accent colour replaces it for every button, so holding one down no
    longer flashes blue. */
-.btn {
   --bs-btn-focus-box-shadow: 0 0 0 0.25rem var(--accent-color);
   --bs-btn-color: var(--header-color);
   --bs-btn-hover-color: var(--header-color);
   --bs-btn-active-color: var(--header-color);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-unit);
+
+  /* Sized down to the label it sits next to, so the icon reads as a marker of
+     the action and not as the action itself. */
+  .material-symbols-outlined {
+    font-size: 20px;
+  }
+}
+
+/* Transparent and elegant button's style */
+.btn-icon-ghost {
+  background-color: transparent;
+  border-color: transparent;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--header-color);
+    background-color: var(--inset-background);
+    border-color: transparent;
+  }
+}
+
+/* Delete keeps its warning, but only at the moment it matters: under the
+     pointer, not while the card is simply being read. */
+.btn-danger-hover {
+
+  &:hover,
+  &:focus-visible {
+    color: var(--danger-color);
+    background-color: var(--danger-tint);
+  }
+}
+
+
+.btn:hover:not(:disabled) {
+  /* Subtle lift effect and soft shadow */
+  box-shadow: 0 4px 12px var(--border-color) !important;
 }
 
 .btn-primary {
@@ -478,6 +508,9 @@ input:-webkit-autofill:active {
 .btn-outline-secondary {
   --bs-btn-active-bg: var(--muted-color);
   --bs-btn-active-border-color: var(--muted-color);
+
+  --bs-btn-color: var(--muted-color);
+  --bs-btn-border-color: var(--muted-color);
 }
 
 /* Outline Button Refinement */
@@ -514,10 +547,12 @@ input:-webkit-autofill:active {
 }
 
 // override bootstrap's btn disabled styles
-.btn.disabled, .btn:disabled, fieldset:disabled .btn {
-    --bs-btn-disabled-color: var(--muted-color);
-    --bs-btn-disabled-border-color: var(--muted-color);
-    --bs-btn-disabled-bg: transparent;
+.btn.disabled,
+.btn:disabled,
+fieldset:disabled .btn {
+  --bs-btn-disabled-color: var(--muted-color);
+  --bs-btn-disabled-border-color: var(--muted-color);
+  --bs-btn-disabled-bg: transparent;
 }
 
 /* Text-only actions. They are plain links, not buttons: no padding, no border
@@ -706,7 +741,8 @@ input:-webkit-autofill:active {
 ngx-colors.rainbow-swatch .main {
   border: 2px solid white !important;
 }
-ngx-colors.rainbow-swatch .bg-transparent > div {
+
+ngx-colors.rainbow-swatch .bg-transparent>div {
   background: conic-gradient(from 0deg, red, orange, yellow, #00be00, #0022ff, #9a0eff, violet, red) !important;
 }
 
@@ -939,25 +975,6 @@ $image-modal-height: calc(100vh - var(--navbar-height) - 32px - 64px);
   color: var(--text-color);
 }
 
-/* A button that carries an icon next to its label. The layout was repeated as
-   utility classes on every such button (d-inline-flex align-items-center gap-2),
-   which every new button had to remember; here it is one class to add. Buttons
-   that are nothing but an icon are deliberately left out: they size their own
-   glyph (see .icon-wrapper in the test runner, .flashcard-actions on the home
-   grid) and a rule reaching them would override it. */
-.btn-with-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-unit);
-
-  /* Sized down to the label it sits next to, so the icon reads as a marker of
-     the action and not as the action itself. */
-  .material-symbols-outlined {
-    font-size: 20px;
-  }
-}
-
 /* Wrapper for the round icon in a card header */
 .header-icon-container {
   background-color: var(--background-color);
@@ -1103,6 +1120,7 @@ $image-modal-height: calc(100vh - var(--navbar-height) - 32px - 64px);
   justify-content: center;
   margin-top: calc(var(--spacing-unit) * 4);
 }
+
 /* A glyph sits on the text baseline, so next to a label it rides high: measured
    at 7px above the text in the navbar menus and 3.5px in the card buttons.
    Bootstrap Icons shipped its own correction (vertical-align: -.125em on the
@@ -1121,4 +1139,3 @@ $image-modal-height: calc(100vh - var(--navbar-height) - 32px - 64px);
 .search-clear-btn .material-symbols-outlined {
   font-size: 18px;
 }
-

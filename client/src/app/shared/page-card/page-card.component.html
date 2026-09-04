@@ -16,11 +16,11 @@
     <div class="card-action">
       @for (a of actions; track a.label) {
       @if (a.link) {
-      <a [routerLink]="a.link" class="btn btn-with-icon" [ngClass]="buttonClass(a)">
+      <a [routerLink]="a.link" class="btn" [ngClass]="buttonClass(a)">
         <span class="material-symbols-outlined">{{ a.icon ?? 'add' }}</span>{{ a.label }}
       </a>
       } @else {
-      <button type="button" class="btn btn-with-icon" [ngClass]="buttonClass(a)" [disabled]="a.disabled"
+      <button type="button" class="btn" [ngClass]="buttonClass(a)" [disabled]="a.disabled"
         (click)="action.emit(a)">
         <span class="material-symbols-outlined">{{ a.icon ?? 'add' }}</span>{{ a.label }}
       </button>

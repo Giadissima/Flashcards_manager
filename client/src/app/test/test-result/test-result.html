@@ -110,7 +110,7 @@
             @if (isAnswerVisible(q.id)) {
             <div class="answer" [innerHTML]="q.answer | katexRenderer" (zoomableImages)="lightbox.open($event)"></div>
             } @else {
-            <button type="button" class="btn answer-reveal btn-with-icon" (click)="revealAnswer(q.id)">
+            <button type="button" class="btn answer-reveal" (click)="revealAnswer(q.id)">
               <span class="material-symbols-outlined">visibility</span>
               {{ t('test.result.showAnswer') }}
             </button>

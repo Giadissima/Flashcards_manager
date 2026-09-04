@@ -1,12 +1,12 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { SearchableSelectComponent, SelectOption } from '../shared/searchable-select/searchable-select.component';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 
 import { ImportExportService } from './import-export.service';
+import { ModalComponent } from '../shared/modal/modal.component';
 import { Subject } from '../models/subject.dto';
 import { SubjectService } from '../subject/subject.service';
 import { ToastService } from '../shared/toast/toast.service';
-import { SearchableSelectComponent, SelectOption } from '../shared/searchable-select/searchable-select.component';
-import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
-import { ModalComponent } from '../shared/modal/modal.component';
 import { toSubjectOptions } from '../shared/select-options.util';
 
 @Component({
@@ -34,7 +34,7 @@ import { toSubjectOptions } from '../shared/select-options.util';
             (valueChange)="selectedSubjectId = $event ?? null"
           ></app-searchable-select>
         </div>
-        <button class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2" (click)="onExport()" [disabled]="isLoading">
+        <button class="btn btn-primary w-100" (click)="onExport()" [disabled]="isLoading">
           <span class="material-symbols-outlined">download</span>
           {{ 'importExport.exportButton' | transloco }}
         </button>
@@ -49,7 +49,7 @@ import { toSubjectOptions } from '../shared/select-options.util';
           <label for="importFile" class="form-label">{{ 'importExport.selectFile' | transloco }}</label>
           <input type="file" id="importFile" class="form-control" (change)="onFileSelected($event)" accept=".json,.zip">
         </div>
-        <button class="btn btn-success w-100 d-flex align-items-center justify-content-center gap-2" (click)="onImport()" [disabled]="isLoading || !selectedFile">
+        <button class="btn btn-success w-100" (click)="onImport()" [disabled]="isLoading || !selectedFile">
           <span class="material-symbols-outlined">upload</span>
           {{ 'importExport.importButton' | transloco }}
         </button>

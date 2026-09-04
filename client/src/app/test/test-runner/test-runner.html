@@ -46,7 +46,7 @@
       <div class="flashcard-body">
         <div class="flashcard-text" [innerHTML]="getCardBody(card) | katexRenderer" (zoomableImages)="lightbox.open($event)"></div>
         <div class="flashcard-actions">
-          <button type="button" class="btn btn-primary btn-with-icon" (click)="seeAnswer(card)">
+          <button type="button" class="btn btn-primary" (click)="seeAnswer(card)">
             <span class="material-symbols-outlined">visibility</span>
             {{ getCardButtonText(card) }}
           </button>
@@ -72,9 +72,9 @@
       (previous)="previousPage()" (next)="nextPage()"></app-pagination>
 
     <div class="d-flex justify-content-center gap-2 mt-4">
-      <button type="button" class="btn btn-outline-secondary btn-with-icon" (click)="exitTest()"><span class="material-symbols-outlined">logout</span>{{ 'test.runner.exit' |
+      <button type="button" class="btn btn-outline-secondary" (click)="exitTest()"><span class="material-symbols-outlined">logout</span>{{ 'test.runner.exit' |
         transloco }}</button>
-      <button type="button" class="btn btn-primary btn-with-icon" id="finishTest" (click)="requestFinish()"><span class="material-symbols-outlined">flag</span>{{ 'test.runner.endTest' |
+      <button type="button" class="btn btn-primary" id="finishTest" (click)="requestFinish()"><span class="material-symbols-outlined">flag</span>{{ 'test.runner.endTest' |
         transloco }}</button>
     </div>
   </app-page-card>

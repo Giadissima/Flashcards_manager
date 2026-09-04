@@ -1,11 +1,11 @@
+import { AppLanguage, storeLanguage } from '../shared/language';
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { SearchableSelectComponent, SelectOption } from '../shared/searchable-select/searchable-select.component';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 
 import { CommonModule } from '@angular/common';
-import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
-import { SearchableSelectComponent, SelectOption } from '../shared/searchable-select/searchable-select.component';
 import { ModalComponent } from '../shared/modal/modal.component';
 import { ThemeService } from '../shared/theme/theme.service';
-import { AppLanguage, storeLanguage } from '../shared/language';
 
 @Component({
   selector: 'app-settings-modal',
@@ -45,15 +45,15 @@ import { AppLanguage, storeLanguage } from '../shared/language';
           <span class="material-symbols-outlined">compare_arrows</span>
           {{ 'settings.importExport' | transloco }}
         </div>
-        <button class="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-2" (click)="openImportExport.emit()">
+        <button class="btn btn-outline-primary w-100" (click)="openImportExport.emit()">
           <span class="material-symbols-outlined">upload_file</span>
           {{ 'settings.importExportButton' | transloco }}
         </button>
       </div>
 
       <ng-container modal-footer>
-        <button type="button" class="btn btn-outline-secondary btn-with-icon" (click)="cancel()"><span class="material-symbols-outlined">close</span>{{ 'settings.cancel' | transloco }}</button>
-        <button type="button" class="btn btn-primary btn-with-icon" (click)="save()"><span class="material-symbols-outlined">save</span>{{ 'settings.save' | transloco }}</button>
+        <button type="button" class="btn btn-outline-secondary" (click)="cancel()"><span class="material-symbols-outlined">close</span>{{ 'settings.cancel' | transloco }}</button>
+        <button type="button" class="btn btn-primary" (click)="save()"><span class="material-symbols-outlined">save</span>{{ 'settings.save' | transloco }}</button>
       </ng-container>
     </app-modal>
   `,
