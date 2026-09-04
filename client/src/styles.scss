@@ -510,14 +510,19 @@ input:-webkit-autofill:active {
   }
 }
 
-/* Transparent and elegant button's style */
+/* Transparent and elegant button's style. It carries the text colour, not the
+   heading one, so the icon sits in the text instead of standing out of it. */
 .btn-icon-ghost {
+  --bs-btn-color: var(--text-color);
+  --bs-btn-hover-color: var(--text-color);
+  --bs-btn-active-color: var(--text-color);
+  color: var(--text-color);
   background-color: transparent;
   border-color: transparent;
 
   &:hover,
   &:focus-visible {
-    color: var(--header-color);
+    color: var(--text-color);
     background-color: var(--inset-background);
     border-color: transparent;
   }

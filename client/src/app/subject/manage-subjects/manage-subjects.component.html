@@ -40,12 +40,12 @@
             }
           </td>
           <td class="cell-actions">
-            <button class="btn btn-outline-warning" (click)="editSubject(subject._id)" [attr.aria-label]="t('common.edit')">
+            <button class="btn btn-icon-ghost" (click)="editSubject(subject._id)" [attr.aria-label]="t('common.edit')">
               <span class="material-symbols-outlined">
               edit
               </span>
             </button>
-            <button class="btn btn-outline-danger" (click)="askDeleteSubject(subject._id)" [attr.aria-label]="t('common.delete')">
+            <button class="btn btn-icon-ghost btn-danger-hover" (click)="askDeleteSubject(subject._id)" [attr.aria-label]="t('common.delete')">
               <span class="material-symbols-outlined">
               delete
               </span>
