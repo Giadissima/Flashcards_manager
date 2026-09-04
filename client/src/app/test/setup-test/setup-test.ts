@@ -120,6 +120,11 @@ export class SetupTest implements OnInit {
   }
 
   addTopic(): void {
+    /* The trigger is a link, not a button: it cannot be truly disabled, so the
+       guard lives here for the keyboard path. */
+    if (!this.canAddTopic) {
+      return;
+    }
     this.topicControls.push(this.fb.control<string | null>(null));
   }
 

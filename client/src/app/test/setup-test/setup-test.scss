@@ -90,7 +90,7 @@
   margin-top: var(--spacing-unit);
   text-decoration: none;
 
-  &:disabled {
+  &.disabled {
     opacity: 0.5;
   }
 }

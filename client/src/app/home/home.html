@@ -86,9 +86,10 @@
           [innerHTML]="getCardBody(card) | katexRenderer" (zoomableImages)="lightbox.open($event)"
           (contentOverflow)="onContentOverflow(card, $event)"></div>
         @if (canExpand(card)) {
-        <button type="button" class="btn btn-link flashcard-expand" (click)="toggleExpanded(card)">
+        <a class="link-action" role="button" tabindex="0" (click)="toggleExpanded(card)"
+          (keydown.enter)="toggleExpanded(card)">
           {{ (isExpanded(card) ? 'home.collapse' : 'home.expand') | transloco }}
-        </button>
+        </a>
         }
         <div class="flashcard-actions">
           <button class="btn btn-primary btn-with-icon" (click)="seeAnswer(card)">

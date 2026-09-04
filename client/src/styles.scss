@@ -520,6 +520,42 @@ input:-webkit-autofill:active {
     --bs-btn-disabled-bg: transparent;
 }
 
+/* Text-only actions. They are plain links, not buttons: no padding, no border
+   and no hover box, so only the coloured label shows. Used on <a> elements that
+   act on the page, hence the role/aria-disabled attributes at the call sites. */
+.link-action {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-unit);
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--primary-color);
+  text-decoration: underline;
+  cursor: pointer;
+  margin-block: var(--spacing-unit);
+
+  &:hover {
+    color: var(--accent-color);
+  }
+
+  &:active {
+    color: var(--primary-color);
+  }
+
+  &.disabled {
+    color: var(--muted-color);
+    text-decoration: none;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  /* Sized down to the label it sits next to, like in .btn-with-icon. */
+  .material-symbols-outlined {
+    font-size: 20px;
+  }
+}
+
 /* ---------------------------------- */
 /* 6. Feature Specific Components     */
 /* ---------------------------------- */

@@ -29,10 +29,10 @@
           </div>
           }
         </div>
-        <button type="button" class="btn btn-link btn-with-icon topic-add p-0"
-          [disabled]="!canAddTopic" (click)="addTopic()">
+        <a class="link-action topic-add" role="button" tabindex="0" [class.disabled]="!canAddTopic"
+          [attr.aria-disabled]="!canAddTopic" (click)="addTopic()" (keydown.enter)="addTopic()">
           <span class="material-symbols-outlined">add</span>{{ 'test.setup.addTopic' | transloco }}
-        </button>
+        </a>
       </div>
 
       <div class="mb-3">
