@@ -41,7 +41,7 @@
   --inset-background: #262626;
   --on-accent-color: #f8f9fa;
   /* See the light theme: a grey that stays visible against #121212. */
-  --muted-color: #5C6470;
+  --muted-color: #818da0;
 }
 
 :root {
@@ -511,6 +511,9 @@ input:-webkit-autofill:active {
 
   --bs-btn-color: var(--muted-color);
   --bs-btn-border-color: var(--muted-color);
+
+  --bs-btn-hover-color: var(--white-color);
+  --bs-btn-active-color: var(--white-color);
 }
 
 /* Outline Button Refinement */
