@@ -54,6 +54,7 @@ export class ImageLightboxComponent implements AfterViewChecked, OnDestroy {
 
   onImageLoaded(): void {
     this.loading = false;
+    this.applyRatio();
   }
 
   onClosed(): void {
@@ -66,6 +67,7 @@ export class ImageLightboxComponent implements AfterViewChecked, OnDestroy {
     // which reflects the fetch state regardless of whether src actually changed.
     if (this.loading && this.imageRef?.nativeElement.complete) {
       this.loading = false;
+      this.applyRatio();
     }
 
     // Wait for the image to actually finish loading: while loading is true the
@@ -93,6 +95,21 @@ export class ImageLightboxComponent implements AfterViewChecked, OnDestroy {
 
   resetZoom(): void {
     this.panzoom?.reset();
+  }
+
+  /**
+   * Hands the image's own proportions to the stylesheet, which sizes it by width
+   * alone from there: only one of the two dimensions may be set, or the image
+   * gets stretched instead of scaled. Without the real ratio the CSS cannot tell
+   * which of the screen's width and height the image runs out of first.
+   */
+  private applyRatio(): void {
+    const el = this.imageRef?.nativeElement;
+    if (!el?.naturalWidth || !el.naturalHeight) return;
+    el.style.setProperty(
+      '--image-ratio',
+      String(el.naturalWidth / el.naturalHeight),
+    );
   }
 
   private initZoom(): void {

@@ -251,6 +251,19 @@ input.form-control::placeholder {
   filter: invert(1) grayscale(100%) brightness(200%);
 }
 
+/* Bootstrap draws a thick blue ring around the X as soon as it takes focus,
+   which on a click looks like a stray border. The ring is kept only for
+   keyboard navigation, in the palette's accent colour. */
+.btn-close:focus {
+  box-shadow: none;
+  outline: none;
+}
+
+.btn-close:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
 /* Bootstrap draws the switch with an almost transparent border and the knob as
    a background-image (SVG) in the theme colour: here the border is forced to a
    always-visible black, and the knob to black in light / white in dark for
@@ -930,20 +943,30 @@ ngx-colors-overlay[data-ngx-colors-theme='dark'] .bg-white {
    precisely to have room to centre in): that min-height has to be cancelled, and
    the default margin-top (1.75rem, for the centring) replaced with the exact
    navbar height + 1px. */
-// The viewer is a box of fixed size and the image is scaled to fit it, so a
-// small image is enlarged instead of sitting tiny in the middle and a large one
-// is reduced. Keeping the box fixed also stops the dialog from resizing when the
-// spinner gives way to the image: that resize is what used to leave the image
-// off-centre, because panzoom measured the geometry across the change.
-$image-modal-width: 90vw;
-$image-modal-height: calc(100vh - var(--navbar-height) - 32px - 64px);
+// The image is blown up to the whole viewport minus the navbar and a hairline
+// gap, and the dialog is only as big as the image ends up being: no empty band
+// above or beside it, whatever the aspect ratio.
+$image-modal-gap: 4px;
+$image-modal-width: calc(100vw - #{$image-modal-gap} * 2);
+$image-modal-height: calc(
+  100vh - var(--navbar-height) - #{$image-modal-gap} * 2 - 64px
+);
 
 .image-modal-dialog {
-  width: $image-modal-width;
-  max-width: $image-modal-width;
+  /* fit-content makes the dialog hug the image instead of keeping Bootstrap's
+     fixed 500px; max-width caps it at the space the modal really has, which is
+     the viewport minus the scrollbar - hence a percentage here and not $image-
+     modal-width, whose 100vw would count the scrollbar in. */
+  width: fit-content;
+  max-width: calc(100% - #{$image-modal-gap} * 2);
   min-height: 0;
-  margin-top: calc(var(--navbar-height) + 1px);
-  margin-bottom: var(--spacing-unit);
+  /* Bootstrap gives .modal-dialog a side margin of its own (1.75rem): left over,
+     it would push a dialog this wide past the viewport. auto both centres it and
+     keeps the only real gap the one built into the width above. */
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: calc(var(--navbar-height) + #{$image-modal-gap});
+  margin-bottom: $image-modal-gap;
 }
 
 .image-modal-content {
@@ -951,21 +974,37 @@ $image-modal-height: calc(100vh - var(--navbar-height) - 32px - 64px);
 
   .modal-body {
     padding: 0;
-    display: flex;
-    justify-content: center;
+    /* Deliberately not a flex container: as a flex item the image would take its
+       width from the main axis and then have max-height clamp the cross axis on
+       its own, which stretches it. In normal block flow the browser applies both
+       constraints together and keeps the aspect ratio. Centring is not needed
+       either - the dialog is exactly as wide as the image. */
+    display: block;
     overflow: hidden;
   }
 }
 
 .image-modal-img {
   display: block;
-  /* The height subtracts the navbar, the margins and the modal header (~64px,
-     the close button): the image alone could fit while header plus image would
-     not. object-fit keeps the aspect ratio inside that fixed box, scaling a
-     small image up and a large one down. */
-  width: 100%;
-  height: $image-modal-height;
-  object-fit: contain;
+  /* Only the width is ever set, so height:auto always follows the real ratio and
+     the image can never be stretched: leaving both to the browser (a width plus
+     a max-height, say) is what squashed it, because each constraint is applied
+     on its own axis instead of scaling the box as a whole.
+     The width taken is the smaller of the screen and the width the image would
+     need to use up all the height there is under the navbar (minus the margins
+     and the ~64px modal header holding the close button) - so the image is blown
+     up as far as it goes on whichever side runs out first, and small images are
+     enlarged as well. --image-ratio is written by ImageLightboxComponent once
+     the image has loaded and its natural size is known.
+     max-width is only for screens with a scrollbar, where $image-modal-width
+     overshoots by that scrollbar's width; clamping a width with height:auto
+     keeps the ratio. */
+  width: min(
+    #{$image-modal-width},
+    calc(#{$image-modal-height} * var(--image-ratio, 1))
+  );
+  max-width: 100%;
+  height: auto;
   border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);
   touch-action: none;
   cursor: grab;
@@ -979,8 +1018,10 @@ $image-modal-height: calc(100vh - var(--navbar-height) - 32px - 64px);
   display: flex;
   align-items: center;
   justify-content: center;
-  /* Same box as the image, so nothing moves when one replaces the other. */
-  width: 100%;
+  /* The dialog hugs the image, so before there is one the spinner has to hold
+     the box open itself - at the largest size the image could take. */
+  width: $image-modal-width;
+  max-width: 100%;
   height: $image-modal-height;
 }
 
