@@ -114,12 +114,21 @@ export class TestRunner extends PaginatedList implements OnInit {
   async getTest(): Promise<void> {
     if(!this.testId) return;
 
+    const test = await this.testService.getById(this.testId);
+    // A finished test can only be reviewed: reaching the runner on it (from an
+    // old link or the back button) is an error, not a run to resume.
+    if (test.completedAt) {
+      this.router.navigate(['/not-found'], {
+        queryParams: { code: '409', message: 'common.error.testAlreadyCompleted' },
+      });
+      return;
+    }
+
     const { count, elapsed_time } = await this.testService.getQuestionsCount(this.testId);
     this.totalCount = count;
     if(this.elapsed_time == 0)
       this.elapsed_time = elapsed_time ?? 0;
 
-    const test = await this.testService.getById(this.testId);
     this.testStartDate = test.createdAt;
     this.answeredCount = test.questions.filter(q => q.is_correct !== undefined).length;
 

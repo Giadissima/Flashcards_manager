@@ -16,9 +16,16 @@ export class NotFoundComponent {
   // (?message=common.error.testNotFound) for specific cases like a missing test.
   messageKey = 'notFound.message';
 
+  // The page is the generic error screen, not only the 404 one: the status
+  // shown is overridable via query param (?code=409) for the cases where the
+  // resource does exist but cannot be opened in the state it is in.
+  code = '404';
+
   constructor(private route: ActivatedRoute, private router: Router) {
     const message = this.route.snapshot.queryParamMap.get('message');
     if (message) this.messageKey = message;
+    const code = this.route.snapshot.queryParamMap.get('code');
+    if (code) this.code = code;
   }
 
   goHome(): void {

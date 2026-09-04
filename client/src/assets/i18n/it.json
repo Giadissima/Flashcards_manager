@@ -53,7 +53,8 @@
       "offline": "Nessuna connessione al server. Controlla la tua rete e riprova.",
       "server": "Il server non è al momento raggiungibile. Riprova tra qualche istante.",
       "notFound": "La risorsa richiesta non esiste",
-      "testNotFound": "Non è stato possibile recuperare il test"
+      "testNotFound": "Non è stato possibile recuperare il test",
+      "testAlreadyCompleted": "Questo test è già terminato e non può più essere ripreso"
     },
     "zoomIn": "Zoom avanti",
     "zoomOut": "Zoom indietro",
@@ -66,7 +67,6 @@
     "zoomLevel": "Livello di zoom"
   },
   "notFound": {
-    "title": "404",
     "message": "La pagina che stai cercando non esiste.",
     "backHome": "Torna alla Home"
   },

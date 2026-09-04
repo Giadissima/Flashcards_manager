@@ -53,7 +53,8 @@
       "offline": "No connection to the server. Check your network and try again.",
       "server": "The server is currently unreachable. Please try again shortly.",
       "notFound": "The requested resource doesn't exist",
-      "testNotFound": "Unable to retrieve the test"
+      "testNotFound": "Unable to retrieve the test",
+      "testAlreadyCompleted": "This test is already finished and can no longer be resumed"
     },
     "zoomIn": "Zoom in",
     "zoomOut": "Zoom out",
@@ -66,7 +67,6 @@
     "zoomLevel": "Zoom level"
   },
   "notFound": {
-    "title": "404",
     "message": "The page you are looking for does not exist.",
     "backHome": "Back to Home"
   },
