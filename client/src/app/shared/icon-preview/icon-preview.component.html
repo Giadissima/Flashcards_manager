@@ -3,8 +3,8 @@
   <div class="icon-preview-wrapper">
     @if (previewUrl) {
     <img [src]="previewUrl" alt="icon preview" class="current-icon">
-    <button type="button" class="btn btn-sm cancel-btn btn-dark" (click)="onReset(icon)">
-      <span class="material-symbols-outlined text-danger">cancel</span>
+    <button type="button" class="btn btn-sm cancel-btn" (click)="onReset(icon)">
+      <span class="material-symbols-outlined text-danger">x_circle</span>
     </button>
     } @else {
     <ng-content select="[defaultIcon]"></ng-content>

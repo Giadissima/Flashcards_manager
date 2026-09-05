@@ -20,25 +20,62 @@
   border: 1px solid var(--border-color);
 }
 
-/* Sat on the upper rim rather than off the corner: on a circle, the corner of
-   the bounding box is empty space, so a badge pinned to it floats away from the
-   picture instead of sitting on it. */
+/* No button behind the glyph, only a small disc under it: a background as wide
+   as the button showed up as a ring around the icon, while the filled x_circle
+   still needs something opaque behind it - its X is knocked out of the shape
+   rather than drawn, so over a picture the cross would show the photo through
+   and stop reading as an X. */
 .cancel-btn {
   position: absolute;
-  top: 0;
-  right: 0;
+  /* The offset is half the growth of the box over its glyph, so making the
+     icon bigger grows it around its own centre instead of pushing it towards
+     the middle of the picture. */
+  top: -3px;
+  right: -3px;
   padding: 0;
-  border-radius: 50%;
-  width: 28px;
-  height: 28px;
+  width: 34px;
+  height: 34px;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: transparent;
+  border: none;
+  /* Round, so any ring the browser draws for it - a focus outline - follows the
+     icon instead of a square nobody can see. */
+  border-radius: 50%;
+  transition: transform 0.15s ease;
 
-  /* The glyph defaults to the full 24px, which leaves it cramped against the
-     edge of the button and reads as a clipped icon. */
+  /* Narrower than the circle the glyph draws (about 23px at this size), so it
+     fills the hollow X without peeking out around the icon. */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--white-color);
+  }
+
   .material-symbols-outlined {
-    font-size: 20px;
+    font-size: 28px;
+    /* Filled rather than the outlined default: a thin ring would get lost
+       against a busy picture. The disc under it fills the hollow X. */
+    font-variation-settings: 'FILL' 1;
+    position: relative;
+  }
+
+  &:hover {
+    transform: scale(1.15);
+  }
+
+  /* The global .btn:hover lift casts a shadow in --border-color, which on a
+     light theme reads as a pale halo around a button that has no shape of its
+     own here. It is declared !important, so turning it off takes one too. */
+  &:hover:not(:disabled) {
+    box-shadow: none !important;
   }
 }
 
