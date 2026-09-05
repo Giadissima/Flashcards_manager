@@ -3,7 +3,6 @@ import * as qs from 'qs';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 
-import { Router } from '@angular/router';
 import { baseUrlAPI } from '../../config/config';
 import { firstValueFrom } from 'rxjs';
 
@@ -19,7 +18,6 @@ export class RestClientService {
 
   constructor(
     private http: HttpClient,
-    private router: Router,
   ) { }
 
   private getFullUrl(endpoint: string): string {
@@ -31,9 +29,6 @@ export class RestClientService {
 
   private handleError(error: HttpErrorResponse, method: string) {
     console.error(`[${method}] error`, error);
-    if (error.status === 401) {
-      this.router.navigate(['']);
-    }
   }
 
   async get<T>(endpoint: string, params?: any, reqOpts?: any): Promise<T> {

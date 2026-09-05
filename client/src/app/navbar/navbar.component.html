@@ -55,6 +55,13 @@
       [attr.aria-label]="'settings.title' | transloco">
       <span class="material-symbols-outlined">settings</span>
     </button>
+    <!-- Ends the session: the title carries who is logged in, which the bar has
+         no room to spell out -->
+    <button (click)="logout()" class="theme-switch-btn" type="button"
+      [title]="'auth.loggedInAs' | transloco:{ username: authService.user?.username }"
+      [attr.aria-label]="'auth.logout' | transloco">
+      <span class="material-symbols-outlined">logout</span>
+    </button>
     <!-- Hamburger button: shown below the breakpoint, opens the menu as a drawer from the right -->
     <button type="button" class="hamburger-btn" [class.open]="isMobileMenuOpen" (click)="toggleMobileMenu()"
       [attr.aria-label]="'navbar.menu' | transloco" [attr.aria-expanded]="isMobileMenuOpen">

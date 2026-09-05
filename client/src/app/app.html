@@ -1,4 +1,8 @@
+<!-- Login and register are the only pages reachable while logged out, and they
+     have no navbar to show. -->
+@if (authService.user$ | async) {
 <app-navbar></app-navbar>
+}
 
 <router-outlet></router-outlet>
 

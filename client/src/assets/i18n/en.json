@@ -12,6 +12,42 @@
     "createCard": "Create Card",
     "menu": "Menu"
   },
+  "auth": {
+    "username": "Username",
+    "password": "Password",
+    "usernameRequiredError": "Enter your username",
+    "usernameLengthError": "The username must be between {{min}} and {{max}} characters",
+    "usernamePatternError": "The username can only contain letters, digits, dots, dashes and underscores",
+    "passwordMinError": "The password must be at least {{min}} characters long",
+    "logout": "Log out",
+    "loggedInAs": "Logged in as {{username}}",
+    "login": {
+      "title": "Sign in",
+      "subtitle": "Enter your credentials to reach your flashcards",
+      "submit": "Sign in",
+      "noAccount": "Don't have an account yet?",
+      "registerLink": "Create one"
+    },
+    "register": {
+      "title": "Create account",
+      "subtitle": "Choose a username and a password to get started",
+      "confirmPassword": "Confirm password",
+      "mismatchError": "The two passwords do not match",
+      "submit": "Create account",
+      "haveAccount": "Already have an account?",
+      "loginLink": "Sign in"
+    },
+    "error": {
+      "wrongCredentials": "Wrong username or password",
+      "usernameTaken": "This username is already taken",
+      "generic": "Something went wrong, please try again"
+    },
+    "toast": {
+      "loggedIn": "Welcome back, {{username}}!",
+      "registered": "Account created, welcome!",
+      "loggedOut": "You have been logged out"
+    }
+  },
   "settings": {
     "title": "Settings",
     "language": "Language",

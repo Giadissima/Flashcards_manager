@@ -12,6 +12,42 @@
     "createCard": "Crea Flashcard",
     "menu": "Menu"
   },
+  "auth": {
+    "username": "Nome utente",
+    "password": "Password",
+    "usernameRequiredError": "Inserisci il tuo nome utente",
+    "usernameLengthError": "Il nome utente deve avere tra {{min}} e {{max}} caratteri",
+    "usernamePatternError": "Il nome utente può contenere solo lettere, numeri, punti, trattini e trattini bassi",
+    "passwordMinError": "La password deve avere almeno {{min}} caratteri",
+    "logout": "Esci",
+    "loggedInAs": "Accesso come {{username}}",
+    "login": {
+      "title": "Accedi",
+      "subtitle": "Inserisci le tue credenziali per raggiungere le tue flashcard",
+      "submit": "Accedi",
+      "noAccount": "Non hai ancora un account?",
+      "registerLink": "Creane uno"
+    },
+    "register": {
+      "title": "Crea account",
+      "subtitle": "Scegli un nome utente e una password per iniziare",
+      "confirmPassword": "Conferma password",
+      "mismatchError": "Le due password non coincidono",
+      "submit": "Crea account",
+      "haveAccount": "Hai già un account?",
+      "loginLink": "Accedi"
+    },
+    "error": {
+      "wrongCredentials": "Nome utente o password errati",
+      "usernameTaken": "Questo nome utente è già in uso",
+      "generic": "Qualcosa è andato storto, riprova"
+    },
+    "toast": {
+      "loggedIn": "Bentornata, {{username}}!",
+      "registered": "Account creato, benvenuta!",
+      "loggedOut": "Hai effettuato il logout"
+    }
+  },
   "settings": {
     "title": "Impostazioni",
     "language": "Lingua",

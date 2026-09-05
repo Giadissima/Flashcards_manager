@@ -1,0 +1,30 @@
+/* Shared by login and register: with the navbar hidden the card is the whole
+   page, so it is kept narrow and pushed down from the top edge. */
+.auth-page {
+  max-width: 460px;
+  margin: calc(var(--spacing-unit) * 6) auto;
+}
+
+.auth-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-unit);
+  margin-bottom: calc(var(--spacing-unit) * 3);
+
+  img {
+    height: 48px;
+  }
+
+  span {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--header-color);
+  }
+}
+
+.auth-switch {
+  margin-top: calc(var(--spacing-unit) * 2);
+  text-align: center;
+  color: var(--text-color);
+}

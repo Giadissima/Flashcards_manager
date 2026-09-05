@@ -1,10 +1,12 @@
+import { AuthService } from '../auth/auth.service';
 import { ClickOutsideDirective } from '../shared/click-outside.directive';
 import { CommonModule } from '@angular/common';
 import { Component, HostListener } from '@angular/core';
 import { ImportExportModalComponent } from '../import-export-modal/import-export-modal.component';
 import { RouterLink } from '@angular/router';
 import { SettingsModalComponent } from '../settings-modal/settings-modal.component';
-import { TranslocoModule } from '@jsverse/transloco';
+import { ToastService } from '../shared/toast/toast.service';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 
 type NavbarDropdown = 'topics' | 'subjects' | 'test';
 
@@ -25,6 +27,12 @@ export class NavbarComponent {
   // crossing the mobile breakpoint would otherwise make it flash open for a moment
   isResizing = false;
   private resizeTimeoutId: ReturnType<typeof setTimeout> | null = null;
+
+  constructor(
+    protected authService: AuthService,
+    private toastService: ToastService,
+    private transloco: TranslocoService,
+  ) {}
 
   @HostListener('window:resize')
   onWindowResize(): void {
@@ -64,6 +72,12 @@ export class NavbarComponent {
   onNavigate(name: NavbarDropdown): void {
     this.closeDropdown(name);
     this.closeMobileMenu();
+  }
+
+  logout(): void {
+    this.closeMobileMenu();
+    this.authService.logout();
+    this.toastService.show(this.transloco.translate('auth.toast.loggedOut'), 'info');
   }
 
   openSettings(): void {

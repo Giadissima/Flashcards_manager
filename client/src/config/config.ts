@@ -8,6 +8,10 @@ export const questionMaxLength = 700;
 export const answerMaxLength = 8000;
 export const nameMaxLength = 30;
 export const descMaxLength = 1000;
+export const usernameMaxLength = 30;
+export const passwordMinLength = 8;
+// bcrypt only hashes the first 72 bytes, so the server refuses anything longer
+export const passwordMaxLength = 72;
 
 // how many entries a subject/topic dropdown loads at once
 export const selectableListLimit = 50;

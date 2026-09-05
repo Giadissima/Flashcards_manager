@@ -4,8 +4,9 @@ import {
   provideBrowserGlobalErrorListeners,
   provideZoneChangeDetection,
 } from '@angular/core';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { provideHttpClient, withInterceptors, withInterceptorsFromDi } from '@angular/common/http';
 import { availableLanguages, readStoredLanguage } from './shared/language';
+import { authInterceptor } from './auth/auth.interceptor';
 
 import { provideRouter } from '@angular/router';
 import { provideTransloco } from '@jsverse/transloco';
@@ -18,7 +19,7 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     // replaces HttpClientModule, registers HttpClient in the standalone DI system
-    provideHttpClient(withInterceptorsFromDi()),
+    provideHttpClient(withInterceptorsFromDi(), withInterceptors([authInterceptor])),
     provideTransloco({
       config: {
         availableLangs: [...availableLanguages],

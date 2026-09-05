@@ -1,0 +1,58 @@
+<div class="container-md auth-page">
+  <!-- The navbar is hidden while logged out, so the page carries the logo itself -->
+  <div class="auth-logo">
+    <img src="assets/favicon.png" alt="Logo">
+    <span>Flashcards Manager</span>
+  </div>
+
+  <app-page-card icon="person_add" [title]="'auth.register.title' | transloco"
+    [subtitle]="'auth.register.subtitle' | transloco">
+    <form [formGroup]="registerForm" (ngSubmit)="register()" novalidate>
+
+      @if (errorKey) {
+      <div class="alert alert-danger" role="alert">{{ errorKey | transloco }}</div>
+      }
+
+      <div class="form-group">
+        <label for="username" class="form-label">{{ 'auth.username' | transloco }}</label>
+        <input type="text" id="username" formControlName="username" class="form-control" autocomplete="username"
+          autofocus>
+        @if (registerForm.get('username')?.touched && registerForm.get('username')?.hasError('pattern')) {
+        <div class="invalid-feedback d-block">{{ 'auth.usernamePatternError' | transloco }}</div>
+        } @else if (registerForm.get('username')?.touched && registerForm.get('username')?.invalid) {
+        <div class="invalid-feedback d-block">{{ 'auth.usernameLengthError' | transloco:{ min: charMinLength, max:
+          usernameMaxLength } }}</div>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="password" class="form-label">{{ 'auth.password' | transloco }}</label>
+        <input type="password" id="password" formControlName="password" class="form-control"
+          autocomplete="new-password">
+        @if (registerForm.get('password')?.touched && registerForm.get('password')?.invalid) {
+        <div class="invalid-feedback d-block">{{ 'auth.passwordMinError' | transloco:{ min: passwordMinLength } }}</div>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword" class="form-label">{{ 'auth.register.confirmPassword' | transloco }}</label>
+        <input type="password" id="confirmPassword" formControlName="confirmPassword" class="form-control"
+          autocomplete="new-password">
+        @if (registerForm.get('confirmPassword')?.touched && registerForm.hasError('passwordMismatch')) {
+        <div class="invalid-feedback d-block">{{ 'auth.register.mismatchError' | transloco }}</div>
+        }
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" [disabled]="registerForm.invalid || submitting">
+          <span class="material-symbols-outlined">person_add</span>{{ 'auth.register.submit' | transloco }}
+        </button>
+      </div>
+    </form>
+
+    <div class="auth-switch">
+      {{ 'auth.register.haveAccount' | transloco }}
+      <a routerLink="/login">{{ 'auth.register.loginLink' | transloco }}</a>
+    </div>
+  </app-page-card>
+</div>
