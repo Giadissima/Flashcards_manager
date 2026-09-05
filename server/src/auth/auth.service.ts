@@ -1,5 +1,13 @@
-import { AuthResponse, JwtPayload, LoginDto, PublicUser, RegisterDto } from './auth.dto';
 import {
+  AuthResponse,
+  JwtPayload,
+  LoginDto,
+  PublicUser,
+  RegisterDto,
+  StudyFieldsDto,
+} from './auth.dto';
+import {
+  BadRequestException,
   ConflictException,
   Injectable,
   UnauthorizedException,
@@ -9,6 +17,7 @@ import { User, UserDocument } from './user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { Model } from 'mongoose';
+import { UniversityService } from 'src/university/university.service';
 import bcrypt from 'bcryptjs';
 import { bcryptSaltRounds } from 'src/config';
 
@@ -17,9 +26,12 @@ export class AuthService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
     private readonly jwtService: JwtService,
+    private readonly universityService: UniversityService,
   ) {}
 
   async register(dto: RegisterDto): Promise<AuthResponse> {
+    this.assertStudyFieldsExist(dto);
+
     const username = dto.username.toLowerCase();
     if (await this.userModel.exists({ username })) {
       throw new ConflictException('Username already taken');
@@ -30,7 +42,13 @@ export class AuthService {
     // both pass the check above, and only one of them can reach the database.
     let user: UserDocument;
     try {
-      user = await this.userModel.create({ username, password });
+      user = await this.userModel.create({
+        username,
+        password,
+        universityCode: dto.universityCode,
+        course: dto.course,
+        courseKind: dto.courseKind,
+      });
     } catch (error) {
       if ((error as { code?: number }).code === 11000) {
         throw new ConflictException('Username already taken');
@@ -76,7 +94,45 @@ export class AuthService {
     };
   }
 
+  /**
+   * The DTO can only check the shape of the two study fields; whether they name
+   * something real is decided here, where the reference lists are reachable.
+   */
+  private assertStudyFieldsExist(dto: StudyFieldsDto): void {
+    const { universityCode, course, courseKind } = dto;
+
+    if (course && !universityCode) {
+      throw new BadRequestException(
+        'A course cannot be given without its university',
+      );
+    }
+    if (!!course !== !!courseKind) {
+      throw new BadRequestException(
+        'A course and its level have to be given together',
+      );
+    }
+    if (universityCode && !this.universityService.exists(universityCode)) {
+      throw new BadRequestException(`Unknown university code ${universityCode}`);
+    }
+    if (
+      universityCode &&
+      course &&
+      courseKind &&
+      !this.universityService.hasCourse(universityCode, course, courseKind)
+    ) {
+      throw new BadRequestException(
+        'That course does not belong to the chosen university',
+      );
+    }
+  }
+
   private toPublicUser(user: UserDocument): PublicUser {
-    return { _id: String(user._id), username: user.username };
+    return {
+      _id: String(user._id),
+      username: user.username,
+      universityCode: user.universityCode,
+      course: user.course,
+      courseKind: user.courseKind,
+    };
   }
 }

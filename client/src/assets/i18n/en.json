@@ -387,5 +387,19 @@
       "importCompleted": "Import completed: {{imported}} added, {{skipped}} duplicates skipped.",
       "importFailed": "Import failed"
     }
+  },
+  "studyFields": {
+    "why": "Why we ask for your university",
+    "whyText": "In the Community section the shared flashcards are grouped by degree course: tell us yours and you go straight to the ones made by people sitting your same exams.",
+    "university": "University",
+    "universityPlaceholder": "Choose your university",
+    "course": "Degree course",
+    "coursePlaceholder": "Choose your course",
+    "coursePlaceholderLocked": "Choose a university first",
+    "noCoursesAvailable": "No courses available",
+    "noCoursesHint": "This institution only offers post-graduate programmes, which are not in the ministry's list.",
+    "clear": "Clear the selection",
+    "universitiesError": "The list of universities could not be loaded",
+    "coursesError": "The courses of this university could not be loaded"
   }
 }

@@ -1,4 +1,4 @@
-import { AuthResponse, AuthUser, Credentials } from '../models/auth.dto';
+import { AuthResponse, AuthUser, Credentials, RegistrationPayload } from '../models/auth.dto';
 
 import { BehaviorSubject } from 'rxjs';
 import { Injectable } from '@angular/core';
@@ -50,8 +50,8 @@ export class AuthService {
     this.storeSession(response);
   }
 
-  async register(credentials: Credentials): Promise<void> {
-    const response: AuthResponse = await this.restClient.post(this.baseUrl + '/register', credentials);
+  async register(payload: RegistrationPayload): Promise<void> {
+    const response: AuthResponse = await this.restClient.post(this.baseUrl + '/register', payload);
     this.storeSession(response);
   }
 
@@ -65,8 +65,12 @@ export class AuthService {
 
   private storeSession(response: AuthResponse): void {
     localStorage.setItem(tokenStorageKey, response.access_token);
-    localStorage.setItem(userStorageKey, JSON.stringify(response.user));
-    this._user.next(response.user);
+    this.storeUser(response.user);
+  }
+
+  private storeUser(user: AuthUser): void {
+    localStorage.setItem(userStorageKey, JSON.stringify(user));
+    this._user.next(user);
   }
 
   // The stored user is only there to show a name without waiting for a round

@@ -83,14 +83,23 @@ export class SearchableSelectComponent {
     this.focusMatchingOption();
   }
 
-  // Moves the focus to the first option whose label starts with the typed text,
-  // without selecting it, so the user can keep typing to refine the search.
+  // Moves the focus to the option matching the typed text, without selecting
+  // it, so the user can keep typing to refine the search. The text is looked up
+  // anywhere in the label ("savona" finds "Universita degli Studi di Savona"),
+  // but a label that starts with it wins over one that merely contains it.
   private focusMatchingOption(): void {
     if (!this.dropdownContent || !this.typeaheadBuffer) return;
 
-    const matchIndex = this.options.findIndex((o) =>
-      o.label.toLowerCase().startsWith(this.typeaheadBuffer),
-    );
+    let matchIndex = -1;
+    for (let i = 0; i < this.options.length; i++) {
+      const label = this.options[i].label.toLowerCase();
+      if (label.startsWith(this.typeaheadBuffer)) {
+        matchIndex = i;
+        break;
+      }
+      // Kept as a fallback: a closer, prefix match may still show up later
+      if (matchIndex === -1 && label.includes(this.typeaheadBuffer)) matchIndex = i;
+    }
     if (matchIndex === -1) return;
 
     const offset = this.allOptionLabel ? 1 : 0;

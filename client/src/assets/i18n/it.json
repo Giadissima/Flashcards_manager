@@ -387,5 +387,19 @@
       "importCompleted": "Importazione completata: {{imported}} aggiunte, {{skipped}} duplicati saltati.",
       "importFailed": "Importazione fallita"
     }
+  },
+  "studyFields": {
+    "why": "Perché ti chiediamo l'università",
+    "whyText": "Nella sezione Community le flashcard condivise sono raggruppate per corso di laurea: indicando il tuo, arrivi subito a quelle di chi prepara i tuoi stessi esami.",
+    "university": "Università",
+    "universityPlaceholder": "Scegli la tua università",
+    "course": "Corso di laurea",
+    "coursePlaceholder": "Scegli il tuo corso",
+    "coursePlaceholderLocked": "Scegli prima un'università",
+    "noCoursesAvailable": "Nessun corso disponibile",
+    "noCoursesHint": "Questa istituzione offre solo percorsi post-lauream, che non compaiono nell'elenco ministeriale.",
+    "clear": "Annulla la selezione",
+    "universitiesError": "Non è stato possibile caricare l'elenco delle università",
+    "coursesError": "Non è stato possibile caricare i corsi di questa università"
   }
 }

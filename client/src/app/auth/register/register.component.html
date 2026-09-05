@@ -43,6 +43,8 @@
         }
       </div>
 
+      <app-study-fields [value]="studyFields" (valueChange)="studyFields = $event"></app-study-fields>
+
       <div class="form-actions">
         <button type="submit" class="btn btn-primary" [disabled]="registerForm.invalid || submitting">
           <span class="material-symbols-outlined">person_add</span>{{ 'auth.register.submit' | transloco }}

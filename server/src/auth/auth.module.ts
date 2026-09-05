@@ -6,10 +6,12 @@ import { AuthService } from './auth.service';
 import { JwtModule, JwtSignOptions } from '@nestjs/jwt';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { UniversityModule } from 'src/university/university.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    UniversityModule,
     JwtModule.registerAsync({
       global: true, // the guard registered in AppModule needs JwtService too
       imports: [ConfigModule],
