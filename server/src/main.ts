@@ -23,6 +23,10 @@ async function bootstrap() {
   if (configService.getOrThrow<boolean>('enableSwagger')) {
     const config = new DocumentBuilder()
       .addBearerAuth()
+      // Applied to every operation: all of them are behind the global
+      // JwtAuthGuard but a handful of @Public() ones, so declaring it per
+      // controller would only be a list to keep in sync.
+      .addSecurityRequirements('bearer')
       .setTitle(configService.getOrThrow<string>('appName'));
 
     const document = SwaggerModule.createDocument(app, config.build());

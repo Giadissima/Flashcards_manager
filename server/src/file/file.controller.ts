@@ -14,6 +14,7 @@ import { FileService } from './file.service';
 import { Readable } from 'stream';
 import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Public } from 'src/auth/public.decorator';
 
 @Controller('file')
 export class FileController {
@@ -56,6 +57,10 @@ export class FileController {
   }
 
   @ApiOperation({ description: 'get a specific file from db' })
+  // The browser loads these URLs on its own, straight out of <img src>, where
+  // no Authorization header can be attached. Left open on purpose: the id is an
+  // opaque ObjectId and nothing but the image bytes is behind it.
+  @Public()
   @Get(':id') // TODO document the NotFoundException response in Swagger
   async findOne(@Param('id') id: string, @Res() res: Response) {
     const fileDoc = await this.fileService.findOne(id);

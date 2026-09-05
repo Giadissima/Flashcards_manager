@@ -5,6 +5,11 @@ export const answerMaxLength = 8000;
 export const idLength = 24;
 export const nameMaxLength = 30;
 export const descMaxLength = 1000;
+export const usernameMaxLength = 30;
+export const passwordMinLength = 8;
+// bcrypt only hashes the first 72 bytes, so anything longer is silently truncated
+export const passwordMaxLength = 72;
+export const bcryptSaltRounds = 10;
 
 export const Filters = {
   skipMinLength: 0,

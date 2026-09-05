@@ -22,6 +22,10 @@ services:
       - MONGO_URL=mongodb://mongodb:27017/flashcard_db
       - enableSwagger=true # per il development lasciare a true, altrimenti mettere a false
       - appName=Flashcards_Manager
+      # Signs the login tokens: change it before going online, and every token
+      # already handed out stops working - TODO
+      - JWT_SECRET=${JWT_SECRET:-change-me-in-production}
+      - JWT_EXPIRES_IN=7d
     depends_on:
       - mongodb
 
