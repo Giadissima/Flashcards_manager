@@ -12,6 +12,7 @@ import {
   findPaginated,
 } from 'src/common/mongo.util';
 import { FileService } from 'src/file/file.service';
+import { PostService } from 'src/post/post.service';
 
 const ENTITY = 'Subject';
 
@@ -20,6 +21,7 @@ export class SubjectService {
   constructor(
     @InjectModel(Subject.name) private subjectModel: Model<Subject>,
     private readonly fileService: FileService,
+    private readonly postService: PostService,
   ) {}
 
   async create(
@@ -30,11 +32,13 @@ export class SubjectService {
     const icon_id = icon
       ? (await this.fileService.create([icon]))._id
       : undefined;
-    await new this.subjectModel({
+    const created = await new this.subjectModel({
       ...createSubjectDto,
       icon: icon_id,
       user_id: userId,
     }).save();
+
+    await this.postService.refresh(userId, created._id as never);
   }
 
   findOne(userId: string, id: string): Promise<SubjectDocument> {
@@ -74,6 +78,9 @@ export class SubjectService {
     if (existing.icon) {
       await this.fileService.delete(existing.icon.toString());
     }
+
+    // The subject is gone, so its post has nothing left to hang off
+    await this.postService.refresh(userId, id);
   }
 
   // Not routed through updateByIdOrThrow: the previous icon has to be read
@@ -114,21 +121,24 @@ export class SubjectService {
     if (newIconId && previousIconId) {
       await this.fileService.delete(previousIconId.toString());
     }
+
+    await this.postService.refresh(userId, id);
   }
 
   /** Only the visibility, for the quick toggle in the lists. */
-  setVisibility(
+  async setVisibility(
     userId: string,
     id: string,
     visibility: Visibility,
   ): Promise<void> {
-    return updateOwnedOrThrow(
+    await updateOwnedOrThrow(
       this.subjectModel,
       id,
       userId,
       { visibility },
       ENTITY,
     );
+    await this.postService.refresh(userId, id);
   }
 
 }

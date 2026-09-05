@@ -11,6 +11,7 @@ import { ImportExportModule } from './import-export/import-export.module';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { PostModule } from './post/post.module';
 import { SubjectModule } from './subject/subject.module';
 import { TestModule } from './test/test.module';
 import { UniversityModule } from './university/university.module';
@@ -35,6 +36,7 @@ import { UniversityModule } from './university/university.module';
     ImportExportModule,
     TestModule,
     UniversityModule,
+    PostModule,
   ],
   controllers: [AppController],
   providers: [

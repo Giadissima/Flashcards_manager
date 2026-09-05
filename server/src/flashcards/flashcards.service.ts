@@ -5,7 +5,7 @@ import {
   RandomFlashcardsDTO,
 } from './flashcards.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Visibility } from 'src/common/visibility';
+import { Visibility, defaultVisibility } from 'src/common/visibility';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Flashcard, FlashcardDocument } from './flashcards.schema';
 import { FilterQuery, Model, Types } from 'mongoose';
@@ -18,6 +18,9 @@ import {
 } from 'src/common/mongo.util';
 import { extractImageFileIds, replaceImageFileIds } from 'src/common/html.util';
 import { FileService } from 'src/file/file.service';
+import { PostService } from 'src/post/post.service';
+import { Subject } from 'src/subject/subject.schema';
+import { Topic } from 'src/topic/topic.schema';
 
 const ENTITY = 'Flashcard';
 const POPULATE = ['topic_id', 'subject_id'];
@@ -29,6 +32,9 @@ export class FlashcardsService {
     @InjectModel(Flashcard.name)
     private flashcardModel: Model<Flashcard>,
     private readonly fileService: FileService,
+    @InjectModel(Subject.name) private subjectModel: Model<Subject>,
+    @InjectModel(Topic.name) private topicModel: Model<Topic>,
+    private readonly postService: PostService,
   ) {}
 
   async create(
@@ -36,7 +42,40 @@ export class FlashcardsService {
     createFlashcardDto: ModifyFlashcardDto,
   ): Promise<void> {
     const owned = await this.claimImages(userId, createFlashcardDto);
-    await new this.flashcardModel({ ...owned, user_id: userId }).save();
+    const created = await new this.flashcardModel({
+      ...owned,
+      user_id: userId,
+      // A card added under something already shared is shared with it, unless
+      // the form said otherwise: the topic or subject was made public exactly
+      // to carry what goes in it.
+      visibility: owned.visibility ?? (await this.inheritedVisibility(userId, owned)),
+    }).save();
+
+    if (created.subject_id) {
+      await this.postService.refresh(userId, created.subject_id);
+    }
+  }
+
+  /** "public" when the topic, or failing that the subject, is itself public. */
+  private async inheritedVisibility(
+    userId: string,
+    dto: ModifyFlashcardDto,
+  ): Promise<Visibility> {
+    if (dto.topic_id) {
+      const topic = await this.topicModel
+        .findOne({ _id: dto.topic_id, user_id: userId }, { visibility: 1 })
+        .lean()
+        .exec();
+      if (topic?.visibility === 'public') return 'public';
+    }
+    if (dto.subject_id) {
+      const subject = await this.subjectModel
+        .findOne({ _id: dto.subject_id, user_id: userId }, { visibility: 1 })
+        .lean()
+        .exec();
+      if (subject?.visibility === 'public') return 'public';
+    }
+    return defaultVisibility;
   }
 
   findOne(userId: string, id: string): Promise<FlashcardDocument> {
@@ -141,6 +180,10 @@ export class FlashcardsService {
     // Unconditionally, with no check on who else might point at them: a file
     // belongs to one flashcard only, which is what claimImages() guarantees.
     await this.deleteImagesOf(existing.question, existing.answer);
+
+    if (existing.subject_id) {
+      await this.postService.refresh(userId, existing.subject_id);
+    }
   }
 
   async update(
@@ -166,6 +209,8 @@ export class FlashcardsService {
     const before = this.imageIdsOf(existing.question, existing.answer);
     const after = this.imageIdsOf(owned.question, owned.answer);
     await this.deleteFiles(before.filter((fileId) => !after.includes(fileId)));
+
+    await this.refreshPostOf(userId, id);
   }
 
   private imageIdsOf(question?: string, answer?: string): string[] {
@@ -256,18 +301,29 @@ export class FlashcardsService {
   }
 
   /** Only the visibility, for the quick toggle in the lists. */
-  setVisibility(
+  async setVisibility(
     userId: string,
     id: string,
     visibility: Visibility,
   ): Promise<void> {
-    return updateOwnedOrThrow(
+    await updateOwnedOrThrow(
       this.flashcardModel,
       id,
       userId,
       { visibility },
       ENTITY,
     );
+    await this.refreshPostOf(userId, id);
+  }
+
+  private async refreshPostOf(userId: string, cardId: string): Promise<void> {
+    const card = await this.flashcardModel
+      .findOne({ _id: cardId, user_id: userId }, { subject_id: 1 })
+      .lean()
+      .exec();
+    if (card?.subject_id) {
+      await this.postService.refresh(userId, card.subject_id);
+    }
   }
 
 }
