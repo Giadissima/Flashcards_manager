@@ -6,7 +6,13 @@ import { BasePaginatedResult } from 'src/common.dto';
 import { Flashcard, FlashcardDocument } from 'src/flashcards/flashcards.schema';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { ConflictException } from '@nestjs/common';
+import { FileService } from 'src/file/file.service';
 import { Subject } from 'src/subject/subject.schema';
+import {
+  extractImageFileIds,
+  replaceImageFileIds,
+} from 'src/common/html.util';
 import { Topic } from 'src/topic/topic.schema';
 import { Vote, VoteValue } from './vote.schema';
 
@@ -20,6 +26,7 @@ export class PostService {
     @InjectModel(Topic.name) private topicModel: Model<Topic>,
     @InjectModel(Flashcard.name) private flashcardModel: Model<Flashcard>,
     @InjectModel(Vote.name) private voteModel: Model<Vote>,
+    private readonly fileService: FileService,
   ) {}
 
   /**
@@ -213,6 +220,134 @@ export class PostService {
     return { data: data as FlashcardDocument[], count };
   }
 
+  /**
+   * Copies a public flashcard into the caller's own library.
+   *
+   * The copy is marked imported and can never be published again: the point of
+   * taking someone's card is to study it, not to pass it on as one's own.
+   *
+   * Its subject and topic are recreated by name under the caller, the way the
+   * zip import already does, so the card lands somewhere that makes sense
+   * instead of loose at the top of the library.
+   */
+  async importFlashcard(userId: string, cardId: string): Promise<void> {
+    const owner = new Types.ObjectId(userId);
+    const source = (await this.flashcardModel
+      .findOne({ _id: cardId, visibility: 'public' })
+      .populate(['subject_id', 'topic_id'])
+      .lean()
+      .exec()) as SourceCard | null;
+    if (!source) {
+      throw new NotFoundException(`Flashcard with id ${cardId} not found`);
+    }
+    if (String(source.user_id) === userId) {
+      throw new ConflictException('This flashcard is already yours');
+    }
+
+    const already = await this.flashcardModel
+      .exists({ user_id: owner, imported_from: source._id })
+      .exec();
+    if (already) {
+      throw new ConflictException('This flashcard was already imported');
+    }
+
+    const subject_id = await this.mirrorSubject(owner, source);
+    const topic_id = await this.mirrorTopic(owner, source, subject_id);
+    const { question, answer } = await this.copyImages(source);
+
+    await this.flashcardModel.create({
+      title: source.title,
+      question,
+      answer,
+      subject_id,
+      topic_id,
+      user_id: owner,
+      visibility: 'private',
+      imported: true,
+      imported_from: source._id,
+    });
+  }
+
+  /** The caller's own subject of the same name, created if they have none. */
+  private async mirrorSubject(
+    owner: Types.ObjectId,
+    source: SourceCard,
+  ): Promise<Types.ObjectId | undefined> {
+    const name = source.subject_id?.name;
+    if (!name) return undefined;
+
+    const subject = await this.subjectModel
+      .findOneAndUpdate(
+        { user_id: owner, name },
+        {
+          $setOnInsert: {
+            name,
+            color: source.subject_id?.color,
+            user_id: owner,
+            visibility: 'private',
+          },
+        },
+        { upsert: true, new: true },
+      )
+      .exec();
+    return subject._id as Types.ObjectId;
+  }
+
+  private async mirrorTopic(
+    owner: Types.ObjectId,
+    source: SourceCard,
+    subject_id?: Types.ObjectId,
+  ): Promise<Types.ObjectId | undefined> {
+    const name = source.topic_id?.name;
+    if (!name || !subject_id) return undefined;
+
+    const topic = await this.topicModel
+      .findOneAndUpdate(
+        { user_id: owner, name, subject_id },
+        {
+          $setOnInsert: {
+            name,
+            color: source.topic_id?.color,
+            subject_id,
+            user_id: owner,
+            visibility: 'private',
+          },
+        },
+        { upsert: true, new: true },
+      )
+      .exec();
+    return topic._id as Types.ObjectId;
+  }
+
+  /**
+   * Gives the copy its own image files. Sharing them with the original would
+   * break the rule the whole app rests on - one file, one flashcard - and the
+   * day the author deleted their card it would take the images out of every
+   * copy with it.
+   */
+  private async copyImages(
+    source: SourceCard,
+  ): Promise<{ question: string; answer: string }> {
+    const ids = [
+      ...new Set([
+        ...extractImageFileIds(source.question),
+        ...extractImageFileIds(source.answer),
+      ]),
+    ];
+    if (!ids.length) return { question: source.question, answer: source.answer };
+
+    const idMap = new Map<string, string>();
+    for (const fileId of ids) {
+      const copyId = await this.fileService.duplicate(fileId);
+      if (copyId) idMap.set(fileId, copyId);
+    }
+
+    return {
+      question: replaceImageFileIds(source.question, idMap),
+      answer: replaceImageFileIds(source.answer, idMap),
+    };
+  }
+
   private async findOneOrThrow(postId: string): Promise<PostDocument> {
     const post = await this.postModel.findById(postId).exec();
     if (!post) {
@@ -310,6 +445,17 @@ export class PostService {
       updatedAt: post.updatedAt,
     };
   }
+}
+
+/** The card being imported, with its subject and topic populated. */
+interface SourceCard {
+  _id: Types.ObjectId;
+  user_id: Types.ObjectId;
+  title: string;
+  question: string;
+  answer: string;
+  subject_id?: { _id: Types.ObjectId; name?: string; color?: string };
+  topic_id?: { _id: Types.ObjectId; name?: string; color?: string };
 }
 
 /** The shape the three populate() calls above leave behind. */

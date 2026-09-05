@@ -6,7 +6,11 @@ import {
 } from './flashcards.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Visibility, defaultVisibility } from 'src/common/visibility';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Flashcard, FlashcardDocument } from './flashcards.schema';
 import { FilterQuery, Model, Types } from 'mongoose';
 import { BasePaginatedResult, ListFilterRequest } from 'src/common.dto';
@@ -192,6 +196,9 @@ export class FlashcardsService {
     updateObj: ModifyFlashcardDto,
   ): Promise<void> {
     assertValidObjectId(id);
+    if (updateObj.visibility) {
+      await this.assertCanBePublished(userId, id, updateObj.visibility);
+    }
 
     const existing = await this.flashcardModel
       .findOne({ _id: id, user_id: userId })
@@ -306,6 +313,7 @@ export class FlashcardsService {
     id: string,
     visibility: Visibility,
   ): Promise<void> {
+    await this.assertCanBePublished(userId, id, visibility);
     await updateOwnedOrThrow(
       this.flashcardModel,
       id,
@@ -314,6 +322,29 @@ export class FlashcardsService {
       ENTITY,
     );
     await this.refreshPostOf(userId, id);
+  }
+
+  /**
+   * An imported card cannot go back out. It is somebody else's work, kept for
+   * studying: republishing it would let the Community fill with copies whose
+   * author has no say in them.
+   */
+  private async assertCanBePublished(
+    userId: string,
+    cardId: string,
+    visibility: Visibility,
+  ): Promise<void> {
+    if (visibility !== 'public') return;
+
+    const card = await this.flashcardModel
+      .findOne({ _id: cardId, user_id: userId }, { imported: 1 })
+      .lean()
+      .exec();
+    if (card?.imported) {
+      throw new BadRequestException(
+        'An imported flashcard cannot be published again',
+      );
+    }
   }
 
   private async refreshPostOf(userId: string, cardId: string): Promise<void> {

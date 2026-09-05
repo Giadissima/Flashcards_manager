@@ -51,6 +51,27 @@ export class Flashcard {
 
   @Prop({ required: true, enum: visibilities, default: defaultVisibility })
   visibility: Visibility;
+
+  /**
+   * True on a copy taken from somebody else's post. Such a card can be studied,
+   * edited and deleted like any other, but never published again: passing on
+   * someone's work as one's own is the one thing the Community must not make
+   * easy.
+   */
+  @Prop({ required: true, default: false, index: true })
+  imported: boolean;
+
+  /**
+   * The card this was copied from. Kept so the same card cannot be imported
+   * twice, and so "how many people took this" can be counted later - a better
+   * measure of usefulness than a vote, since it costs the reader something.
+   */
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Flashcard',
+    required: false,
+  })
+  imported_from?: mongoose.Types.ObjectId;
 }
 // ! known gap: by editing the request by hand a client can create a flashcard
 // whose topic and subject are not related to each other, since nothing checks

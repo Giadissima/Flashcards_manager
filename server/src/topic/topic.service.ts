@@ -135,9 +135,14 @@ export class TopicService {
     topicId: string,
     visibility: Visibility,
   ): Promise<void> {
-    await this.flashcardModel
-      .updateMany({ user_id: userId, topic_id: topicId }, { visibility })
-      .exec();
+    const owned = { user_id: userId, topic_id: topicId };
+    // Imported cards are left behind when publishing: they are somebody else's
+    // work. Taking a topic back still reaches them, since making something
+    // private can only ever be the safer direction.
+    const cards =
+      visibility === 'public' ? { ...owned, imported: { $ne: true } } : owned;
+
+    await this.flashcardModel.updateMany(cards, { visibility }).exec();
   }
 
   private async refreshPostOf(userId: string, topicId: string): Promise<void> {

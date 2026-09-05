@@ -159,9 +159,15 @@ export class SubjectService {
     visibility: Visibility,
   ): Promise<void> {
     const owned = { user_id: userId, subject_id: subjectId };
+    // Imported cards are left behind when publishing: they are somebody else's
+    // work. Taking a subject back still reaches them, since making something
+    // private can only ever be the safer direction.
+    const cards =
+      visibility === 'public' ? { ...owned, imported: { $ne: true } } : owned;
+
     await Promise.all([
       this.topicModel.updateMany(owned, { visibility }).exec(),
-      this.flashcardModel.updateMany(owned, { visibility }).exec(),
+      this.flashcardModel.updateMany(cards, { visibility }).exec(),
     ]);
   }
 

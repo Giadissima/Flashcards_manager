@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Patch, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { CastVoteDto, FeedFilterRequest, FeedPost } from './post.dto';
 
 import { ApiOperation } from '@nestjs/swagger';
@@ -53,6 +61,18 @@ export class PostController {
     @Body() dto: CastVoteDto,
   ): Promise<void> {
     return this.postService.vote(user.sub, id, dto.value);
+  }
+
+
+  @ApiOperation({
+    description: 'copy a public flashcard into your own library',
+  })
+  @Post('flashcards/:id/import')
+  importFlashcard(
+    @CurrentUser() user: JwtPayload,
+    @Param('id') id: string,
+  ): Promise<void> {
+    return this.postService.importFlashcard(user.sub, id);
   }
 
 }

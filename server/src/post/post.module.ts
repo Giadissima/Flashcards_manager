@@ -4,6 +4,7 @@ import { Subject, SubjectSchema } from 'src/subject/subject.schema';
 import { Topic, TopicSchema } from 'src/topic/topic.schema';
 import { Vote, VoteSchema } from './vote.schema';
 
+import { FileModule } from 'src/file/file.module';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PostController } from './post.controller';
@@ -18,6 +19,7 @@ import { PostService } from './post.service';
       { name: Flashcard.name, schema: FlashcardSchema },
       { name: Vote.name, schema: VoteSchema },
     ]),
+    FileModule,
   ],
   controllers: [PostController],
   // The three services that change a visibility keep the feed in step through it
