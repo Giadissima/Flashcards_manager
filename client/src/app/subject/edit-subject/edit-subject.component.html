@@ -27,10 +27,12 @@
           }
         </div>
 
-        <app-subject-icon-preview [previewUrl]="previewUrl" [colorControl]="colorControl"
+        <app-icon-preview [previewUrl]="previewUrl" [colorControl]="colorControl"
           [colorTitle]="t('subject.edit.iconColor')" [previewLabel]="t('subject.edit.currentIcon')"
           [fileLabel]="t('subject.edit.replaceIcon')" (fileSelected)="onFileSelected($event)"
-          (reset)="resetIcon()"></app-subject-icon-preview>
+          (reset)="resetIcon()">
+          <app-subject-icon-svg defaultIcon [fill]="colorControl.value" class="current-icon"></app-subject-icon-svg>
+        </app-icon-preview>
 
         <div class="form-actions">
           <button type="submit" class="btn btn-primary"

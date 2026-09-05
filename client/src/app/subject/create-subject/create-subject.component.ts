@@ -10,7 +10,8 @@ import { PageCardComponent } from '../../shared/page-card/page-card.component';
 import { Router } from '@angular/router';
 import { SubjectService } from '../subject.service';
 import { defaultSubjectIconColor } from '../subject-icon.util';
-import { SubjectIconPreviewComponent } from '../../shared/subject-icon-preview/subject-icon-preview.component';
+import { IconPreviewComponent } from '../../shared/icon-preview/icon-preview.component';
+import { SubjectIconSvgComponent } from '../subject-icon-svg/subject-icon-svg.component';
 import { ToastService } from '../../shared/toast/toast.service';
 import { RichTextEditorComponent } from '../../shared/rich-text-editor/rich-text-editor.component';
 
@@ -22,7 +23,8 @@ import { RichTextEditorComponent } from '../../shared/rich-text-editor/rich-text
     ReactiveFormsModule,
     TranslocoModule,
     RichTextEditorComponent,
-    SubjectIconPreviewComponent,
+    IconPreviewComponent,
+    SubjectIconSvgComponent,
     PageCardComponent,
   ],
   templateUrl: './create-subject.component.html',

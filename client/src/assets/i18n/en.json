@@ -404,7 +404,10 @@
   },
   "profile": {
     "title": "Profile",
-    "subtitle": "Signed in as {{username}}",
+    "subtitle": "Your account and where you study",
+    "avatar": "Profile picture",
+    "avatarColor": "Picture colour",
+    "replaceAvatar": "Upload a picture",
     "save": "Save changes",
     "loadError": "Your profile could not be loaded",
     "toast": {

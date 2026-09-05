@@ -35,6 +35,18 @@ export class User {
       - which the name alone does not pin down. */
   @Prop({ required: false })
   courseKind?: string;
+
+  /**
+   * Id of the uploaded picture in the file collection, as subjects hold their
+   * icon. Absent means the default drawing, which the client builds from
+   * avatarColor - nothing is stored for it.
+   */
+  @Prop({ required: false })
+  avatar?: string;
+
+  /** Background colour of the default avatar, as "#rrggbb". */
+  @Prop({ required: false })
+  avatarColor?: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

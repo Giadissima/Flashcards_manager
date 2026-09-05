@@ -27,10 +27,12 @@
         }
       </div>
 
-      <app-subject-icon-preview [previewUrl]="filePreviewUrl" [colorControl]="colorControl"
+      <app-icon-preview [previewUrl]="filePreviewUrl" [colorControl]="colorControl"
         [colorTitle]="t('subject.create.iconColor')" [previewLabel]="t('subject.create.iconPreview')"
         [fileLabel]="t('common.chooseFile')" (fileSelected)="onFileSelected($event)"
-        (reset)="resetIcon()"></app-subject-icon-preview>
+        (reset)="resetIcon()">
+          <app-subject-icon-svg defaultIcon [fill]="colorControl.value" class="current-icon"></app-subject-icon-svg>
+        </app-icon-preview>
 
       <div class="form-actions">
         <button type="submit" class="btn btn-primary"

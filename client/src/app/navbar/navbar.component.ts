@@ -1,4 +1,6 @@
 import { AuthService } from '../auth/auth.service';
+import { Observable, map } from 'rxjs';
+import { getAvatarUrl } from '../shared/avatar/avatar.util';
 import { ClickOutsideDirective } from '../shared/click-outside.directive';
 import { CommonModule } from '@angular/common';
 import { Component, HostListener } from '@angular/core';
@@ -28,11 +30,20 @@ export class NavbarComponent {
   isResizing = false;
   private resizeTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
+  /**
+   * Derived from the stream rather than read in the template: the URL is a
+   * generated data URI when no picture is uploaded, and a plain call would
+   * rebuild it on every change detection run.
+   */
+  readonly avatarUrl$: Observable<string>;
+
   constructor(
     protected authService: AuthService,
     private toastService: ToastService,
     private transloco: TranslocoService,
-  ) {}
+  ) {
+    this.avatarUrl$ = this.authService.user$.pipe(map((user) => getAvatarUrl(user)));
+  }
 
   @HostListener('window:resize')
   onWindowResize(): void {

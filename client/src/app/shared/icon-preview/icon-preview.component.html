@@ -7,7 +7,7 @@
       <span class="material-symbols-outlined text-danger">cancel</span>
     </button>
     } @else {
-    <app-subject-icon-svg [fill]="colorControl.value" class="current-icon"></app-subject-icon-svg>
+    <ng-content select="[defaultIcon]"></ng-content>
     <ngx-colors ngxColorsTrigger [formControl]="colorControl" [title]="colorTitle" [allowedModels]="['HEXA']"
       class="rainbow-swatch" [theme]="(themeService.theme$ | async) ?? 'light'"
       [lockValues]="{ alpha: 1, clamp: true }"></ngx-colors>

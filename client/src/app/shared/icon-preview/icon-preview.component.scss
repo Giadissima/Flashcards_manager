@@ -20,14 +20,26 @@
   border: 1px solid var(--border-color);
 }
 
+/* Sat on the upper rim rather than off the corner: on a circle, the corner of
+   the bounding box is empty space, so a badge pinned to it floats away from the
+   picture instead of sitting on it. */
 .cancel-btn {
   position: absolute;
-  top: -8px;
-  right: -8px;
+  top: 0;
+  right: 0;
   padding: 0;
   border-radius: 50%;
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* The glyph defaults to the full 24px, which leaves it cramped against the
+     edge of the button and reads as a clipped icon. */
+  .material-symbols-outlined {
+    font-size: 20px;
+  }
 }
 
 /* Sat on the lower edge of the circle, so it follows its size. */

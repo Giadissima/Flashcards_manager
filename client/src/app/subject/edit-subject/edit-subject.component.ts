@@ -14,7 +14,8 @@ import { ToastService } from '../../shared/toast/toast.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { charMinLength, nameMaxLength, descMaxLength } from '../../../config/config';
 import { buildDefaultSubjectIconSvgMarkup, defaultSubjectIconColor, getSubjectIconUrl } from '../subject-icon.util';
-import { SubjectIconPreviewComponent } from '../../shared/subject-icon-preview/subject-icon-preview.component';
+import { IconPreviewComponent } from '../../shared/icon-preview/icon-preview.component';
+import { SubjectIconSvgComponent } from '../subject-icon-svg/subject-icon-svg.component';
 
 @Component({
   selector: 'app-edit-subject',
@@ -24,7 +25,8 @@ import { SubjectIconPreviewComponent } from '../../shared/subject-icon-preview/s
     ReactiveFormsModule,
     RichTextEditorComponent,
     TranslocoModule,
-    SubjectIconPreviewComponent,
+    IconPreviewComponent,
+    SubjectIconSvgComponent,
     LoadStateComponent,
     PageCardComponent,
   ],

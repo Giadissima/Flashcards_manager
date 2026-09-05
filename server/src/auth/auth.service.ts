@@ -18,6 +18,7 @@ import { User, UserDocument } from './user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { Model } from 'mongoose';
+import { FileService } from 'src/file/file.service';
 import { UniversityService } from 'src/university/university.service';
 import bcrypt from 'bcryptjs';
 import { bcryptSaltRounds } from 'src/config';
@@ -28,6 +29,7 @@ export class AuthService {
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
     private readonly jwtService: JwtService,
     private readonly universityService: UniversityService,
+    private readonly fileService: FileService,
   ) {}
 
   async register(dto: RegisterDto): Promise<AuthResponse> {
@@ -107,18 +109,49 @@ export class AuthService {
   async updateProfile(
     payload: JwtPayload,
     dto: UpdateProfileDto,
+    avatar?: Express.Multer.File,
   ): Promise<PublicUser> {
     this.assertStudyFieldsExist(dto);
 
     const user = await this.userModel.findById(payload.sub).exec();
     if (!user) throw new UnauthorizedException('User no longer exists');
 
+    if (dto.username) await this.renameTo(user, dto.username);
+
     user.universityCode = dto.universityCode;
     user.course = dto.course;
     user.courseKind = dto.courseKind;
+    user.avatarColor = dto.avatarColor;
+
+    // Read before the change, dropped only once the save went through
+    const previousAvatar = user.avatar;
+    if (avatar) {
+      user.avatar = String((await this.fileService.create([avatar]))._id);
+    } else if (dto.removeAvatar) {
+      user.avatar = undefined;
+    }
+
     await user.save();
 
+    if (previousAvatar && previousAvatar !== user.avatar) {
+      await this.fileService.delete(previousAvatar);
+    }
+
     return this.toPublicUser(user);
+  }
+
+  /**
+   * Renames the user, unless the name is taken. Nothing else has to move: the
+   * token is signed with the id and every reference goes through it, which is
+   * the whole reason the username can be changed at all.
+   */
+  private async renameTo(user: UserDocument, username: string): Promise<void> {
+    const wanted = username.toLowerCase();
+    if (wanted === user.username) return;
+
+    const taken = await this.userModel.exists({ username: wanted });
+    if (taken) throw new ConflictException('Username already taken');
+    user.username = wanted;
   }
 
   private assertStudyFieldsExist(dto: StudyFieldsDto): void {
@@ -156,6 +189,8 @@ export class AuthService {
       universityCode: user.universityCode,
       course: user.course,
       courseKind: user.courseKind,
+      avatar: user.avatar,
+      avatarColor: user.avatarColor,
     };
   }
 }

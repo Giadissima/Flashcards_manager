@@ -404,7 +404,10 @@
   },
   "profile": {
     "title": "Profilo",
-    "subtitle": "Accesso come {{username}}",
+    "subtitle": "Il tuo account e dove studi",
+    "avatar": "Immagine del profilo",
+    "avatarColor": "Colore dell'immagine",
+    "replaceAvatar": "Carica un'immagine",
     "save": "Salva modifiche",
     "loadError": "Non è stato possibile caricare il tuo profilo",
     "toast": {

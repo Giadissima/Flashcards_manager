@@ -1,15 +1,42 @@
 <div class="container-md">
   <app-load-state errorMessageKey="profile.loadError">
     <app-page-card icon="account_circle" [title]="'profile.title' | transloco"
-      [subtitle]="'profile.subtitle' | transloco:{ username: username }">
+      [subtitle]="'profile.subtitle' | transloco">
+      <form [formGroup]="profileForm" (ngSubmit)="save()" novalidate>
 
-      <app-study-fields [value]="studyFields" (valueChange)="studyFields = $event"></app-study-fields>
+        @if (errorKey) {
+        <div class="alert alert-danger" role="alert">{{ errorKey | transloco }}</div>
+        }
 
-      <div class="form-actions">
-        <button type="button" class="btn btn-primary" [disabled]="saving" (click)="save()">
-          <span class="material-symbols-outlined">save</span>{{ 'profile.save' | transloco }}
-        </button>
-      </div>
+        <app-icon-preview [previewUrl]="previewUrl" [colorControl]="colorControl"
+          [colorTitle]="'profile.avatarColor' | transloco" [previewLabel]="'profile.avatar' | transloco"
+          [fileLabel]="'profile.replaceAvatar' | transloco" (fileSelected)="onAvatarSelected($event)"
+          (reset)="resetAvatar()">
+          <app-avatar-svg defaultIcon [fill]="colorControl.value" class="current-icon"></app-avatar-svg>
+        </app-icon-preview>
+
+        <div class="form-group">
+          <label for="username" class="form-label">{{ 'auth.username' | transloco }}</label>
+          <input type="text" id="username" formControlName="username" class="form-control" autocomplete="username">
+          @if (profileForm.get('username')?.touched && profileForm.get('username')?.hasError('pattern')) {
+          <div class="invalid-feedback d-block">{{ 'auth.usernamePatternError' | transloco }}</div>
+          } @else if (profileForm.get('username')?.touched && profileForm.get('username')?.invalid) {
+          <div class="invalid-feedback d-block">{{ 'auth.usernameLengthError' | transloco:{ min: charMinLength, max:
+            usernameMaxLength } }}</div>
+          }
+        </div>
+
+        <app-study-fields [value]="studyFields" (valueChange)="studyFields = $event"></app-study-fields>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" [disabled]="profileForm.invalid || saving">
+            <span class="material-symbols-outlined">save</span>{{ 'profile.save' | transloco }}
+          </button>
+          <button type="button" class="btn btn-outline-primary" (click)="logout()">
+            <span class="material-symbols-outlined">logout</span>{{ 'auth.logout' | transloco }}
+          </button>
+        </div>
+      </form>
     </app-page-card>
   </app-load-state>
 </div>

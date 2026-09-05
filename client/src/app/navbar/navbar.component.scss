@@ -71,6 +71,31 @@ nav {
   background-color: var(--secondary-color);
 }
 
+/* Holds the avatar picture, so it has no padding of its own: the round image
+   is the whole button. */
+.avatar-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  border-radius: 50%;
+}
+
+.navbar-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  border: 1px solid var(--border-color);
+}
+
+.avatar-btn:hover .navbar-avatar {
+  border-color: var(--primary-color);
+}
+
 .hamburger-btn {
   display: flex;
   flex-direction: column;

@@ -4,24 +4,33 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { AsyncPipe } from '@angular/common';
 import { ImageCropEditorComponent } from '../image-crop-editor/image-crop-editor.component';
 import { NgxColorsComponent, NgxColorsTriggerDirective } from 'ngx-colors';
-import { SubjectIconSvgComponent } from '../../subject/subject-icon-svg/subject-icon-svg.component';
 import { ThemeService } from '../theme/theme.service';
 
+/**
+ * A round picture that can be replaced by an upload or, while none is set,
+ * recoloured: the preview, the colour swatch, the file picker and the crop
+ * editor behind it.
+ *
+ * The drawing shown when nothing is uploaded is projected in by the caller
+ * (slot "defaultIcon"), because it is the only part that differs: a subject
+ * gets its book, a user gets the person figure. Everything else - cropping
+ * before handing the file over, clearing, the colour picker - is the same
+ * behaviour in both places and is defined once, here.
+ */
 @Component({
-  selector: 'app-subject-icon-preview',
+  selector: 'app-icon-preview',
   standalone: true,
   imports: [
     ReactiveFormsModule,
     AsyncPipe,
     NgxColorsComponent,
     NgxColorsTriggerDirective,
-    SubjectIconSvgComponent,
     ImageCropEditorComponent,
   ],
-  templateUrl: './subject-icon-preview.component.html',
-  styleUrl: './subject-icon-preview.component.scss',
+  templateUrl: './icon-preview.component.html',
+  styleUrl: './icon-preview.component.scss',
 })
-export class SubjectIconPreviewComponent {
+export class IconPreviewComponent {
   @Input() previewUrl: string | null = null;
   @Input({ required: true }) colorControl!: FormControl<string>;
   @Input() colorTitle = '';
@@ -35,7 +44,7 @@ export class SubjectIconPreviewComponent {
 
   constructor(protected themeService: ThemeService) {}
 
-  // The picked file is not handed over as it is: the icon is shown in a circle,
+  // The picked file is not handed over as it is: the image is shown in a circle,
   // so it goes through the crop editor first and only the result gets out.
   onFileChosen(event: Event, fileInput: HTMLInputElement): void {
     const file = (event.currentTarget as HTMLInputElement).files?.[0];

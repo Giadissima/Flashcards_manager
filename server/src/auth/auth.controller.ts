@@ -14,9 +14,12 @@ import {
   HttpStatus,
   Patch,
   Post,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiOperation } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthService } from './auth.service';
 import { CurrentUser } from './current-user.decorator';
 import { Public } from './public.decorator';
@@ -54,10 +57,31 @@ export class AuthController {
       'replace the study fields of the logged user; a field left out is cleared',
   })
   @Patch('me')
+  @UseInterceptors(FileInterceptor('avatar'))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        username: { type: 'string', example: 'giada' },
+        universityCode: { type: 'string', example: '00101' },
+        course: { type: 'string', example: 'Informatica' },
+        courseKind: { type: 'string', example: 'Laurea' },
+        avatarColor: { type: 'string', example: '#a294f9' },
+        removeAvatar: { type: 'boolean' },
+        avatar: {
+          type: 'string',
+          format: 'binary',
+          description: 'Picture to use instead of the default drawing',
+        },
+      },
+    },
+  })
   updateProfile(
     @CurrentUser() user: JwtPayload,
     @Body() updateProfileDto: UpdateProfileDto,
+    @UploadedFile() avatar?: Express.Multer.File,
   ): Promise<PublicUser> {
-    return this.authService.updateProfile(user, updateProfileDto);
+    return this.authService.updateProfile(user, updateProfileDto, avatar);
   }
 }

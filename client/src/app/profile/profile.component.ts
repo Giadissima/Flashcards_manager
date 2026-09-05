@@ -1,73 +1,174 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { StudyFields, StudyFieldsComponent, emptyStudyFields } from '../university/study-fields/study-fields.component';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
+import { charMinLength, usernameMaxLength } from '../../config/config';
+import { defaultAvatarColor, getAvatarUrl } from '../shared/avatar/avatar.util';
 
 import { AuthService } from '../auth/auth.service';
+import { AvatarSvgComponent } from '../shared/avatar/avatar-svg.component';
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
+import { IconPreviewComponent } from '../shared/icon-preview/icon-preview.component';
 import { LoadStateComponent } from '../shared/load-state/load-state.component';
 import { PageCardComponent } from '../shared/page-card/page-card.component';
-import { StudyFieldsPayload } from '../models/auth.dto';
 import { ToastService } from '../shared/toast/toast.service';
-import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
+
+/** Same rule as the server DTO: what is refused there is caught here first. */
+const usernamePattern = /^[A-Za-z0-9._-]+$/;
 
 /**
- * Where the study fields can be filled in after the fact. Without it the only
- * chance to give them is the registration form, which makes skipping them
- * permanent - and the Community section reads exactly those two fields.
+ * Where the account is edited after the fact. Without it the registration form
+ * would be the only chance to give the study fields, which would make skipping
+ * them permanent - and those two fields are what the Community section reads.
  */
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, TranslocoModule, PageCardComponent, LoadStateComponent, StudyFieldsComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    TranslocoModule,
+    PageCardComponent,
+    LoadStateComponent,
+    StudyFieldsComponent,
+    IconPreviewComponent,
+    AvatarSvgComponent,
+  ],
   templateUrl: './profile.component.html',
 })
-export class ProfileComponent implements OnInit {
+export class ProfileComponent implements OnInit, OnDestroy {
   @ViewChild(LoadStateComponent, { static: true }) loadState!: LoadStateComponent;
 
-  username = '';
+  profileForm: FormGroup;
   studyFields: StudyFields = emptyStudyFields();
   saving = false;
+  /** Translation key of the failure shown above the form, cleared on each save. */
+  errorKey: string | null = null;
+
+  selectedAvatar: File | null = null;
+  /**
+   * null means nothing is uploaded, so the live drawing is shown and follows the
+   * colour picker; otherwise it is the picture, either the stored one or the
+   * file just chosen.
+   */
+  previewUrl: string | null = null;
+  /** True after a "reset" click: on save the stored picture has to be dropped. */
+  private removeAvatar = false;
+
+  readonly charMinLength = charMinLength;
+  readonly usernameMaxLength = usernameMaxLength;
+
+  get colorControl(): FormControl<string> {
+    return this.profileForm.get('avatarColor') as FormControl<string>;
+  }
 
   constructor(
+    private fb: FormBuilder,
     private authService: AuthService,
     private toastService: ToastService,
     private transloco: TranslocoService,
-  ) {}
+  ) {
+    this.profileForm = this.fb.group({
+      username: ['', [
+        Validators.required,
+        Validators.minLength(charMinLength),
+        Validators.maxLength(usernameMaxLength),
+        Validators.pattern(usernamePattern),
+      ]],
+      avatarColor: [defaultAvatarColor, Validators.required],
+    });
+  }
 
   ngOnInit(): void {
     this.loadState.run(() => this.loadProfile());
+  }
+
+  ngOnDestroy(): void {
+    this.revokePreviewUrl();
   }
 
   private async loadProfile(): Promise<void> {
     // Asked for rather than read from storage: the copy kept there is only a
     // convenience, and this is the page that edits the real thing.
     const user = await this.authService.fetchMe();
-    this.username = user.username;
+    this.profileForm.patchValue({
+      username: user.username,
+      avatarColor: user.avatarColor ?? defaultAvatarColor,
+    });
     this.studyFields = {
       universityCode: user.universityCode ?? null,
       course: user.course ?? null,
       courseKind: user.courseKind ?? null,
     };
+    this.previewUrl = user.avatar ? getAvatarUrl(user) : null;
+  }
+
+  // Already cropped by app-icon-preview: what arrives here is the picture as it
+  // will be stored, not the file the user picked.
+  onAvatarSelected(file: File): void {
+    this.removeAvatar = false;
+    this.revokePreviewUrl();
+    this.selectedAvatar = file;
+    this.previewUrl = URL.createObjectURL(file);
+  }
+
+  /** Back to the live drawing, which follows the colour picker. */
+  resetAvatar(): void {
+    this.removeAvatar = true;
+    this.revokePreviewUrl();
+    this.selectedAvatar = null;
+    this.previewUrl = null;
+  }
+
+  private revokePreviewUrl(): void {
+    if (this.previewUrl?.startsWith('blob:')) {
+      URL.revokeObjectURL(this.previewUrl);
+    }
   }
 
   async save(): Promise<void> {
-    if (this.saving) return;
+    if (this.profileForm.invalid || this.saving) {
+      this.profileForm.markAllAsTouched();
+      return;
+    }
+
     this.saving = true;
+    this.errorKey = null;
+
+    const formData = new FormData();
+    formData.append('username', this.profileForm.get('username')?.value);
+    formData.append('avatarColor', this.profileForm.get('avatarColor')?.value);
 
     const { universityCode, course, courseKind } = this.studyFields;
-    const payload: StudyFieldsPayload = {};
-    if (universityCode) payload.universityCode = universityCode;
+    if (universityCode) formData.append('universityCode', universityCode);
     if (course && courseKind) {
-      payload.course = course;
-      payload.courseKind = courseKind;
+      formData.append('course', course);
+      formData.append('courseKind', courseKind);
+    }
+
+    if (this.selectedAvatar) {
+      formData.append('avatar', this.selectedAvatar, this.selectedAvatar.name);
+    } else if (this.removeAvatar) {
+      formData.append('removeAvatar', 'true');
     }
 
     try {
-      await this.authService.updateProfile(payload);
+      await this.authService.updateProfile(formData);
+      this.selectedAvatar = null;
+      this.removeAvatar = false;
       this.toastService.show(this.transloco.translate('profile.toast.saved'), 'success');
-    } catch {
-      this.toastService.show(this.transloco.translate('profile.toast.saveError'), 'error');
+    } catch (error) {
+      this.errorKey = error instanceof HttpErrorResponse && error.status === 409
+        ? 'auth.error.usernameTaken'
+        : 'profile.toast.saveError';
     } finally {
       this.saving = false;
     }
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.toastService.show(this.transloco.translate('auth.toast.loggedOut'), 'info');
   }
 }

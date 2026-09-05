@@ -7,6 +7,13 @@ import { hasHtmlContent } from './html.util';
  * inline on almost every string property.
  */
 
+/**
+ * "true"/"false" as they arrive from a multipart form, where every field is a
+ * string, turned into the boolean the DTO declares.
+ */
+export const ToBoolean = () =>
+  Transform(({ value }) => (typeof value === 'string' ? value === 'true' : value));
+
 /** Trims a value only when it is a string, leaving any other type untouched. */
 export const Trim = () =>
   Transform(({ value }) => (typeof value === 'string' ? value.trim() : value));

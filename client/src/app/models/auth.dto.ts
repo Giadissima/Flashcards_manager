@@ -6,6 +6,9 @@ export interface AuthUser {
   universityCode?: string;
   course?: string;
   courseKind?: string;
+  /** Id of the uploaded picture; absent means the default drawing. */
+  avatar?: string;
+  avatarColor?: string;
 }
 
 export interface AuthResponse {

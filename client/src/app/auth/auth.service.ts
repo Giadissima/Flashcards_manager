@@ -1,4 +1,4 @@
-import { AuthResponse, AuthUser, Credentials, RegistrationPayload, StudyFieldsPayload } from '../models/auth.dto';
+import { AuthResponse, AuthUser, Credentials, RegistrationPayload } from '../models/auth.dto';
 
 import { BehaviorSubject } from 'rxjs';
 import { Injectable } from '@angular/core';
@@ -66,9 +66,12 @@ export class AuthService {
     return user;
   }
 
-  /** Replaces the study fields: what is left out is cleared, not kept. */
-  async updateProfile(fields: StudyFieldsPayload): Promise<AuthUser> {
-    const user: AuthUser = await this.restClient.patch(this.baseUrl + '/me', fields);
+  /**
+   * Replaces the profile: what is left out of the form is cleared, not kept.
+   * Sent as multipart because it can carry the avatar picture.
+   */
+  async updateProfile(profile: FormData): Promise<AuthUser> {
+    const user: AuthUser = await this.restClient.patch(this.baseUrl + '/me', profile);
     this.storeUser(user);
     return user;
   }
