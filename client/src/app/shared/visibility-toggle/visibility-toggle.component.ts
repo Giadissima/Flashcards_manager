@@ -26,7 +26,21 @@ let nextId = 0;
 export class VisibilityToggleComponent {
   @Input({ required: true }) control!: FormControl<Visibility>;
 
+  /**
+   * What is being published. A subject carries its topics and cards with it,
+   * and a topic its cards - both ways round - so the form has to say so before
+   * the switch is touched, not after.
+   */
+  @Input() kind: 'subject' | 'topic' | 'flashcard' = 'flashcard';
+
   readonly inputId = `visibility-switch-${nextId++}`;
+
+  /** The key of the line explaining what the choice drags along, if anything. */
+  get cascadeKey(): string | null {
+    if (this.kind === 'subject') return 'visibility.cascadeSubject';
+    if (this.kind === 'topic') return 'visibility.cascadeTopic';
+    return null;
+  }
 
   get isPublic(): boolean {
     return this.control.value === 'public';

@@ -27,6 +27,9 @@
         <a routerLink="/manage-subjects" (click)="onNavigate('subjects')">{{ 'navbar.manageSubjects' | transloco }}</a>
       </div>
     </div>
+    <a routerLink="/community" class="menu-item" (click)="closeMobileMenu()">
+      {{ 'navbar.community' | transloco }}
+    </a>
     <div class="dropdown" (appClickOutside)="closeDropdown('test')">
       <span class="menu-item" (click)="toggleDropdown('test')">
         {{ 'navbar.test' | transloco }}

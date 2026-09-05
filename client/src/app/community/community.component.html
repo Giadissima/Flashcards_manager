@@ -1,0 +1,22 @@
+<div class="container-md" *transloco="let t">
+  <app-page-card icon="diversity_3" [title]="t('community.title')" [subtitle]="t('community.subtitle')">
+    <app-segmented-filter [options]="[
+        { value: 'created', label: t('community.sortCreated') },
+        { value: 'updated', label: t('community.sortUpdated') }
+      ]" [value]="sort" [label]="t('community.sortLabel')" (valueChange)="onSortChange($event)">
+    </app-segmented-filter>
+
+    <app-load-state errorMessageKey="community.loadError">
+      @for (post of posts; track post._id) {
+      <app-post-card [post]="post"></app-post-card>
+      } @empty {
+      <p class="community-empty">{{ t('community.empty') }}</p>
+      }
+
+      @if (totalPages > 1) {
+      <app-pagination [currentPage]="currentPage" [totalPages]="totalPages" (previous)="previousPage()"
+        (next)="nextPage()"></app-pagination>
+      }
+    </app-load-state>
+  </app-page-card>
+</div>

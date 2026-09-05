@@ -11,7 +11,8 @@
     "results": "Risultati",
     "createCard": "Crea Flashcard",
     "menu": "Menu",
-    "account": "Account"
+    "account": "Account",
+    "community": "Community"
   },
   "auth": {
     "username": "Nome utente",
@@ -426,6 +427,22 @@
     "makePrivate": "Rendi privata",
     "toastPublic": "Ora è pubblica",
     "toastPrivate": "Ora è privata",
-    "toastError": "Non è stato possibile cambiare la visibilità"
+    "toastError": "Non è stato possibile cambiare la visibilità",
+    "cascadeSubject": "I suoi argomenti e le sue flashcard la seguono, sia quando la pubblichi sia quando la togli.",
+    "cascadeTopic": "Le sue flashcard lo seguono, sia quando lo pubblichi sia quando lo togli."
+  },
+  "community": {
+    "title": "Community",
+    "subtitle": "Quello che gli altri hanno scelto di condividere",
+    "sortLabel": "Ordine",
+    "sortCreated": "Più recenti",
+    "sortUpdated": "Aggiornati di recente",
+    "empty": "Non è ancora stato condiviso nulla.",
+    "loadError": "Non è stato possibile caricare il feed",
+    "noFlashcards": "Nessuna flashcard da mostrare",
+    "previous": "Flashcard precedenti",
+    "next": "Altre flashcard",
+    "cardCount": "{{count}} flashcard",
+    "updatedAt": "Aggiornato il {{date}}"
   }
 }

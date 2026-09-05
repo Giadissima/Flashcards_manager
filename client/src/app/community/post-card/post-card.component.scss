@@ -1,0 +1,127 @@
+.post-card {
+  background-color: var(--component-background);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  padding: calc(var(--spacing-unit) * 2);
+  margin-bottom: calc(var(--spacing-unit) * 3);
+}
+
+.post-header {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--spacing-unit) * 2);
+  margin-bottom: calc(var(--spacing-unit) * 2);
+}
+
+.post-subject-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+/* Takes the room left over so the author stays pinned to the right edge, and
+   a long "subject - topic" is cut instead of pushing them out of the card. */
+.post-heading {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: 1.05rem;
+  color: var(--header-color);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.post-author {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-unit);
+  flex-shrink: 0;
+}
+
+.post-username {
+  color: var(--text-color);
+  font-weight: 600;
+}
+
+.post-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.post-carousel {
+  display: flex;
+  align-items: stretch;
+  gap: var(--spacing-unit);
+}
+
+.carousel-arrow {
+  flex-shrink: 0;
+  border: none;
+  background-color: var(--inset-background);
+  color: var(--header-color);
+  border-radius: var(--border-radius-md);
+  padding: 0 calc(var(--spacing-unit) * 0.5);
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+}
+
+/* The cards scroll sideways rather than wrapping: a post is one row, and on a
+   phone the row is swiped instead of paged. */
+.carousel-track {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  gap: calc(var(--spacing-unit) * 2);
+  overflow-x: auto;
+}
+
+.post-flashcard {
+  flex: 1 0 220px;
+  min-height: 180px;
+  background-color: var(--inset-background);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  padding: calc(var(--spacing-unit) * 1.5);
+  overflow: hidden;
+}
+
+.post-flashcard-title {
+  color: var(--header-color);
+  font-size: 0.95rem;
+}
+
+.post-flashcard-body {
+  color: var(--text-color);
+  font-size: 0.9rem;
+
+  ::ng-deep img {
+    max-width: 100%;
+  }
+}
+
+.carousel-loading,
+.carousel-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 180px;
+  color: var(--muted-color);
+}
+
+.post-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: calc(var(--spacing-unit) * 1.5);
+  font-size: 0.85rem;
+  color: var(--muted-color);
+}

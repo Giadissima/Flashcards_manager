@@ -1,0 +1,10 @@
+app-segmented-filter {
+  display: block;
+  margin-bottom: calc(var(--spacing-unit) * 3);
+}
+
+.community-empty {
+  text-align: center;
+  color: var(--muted-color);
+  margin: calc(var(--spacing-unit) * 4) 0;
+}

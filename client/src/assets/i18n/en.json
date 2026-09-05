@@ -11,7 +11,8 @@
     "results": "Results",
     "createCard": "Create Card",
     "menu": "Menu",
-    "account": "Account"
+    "account": "Account",
+    "community": "Community"
   },
   "auth": {
     "username": "Username",
@@ -426,6 +427,22 @@
     "makePrivate": "Make it private",
     "toastPublic": "Now public",
     "toastPrivate": "Now private",
-    "toastError": "The visibility could not be changed"
+    "toastError": "The visibility could not be changed",
+    "cascadeSubject": "Its topics and flashcards follow it, both when it is published and when it is taken back.",
+    "cascadeTopic": "Its flashcards follow it, both when it is published and when it is taken back."
+  },
+  "community": {
+    "title": "Community",
+    "subtitle": "What other people have chosen to share",
+    "sortLabel": "Order",
+    "sortCreated": "Newest",
+    "sortUpdated": "Recently updated",
+    "empty": "Nothing has been shared yet.",
+    "loadError": "The feed could not be loaded",
+    "noFlashcards": "No flashcards to show",
+    "previous": "Previous flashcards",
+    "next": "More flashcards",
+    "cardCount": "{{count}} flashcards",
+    "updatedAt": "Updated {{date}}"
   }
 }

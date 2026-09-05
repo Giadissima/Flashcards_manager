@@ -1,5 +1,6 @@
 import { authGuard, guestGuard } from './auth/auth.guard';
 
+import { CommunityComponent } from './community/community.component';
 import { CreateFlashcard } from './flashcard/create-flashcard/create-flashcard';
 import { CreateSubjectComponent } from './subject/create-subject/create-subject.component';
 import { CreateTopicComponent } from './topic/create-topic/create-topic.component';
@@ -30,6 +31,7 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: 'home', component: Home },
+      { path: 'community', component: CommunityComponent },
       { path: 'profile', component: ProfileComponent },
       { path: 'create-card', component: CreateFlashcard },
       { path: 'edit-card/:id', component: EditFlashcard },

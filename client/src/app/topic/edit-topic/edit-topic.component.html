@@ -29,7 +29,7 @@
             (valueChange)="editForm.get('subject_id')?.setValue($event)"></app-searchable-select>
         </div>
 
-        <app-visibility-toggle [control]="visibilityControl"></app-visibility-toggle>
+        <app-visibility-toggle [control]="visibilityControl" kind="topic"></app-visibility-toggle>
 
         <div class="form-actions">
           <button type="button" class="btn btn-outline-primary" (click)="cancel()"><span

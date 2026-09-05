@@ -1,0 +1,46 @@
+<article class="post-card">
+  <header class="post-header">
+    <img [src]="subjectIconUrl" alt="" class="post-subject-icon">
+    <h3 class="post-heading">{{ heading }}</h3>
+    <div class="post-author">
+      <span class="post-username">{{ post.author.username }}</span>
+      <img [src]="avatarUrl" alt="" class="post-avatar">
+    </div>
+  </header>
+
+  <div class="post-carousel">
+    <button type="button" class="carousel-arrow" [disabled]="!canGoBack || loading" (click)="previous()"
+      [attr.aria-label]="'community.previous' | transloco">
+      <span class="material-symbols-outlined">chevron_left</span>
+    </button>
+
+    <div class="carousel-track">
+      @if (loading) {
+      <div class="carousel-loading">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">{{ 'common.loading' | transloco }}</span>
+        </div>
+      </div>
+      } @else {
+      @for (card of cards; track card._id) {
+      <div class="post-flashcard">
+        <h5 class="post-flashcard-title">{{ card.title }}</h5>
+        <div class="post-flashcard-body" [innerHTML]="card.question | katexRenderer"></div>
+      </div>
+      } @empty {
+      <p class="carousel-empty">{{ 'community.noFlashcards' | transloco }}</p>
+      }
+      }
+    </div>
+
+    <button type="button" class="carousel-arrow" [disabled]="!canGoForward || loading" (click)="next()"
+      [attr.aria-label]="'community.next' | transloco">
+      <span class="material-symbols-outlined">chevron_right</span>
+    </button>
+  </div>
+
+  <footer class="post-footer">
+    <span>{{ 'community.cardCount' | transloco:{ count: post.flashcardCount } }}</span>
+    <span>{{ 'community.updatedAt' | transloco:{ date: post.updatedAt | date:'short' } }}</span>
+  </footer>
+</article>
