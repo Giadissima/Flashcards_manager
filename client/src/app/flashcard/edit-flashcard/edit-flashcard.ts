@@ -130,6 +130,11 @@ export class EditFlashcard implements OnInit, OnDestroy {
     this.editForm.get('answer')?.setValue(this.answerEditor.getText());
   }
 
+  /** Leaves without saving: whatever was typed is thrown away. */
+  cancel(): void {
+    this.router.navigate(['/home']);
+  }
+
   async updateCard(): Promise<void> {
     if (this.editForm.invalid || !this.cardId) {
       this.editForm.markAllAsTouched();

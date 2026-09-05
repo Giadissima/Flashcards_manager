@@ -35,6 +35,8 @@
         </app-icon-preview>
 
         <div class="form-actions">
+          <button type="button" class="btn btn-outline-primary" (click)="cancel()"><span
+              class="material-symbols-outlined">close</span>{{ 'common.cancel' | transloco }}</button>
           <button type="submit" class="btn btn-primary"
             [disabled]="editForm.invalid || descLength > descMaxLength"><span
               class="material-symbols-outlined">save</span>{{ 'subject.edit.saveChanges' | transloco }}</button>

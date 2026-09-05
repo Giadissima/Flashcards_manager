@@ -12,6 +12,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { IconPreviewComponent } from '../shared/icon-preview/icon-preview.component';
 import { LoadStateComponent } from '../shared/load-state/load-state.component';
 import { PageCardComponent } from '../shared/page-card/page-card.component';
+import { Router } from '@angular/router';
 import { ToastService } from '../shared/toast/toast.service';
 
 /** Same rule as the server DTO: what is refused there is caught here first. */
@@ -66,6 +67,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
+    private router: Router,
     private toastService: ToastService,
     private transloco: TranslocoService,
   ) {
@@ -158,6 +160,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       this.selectedAvatar = null;
       this.removeAvatar = false;
       this.toastService.show(this.transloco.translate('profile.toast.saved'), 'success');
+      this.router.navigate(['/home']);
     } catch (error) {
       this.errorKey = error instanceof HttpErrorResponse && error.status === 409
         ? 'auth.error.usernameTaken'
@@ -165,6 +168,11 @@ export class ProfileComponent implements OnInit, OnDestroy {
     } finally {
       this.saving = false;
     }
+  }
+
+  /** Leaves without saving: the form is thrown away as it stands. */
+  cancel(): void {
+    this.router.navigate(['/home']);
   }
 
   logout(): void {

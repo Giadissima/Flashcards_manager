@@ -1,7 +1,11 @@
 <div class="container-md">
   <app-load-state errorMessageKey="profile.loadError">
-    <app-page-card icon="account_circle" [title]="'profile.title' | transloco"
-      [subtitle]="'profile.subtitle' | transloco">
+    <!-- The directive sits here and not around app-load-state: it is structural,
+         so anything under it lands in an embedded view, where the static
+         ViewChild that starts the load would no longer find the component. -->
+    <app-page-card *transloco="let t" icon="account_circle" [title]="t('profile.title')"
+      [subtitle]="t('profile.subtitle')"
+      [actions]="[{ label: t('auth.logout'), icon: 'logout', variant: 'outline' }]" (action)="logout()">
       <form [formGroup]="profileForm" (ngSubmit)="save()" novalidate>
 
         @if (errorKey) {
@@ -9,17 +13,17 @@
         }
 
         <app-icon-preview [previewUrl]="previewUrl" [colorControl]="colorControl"
-          [colorTitle]="'profile.avatarColor' | transloco" [previewLabel]="'profile.avatar' | transloco"
-          [fileLabel]="'profile.replaceAvatar' | transloco" (fileSelected)="onAvatarSelected($event)"
+          [colorTitle]="t('profile.avatarColor')" [previewLabel]="t('profile.avatar')"
+          [fileLabel]="t('profile.replaceAvatar')" (fileSelected)="onAvatarSelected($event)"
           (reset)="resetAvatar()">
           <app-avatar-svg defaultIcon [fill]="colorControl.value" class="current-icon"></app-avatar-svg>
         </app-icon-preview>
 
         <div class="form-group">
-          <label for="username" class="form-label">{{ 'auth.username' | transloco }}</label>
+          <label for="username" class="form-label">{{ t('auth.username') }}</label>
           <input type="text" id="username" formControlName="username" class="form-control" autocomplete="username">
           @if (profileForm.get('username')?.touched && profileForm.get('username')?.hasError('pattern')) {
-          <div class="invalid-feedback d-block">{{ 'auth.usernamePatternError' | transloco }}</div>
+          <div class="invalid-feedback d-block">{{ t('auth.usernamePatternError') }}</div>
           } @else if (profileForm.get('username')?.touched && profileForm.get('username')?.invalid) {
           <div class="invalid-feedback d-block">{{ 'auth.usernameLengthError' | transloco:{ min: charMinLength, max:
             usernameMaxLength } }}</div>
@@ -28,12 +32,14 @@
 
         <app-study-fields [value]="studyFields" (valueChange)="studyFields = $event"></app-study-fields>
 
+        <!-- Saving is what the page is for, so it sits on the right, where the
+             eye ends up after reading the form. -->
         <div class="form-actions">
-          <button type="submit" class="btn btn-primary" [disabled]="profileForm.invalid || saving">
-            <span class="material-symbols-outlined">save</span>{{ 'profile.save' | transloco }}
+          <button type="button" class="btn btn-outline-primary" (click)="cancel()">
+            <span class="material-symbols-outlined">close</span>{{ t('common.cancel') }}
           </button>
-          <button type="button" class="btn btn-outline-primary" (click)="logout()">
-            <span class="material-symbols-outlined">logout</span>{{ 'auth.logout' | transloco }}
+          <button type="submit" class="btn btn-primary" [disabled]="profileForm.invalid || saving">
+            <span class="material-symbols-outlined">save</span>{{ t('profile.save') }}
           </button>
         </div>
       </form>

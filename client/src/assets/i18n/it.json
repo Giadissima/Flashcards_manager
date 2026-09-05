@@ -19,7 +19,7 @@
     "usernameLengthError": "Il nome utente deve avere tra {{min}} e {{max}} caratteri",
     "usernamePatternError": "Il nome utente può contenere solo lettere, numeri, punti, trattini e trattini bassi",
     "passwordMinError": "La password deve avere almeno {{min}} caratteri",
-    "logout": "Esci",
+    "logout": "Logout",
     "loggedInAs": "Accesso come {{username}}",
     "login": {
       "title": "Accedi",

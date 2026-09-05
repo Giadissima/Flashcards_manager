@@ -1239,6 +1239,9 @@ $image-modal-height: calc(
 .form-actions {
   display: flex;
   justify-content: center;
+  /* A form with more than one action had them touching, which read as a single
+     split control rather than as two choices. */
+  gap: calc(var(--spacing-unit) * 2);
   margin-top: calc(var(--spacing-unit) * 4);
 }
 

@@ -135,6 +135,11 @@ export class EditSubjectComponent implements OnInit, OnDestroy {
     }
   }
 
+  /** Leaves without saving: whatever was typed is thrown away. */
+  cancel(): void {
+    this.router.navigate(['/manage-subjects']);
+  }
+
   async updateSubject(): Promise<void> {
     if (this.editForm.invalid || !this.subjectId || this.descLength > this.descMaxLength) {
       this.editForm.markAllAsTouched();

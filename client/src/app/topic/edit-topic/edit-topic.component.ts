@@ -82,6 +82,11 @@ export class EditTopicComponent implements OnInit {
     });
   }
 
+  /** Leaves without saving: whatever was typed is thrown away. */
+  cancel(): void {
+    this.router.navigate(['/manage-topics']);
+  }
+
   async updateTopic(): Promise<void> {
     if (this.editForm.invalid || !this.topicId) {
       this.editForm.markAllAsTouched();
