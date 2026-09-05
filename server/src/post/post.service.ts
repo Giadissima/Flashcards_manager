@@ -6,7 +6,7 @@ import { BasePaginatedResult } from 'src/common.dto';
 import { Flashcard, FlashcardDocument } from 'src/flashcards/flashcards.schema';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { ConflictException } from '@nestjs/common';
+import { BadRequestException, ConflictException } from '@nestjs/common';
 import { FileService } from 'src/file/file.service';
 import { Subject } from 'src/subject/subject.schema';
 import {
@@ -14,6 +14,7 @@ import {
   replaceImageFileIds,
 } from 'src/common/html.util';
 import { Topic } from 'src/topic/topic.schema';
+import { NotificationService } from 'src/notification/notification.service';
 import { Vote, VoteValue } from './vote.schema';
 
 const ENTITY = 'Post';
@@ -27,6 +28,7 @@ export class PostService {
     @InjectModel(Flashcard.name) private flashcardModel: Model<Flashcard>,
     @InjectModel(Vote.name) private voteModel: Model<Vote>,
     private readonly fileService: FileService,
+    private readonly notificationService: NotificationService,
   ) {}
 
   /**
@@ -172,6 +174,13 @@ export class PostService {
     const user_id = new Types.ObjectId(userId);
     const post_id = post._id as Types.ObjectId;
 
+    // Read before the change: an upvote already there is somebody clicking
+    // twice, and the author has been told about it once already
+    const previous = await this.voteModel
+      .findOne({ user_id, post_id }, { value: 1 })
+      .lean()
+      .exec();
+
     if (value === 0) {
       await this.voteModel.deleteOne({ user_id, post_id }).exec();
     } else {
@@ -196,6 +205,14 @@ export class PostService {
         { timestamps: false },
       )
       .exec();
+    if (value === 1 && previous?.value !== 1) {
+      await this.notificationService.record({
+        userId: post.user_id,
+        actorId: userId,
+        kind: 'upvote',
+        postId: post_id,
+      });
+    }
   }
 
   /** One page of the carousel. */

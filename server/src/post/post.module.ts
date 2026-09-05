@@ -1,4 +1,5 @@
 import { Flashcard, FlashcardSchema } from 'src/flashcards/flashcards.schema';
+import { NotificationModule } from 'src/notification/notification.module';
 import { Post, PostSchema } from './post.schema';
 import { Subject, SubjectSchema } from 'src/subject/subject.schema';
 import { Topic, TopicSchema } from 'src/topic/topic.schema';
@@ -20,6 +21,7 @@ import { PostService } from './post.service';
       { name: Vote.name, schema: VoteSchema },
     ]),
     FileModule,
+    NotificationModule,
   ],
   controllers: [PostController],
   // The three services that change a visibility keep the feed in step through it
