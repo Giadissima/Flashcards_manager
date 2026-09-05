@@ -1,4 +1,4 @@
-import { AuthResponse, AuthUser, Credentials, RegistrationPayload } from '../models/auth.dto';
+import { AuthResponse, AuthUser, Credentials, RegistrationPayload, StudyFieldsPayload } from '../models/auth.dto';
 
 import { BehaviorSubject } from 'rxjs';
 import { Injectable } from '@angular/core';
@@ -53,6 +53,24 @@ export class AuthService {
   async register(payload: RegistrationPayload): Promise<void> {
     const response: AuthResponse = await this.restClient.post(this.baseUrl + '/register', payload);
     this.storeSession(response);
+  }
+
+  /**
+   * The user as the server has them now. The copy in storage is only there to
+   * show a name without waiting for a round trip, so a page that edits the
+   * profile asks for the real thing.
+   */
+  async fetchMe(): Promise<AuthUser> {
+    const user = await this.restClient.get<AuthUser>(this.baseUrl + '/me');
+    this.storeUser(user);
+    return user;
+  }
+
+  /** Replaces the study fields: what is left out is cleared, not kept. */
+  async updateProfile(fields: StudyFieldsPayload): Promise<AuthUser> {
+    const user: AuthUser = await this.restClient.patch(this.baseUrl + '/me', fields);
+    this.storeUser(user);
+    return user;
   }
 
   /** Clears the session and sends the browser back to the login page. */

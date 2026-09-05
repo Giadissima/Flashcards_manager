@@ -11,6 +11,7 @@ import { LoginComponent } from './auth/login/login.component';
 import { ManageSubjectsComponent } from './subject/manage-subjects/manage-subjects.component';
 import { ManageTopicsComponent } from './topic/manage-topics/manage-topics.component';
 import { NotFoundComponent } from './shared/not-found/not-found.component';
+import { ProfileComponent } from './profile/profile.component';
 import { RegisterComponent } from './auth/register/register.component';
 import { Routes } from '@angular/router';
 import { SetupTest } from './test/setup-test/setup-test';
@@ -29,6 +30,7 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: 'home', component: Home },
+      { path: 'profile', component: ProfileComponent },
       { path: 'create-card', component: CreateFlashcard },
       { path: 'edit-card/:id', component: EditFlashcard },
       { path: 'setup-test', component: SetupTest },

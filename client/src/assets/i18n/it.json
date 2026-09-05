@@ -401,5 +401,15 @@
     "clear": "Annulla la selezione",
     "universitiesError": "Non è stato possibile caricare l'elenco delle università",
     "coursesError": "Non è stato possibile caricare i corsi di questa università"
+  },
+  "profile": {
+    "title": "Profilo",
+    "subtitle": "Accesso come {{username}}",
+    "save": "Salva modifiche",
+    "loadError": "Non è stato possibile caricare il tuo profilo",
+    "toast": {
+      "saved": "Profilo aggiornato",
+      "saveError": "Non è stato possibile salvare il profilo"
+    }
   }
 }

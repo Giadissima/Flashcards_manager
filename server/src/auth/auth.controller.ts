@@ -1,5 +1,20 @@
-import { AuthResponse, JwtPayload, LoginDto, PublicUser, RegisterDto } from './auth.dto';
-import { Body, Controller, Get, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import {
+  AuthResponse,
+  JwtPayload,
+  LoginDto,
+  PublicUser,
+  RegisterDto,
+  UpdateProfileDto,
+} from './auth.dto';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Patch,
+  Post,
+} from '@nestjs/common';
 
 import { ApiOperation } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
@@ -32,5 +47,17 @@ export class AuthController {
   @Get('me')
   me(@CurrentUser() user: JwtPayload): Promise<PublicUser> {
     return this.authService.findMe(user);
+  }
+
+  @ApiOperation({
+    description:
+      'replace the study fields of the logged user; a field left out is cleared',
+  })
+  @Patch('me')
+  updateProfile(
+    @CurrentUser() user: JwtPayload,
+    @Body() updateProfileDto: UpdateProfileDto,
+  ): Promise<PublicUser> {
+    return this.authService.updateProfile(user, updateProfileDto);
   }
 }

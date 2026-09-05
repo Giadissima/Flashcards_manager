@@ -401,5 +401,15 @@
     "clear": "Clear the selection",
     "universitiesError": "The list of universities could not be loaded",
     "coursesError": "The courses of this university could not be loaded"
+  },
+  "profile": {
+    "title": "Profile",
+    "subtitle": "Signed in as {{username}}",
+    "save": "Save changes",
+    "loadError": "Your profile could not be loaded",
+    "toast": {
+      "saved": "Profile updated",
+      "saveError": "The profile could not be saved"
+    }
   }
 }

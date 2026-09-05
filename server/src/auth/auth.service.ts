@@ -5,6 +5,7 @@ import {
   PublicUser,
   RegisterDto,
   StudyFieldsDto,
+  UpdateProfileDto,
 } from './auth.dto';
 import {
   BadRequestException,
@@ -98,6 +99,28 @@ export class AuthService {
    * The DTO can only check the shape of the two study fields; whether they name
    * something real is decided here, where the reference lists are reachable.
    */
+  /**
+   * Replaces the study block of the logged user. The profile form always sends
+   * the whole of it, so a field left out means "cleared" rather than
+   * "unchanged" - assigning undefined is what drops it from the document.
+   */
+  async updateProfile(
+    payload: JwtPayload,
+    dto: UpdateProfileDto,
+  ): Promise<PublicUser> {
+    this.assertStudyFieldsExist(dto);
+
+    const user = await this.userModel.findById(payload.sub).exec();
+    if (!user) throw new UnauthorizedException('User no longer exists');
+
+    user.universityCode = dto.universityCode;
+    user.course = dto.course;
+    user.courseKind = dto.courseKind;
+    await user.save();
+
+    return this.toPublicUser(user);
+  }
+
   private assertStudyFieldsExist(dto: StudyFieldsDto): void {
     const { universityCode, course, courseKind } = dto;
 

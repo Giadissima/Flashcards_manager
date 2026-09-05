@@ -87,6 +87,12 @@ export class RegisterDto extends IntersectionType(LoginDto, StudyFieldsDto) {
 
 }
 
+/**
+ * The profile form sends the whole study block every time, so this is a
+ * replacement and not a merge: a field left out is a field cleared.
+ */
+export class UpdateProfileDto extends StudyFieldsDto {}
+
 export interface AuthResponse {
   access_token: string;
   user: PublicUser;

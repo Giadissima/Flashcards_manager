@@ -55,6 +55,11 @@
       [attr.aria-label]="'settings.title' | transloco">
       <span class="material-symbols-outlined">settings</span>
     </button>
+    <button routerLink="/profile" (click)="closeMobileMenu()" class="theme-switch-btn" type="button"
+      [title]="'auth.loggedInAs' | transloco:{ username: authService.user?.username }"
+      [attr.aria-label]="'profile.title' | transloco">
+      <span class="material-symbols-outlined">account_circle</span>
+    </button>
     <!-- Ends the session: the title carries who is logged in, which the bar has
          no room to spell out -->
     <button (click)="logout()" class="theme-switch-btn" type="button"
