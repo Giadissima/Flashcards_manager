@@ -13,6 +13,8 @@ import {
 } from 'src/common/mongo.util';
 import { FileService } from 'src/file/file.service';
 import { PostService } from 'src/post/post.service';
+import { Flashcard } from 'src/flashcards/flashcards.schema';
+import { Topic } from 'src/topic/topic.schema';
 
 const ENTITY = 'Subject';
 
@@ -22,6 +24,8 @@ export class SubjectService {
     @InjectModel(Subject.name) private subjectModel: Model<Subject>,
     private readonly fileService: FileService,
     private readonly postService: PostService,
+    @InjectModel(Topic.name) private topicModel: Model<Topic>,
+    @InjectModel(Flashcard.name) private flashcardModel: Model<Flashcard>,
   ) {}
 
   async create(
@@ -138,7 +142,27 @@ export class SubjectService {
       { visibility },
       ENTITY,
     );
+    await this.cascadeVisibility(userId, id, visibility);
     await this.postService.refresh(userId, id);
+  }
+
+  /**
+   * Carries the choice down to everything under the subject.
+   *
+   * Both ways round, and the second is the one that matters: a subject shared
+   * by mistake and then taken back has to take its topics and cards with it,
+   * or they stay out in the open with nothing on screen to say so.
+   */
+  private async cascadeVisibility(
+    userId: string,
+    subjectId: string,
+    visibility: Visibility,
+  ): Promise<void> {
+    const owned = { user_id: userId, subject_id: subjectId };
+    await Promise.all([
+      this.topicModel.updateMany(owned, { visibility }).exec(),
+      this.flashcardModel.updateMany(owned, { visibility }).exec(),
+    ]);
   }
 
 }

@@ -4,6 +4,7 @@ import { TopicController } from './topic.controller';
 import { TopicService } from './topic.service';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { Flashcard, FlashcardSchema } from 'src/flashcards/flashcards.schema';
 import { PostModule } from 'src/post/post.module';
 import { Subject, SubjectSchema } from 'src/subject/subject.schema';
 
@@ -12,6 +13,7 @@ import { Subject, SubjectSchema } from 'src/subject/subject.schema';
     MongooseModule.forFeature([
       { name: Topic.name, schema: TopicSchema },
       { name: Subject.name, schema: SubjectSchema },
+      { name: Flashcard.name, schema: FlashcardSchema },
     ]),
     PostModule,
   ],

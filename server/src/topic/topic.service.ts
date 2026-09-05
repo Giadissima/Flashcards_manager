@@ -2,6 +2,7 @@ import { Visibility, defaultVisibility } from 'src/common/visibility';
 import { Injectable } from '@nestjs/common';
 import { PostService } from 'src/post/post.service';
 import { Subject } from 'src/subject/subject.schema';
+import { Flashcard } from 'src/flashcards/flashcards.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
 import { Topic, TopicDocument } from './topic.schema';
@@ -23,6 +24,7 @@ export class TopicService {
     @InjectModel(Topic.name) private topicModel: Model<Topic>,
     @InjectModel(Subject.name) private subjectModel: Model<Subject>,
     private readonly postService: PostService,
+    @InjectModel(Flashcard.name) private flashcardModel: Model<Flashcard>,
   ) {}
 
   async create(userId: string, createTopicDto: ModifyTopicDto): Promise<void> {
@@ -100,6 +102,9 @@ export class TopicService {
     updateObj: ModifyTopicDto,
   ): Promise<void> {
     await updateOwnedOrThrow(this.topicModel, id, userId, updateObj, ENTITY);
+    if (updateObj.visibility) {
+      await this.cascadeVisibility(userId, id, updateObj.visibility);
+    }
     await this.refreshPostOf(userId, id);
   }
 
@@ -116,7 +121,23 @@ export class TopicService {
       { visibility },
       ENTITY,
     );
+    await this.cascadeVisibility(userId, id, visibility);
     await this.refreshPostOf(userId, id);
+  }
+
+  /**
+   * Carries the choice down to the flashcards of the topic, both ways round:
+   * a topic taken back has to take its cards with it, or they stay out in the
+   * open with nothing on screen to say so.
+   */
+  private async cascadeVisibility(
+    userId: string,
+    topicId: string,
+    visibility: Visibility,
+  ): Promise<void> {
+    await this.flashcardModel
+      .updateMany({ user_id: userId, topic_id: topicId }, { visibility })
+      .exec();
   }
 
   private async refreshPostOf(userId: string, topicId: string): Promise<void> {
