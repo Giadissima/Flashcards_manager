@@ -13,6 +13,7 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { SubjectModule } from './subject/subject.module';
 import { TestModule } from './test/test.module';
+import { UniversityModule } from './university/university.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { TestModule } from './test/test.module';
     SubjectModule,
     ImportExportModule,
     TestModule,
+    UniversityModule,
   ],
   controllers: [AppController],
   providers: [
