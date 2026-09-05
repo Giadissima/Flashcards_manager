@@ -85,6 +85,7 @@
 }
 
 .post-flashcard {
+  position: relative;
   flex: 1 0 220px;
   min-height: 180px;
   background-color: var(--inset-background);
@@ -173,4 +174,13 @@
   &.is-negative {
     color: var(--danger-color);
   }
+}
+
+/* In the corner of the card it belongs to, so which one is being taken is
+   never in doubt when three sit side by side. */
+.import-button {
+  position: absolute;
+  bottom: calc(var(--spacing-unit) * 0.5);
+  right: calc(var(--spacing-unit) * 0.5);
+  padding: calc(var(--spacing-unit) * 0.5);
 }

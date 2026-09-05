@@ -447,6 +447,10 @@
     "sortPopular": "Most rated",
     "upvote": "Useful",
     "downvote": "Not useful",
-    "voteError": "The vote could not be saved"
+    "voteError": "The vote could not be saved",
+    "import": "Add to my flashcards",
+    "imported": "Added to your flashcards",
+    "alreadyImported": "You already have this one",
+    "importError": "The flashcard could not be added"
   }
 }

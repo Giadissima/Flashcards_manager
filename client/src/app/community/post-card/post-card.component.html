@@ -26,6 +26,14 @@
       <div class="post-flashcard">
         <h5 class="post-flashcard-title">{{ card.title }}</h5>
         <div class="post-flashcard-body" [innerHTML]="card.question | katexRenderer"></div>
+        @if (!isMine) {
+        <button type="button" class="btn btn-icon-ghost import-button" [disabled]="importingId === card._id"
+          (click)="importCard(card)"
+          [title]="(importedIds.has(card._id) ? 'community.alreadyImported' : 'community.import') | transloco"
+          [attr.aria-label]="'community.import' | transloco">
+          <span class="material-symbols-outlined">{{ importedIds.has(card._id) ? 'library_add_check' : 'library_add' }}</span>
+        </button>
+        }
       </div>
       } @empty {
       <p class="carousel-empty">{{ 'community.noFlashcards' | transloco }}</p>

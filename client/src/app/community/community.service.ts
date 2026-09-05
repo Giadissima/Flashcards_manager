@@ -38,4 +38,10 @@ export class CommunityService {
     return this.restClient.patch(`${this.baseUrl}/${postId}/vote`, { value });
   }
 
+
+  /** Copies a public flashcard into the caller's own library. */
+  importFlashcard(flashcardId: string): Promise<void> {
+    return this.restClient.post(`${this.baseUrl}/flashcards/${flashcardId}/import`, {});
+  }
+
 }

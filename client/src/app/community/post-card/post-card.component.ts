@@ -1,11 +1,13 @@
 import { Component, Input, OnInit } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../auth/auth.service';
 import { CommunityService } from '../community.service';
 import { FeedPost } from '../../models/post.dto';
 import { Flashcard } from '../../models/flashcard.dto';
 import { KatexRendererPipe } from '../../pipes/katex-renderer.pipe';
-import { TranslocoModule } from '@jsverse/transloco';
+import { ToastService } from '../../shared/toast/toast.service';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { getAvatarUrl } from '../../shared/avatar/avatar.util';
 import { getDefaultSubjectIconDataUrl } from '../../subject/subject-icon.util';
 import { baseUrlAPI } from '../../../config/config';
@@ -38,7 +40,17 @@ export class PostCardComponent implements OnInit {
   /** First card of the window currently shown. */
   skip = 0;
 
-  constructor(private communityService: CommunityService) {}
+  constructor(
+    private communityService: CommunityService,
+    private authService: AuthService,
+    private toast: ToastService,
+    private transloco: TranslocoService,
+  ) {}
+
+  /** Nobody imports their own work, so the button stays off their own posts. */
+  get isMine(): boolean {
+    return this.authService.user?._id === this.post.author._id;
+  }
 
   ngOnInit(): void {
     void this.loadPage(0);
@@ -84,6 +96,32 @@ export class PostCardComponent implements OnInit {
       this.post.score = previous.score;
     } finally {
       this.voting = false;
+    }
+  }
+
+  /** Cards already taken, so the button does not invite a second useless click. */
+  readonly importedIds = new Set<string>();
+  importingId: string | null = null;
+
+  async importCard(card: Flashcard): Promise<void> {
+    if (this.importingId || this.importedIds.has(card._id)) return;
+
+    this.importingId = card._id;
+    try {
+      await this.communityService.importFlashcard(card._id);
+      this.importedIds.add(card._id);
+      this.toast.show(this.transloco.translate('community.imported'), 'success');
+    } catch (error) {
+      // 409 is the server saying it is already there, which is worth telling
+      // apart from a real failure
+      const already = (error as { status?: number })?.status === 409;
+      this.toast.show(
+        this.transloco.translate(already ? 'community.alreadyImported' : 'community.importError'),
+        already ? 'info' : 'error',
+      );
+      if (already) this.importedIds.add(card._id);
+    } finally {
+      this.importingId = null;
     }
   }
 
