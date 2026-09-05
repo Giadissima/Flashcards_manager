@@ -125,3 +125,52 @@
   font-size: 0.85rem;
   color: var(--muted-color);
 }
+
+/* The arrows sit under the carousel, in a row of their own: on the sides they
+   would fight with the ones that page through the cards. */
+.post-votes {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-unit);
+  margin-top: calc(var(--spacing-unit) * 1.5);
+}
+
+.vote-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  color: var(--muted-color);
+  cursor: pointer;
+  padding: calc(var(--spacing-unit) * 0.5);
+  border-radius: 50%;
+
+  &:hover:not(:disabled) {
+    background-color: var(--primary-tint-soft);
+    color: var(--accent-color);
+  }
+
+  &.is-active {
+    color: var(--accent-color);
+  }
+
+  &:disabled {
+    cursor: default;
+  }
+}
+
+.vote-score {
+  min-width: 2ch;
+  text-align: center;
+  font-weight: 700;
+  color: var(--text-color);
+
+  &.is-positive {
+    color: var(--accent-color);
+  }
+
+  &.is-negative {
+    color: var(--danger-color);
+  }
+}

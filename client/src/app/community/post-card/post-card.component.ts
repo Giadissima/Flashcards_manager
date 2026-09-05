@@ -32,6 +32,8 @@ export class PostCardComponent implements OnInit {
   @Input({ required: true }) post!: FeedPost;
 
   cards: Flashcard[] = [];
+  /** Set while a vote is in flight, so a double click cannot send two. */
+  voting = false;
   loading = false;
   /** First card of the window currently shown. */
   skip = 0;
@@ -58,6 +60,31 @@ export class PostCardComponent implements OnInit {
       return this.post.subject.name;
     }
     return `${this.post.subject.name} - ${this.post.topics.map((t) => t.name).join(', ')}`;
+  }
+
+  /**
+   * Applied on screen before the server answers, and rolled back if it
+   * refuses: a vote that waits for a round trip feels broken, and the only
+   * thing at stake is a number.
+   */
+  async castVote(value: number): Promise<void> {
+    if (this.voting) return;
+
+    const previous = { myVote: this.post.myVote, score: this.post.score };
+    // Clicking the arrow already lit takes the vote back
+    const wanted = this.post.myVote === value ? 0 : value;
+
+    this.post.score += wanted - this.post.myVote;
+    this.post.myVote = wanted;
+    this.voting = true;
+    try {
+      await this.communityService.vote(this.post._id, wanted);
+    } catch {
+      this.post.myVote = previous.myVote;
+      this.post.score = previous.score;
+    } finally {
+      this.voting = false;
+    }
   }
 
   get canGoBack(): boolean {

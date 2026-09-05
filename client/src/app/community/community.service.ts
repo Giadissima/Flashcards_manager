@@ -32,4 +32,10 @@ export class CommunityService {
       { skip, limit },
     );
   }
+
+  /** 1 up, -1 down, 0 to take the vote back. */
+  vote(postId: string, value: number): Promise<void> {
+    return this.restClient.patch(`${this.baseUrl}/${postId}/vote`, { value });
+  }
+
 }

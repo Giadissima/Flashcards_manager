@@ -2,7 +2,8 @@
   <app-page-card icon="diversity_3" [title]="t('community.title')" [subtitle]="t('community.subtitle')">
     <app-segmented-filter [options]="[
         { value: 'created', label: t('community.sortCreated') },
-        { value: 'updated', label: t('community.sortUpdated') }
+        { value: 'updated', label: t('community.sortUpdated') },
+        { value: 'popular', label: t('community.sortPopular') }
       ]" [value]="sort" [label]="t('community.sortLabel')" (valueChange)="onSortChange($event)">
     </app-segmented-filter>
 

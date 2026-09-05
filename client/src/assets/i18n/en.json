@@ -443,6 +443,10 @@
     "previous": "Previous flashcards",
     "next": "More flashcards",
     "cardCount": "{{count}} flashcards",
-    "updatedAt": "Updated {{date}}"
+    "updatedAt": "Updated {{date}}",
+    "sortPopular": "Most rated",
+    "upvote": "Useful",
+    "downvote": "Not useful",
+    "voteError": "The vote could not be saved"
   }
 }

@@ -1,5 +1,5 @@
-/** The two orders the Community feed offers, both newest first. */
-export const feedSorts = ['created', 'updated'] as const;
+/** The three orders the Community feed offers, all descending. */
+export const feedSorts = ['created', 'updated', 'popular'] as const;
 export type FeedSort = (typeof feedSorts)[number];
 
 export interface PostAuthor {
@@ -19,6 +19,9 @@ export interface FeedPost {
   topics: { _id: string; name: string; color?: string }[];
   wholeSubject: boolean;
   flashcardCount: number;
+  score: number;
+  /** How the person reading voted: 1, -1, or 0 when they have not. */
+  myVote: number;
   createdAt: string;
   updatedAt: string;
 }
