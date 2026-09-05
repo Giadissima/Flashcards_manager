@@ -5,16 +5,18 @@ import {
   RandomFlashcardsDTO,
 } from './flashcards.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Flashcard, FlashcardDocument } from './flashcards.schema';
 import { FilterQuery, Model, Types } from 'mongoose';
 import { BasePaginatedResult, ListFilterRequest } from 'src/common.dto';
 import {
-  deleteByIdOrThrow,
+  assertValidObjectId,
   findByIdOrThrow,
   findPaginated,
   updateByIdOrThrow,
 } from 'src/common/mongo.util';
+import { extractImageFileIds, replaceImageFileIds } from 'src/common/html.util';
+import { FileService } from 'src/file/file.service';
 
 const ENTITY = 'Flashcard';
 const POPULATE = ['topic_id', 'subject_id'];
@@ -25,10 +27,12 @@ export class FlashcardsService {
   constructor(
     @InjectModel(Flashcard.name)
     private flashcardModel: Model<Flashcard>,
+    private readonly fileService: FileService,
   ) {}
 
   async create(createFlashcardDto: ModifyFlashcardDto): Promise<void> {
-    await new this.flashcardModel(createFlashcardDto).save();
+    const owned = await this.claimImages(createFlashcardDto);
+    await new this.flashcardModel(owned).save();
   }
 
   findOne(id: string): Promise<FlashcardDocument> {
@@ -105,12 +109,98 @@ export class FlashcardsService {
       .exec();
   }
 
-  delete(id: string): Promise<void> {
-    return deleteByIdOrThrow(this.flashcardModel, id, ENTITY);
+  // Not routed through deleteByIdOrThrow: the images live inside the HTML, so
+  // the document has to be read before it goes to know what to delete with it.
+  async delete(id: string): Promise<void> {
+    assertValidObjectId(id);
+
+    const existing = await this.flashcardModel.findByIdAndDelete(id).exec();
+    if (!existing) {
+      throw new NotFoundException(`${ENTITY} with id ${id} not found`);
+    }
+
+    // Unconditionally, with no check on who else might point at them: a file
+    // belongs to one flashcard only, which is what claimImages() guarantees.
+    await this.deleteImagesOf(existing.question, existing.answer);
   }
 
-  update(id: string, updateObj: ModifyFlashcardDto): Promise<void> {
-    return updateByIdOrThrow(this.flashcardModel, id, updateObj, ENTITY);
+  async update(id: string, updateObj: ModifyFlashcardDto): Promise<void> {
+    assertValidObjectId(id);
+
+    const existing = await this.flashcardModel.findById(id).lean().exec();
+    if (!existing) {
+      throw new NotFoundException(`${ENTITY} with id ${id} not found`);
+    }
+
+    const owned = await this.claimImages(updateObj, id);
+    await updateByIdOrThrow(this.flashcardModel, id, owned, ENTITY);
+
+    // Images the edit took out of the content have nothing left pointing at
+    // them, so they go with it. Done after the update succeeded.
+    const before = this.imageIdsOf(existing.question, existing.answer);
+    const after = this.imageIdsOf(owned.question, owned.answer);
+    await this.deleteFiles(before.filter((fileId) => !after.includes(fileId)));
+  }
+
+  private imageIdsOf(question?: string, answer?: string): string[] {
+    return [...new Set([...extractImageFileIds(question), ...extractImageFileIds(answer)])];
+  }
+
+  private deleteImagesOf(question?: string, answer?: string): Promise<void> {
+    return this.deleteFiles(this.imageIdsOf(question, answer));
+  }
+
+  private async deleteFiles(ids: string[]): Promise<void> {
+    await Promise.all(ids.map((fileId) => this.fileService.delete(fileId)));
+  }
+
+  /**
+   * Gives the flashcard images of its own, so that deleting it can drop them
+   * without asking anyone's permission.
+   *
+   * The editor uploads a new file for every picture inserted, so normally there
+   * is nothing to do. What this catches is content copied from another
+   * flashcard, which carries the very same <img src> along: that file is copied
+   * and the markup repointed at the copy, rather than being shared - a shared
+   * file would turn one deletion into a broken image somewhere else.
+   */
+  private async claimImages(
+    dto: ModifyFlashcardDto,
+    selfId?: string,
+  ): Promise<ModifyFlashcardDto> {
+    const ids = this.imageIdsOf(dto.question, dto.answer);
+    if (!ids.length) return dto;
+
+    const pattern = ids.join('|');
+    const query: FilterQuery<Flashcard> = {
+      $or: [{ question: { $regex: pattern } }, { answer: { $regex: pattern } }],
+    };
+    if (selfId) query._id = { $ne: new Types.ObjectId(selfId) };
+
+    const others = await this.flashcardModel
+      .find(query, { question: 1, answer: 1 })
+      .lean()
+      .exec();
+
+    const alreadyTaken = new Set(
+      others.flatMap((other) => this.imageIdsOf(other.question, other.answer)),
+    );
+
+    const idMap = new Map<string, string>();
+    for (const fileId of ids) {
+      if (!alreadyTaken.has(fileId)) continue;
+      const copyId = await this.fileService.duplicate(fileId);
+      // A missing file means the reference was already broken: left as it is,
+      // since copying nothing would not mend it
+      if (copyId) idMap.set(fileId, copyId);
+    }
+    if (!idMap.size) return dto;
+
+    return {
+      ...dto,
+      question: replaceImageFileIds(dto.question, idMap),
+      answer: replaceImageFileIds(dto.answer, idMap),
+    };
   }
 
   // The aggregation pipeline does not cast strings to ObjectId the way find()

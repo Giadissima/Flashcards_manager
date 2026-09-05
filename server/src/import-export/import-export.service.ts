@@ -12,6 +12,10 @@ import {
 } from './file.dto';
 import { Subject, SubjectDocument } from 'src/subject/subject.schema';
 import { FileService } from 'src/file/file.service';
+import {
+  extractImageFileIds,
+  replaceImageFileIds,
+} from 'src/common/html.util';
 
 function extensionFromMimetype(mimetype: string): string {
   const subtype = mimetype.split('/')[1] ?? 'bin';
@@ -23,27 +27,6 @@ function extensionFromMimetype(mimetype: string): string {
 // Every zip archive starts with the "PK" signature (0x50 0x4B)
 function looksLikeZip(buffer: Buffer): boolean {
   return buffer.length >= 2 && buffer[0] === 0x50 && buffer[1] === 0x4b;
-}
-
-// Inline images inside question/answer are referenced as
-// <img src="/api/file/{24 hex char mongo id}">
-const IMAGE_REF_REGEX = /file\/([0-9a-fA-F]{24})/g;
-
-function extractImageFileIds(html: string | undefined): string[] {
-  if (!html) return [];
-  const ids = new Set<string>();
-  for (const match of html.matchAll(IMAGE_REF_REGEX)) {
-    ids.add(match[1]);
-  }
-  return [...ids];
-}
-
-function replaceImageFileIds(html: string, idMap: Map<string, string>): string {
-  if (!html) return html;
-  return html.replace(IMAGE_REF_REGEX, (full, oldId: string) => {
-    const newId = idMap.get(oldId);
-    return newId ? `file/${newId}` : full;
-  });
 }
 
 @Injectable()

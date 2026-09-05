@@ -6,7 +6,6 @@ import { ModifySubjectDto } from './subject.dto';
 import { BasePaginatedResult, ListFilterRequest } from 'src/common.dto';
 import {
   assertValidObjectId,
-  deleteByIdOrThrow,
   findByIdOrThrow,
   findPaginated,
 } from 'src/common/mongo.util';
@@ -44,8 +43,20 @@ export class SubjectService {
     return findPaginated<SubjectDocument>(this.subjectModel, query, filter);
   }
 
-  delete(id: string): Promise<void> {
-    return deleteByIdOrThrow(this.subjectModel, id, ENTITY);
+  // Not routed through deleteByIdOrThrow: the icon has to go with the subject,
+  // and the document has to be read before it disappears to know which file
+  // that is.
+  async delete(id: string): Promise<void> {
+    assertValidObjectId(id);
+
+    const existing = await this.subjectModel.findByIdAndDelete(id).exec();
+    if (!existing) {
+      throw new NotFoundException(`${ENTITY} with id ${id} not found`);
+    }
+
+    if (existing.icon) {
+      await this.fileService.delete(existing.icon.toString());
+    }
   }
 
   // Not routed through updateByIdOrThrow: the previous icon has to be read

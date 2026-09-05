@@ -19,6 +19,28 @@ export class FileService {
     }).save();
   }
 
+  /**
+   * An independent copy of a file, or null when there is nothing to copy.
+   *
+   * Used when the same image ends up in two flashcards: each one gets its own
+   * file, so deleting a flashcard can drop its images without first asking who
+   * else might still be pointing at them.
+   */
+  async duplicate(id: string): Promise<string | null> {
+    const source = await this.findOne(id);
+    if (!source) return null;
+
+    const copy = await this.create([
+      // Buffer.from copies: convertBuffer can hand back a view over the stored
+      // bytes, and the copy must not stay tied to the original document
+      {
+        buffer: Buffer.from(this.convertBuffer(source.content)),
+        mimetype: source.mimetype,
+      },
+    ]);
+    return String(copy._id);
+  }
+
   // TODO take a res parameter to serve the file as a download
   async findOne(id: string) {
     return this.fileModel.findById(id).lean().exec();
