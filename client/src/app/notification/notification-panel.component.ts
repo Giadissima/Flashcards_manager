@@ -34,10 +34,16 @@ export class NotificationPanelComponent implements OnInit {
   notifications: AppNotification[] = [];
   unread = 0;
 
+  /** Which of the two lists the panel is showing. */
+  tab: 'all' | 'open' = 'all';
+  openReports: Feedback[] = [];
+  openCount = 0;
+
   /** The exchange opened inside the panel, if any. */
   openThread: Feedback | null = null;
   replyDraft = '';
   sendingReply = false;
+  resolving = false;
 
   constructor(
     private notificationService: NotificationService,
@@ -59,6 +65,33 @@ export class NotificationPanelComponent implements OnInit {
     if (this.isOpen) await this.load();
   }
 
+  async showTab(tab: 'all' | 'open'): Promise<void> {
+    this.tab = tab;
+    this.openThread = null;
+    if (tab === 'open') await this.loadOpenReports();
+  }
+
+  /** The first line of a report, which is what it is about. */
+  firstLine(report: Feedback): string {
+    return report.messages[0]?.text ?? '';
+  }
+
+  async openReport(report: Feedback): Promise<void> {
+    this.openThread = report;
+    this.replyDraft = '';
+  }
+
+  private async loadOpenReports(): Promise<void> {
+    this.loading = true;
+    try {
+      const page = await this.communityService.getOpenFeedback(0, 20);
+      this.openReports = page.data;
+      this.openCount = page.count;
+    } finally {
+      this.loading = false;
+    }
+  }
+
   close(): void {
     this.isOpen = false;
     this.openThread = null;
@@ -66,7 +99,34 @@ export class NotificationPanelComponent implements OnInit {
 
   iconOf(notification: AppNotification): string {
     if (notification.kind === 'upvote') return 'arrow_upward';
-    return notification.kind === 'comment' ? 'chat_bubble' : 'flag';
+    if (notification.kind === 'comment') return 'chat_bubble';
+    return notification.kind === 'resolved' ? 'task_alt' : 'flag';
+  }
+
+  /** Only the author closes a report, and only once. */
+  get canResolve(): boolean {
+    const thread = this.openThread;
+    return (
+      !!thread && !thread.resolved && this.authService.user?._id === thread.author_id
+    );
+  }
+
+  async resolve(): Promise<void> {
+    if (!this.openThread || this.resolving) return;
+
+    this.resolving = true;
+    try {
+      await this.communityService.resolveFeedback(this.openThread._id);
+      this.openThread = { ...this.openThread, resolved: true };
+      // It has left the list of things to do, so the list has to lose it too
+      this.openReports = this.openReports.filter((r) => r._id !== this.openThread?._id);
+      this.openCount = Math.max(0, this.openCount - 1);
+      this.toast.show(this.transloco.translate('notifications.resolved'), 'success');
+    } catch {
+      this.toast.show(this.transloco.translate('notifications.resolveError'), 'error');
+    } finally {
+      this.resolving = false;
+    }
   }
 
   async onNotificationClick(notification: AppNotification): Promise<void> {
@@ -124,9 +184,14 @@ export class NotificationPanelComponent implements OnInit {
   private async load(): Promise<void> {
     this.loading = true;
     try {
-      const page = await this.notificationService.getMine(0, 20);
+      const [page, open] = await Promise.all([
+        this.notificationService.getMine(0, 20),
+        this.communityService.getOpenFeedback(0, 20),
+      ]);
       this.notifications = page.data;
       this.unread = this.notifications.filter((n) => !n.read).length;
+      this.openReports = open.data;
+      this.openCount = open.count;
     } finally {
       this.loading = false;
     }

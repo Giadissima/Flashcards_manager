@@ -70,8 +70,23 @@ export class CommunityService {
     return this.restClient.post(`${this.baseUrl}/flashcards/${flashcardId}/feedback`, { text });
   }
 
+  /** The reports on my flashcards still waiting to be dealt with. */
+  getOpenFeedback(skip: number, limit: number): Promise<PaginatedResponse<Feedback>> {
+    return this.restClient.get<PaginatedResponse<Feedback>>(`${this.baseUrl}/feedback/open`, {
+      skip,
+      limit,
+      sortField: '_id',
+      sortDirection: 'desc',
+    });
+  }
+
   getFeedback(feedbackId: string): Promise<Feedback> {
     return this.restClient.get<Feedback>(`${this.baseUrl}/feedback/${feedbackId}`);
+  }
+
+  /** Only the author of the flashcard may. */
+  resolveFeedback(feedbackId: string): Promise<void> {
+    return this.restClient.patch(`${this.baseUrl}/feedback/${feedbackId}/resolve`, {});
   }
 
   replyToFeedback(feedbackId: string, text: string): Promise<void> {

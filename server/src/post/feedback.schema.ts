@@ -72,6 +72,16 @@ export class Feedback {
 
   @Prop({ type: [FeedbackMessageSchema], required: true, default: [] })
   messages: FeedbackMessage[];
+
+  /**
+   * Set by the author when they have taken the report on board.
+   *
+   * Not the same as the exchange running out of messages: one says the writing
+   * is over, the other that the thing reported has been dealt with. Without it
+   * an inbox never empties, since nothing else says when a thread is finished.
+   */
+  @Prop({ required: true, default: false, index: true })
+  resolved: boolean;
 }
 
 export const FeedbackSchema = SchemaFactory.createForClass(Feedback);

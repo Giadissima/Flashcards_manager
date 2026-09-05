@@ -476,7 +476,15 @@
     "kind": {
       "upvote": "found your post useful",
       "comment": "commented on your post",
-      "feedback": "wrote about a flashcard"
-    }
+      "feedback": "wrote about a flashcard",
+      "resolved": "took note of your report"
+    },
+    "markResolved": "Mark as sorted",
+    "resolved": "The reporter has been told",
+    "resolvedState": "Sorted by the author",
+    "resolveError": "It could not be marked",
+    "tabAll": "All",
+    "tabOpen": "To sort out",
+    "noOpen": "Nothing waiting on you"
   }
 }

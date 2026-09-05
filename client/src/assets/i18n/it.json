@@ -476,7 +476,15 @@
     "kind": {
       "upvote": "ha trovato utile il tuo post",
       "comment": "ha commentato il tuo post",
-      "feedback": "ti ha scritto su una flashcard"
-    }
+      "feedback": "ti ha scritto su una flashcard",
+      "resolved": "ha preso nota della tua segnalazione"
+    },
+    "markResolved": "Segna come risolta",
+    "resolved": "Chi l'ha segnalata è stato avvisato",
+    "resolvedState": "Presa in carico dall'autore",
+    "resolveError": "Non è stato possibile segnarla",
+    "tabAll": "Tutte",
+    "tabOpen": "Da sistemare",
+    "noOpen": "Non c'è niente in sospeso"
   }
 }

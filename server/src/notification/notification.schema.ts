@@ -7,7 +7,12 @@ export type NotificationDocument = Notification & Document;
  * What happened. Each kind carries the id the panel needs to open the thing it
  * is about, which is why they are not one generic "target".
  */
-export const notificationKinds = ['upvote', 'comment', 'feedback'] as const;
+export const notificationKinds = [
+  'upvote',
+  'comment',
+  'feedback',
+  'resolved',
+] as const;
 export type NotificationKind = (typeof notificationKinds)[number];
 
 /**

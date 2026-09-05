@@ -11,15 +11,39 @@
     @if (!openThread) {
     <div class="panel-header">
       <strong>{{ 'notifications.title' | transloco }}</strong>
-      @if (unread) {
+      @if (unread && tab === 'all') {
       <a role="button" tabindex="0" (click)="markAllRead()" (keydown.enter)="markAllRead()">
         {{ 'notifications.markAllRead' | transloco }}
       </a>
       }
     </div>
 
+    <!-- Two lists and not one filtered: a notification is read and done with,
+         an open report is still to do. -->
+    <div class="panel-tabs">
+      <button type="button" [class.is-active]="tab === 'all'" (click)="showTab('all')">
+        {{ 'notifications.tabAll' | transloco }}
+      </button>
+      <button type="button" [class.is-active]="tab === 'open'" (click)="showTab('open')">
+        {{ 'notifications.tabOpen' | transloco }}
+        @if (openCount) { <span class="tab-count">{{ openCount }}</span> }
+      </button>
+    </div>
+
     @if (loading) {
     <div class="panel-empty">{{ 'common.loading' | transloco }}</div>
+    } @else if (tab === 'open') {
+    @for (report of openReports; track report._id) {
+    <a class="notification" (click)="openReport(report)" (keydown.enter)="openReport(report)" tabindex="0">
+      <span class="material-symbols-outlined notification-icon">flag</span>
+      <span class="notification-body">
+        <span class="notification-line"><strong>{{ report.flashcard_id.title }}</strong></span>
+        <span class="notification-preview">{{ firstLine(report) }}</span>
+      </span>
+    </a>
+    } @empty {
+    <div class="panel-empty">{{ 'notifications.noOpen' | transloco }}</div>
+    }
     } @else {
     @for (n of notifications; track n._id) {
     <a class="notification" [class.is-unread]="!n.read" (click)="onNotificationClick(n)"
@@ -55,6 +79,19 @@
     <div class="thread-message">
       <span class="thread-author">{{ message.user_id.username }}</span>
       <span class="thread-text">{{ message.text }}</span>
+    </div>
+    }
+
+    @if (openThread.resolved) {
+    <p class="thread-resolved">
+      <span class="material-symbols-outlined">task_alt</span>
+      {{ 'notifications.resolvedState' | transloco }}
+    </p>
+    } @else if (canResolve) {
+    <div class="thread-resolve">
+      <button type="button" class="btn btn-outline-primary" [disabled]="resolving" (click)="resolve()">
+        <span class="material-symbols-outlined">task_alt</span>{{ 'notifications.markResolved' | transloco }}
+      </button>
     </div>
     }
 

@@ -2,7 +2,7 @@ import { FeedFilterRequest, FeedPost } from './post.dto';
 import { FilterQuery, Model, Types } from 'mongoose';
 import { Post, PostDocument } from './post.schema';
 
-import { BasePaginatedResult } from 'src/common.dto';
+import { BasePaginatedResult, BasicFilterRequest } from 'src/common.dto';
 import { Flashcard, FlashcardDocument } from 'src/flashcards/flashcards.schema';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -362,6 +362,68 @@ export class PostService {
       kind: 'feedback',
       feedbackId: feedback._id as Types.ObjectId,
       preview: text,
+    });
+  }
+
+  /**
+   * The reports still waiting on the caller, newest first.
+   *
+   * Kept apart from the notification list rather than filtered out of it: a
+   * notification is something that happened once and is then read, while an
+   * open report is a thing still to do. Mixing them means the second is lost
+   * among the first the moment a post gets a few upvotes.
+   */
+  async findOpenFeedback(
+    userId: string,
+    filter: BasicFilterRequest,
+  ): Promise<BasePaginatedResult<Feedback>> {
+    const query = {
+      author_id: new Types.ObjectId(userId),
+      resolved: false,
+    };
+
+    const [data, count] = await Promise.all([
+      this.feedbackModel
+        .find(query)
+        .sort({ updatedAt: -1, _id: -1 })
+        .skip(filter.skip)
+        .limit(filter.limit)
+        .populate('flashcard_id', 'title')
+        .populate('messages.user_id', 'username')
+        .lean()
+        .exec(),
+      this.feedbackModel.countDocuments(query),
+    ]);
+    return { data: data as unknown as Feedback[], count };
+  }
+
+  /**
+   * The author marking a report as dealt with, and telling whoever raised it.
+   *
+   * That notification is the point of the whole thing: someone who sends a
+   * correction and never learns whether it landed stops sending them after
+   * two or three tries.
+   */
+  async resolveFeedback(userId: string, feedbackId: string): Promise<void> {
+    const me = new Types.ObjectId(userId);
+    const feedback = await this.feedbackModel
+      .findOne({ _id: new Types.ObjectId(feedbackId), author_id: me })
+      .exec();
+    // Only the author closes one: it is their inbox. Anybody else is told it
+    // does not exist rather than that they may not.
+    if (!feedback) {
+      throw new NotFoundException(`Feedback with id ${feedbackId} not found`);
+    }
+    if (feedback.resolved) return;
+
+    feedback.resolved = true;
+    await feedback.save();
+
+    await this.notificationService.record({
+      userId: feedback.reporter_id,
+      actorId: userId,
+      kind: 'resolved',
+      feedbackId: feedback._id as Types.ObjectId,
     });
   }
 

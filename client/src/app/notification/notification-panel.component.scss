@@ -53,6 +53,41 @@
   border-bottom: 1px solid var(--border-color);
 }
 
+/* Two choices, both always visible: the count on the second is the point of
+   having it, and a dropdown would hide exactly that. */
+.panel-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border-color);
+
+  button {
+    flex: 1;
+    border: none;
+    background: none;
+    padding: var(--spacing-unit);
+    color: var(--text-color);
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+
+    &.is-active {
+      color: var(--accent-color);
+      border-bottom-color: var(--accent-color);
+    }
+  }
+}
+
+.tab-count {
+  display: inline-block;
+  min-width: 18px;
+  padding: 0 5px;
+  margin-left: 4px;
+  border-radius: 9px;
+  background-color: var(--danger-color);
+  color: var(--white-color);
+  font-size: 11px;
+  line-height: 18px;
+}
+
 .panel-empty {
   padding: calc(var(--spacing-unit) * 2);
   color: var(--muted-color);
@@ -108,6 +143,20 @@
 .thread-text {
   color: var(--text-color);
   overflow-wrap: anywhere;
+}
+
+.thread-resolved {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-unit);
+  padding: var(--spacing-unit) calc(var(--spacing-unit) * 1.5);
+  margin: 0;
+  color: var(--accent-color);
+  font-weight: 600;
+}
+
+.thread-resolve {
+  padding: var(--spacing-unit) calc(var(--spacing-unit) * 1.5);
 }
 
 .thread-reply {

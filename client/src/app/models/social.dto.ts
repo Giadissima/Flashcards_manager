@@ -22,9 +22,16 @@ export interface Feedback {
   author_id: string;
   reporter_id: string;
   messages: FeedbackMessage[];
+  /** Set by the author once they have taken the report on board. */
+  resolved: boolean;
 }
 
-export const notificationKinds = ['upvote', 'comment', 'feedback'] as const;
+export const notificationKinds = [
+  'upvote',
+  'comment',
+  'feedback',
+  'resolved',
+] as const;
 export type NotificationKind = (typeof notificationKinds)[number];
 
 export interface AppNotification {

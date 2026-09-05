@@ -129,6 +129,19 @@ export class PostController {
     return this.postService.createFeedback(user.sub, id, dto.text);
   }
 
+  // Declared ahead of feedback/:id, which would otherwise match "open" and
+  // look for an exchange with that id
+  @ApiOperation({
+    description: 'the reports on your flashcards that are still open',
+  })
+  @Get('feedback/open')
+  findOpenFeedback(
+    @CurrentUser() user: JwtPayload,
+    @Query() filters: BasicFilterRequest,
+  ): Promise<BasePaginatedResult<Feedback>> {
+    return this.postService.findOpenFeedback(user.sub, filters);
+  }
+
   @ApiOperation({
     description: 'read one private exchange; only its two people can',
   })
@@ -138,6 +151,17 @@ export class PostController {
     @Param('id') id: string,
   ): Promise<Feedback> {
     return this.postService.findFeedback(user.sub, id);
+  }
+
+  @ApiOperation({
+    description: 'mark a report as dealt with; only its author can',
+  })
+  @Patch('feedback/:id/resolve')
+  resolveFeedback(
+    @CurrentUser() user: JwtPayload,
+    @Param('id') id: string,
+  ): Promise<void> {
+    return this.postService.resolveFeedback(user.sub, id);
   }
 
   @ApiOperation({
