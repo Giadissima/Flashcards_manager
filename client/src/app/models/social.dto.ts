@@ -9,6 +9,21 @@ export interface PostComment {
   createdAt: string;
 }
 
+export interface FeedbackMessage {
+  user_id: { _id: string; username: string };
+  text: string;
+  createdAt: string;
+}
+
+/** A private exchange about one flashcard, closed at three messages. */
+export interface Feedback {
+  _id: string;
+  flashcard_id: { _id: string; title: string };
+  author_id: string;
+  reporter_id: string;
+  messages: FeedbackMessage[];
+}
+
 export const notificationKinds = ['upvote', 'comment', 'feedback'] as const;
 export type NotificationKind = (typeof notificationKinds)[number];
 

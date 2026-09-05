@@ -28,6 +28,10 @@
         <div class="post-flashcard-body" [innerHTML]="card.question | katexRenderer"></div>
         @if (!isMine) {
         <div class="card-actions">
+          <button type="button" class="btn btn-icon-ghost" (click)="openFeedback(card)"
+            [title]="'community.feedback' | transloco" [attr.aria-label]="'community.feedback' | transloco">
+            <span class="material-symbols-outlined">flag</span>
+          </button>
           <button type="button" class="btn btn-icon-ghost" [disabled]="importingId === card._id"
             (click)="importCard(card)"
             [title]="(importedIds.has(card._id) ? 'community.alreadyImported' : 'community.import') | transloco"
@@ -106,3 +110,22 @@
     <span>{{ 'community.updatedAt' | transloco:{ date: post.updatedAt | date:'short' } }}</span>
   </footer>
 </article>
+
+<!-- Private, and addressed to the author alone: correcting a stranger in the
+     open is awkward enough that most people simply would not. -->
+<app-modal [isOpen]="!!feedbackCard" [title]="'community.feedbackTitle' | transloco" [showFooter]="true"
+  (closed)="closeFeedback()">
+  <p class="feedback-intro">{{ 'community.feedbackHint' | transloco:{ title: feedbackCard?.title } }}</p>
+  <textarea class="form-control" rows="4" [(ngModel)]="feedbackDraft"
+    [placeholder]="'community.feedbackPlaceholder' | transloco"></textarea>
+
+  <ng-container modal-footer>
+    <button type="button" class="btn btn-outline-primary" (click)="closeFeedback()">
+      <span class="material-symbols-outlined">close</span>{{ 'common.cancel' | transloco }}
+    </button>
+    <button type="button" class="btn btn-primary" [disabled]="sendingFeedback || feedbackDraft.trim().length < 2"
+      (click)="sendFeedback()">
+      <span class="material-symbols-outlined">send</span>{{ 'community.feedbackSend' | transloco }}
+    </button>
+  </ng-container>
+</app-modal>

@@ -1,0 +1,117 @@
+/* Anchored to the right like the account menu: at the end of the bar a centred
+   dropdown would run past the window edge. */
+.notification-dropdown .dropdown-content {
+  left: auto;
+  right: 0;
+  transform: none;
+  width: 340px;
+  max-width: 90vw;
+  white-space: normal;
+}
+
+.bell-btn {
+  position: relative;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  color: var(--header-color);
+
+  &:hover {
+    background-color: var(--secondary-color);
+  }
+}
+
+/* Sits on the bell rather than beside it, so the bar does not widen as soon as
+   something arrives. */
+.bell-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 9px;
+  background-color: var(--danger-color);
+  color: var(--white-color);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-unit);
+  padding: var(--spacing-unit) calc(var(--spacing-unit) * 1.5);
+  color: var(--header-color);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.panel-empty {
+  padding: calc(var(--spacing-unit) * 2);
+  color: var(--muted-color);
+  text-align: center;
+}
+
+.notification {
+  display: flex;
+  gap: var(--spacing-unit);
+  align-items: flex-start;
+}
+
+.notification.is-unread {
+  background-color: var(--primary-tint-soft);
+}
+
+.notification-icon {
+  color: var(--accent-color);
+  flex-shrink: 0;
+}
+
+.notification-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.notification-line {
+  font-weight: 400;
+}
+
+/* One line of what was written: enough to know whether it needs answering now. */
+.notification-preview {
+  color: var(--muted-color);
+  font-weight: 400;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.thread-message {
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-unit) calc(var(--spacing-unit) * 1.5);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.thread-author {
+  font-weight: 700;
+  color: var(--header-color);
+}
+
+.thread-text {
+  color: var(--text-color);
+  overflow-wrap: anywhere;
+}
+
+.thread-reply {
+  display: flex;
+  gap: var(--spacing-unit);
+  padding: var(--spacing-unit) calc(var(--spacing-unit) * 1.5);
+}

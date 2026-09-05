@@ -6,6 +6,7 @@ import { CommunityService } from '../community.service';
 import { FeedPost } from '../../models/post.dto';
 import { Flashcard } from '../../models/flashcard.dto';
 import { FormsModule } from '@angular/forms';
+import { ModalComponent } from '../../shared/modal/modal.component';
 import { PostComment } from '../../models/social.dto';
 import { KatexRendererPipe } from '../../pipes/katex-renderer.pipe';
 import { ToastService } from '../../shared/toast/toast.service';
@@ -28,7 +29,7 @@ const pageSize = 3;
 @Component({
   selector: 'app-post-card',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslocoModule, KatexRendererPipe],
+  imports: [CommonModule, FormsModule, TranslocoModule, KatexRendererPipe, ModalComponent],
   templateUrl: './post-card.component.html',
   styleUrl: './post-card.component.scss',
 })
@@ -175,6 +176,43 @@ export class PostCardComponent implements OnInit {
     const page = await this.communityService.getComments(this.post._id, 0, 20);
     this.comments = page.data;
     this.commentCount = page.count;
+  }
+
+  // ------------------------------------------------------------- feedback
+
+  feedbackCard: Flashcard | null = null;
+  feedbackDraft = '';
+  sendingFeedback = false;
+
+  openFeedback(card: Flashcard): void {
+    this.feedbackCard = card;
+    this.feedbackDraft = '';
+  }
+
+  closeFeedback(): void {
+    this.feedbackCard = null;
+  }
+
+  async sendFeedback(): Promise<void> {
+    const text = this.feedbackDraft.trim();
+    if (!this.feedbackCard || text.length < 2 || this.sendingFeedback) return;
+
+    this.sendingFeedback = true;
+    try {
+      await this.communityService.createFeedback(this.feedbackCard._id, text);
+      this.toast.show(this.transloco.translate('community.feedbackSent'), 'success');
+      this.closeFeedback();
+    } catch (error) {
+      // 409 is "you already reported this one", which is not a failure
+      const already = (error as { status?: number })?.status === 409;
+      this.toast.show(
+        this.transloco.translate(already ? 'community.feedbackAlready' : 'community.feedbackError'),
+        already ? 'info' : 'error',
+      );
+      if (already) this.closeFeedback();
+    } finally {
+      this.sendingFeedback = false;
+    }
   }
 
   get canGoBack(): boolean {

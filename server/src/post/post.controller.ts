@@ -19,6 +19,7 @@ import { ApiOperation } from '@nestjs/swagger';
 import { BasePaginatedResult } from 'src/common.dto';
 import { BasicFilterRequest } from 'src/common.dto';
 import { Comment } from './comment.schema';
+import { Feedback } from './feedback.schema';
 import { FlashcardDocument } from 'src/flashcards/flashcards.schema';
 import { CurrentUser } from 'src/auth/current-user.decorator';
 import { JwtPayload } from 'src/auth/auth.dto';
@@ -114,5 +115,41 @@ export class PostController {
     return this.postService.deleteComment(user.sub, id);
   }
 
+  // ---------------------------------------------------------------- feedback
+
+  @ApiOperation({
+    description: 'report privately to the author of a flashcard',
+  })
+  @Post('flashcards/:id/feedback')
+  createFeedback(
+    @CurrentUser() user: JwtPayload,
+    @Param('id') id: string,
+    @Body() dto: WriteMessageDto,
+  ): Promise<void> {
+    return this.postService.createFeedback(user.sub, id, dto.text);
+  }
+
+  @ApiOperation({
+    description: 'read one private exchange; only its two people can',
+  })
+  @Get('feedback/:id')
+  findFeedback(
+    @CurrentUser() user: JwtPayload,
+    @Param('id') id: string,
+  ): Promise<Feedback> {
+    return this.postService.findFeedback(user.sub, id);
+  }
+
+  @ApiOperation({
+    description: 'add your one reply to an exchange, when it is your turn',
+  })
+  @Post('feedback/:id/reply')
+  replyToFeedback(
+    @CurrentUser() user: JwtPayload,
+    @Param('id') id: string,
+    @Body() dto: WriteMessageDto,
+  ): Promise<void> {
+    return this.postService.replyToFeedback(user.sub, id, dto.text);
+  }
 
 }

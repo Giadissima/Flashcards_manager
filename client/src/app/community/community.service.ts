@@ -1,6 +1,6 @@
 import { FeedPost, FeedSort } from '../models/post.dto';
 
-import { PostComment } from '../models/social.dto';
+import { Feedback, PostComment } from '../models/social.dto';
 import { Flashcard } from '../models/flashcard.dto';
 import { Injectable } from '@angular/core';
 import { PaginatedResponse } from '../models/http.dto';
@@ -63,5 +63,19 @@ export class CommunityService {
     return this.restClient.delete(`${this.baseUrl}/comments/${commentId}`);
   }
 
+  // ------------------------------------------------------------- feedback
+
+  /** Opens a private thread with the author of a flashcard. */
+  createFeedback(flashcardId: string, text: string): Promise<void> {
+    return this.restClient.post(`${this.baseUrl}/flashcards/${flashcardId}/feedback`, { text });
+  }
+
+  getFeedback(feedbackId: string): Promise<Feedback> {
+    return this.restClient.get<Feedback>(`${this.baseUrl}/feedback/${feedbackId}`);
+  }
+
+  replyToFeedback(feedbackId: string, text: string): Promise<void> {
+    return this.restClient.post(`${this.baseUrl}/feedback/${feedbackId}/reply`, { text });
+  }
 
 }

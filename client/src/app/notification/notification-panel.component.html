@@ -1,0 +1,75 @@
+<div class="dropdown notification-dropdown" (appClickOutside)="close()">
+  <button type="button" class="bell-btn" (click)="toggle()" [attr.aria-expanded]="isOpen"
+    [attr.aria-label]="'notifications.title' | transloco" [title]="'notifications.title' | transloco">
+    <span class="material-symbols-outlined">notifications</span>
+    @if (unread) {
+    <span class="bell-badge">{{ unread > 9 ? '9+' : unread }}</span>
+    }
+  </button>
+
+  <div class="dropdown-content notification-panel" [class.show]="isOpen">
+    @if (!openThread) {
+    <div class="panel-header">
+      <strong>{{ 'notifications.title' | transloco }}</strong>
+      @if (unread) {
+      <a role="button" tabindex="0" (click)="markAllRead()" (keydown.enter)="markAllRead()">
+        {{ 'notifications.markAllRead' | transloco }}
+      </a>
+      }
+    </div>
+
+    @if (loading) {
+    <div class="panel-empty">{{ 'common.loading' | transloco }}</div>
+    } @else {
+    @for (n of notifications; track n._id) {
+    <a class="notification" [class.is-unread]="!n.read" (click)="onNotificationClick(n)"
+      (keydown.enter)="onNotificationClick(n)" tabindex="0">
+      <span class="material-symbols-outlined notification-icon">{{ iconOf(n) }}</span>
+      <span class="notification-body">
+        <span class="notification-line">
+          <strong>{{ n.actor_id.username }}</strong>
+          {{ ('notifications.kind.' + n.kind) | transloco }}
+        </span>
+        @if (n.preview) {
+        <span class="notification-preview">{{ n.preview }}</span>
+        }
+      </span>
+    </a>
+    } @empty {
+    <div class="panel-empty">{{ 'notifications.empty' | transloco }}</div>
+    }
+    }
+    }
+
+    <!-- The exchange opens inside the panel: three messages do not deserve a
+         page of their own. -->
+    @if (openThread) {
+    <div class="panel-header">
+      <a role="button" tabindex="0" (click)="openThread = null" (keydown.enter)="openThread = null">
+        <span class="material-symbols-outlined">arrow_back</span>
+      </a>
+      <strong>{{ openThread.flashcard_id.title }}</strong>
+    </div>
+
+    @for (message of openThread.messages; track message.createdAt) {
+    <div class="thread-message">
+      <span class="thread-author">{{ message.user_id.username }}</span>
+      <span class="thread-text">{{ message.text }}</span>
+    </div>
+    }
+
+    @if (canReply) {
+    <div class="thread-reply">
+      <input type="text" class="form-control" [(ngModel)]="replyDraft"
+        [placeholder]="'notifications.replyPlaceholder' | transloco" (keydown.enter)="sendReply()">
+      <button type="button" class="btn btn-primary" [disabled]="sendingReply || replyDraft.trim().length < 2"
+        (click)="sendReply()">
+        <span class="material-symbols-outlined">send</span>
+      </button>
+    </div>
+    } @else {
+    <p class="panel-empty">{{ 'notifications.threadClosed' | transloco }}</p>
+    }
+    }
+  </div>
+</div>

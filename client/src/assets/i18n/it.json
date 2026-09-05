@@ -455,7 +455,15 @@
     "comments": "Commenti",
     "noComments": "Ancora nessun commento",
     "commentPlaceholder": "Scrivi un commento",
-    "commentError": "Non è stato possibile inviare il commento"
+    "commentError": "Non è stato possibile inviare il commento",
+    "feedback": "Segnala un errore",
+    "feedbackTitle": "Segnala all'autore",
+    "feedbackHint": "Un messaggio privato a chi ha scritto “{{title}}”. Lo vedrà solo lui.",
+    "feedbackPlaceholder": "Cosa c'è di sbagliato, o cosa non è chiaro?",
+    "feedbackSend": "Invia",
+    "feedbackSent": "Inviata all'autore",
+    "feedbackAlready": "Hai già segnalato questa flashcard",
+    "feedbackError": "Non è stato possibile inviare la segnalazione"
   },
   "notifications": {
     "title": "Notifiche",

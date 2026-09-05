@@ -455,7 +455,15 @@
     "comments": "Comments",
     "noComments": "No comments yet",
     "commentPlaceholder": "Write a comment",
-    "commentError": "The comment could not be sent"
+    "commentError": "The comment could not be sent",
+    "feedback": "Report a mistake",
+    "feedbackTitle": "Report to the author",
+    "feedbackHint": "A private note to whoever wrote “{{title}}”. Only they will see it.",
+    "feedbackPlaceholder": "What is wrong, or what is unclear?",
+    "feedbackSend": "Send",
+    "feedbackSent": "Sent to the author",
+    "feedbackAlready": "You already reported this flashcard",
+    "feedbackError": "The report could not be sent"
   },
   "notifications": {
     "title": "Notifications",

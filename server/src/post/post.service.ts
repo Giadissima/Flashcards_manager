@@ -16,6 +16,7 @@ import {
 import { Topic } from 'src/topic/topic.schema';
 import { BadRequestException } from '@nestjs/common';
 import { Comment } from './comment.schema';
+import { Feedback, maxFeedbackMessages } from './feedback.schema';
 import { NotificationService } from 'src/notification/notification.service';
 import { Vote, VoteValue } from './vote.schema';
 
@@ -30,6 +31,7 @@ export class PostService {
     @InjectModel(Flashcard.name) private flashcardModel: Model<Flashcard>,
     @InjectModel(Vote.name) private voteModel: Model<Vote>,
     @InjectModel(Comment.name) private commentModel: Model<Comment>,
+    @InjectModel(Feedback.name) private feedbackModel: Model<Feedback>,
     private readonly fileService: FileService,
     private readonly notificationService: NotificationService,
   ) {}
@@ -270,6 +272,117 @@ export class PostService {
       throw new NotFoundException(`Comment with id ${commentId} not found`);
     }
   }
+
+  // ---------------------------------------------------------------- feedback
+
+  /** Opens a private thread about one flashcard, for whoever wrote it. */
+  async createFeedback(
+    userId: string,
+    flashcardId: string,
+    text: string,
+  ): Promise<void> {
+    const reporter_id = new Types.ObjectId(userId);
+    const card = await this.flashcardModel
+      .findOne({ _id: flashcardId, visibility: 'public' }, { user_id: 1 })
+      .lean()
+      .exec();
+    if (!card) {
+      throw new NotFoundException(`Flashcard with id ${flashcardId} not found`);
+    }
+    if (String(card.user_id) === userId) {
+      throw new BadRequestException('This flashcard is yours');
+    }
+
+    const existing = await this.feedbackModel
+      .exists({ reporter_id, flashcard_id: card._id })
+      .exec();
+    if (existing) {
+      throw new ConflictException('You already reported this flashcard');
+    }
+
+    const feedback = await this.feedbackModel.create({
+      flashcard_id: card._id,
+      reporter_id,
+      author_id: card.user_id,
+      messages: [{ user_id: reporter_id, text, createdAt: new Date() }],
+    });
+
+    await this.notificationService.record({
+      userId: card.user_id,
+      actorId: userId,
+      kind: 'feedback',
+      feedbackId: feedback._id as Types.ObjectId,
+      preview: text,
+    });
+  }
+
+  /**
+   * Adds the one reply each side is allowed, in turn.
+   *
+   * The order is checked here and not left to the interface: the cap is what
+   * keeps this from becoming a chat, and a rule only the buttons know is no
+   * rule at all.
+   */
+  async replyToFeedback(
+    userId: string,
+    feedbackId: string,
+    text: string,
+  ): Promise<void> {
+    const feedback = await this.feedbackModel.findById(feedbackId).exec();
+    const me = new Types.ObjectId(userId);
+    const mine =
+      feedback &&
+      (feedback.author_id.equals(me) || feedback.reporter_id.equals(me));
+    // Someone else's thread is not found rather than forbidden: a 403 would
+    // confirm it exists
+    if (!feedback || !mine) {
+      throw new NotFoundException(`Feedback with id ${feedbackId} not found`);
+    }
+
+    if (feedback.messages.length >= maxFeedbackMessages) {
+      throw new BadRequestException('This exchange is closed');
+    }
+
+    // The second message is the author's, the third the reporter's answer
+    const expected =
+      feedback.messages.length === 1 ? feedback.author_id : feedback.reporter_id;
+    if (!expected.equals(me)) {
+      throw new BadRequestException('It is not your turn to write');
+    }
+
+    feedback.messages.push({ user_id: me, text, createdAt: new Date() });
+    await feedback.save();
+
+    const other = feedback.author_id.equals(me)
+      ? feedback.reporter_id
+      : feedback.author_id;
+    await this.notificationService.record({
+      userId: other,
+      actorId: userId,
+      kind: 'feedback',
+      feedbackId: feedback._id as Types.ObjectId,
+      preview: text,
+    });
+  }
+
+  /** One thread, readable only by the two people in it. */
+  async findFeedback(userId: string, feedbackId: string): Promise<Feedback> {
+    const me = new Types.ObjectId(userId);
+    const feedback = await this.feedbackModel
+      .findOne({
+        _id: new Types.ObjectId(feedbackId),
+        $or: [{ author_id: me }, { reporter_id: me }],
+      })
+      .populate('flashcard_id', 'title')
+      .populate('messages.user_id', 'username')
+      .lean()
+      .exec();
+    if (!feedback) {
+      throw new NotFoundException(`Feedback with id ${feedbackId} not found`);
+    }
+    return feedback as unknown as Feedback;
+  }
+
 
   /** One page of the carousel. */
   async findFlashcards(
