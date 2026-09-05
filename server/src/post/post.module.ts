@@ -2,6 +2,7 @@ import { Flashcard, FlashcardSchema } from 'src/flashcards/flashcards.schema';
 import { Post, PostSchema } from './post.schema';
 import { Subject, SubjectSchema } from 'src/subject/subject.schema';
 import { Topic, TopicSchema } from 'src/topic/topic.schema';
+import { Vote, VoteSchema } from './vote.schema';
 
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -15,6 +16,7 @@ import { PostService } from './post.service';
       { name: Subject.name, schema: SubjectSchema },
       { name: Topic.name, schema: TopicSchema },
       { name: Flashcard.name, schema: FlashcardSchema },
+      { name: Vote.name, schema: VoteSchema },
     ]),
   ],
   controllers: [PostController],

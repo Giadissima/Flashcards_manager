@@ -1,9 +1,11 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
-import { FeedFilterRequest, FeedPost } from './post.dto';
+import { Body, Controller, Get, Param, Patch, Query } from '@nestjs/common';
+import { CastVoteDto, FeedFilterRequest, FeedPost } from './post.dto';
 
 import { ApiOperation } from '@nestjs/swagger';
 import { BasePaginatedResult } from 'src/common.dto';
 import { FlashcardDocument } from 'src/flashcards/flashcards.schema';
+import { CurrentUser } from 'src/auth/current-user.decorator';
+import { JwtPayload } from 'src/auth/auth.dto';
 import { PostService } from './post.service';
 
 /**
@@ -21,9 +23,10 @@ export class PostController {
   })
   @Get()
   findFeed(
+    @CurrentUser() user: JwtPayload,
     @Query() filters: FeedFilterRequest,
   ): Promise<BasePaginatedResult<FeedPost>> {
-    return this.postService.findFeed(filters);
+    return this.postService.findFeed(user.sub, filters);
   }
 
   @ApiOperation({ description: 'one page of the flashcards of a post' })
@@ -39,4 +42,17 @@ export class PostController {
       Number(limit) || 5,
     );
   }
+
+  @ApiOperation({
+    description: 'rate a post: 1 up, -1 down, 0 to take the vote back',
+  })
+  @Patch(':id/vote')
+  vote(
+    @CurrentUser() user: JwtPayload,
+    @Param('id') id: string,
+    @Body() dto: CastVoteDto,
+  ): Promise<void> {
+    return this.postService.vote(user.sub, id, dto.value);
+  }
+
 }

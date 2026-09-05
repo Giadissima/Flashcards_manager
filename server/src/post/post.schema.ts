@@ -61,6 +61,21 @@ export class Post {
     default: [],
   })
   flashcard_ids: mongoose.Types.ObjectId[];
+
+  /**
+   * Upvotes minus downvotes, kept here so the feed can order by it in the
+   * database instead of counting votes for every post it returns. Recomputed
+   * from the votes on every change rather than nudged up and down, so it
+   * cannot drift away from them.
+   */
+  @Prop({ required: true, default: 0, index: true })
+  score: number;
+
+  @Prop({ required: true, default: 0 })
+  upvotes: number;
+
+  @Prop({ required: true, default: 0 })
+  downvotes: number;
 }
 
 export const PostSchema = SchemaFactory.createForClass(Post);

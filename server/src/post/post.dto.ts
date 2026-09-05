@@ -4,11 +4,11 @@ import { ApiProperty } from '@nestjs/swagger';
 import { BasicFilterRequest } from 'src/common.dto';
 
 /**
- * The two orders the feed offers: what was shared most recently, and what was
- * touched most recently. Both descending - an ascending feed would open on the
- * oldest thing anybody ever posted.
+ * The three orders the feed offers: what was shared most recently, what was
+ * touched most recently, and what people rated best. All descending - an
+ * ascending feed would open on the oldest thing anybody ever posted.
  */
-export const feedSorts = ['created', 'updated'] as const;
+export const feedSorts = ['created', 'updated', 'popular'] as const;
 export type FeedSort = (typeof feedSorts)[number];
 
 export class FeedFilterRequest extends BasicFilterRequest {
@@ -16,12 +16,20 @@ export class FeedFilterRequest extends BasicFilterRequest {
   @IsString()
   @IsIn(feedSorts)
   @ApiProperty({
-    description: 'created = newest posts, updated = most recently changed',
+    description:
+      'created = newest, updated = most recently changed, popular = best rated',
     enum: feedSorts,
     required: false,
     default: 'created',
   })
   sort?: FeedSort;
+}
+
+/** What an up or down arrow sends. 0 takes the vote back. */
+export class CastVoteDto {
+  @IsIn([1, -1, 0])
+  @ApiProperty({ enum: [1, -1, 0], example: 1 })
+  value: number;
 }
 
 /** The author of a post, as the feed shows them. */
@@ -47,6 +55,9 @@ export interface FeedPost {
   wholeSubject: boolean;
   /** How many flashcards the carousel can page through. */
   flashcardCount: number;
+  score: number;
+  /** How the person reading voted: 1, -1, or 0 when they have not. */
+  myVote: number;
   createdAt: Date;
   updatedAt: Date;
 }

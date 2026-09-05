@@ -8,6 +8,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Subject } from 'src/subject/subject.schema';
 import { Topic } from 'src/topic/topic.schema';
+import { Vote, VoteValue } from './vote.schema';
 
 const ENTITY = 'Post';
 
@@ -18,6 +19,7 @@ export class PostService {
     @InjectModel(Subject.name) private subjectModel: Model<Subject>,
     @InjectModel(Topic.name) private topicModel: Model<Topic>,
     @InjectModel(Flashcard.name) private flashcardModel: Model<Flashcard>,
+    @InjectModel(Vote.name) private voteModel: Model<Vote>,
   ) {}
 
   /**
@@ -97,14 +99,22 @@ export class PostService {
    * is that a post only ever exists for something marked public.
    */
   async findFeed(
+    userId: string,
     filter: FeedFilterRequest,
   ): Promise<BasePaginatedResult<FeedPost>> {
-    const sortField = filter.sort === 'updated' ? 'updatedAt' : 'createdAt';
+    // A tie on score falls back to the newest, so the popular order does not
+    // freeze on whichever post happened to be inserted first
+    const order: Record<string, 1 | -1> =
+      filter.sort === 'popular'
+        ? { score: -1, createdAt: -1 }
+        : filter.sort === 'updated'
+          ? { updatedAt: -1 }
+          : { createdAt: -1 };
 
     const [posts, count] = await Promise.all([
       this.postModel
         .find()
-        .sort({ [sortField]: -1, _id: -1 })
+        .sort({ ...order, _id: -1 })
         .skip(filter.skip)
         .limit(filter.limit)
         .populate('user_id', 'username avatar avatarColor')
@@ -115,10 +125,70 @@ export class PostService {
       this.postModel.countDocuments(),
     ]);
 
+    // The reader's own votes for this page in one query, rather than one per
+    // post: the arrows have to show which way they already clicked
+    const myVotes = await this.voteModel
+      .find(
+        {
+          user_id: new Types.ObjectId(userId),
+          post_id: { $in: posts.map((post) => post._id) },
+        },
+        { post_id: 1, value: 1 },
+      )
+      .lean()
+      .exec();
+    const voteByPost = new Map(
+      myVotes.map((vote) => [String(vote.post_id), vote.value]),
+    );
+
     const data = await Promise.all(
-      posts.map((post) => this.toFeedPost(post as unknown as PopulatedPost)),
+      posts.map((post) =>
+        this.toFeedPost(
+          post as unknown as PopulatedPost,
+          voteByPost.get(String(post._id)) ?? 0,
+        ),
+      ),
     );
     return { data, count };
+  }
+
+  /**
+   * Records how someone rated a post; 0 takes their vote back.
+   *
+   * The totals are recounted from the votes rather than nudged by one, so they
+   * cannot drift from what was actually cast - and the recount deliberately
+   * leaves updatedAt alone: a vote is not a change to the post, and bumping it
+   * would shuffle the "recently updated" order every time somebody clicked.
+   */
+  async vote(userId: string, postId: string, value: number): Promise<void> {
+    const post = await this.findOneOrThrow(postId);
+    const user_id = new Types.ObjectId(userId);
+    const post_id = post._id as Types.ObjectId;
+
+    if (value === 0) {
+      await this.voteModel.deleteOne({ user_id, post_id }).exec();
+    } else {
+      await this.voteModel
+        .findOneAndUpdate(
+          { user_id, post_id },
+          { $set: { value: value as VoteValue } },
+          { upsert: true },
+        )
+        .exec();
+    }
+
+    const [upvotes, downvotes] = await Promise.all([
+      this.voteModel.countDocuments({ post_id, value: 1 }),
+      this.voteModel.countDocuments({ post_id, value: -1 }),
+    ]);
+
+    await this.postModel
+      .updateOne(
+        { _id: post_id },
+        { $set: { upvotes, downvotes, score: upvotes - downvotes } },
+        { timestamps: false },
+      )
+      .exec();
   }
 
   /** One page of the carousel. */
@@ -209,7 +279,10 @@ export class PostService {
     ];
   }
 
-  private async toFeedPost(post: PopulatedPost): Promise<FeedPost> {
+  private async toFeedPost(
+    post: PopulatedPost,
+    myVote: number,
+  ): Promise<FeedPost> {
     const wholeSubject = post.scope === 'subject';
     return {
       _id: String(post._id),
@@ -231,6 +304,8 @@ export class PostService {
       flashcardCount: await this.flashcardModel.countDocuments(
         this.visibleCardsQuery(post as unknown as Post),
       ),
+      score: post.score ?? 0,
+      myVote,
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,
     };
@@ -255,6 +330,7 @@ interface PopulatedPost {
   };
   topic_ids: { _id: Types.ObjectId; name: string; color?: string }[];
   flashcard_ids: Types.ObjectId[];
+  score: number;
   createdAt: Date;
   updatedAt: Date;
 }
