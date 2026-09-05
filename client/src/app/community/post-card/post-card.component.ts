@@ -5,6 +5,8 @@ import { AuthService } from '../../auth/auth.service';
 import { CommunityService } from '../community.service';
 import { FeedPost } from '../../models/post.dto';
 import { Flashcard } from '../../models/flashcard.dto';
+import { FormsModule } from '@angular/forms';
+import { PostComment } from '../../models/social.dto';
 import { KatexRendererPipe } from '../../pipes/katex-renderer.pipe';
 import { ToastService } from '../../shared/toast/toast.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
@@ -26,7 +28,7 @@ const pageSize = 3;
 @Component({
   selector: 'app-post-card',
   standalone: true,
-  imports: [CommonModule, TranslocoModule, KatexRendererPipe],
+  imports: [CommonModule, FormsModule, TranslocoModule, KatexRendererPipe],
   templateUrl: './post-card.component.html',
   styleUrl: './post-card.component.scss',
 })
@@ -123,6 +125,56 @@ export class PostCardComponent implements OnInit {
     } finally {
       this.importingId = null;
     }
+  }
+
+  // ------------------------------------------------------------- comments
+
+  comments: PostComment[] = [];
+  commentCount = 0;
+  commentsOpen = false;
+  commentDraft = '';
+  sendingComment = false;
+
+  async toggleComments(): Promise<void> {
+    this.commentsOpen = !this.commentsOpen;
+    // Fetched the first time they are opened: most posts are scrolled past
+    // without ever being read
+    if (this.commentsOpen && !this.comments.length) await this.loadComments();
+  }
+
+  async sendComment(): Promise<void> {
+    const text = this.commentDraft.trim();
+    if (text.length < 2 || this.sendingComment) return;
+
+    this.sendingComment = true;
+    try {
+      await this.communityService.addComment(this.post._id, text);
+      this.commentDraft = '';
+      await this.loadComments();
+    } catch {
+      this.toast.show(this.transloco.translate('community.commentError'), 'error');
+    } finally {
+      this.sendingComment = false;
+    }
+  }
+
+  async removeComment(comment: PostComment): Promise<void> {
+    try {
+      await this.communityService.deleteComment(comment._id);
+      await this.loadComments();
+    } catch {
+      this.toast.show(this.transloco.translate('community.commentError'), 'error');
+    }
+  }
+
+  isMyComment(comment: PostComment): boolean {
+    return this.authService.user?._id === comment.user_id._id;
+  }
+
+  private async loadComments(): Promise<void> {
+    const page = await this.communityService.getComments(this.post._id, 0, 20);
+    this.comments = page.data;
+    this.commentCount = page.count;
   }
 
   get canGoBack(): boolean {

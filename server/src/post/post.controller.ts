@@ -1,16 +1,24 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
   Post,
   Query,
 } from '@nestjs/common';
-import { CastVoteDto, FeedFilterRequest, FeedPost } from './post.dto';
+import {
+  CastVoteDto,
+  FeedFilterRequest,
+  FeedPost,
+  WriteMessageDto,
+} from './post.dto';
 
 import { ApiOperation } from '@nestjs/swagger';
 import { BasePaginatedResult } from 'src/common.dto';
+import { BasicFilterRequest } from 'src/common.dto';
+import { Comment } from './comment.schema';
 import { FlashcardDocument } from 'src/flashcards/flashcards.schema';
 import { CurrentUser } from 'src/auth/current-user.decorator';
 import { JwtPayload } from 'src/auth/auth.dto';
@@ -75,6 +83,36 @@ export class PostController {
     return this.postService.importFlashcard(user.sub, id);
   }
 
+
+  // ---------------------------------------------------------------- comments
+
+  @ApiOperation({ description: 'the public comments under a post' })
+  @Get(':id/comments')
+  findComments(
+    @Param('id') id: string,
+    @Query() filters: BasicFilterRequest,
+  ): Promise<BasePaginatedResult<Comment>> {
+    return this.postService.findComments(id, filters);
+  }
+
+  @ApiOperation({ description: 'comment publicly on a post' })
+  @Post(':id/comments')
+  addComment(
+    @CurrentUser() user: JwtPayload,
+    @Param('id') id: string,
+    @Body() dto: WriteMessageDto,
+  ): Promise<void> {
+    return this.postService.addComment(user.sub, id, dto.text);
+  }
+
+  @ApiOperation({ description: 'delete a comment of your own' })
+  @Delete('comments/:id')
+  deleteComment(
+    @CurrentUser() user: JwtPayload,
+    @Param('id') id: string,
+  ): Promise<void> {
+    return this.postService.deleteComment(user.sub, id);
+  }
 
 
 }

@@ -451,6 +451,24 @@
     "import": "Add to my flashcards",
     "imported": "Added to your flashcards",
     "alreadyImported": "You already have this one",
-    "importError": "The flashcard could not be added"
+    "importError": "The flashcard could not be added",
+    "comments": "Comments",
+    "noComments": "No comments yet",
+    "commentPlaceholder": "Write a comment",
+    "commentError": "The comment could not be sent"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "Nothing new",
+    "markAllRead": "Mark all read",
+    "replyPlaceholder": "Write your reply",
+    "replyError": "The reply could not be sent",
+    "threadError": "The exchange could not be opened",
+    "threadClosed": "This exchange is closed",
+    "kind": {
+      "upvote": "found your post useful",
+      "comment": "commented on your post",
+      "feedback": "wrote about a flashcard"
+    }
   }
 }

@@ -1,5 +1,6 @@
 import { FeedPost, FeedSort } from '../models/post.dto';
 
+import { PostComment } from '../models/social.dto';
 import { Flashcard } from '../models/flashcard.dto';
 import { Injectable } from '@angular/core';
 import { PaginatedResponse } from '../models/http.dto';
@@ -43,5 +44,24 @@ export class CommunityService {
   importFlashcard(flashcardId: string): Promise<void> {
     return this.restClient.post(`${this.baseUrl}/flashcards/${flashcardId}/import`, {});
   }
+
+
+  // ------------------------------------------------------------- comments
+
+  getComments(postId: string, skip: number, limit: number): Promise<PaginatedResponse<PostComment>> {
+    return this.restClient.get<PaginatedResponse<PostComment>>(
+      `${this.baseUrl}/${postId}/comments`,
+      { skip, limit, sortField: '_id', sortDirection: 'desc' },
+    );
+  }
+
+  addComment(postId: string, text: string): Promise<void> {
+    return this.restClient.post(`${this.baseUrl}/${postId}/comments`, { text });
+  }
+
+  deleteComment(commentId: string): Promise<void> {
+    return this.restClient.delete(`${this.baseUrl}/comments/${commentId}`);
+  }
+
 
 }

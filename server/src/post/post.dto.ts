@@ -1,7 +1,8 @@
-import { IsIn, IsOptional, IsString } from 'class-validator';
+import { IsIn, IsOptional, IsString, Length } from 'class-validator';
 
 import { ApiProperty } from '@nestjs/swagger';
 import { BasicFilterRequest } from 'src/common.dto';
+import { Trim } from 'src/common/transform.decorators';
 
 /**
  * The three orders the feed offers: what was shared most recently, what was
@@ -30,6 +31,19 @@ export class CastVoteDto {
   @IsIn([1, -1, 0])
   @ApiProperty({ enum: [1, -1, 0], example: 1 })
   value: number;
+}
+
+/** How long a comment or a feedback message may be. */
+export const messageMaxLength = 1000;
+export const messageMinLength = 2;
+
+/** The body of a comment, of a report, and of a reply: all three are one text. */
+export class WriteMessageDto {
+  @IsString()
+  @Length(messageMinLength, messageMaxLength)
+  @ApiProperty({ description: 'What to say', example: 'Grazie, utilissime!' })
+  @Trim()
+  text: string;
 }
 
 /** The author of a post, as the feed shows them. */

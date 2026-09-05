@@ -451,6 +451,24 @@
     "import": "Aggiungi alle mie flashcard",
     "imported": "Aggiunta alle tue flashcard",
     "alreadyImported": "Questa ce l'hai già",
-    "importError": "Non è stato possibile aggiungere la flashcard"
+    "importError": "Non è stato possibile aggiungere la flashcard",
+    "comments": "Commenti",
+    "noComments": "Ancora nessun commento",
+    "commentPlaceholder": "Scrivi un commento",
+    "commentError": "Non è stato possibile inviare il commento"
+  },
+  "notifications": {
+    "title": "Notifiche",
+    "empty": "Niente di nuovo",
+    "markAllRead": "Segna tutte come lette",
+    "replyPlaceholder": "Scrivi la tua risposta",
+    "replyError": "Non è stato possibile inviare la risposta",
+    "threadError": "Non è stato possibile aprire lo scambio",
+    "threadClosed": "Questo scambio è chiuso",
+    "kind": {
+      "upvote": "ha trovato utile il tuo post",
+      "comment": "ha commentato il tuo post",
+      "feedback": "ti ha scritto su una flashcard"
+    }
   }
 }

@@ -176,11 +176,66 @@
   }
 }
 
-/* In the corner of the card it belongs to, so which one is being taken is
-   never in doubt when three sit side by side. */
-.import-button {
+/* In the corner of the card they belong to, so which one is being reported or
+   taken is never in doubt when three sit side by side. */
+.card-actions {
   position: absolute;
   bottom: calc(var(--spacing-unit) * 0.5);
   right: calc(var(--spacing-unit) * 0.5);
-  padding: calc(var(--spacing-unit) * 0.5);
+  display: flex;
+  gap: calc(var(--spacing-unit) * 0.5);
+
+  .btn {
+    padding: calc(var(--spacing-unit) * 0.5);
+  }
 }
+
+.post-comments {
+  margin-top: calc(var(--spacing-unit) * 1.5);
+  border-top: 1px solid var(--border-color);
+  padding-top: var(--spacing-unit);
+}
+
+.comments-toggle {
+  gap: var(--spacing-unit);
+  color: var(--text-color);
+}
+
+.comment-list {
+  margin: var(--spacing-unit) 0;
+}
+
+.comment {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-unit);
+  padding: calc(var(--spacing-unit) * 0.5) 0;
+}
+
+.comment-author {
+  font-weight: 700;
+  color: var(--header-color);
+  flex-shrink: 0;
+}
+
+.comment-text {
+  flex: 1;
+  color: var(--text-color);
+  overflow-wrap: anywhere;
+}
+
+.comment-delete {
+  padding: 0;
+}
+
+.comment-empty {
+  color: var(--muted-color);
+  margin: var(--spacing-unit) 0;
+}
+
+.comment-form {
+  display: flex;
+  gap: var(--spacing-unit);
+}
+
+

@@ -27,12 +27,14 @@
         <h5 class="post-flashcard-title">{{ card.title }}</h5>
         <div class="post-flashcard-body" [innerHTML]="card.question | katexRenderer"></div>
         @if (!isMine) {
-        <button type="button" class="btn btn-icon-ghost import-button" [disabled]="importingId === card._id"
-          (click)="importCard(card)"
-          [title]="(importedIds.has(card._id) ? 'community.alreadyImported' : 'community.import') | transloco"
-          [attr.aria-label]="'community.import' | transloco">
-          <span class="material-symbols-outlined">{{ importedIds.has(card._id) ? 'library_add_check' : 'library_add' }}</span>
-        </button>
+        <div class="card-actions">
+          <button type="button" class="btn btn-icon-ghost" [disabled]="importingId === card._id"
+            (click)="importCard(card)"
+            [title]="(importedIds.has(card._id) ? 'community.alreadyImported' : 'community.import') | transloco"
+            [attr.aria-label]="'community.import' | transloco">
+            <span class="material-symbols-outlined">{{ importedIds.has(card._id) ? 'library_add_check' : 'library_add' }}</span>
+          </button>
+        </div>
         }
       </div>
       } @empty {
@@ -61,6 +63,42 @@
       [title]="'community.downvote' | transloco">
       <span class="material-symbols-outlined">arrow_downward</span>
     </button>
+  </div>
+
+  <div class="post-comments">
+    <button type="button" class="btn btn-icon-ghost comments-toggle" (click)="toggleComments()">
+      <span class="material-symbols-outlined">chat_bubble</span>
+      {{ 'community.comments' | transloco }}
+      @if (commentCount) { <span>({{ commentCount }})</span> }
+    </button>
+
+    @if (commentsOpen) {
+    <div class="comment-list">
+      @for (comment of comments; track comment._id) {
+      <div class="comment">
+        <span class="comment-author">{{ comment.user_id.username }}</span>
+        <span class="comment-text">{{ comment.text }}</span>
+        @if (isMyComment(comment)) {
+        <button type="button" class="btn btn-icon-ghost btn-danger-hover comment-delete"
+          (click)="removeComment(comment)" [attr.aria-label]="'common.delete' | transloco">
+          <span class="material-symbols-outlined">delete</span>
+        </button>
+        }
+      </div>
+      } @empty {
+      <p class="comment-empty">{{ 'community.noComments' | transloco }}</p>
+      }
+    </div>
+
+    <div class="comment-form">
+      <input type="text" class="form-control" [(ngModel)]="commentDraft"
+        [placeholder]="'community.commentPlaceholder' | transloco" (keydown.enter)="sendComment()">
+      <button type="button" class="btn btn-primary" [disabled]="sendingComment || commentDraft.trim().length < 2"
+        (click)="sendComment()">
+        <span class="material-symbols-outlined">send</span>
+      </button>
+    </div>
+    }
   </div>
 
   <footer class="post-footer">

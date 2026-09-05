@@ -6,7 +6,7 @@ import { BasePaginatedResult } from 'src/common.dto';
 import { Flashcard, FlashcardDocument } from 'src/flashcards/flashcards.schema';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { BadRequestException, ConflictException } from '@nestjs/common';
+import { ConflictException } from '@nestjs/common';
 import { FileService } from 'src/file/file.service';
 import { Subject } from 'src/subject/subject.schema';
 import {
@@ -14,6 +14,8 @@ import {
   replaceImageFileIds,
 } from 'src/common/html.util';
 import { Topic } from 'src/topic/topic.schema';
+import { BadRequestException } from '@nestjs/common';
+import { Comment } from './comment.schema';
 import { NotificationService } from 'src/notification/notification.service';
 import { Vote, VoteValue } from './vote.schema';
 
@@ -27,6 +29,7 @@ export class PostService {
     @InjectModel(Topic.name) private topicModel: Model<Topic>,
     @InjectModel(Flashcard.name) private flashcardModel: Model<Flashcard>,
     @InjectModel(Vote.name) private voteModel: Model<Vote>,
+    @InjectModel(Comment.name) private commentModel: Model<Comment>,
     private readonly fileService: FileService,
     private readonly notificationService: NotificationService,
   ) {}
@@ -212,6 +215,59 @@ export class PostService {
         kind: 'upvote',
         postId: post_id,
       });
+    }
+  }
+
+  // ---------------------------------------------------------------- comments
+
+  async findComments(
+    postId: string,
+    filter: { skip: number; limit: number },
+  ): Promise<BasePaginatedResult<Comment>> {
+    const post_id = new Types.ObjectId(postId);
+
+    const [data, count] = await Promise.all([
+      this.commentModel
+        .find({ post_id })
+        .sort({ createdAt: -1, _id: -1 })
+        .skip(filter.skip)
+        .limit(filter.limit)
+        .populate('user_id', 'username avatar avatarColor')
+        .lean()
+        .exec(),
+      this.commentModel.countDocuments({ post_id }),
+    ]);
+    return { data: data as unknown as Comment[], count };
+  }
+
+  async addComment(userId: string, postId: string, text: string): Promise<void> {
+    const post = await this.findOneOrThrow(postId);
+
+    await this.commentModel.create({
+      post_id: post._id,
+      user_id: new Types.ObjectId(userId),
+      text,
+    });
+
+    await this.notificationService.record({
+      userId: post.user_id,
+      actorId: userId,
+      kind: 'comment',
+      postId: post._id as Types.ObjectId,
+      preview: text,
+    });
+  }
+
+  /** Only by whoever wrote it. */
+  async deleteComment(userId: string, commentId: string): Promise<void> {
+    const result = await this.commentModel
+      .deleteOne({
+        _id: new Types.ObjectId(commentId),
+        user_id: new Types.ObjectId(userId),
+      })
+      .exec();
+    if (!result.deletedCount) {
+      throw new NotFoundException(`Comment with id ${commentId} not found`);
     }
   }
 
