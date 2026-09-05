@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { BasePaginatedResult } from 'src/common.dto';
 import {
   assertValidObjectId,
-  deleteByIdOrThrow,
+  deleteOwnedOrThrow,
 } from 'src/common/mongo.util';
 
 import { Test, TestDocument } from './test.schema';
@@ -30,14 +30,17 @@ export class TestService {
   // Total number of questions in the test, without pulling the whole
   // 'questions' array into memory: $size is computed by Mongo and only the
   // resulting number travels over the wire
-  async getQuestionsCount(test_id: string): Promise<{
+  async getQuestionsCount(
+    userId: string,
+    test_id: string,
+  ): Promise<{
     count: number;
     elapsed_time?: number;
   }> {
     assertValidObjectId(test_id);
 
     const [result] = await this.testModel.aggregate([
-      { $match: { _id: new Types.ObjectId(test_id) } },
+      { $match: this.ownedById(userId, test_id) },
       {
         $project: {
           count: { $size: '$questions' },
@@ -57,6 +60,7 @@ export class TestService {
   // A single page of questions (skip/limit) via $slice: Mongo extracts only the
   // requested slice, without loading the other questions of the test
   async getQuestionsPage(
+    userId: string,
     test_id: string,
     skip: number,
     limit: number,
@@ -64,7 +68,7 @@ export class TestService {
     assertValidObjectId(test_id);
 
     const [result] = await this.testModel.aggregate([
-      { $match: { _id: new Types.ObjectId(test_id) } },
+      { $match: this.ownedById(userId, test_id) },
       { $project: { questions: { $slice: ['$questions', skip, limit] } } },
     ]);
 
@@ -83,14 +87,14 @@ export class TestService {
    * without a name: what comes back is a list of choices, and a choice with no
    * label cannot be offered.
    */
-  async getTopics(id: string): Promise<TestTopic[]> {
+  async getTopics(userId: string, id: string): Promise<TestTopic[]> {
     assertValidObjectId(id);
 
-    if (!(await this.testModel.exists({ _id: new Types.ObjectId(id) })))
+    if (!(await this.testModel.exists(this.ownedById(userId, id))))
       throw new NotFoundException('test not found');
 
     return this.testModel.aggregate<TestTopic>([
-      { $match: { _id: new Types.ObjectId(id) } },
+      { $match: this.ownedById(userId, id) },
       { $unwind: '$questions' },
       { $group: { _id: '$questions.topic_id' } },
       {
@@ -109,15 +113,18 @@ export class TestService {
 
   // Marks the test as completed without having the client read back and
   // rewrite the whole document, the 'questions' array included
-  completeTest(id: string, elapsed_time: number) {
+  completeTest(userId: string, id: string, elapsed_time: number) {
     assertValidObjectId(id);
-    return this.testModel.findByIdAndUpdate(id, {
-      completedAt: new Date(),
-      elapsed_time,
-    });
+    return this.testModel.findOneAndUpdate(
+      { _id: id, user_id: userId },
+      { completedAt: new Date(), elapsed_time },
+    );
   }
   // TODO find a way to filter only the questions that have no category
-  async create(test: TestCreateRequest): Promise<TestDocument> {
+  async create(
+    userId: string,
+    test: TestCreateRequest,
+  ): Promise<TestDocument> {
     // The questions arrive with the topic each is on, so the topics of the test
     // are read off them rather than looked up again: one rule for what a test
     // is about, and no second answer to disagree with the questions. Resolved
@@ -128,22 +135,34 @@ export class TestService {
     ];
     // The subject is the one thing a question does not carry, and a test has
     // exactly one: it is still read from the cards.
+    // Scoped to the caller, like every other read of the flashcards: cards that
+    // are not theirs answer nothing, so a test cannot be built over them.
     const subject_id = await this.flashcardService.getSubject(
+      userId,
       test.questions.map((q) => q.flashcard_id),
     );
-    return new this.testModel({ ...test, subject_id, topic_id }).save();
+    return new this.testModel({
+      ...test,
+      subject_id,
+      topic_id,
+      user_id: userId,
+    }).save();
   }
 
-  updateelapsed_time(id: string, time: number) {
+  updateelapsed_time(userId: string, id: string, time: number) {
     assertValidObjectId(id);
-    return this.testModel.findByIdAndUpdate(id, { elapsed_time: time });
+    return this.testModel.findOneAndUpdate(
+      { _id: id, user_id: userId },
+      { elapsed_time: time },
+    );
   }
 
-  delete(id: string): Promise<void> {
-    return deleteByIdOrThrow(this.testModel, id, ENTITY);
+  delete(userId: string, id: string): Promise<void> {
+    return deleteOwnedOrThrow(this.testModel, id, userId, ENTITY);
   }
 
   updateAnswer(
+    userId: string,
     test_id: string,
     question_id: string,
     is_correct: boolean | undefined,
@@ -155,17 +174,32 @@ export class TestService {
         ? { $unset: { 'questions.$.is_correct': '' } }
         : { $set: { 'questions.$.is_correct': is_correct } };
     return this.testModel.findOneAndUpdate(
-      { _id: test_id, 'questions.flashcard_id': question_id },
+      { _id: test_id, user_id: userId, 'questions.flashcard_id': question_id },
       update,
       { new: true },
     );
   }
 
+  /**
+   * The $match every aggregation over a single test opens with. An aggregation
+   * does not cast strings the way find() does, so both ids are converted here.
+   */
+  private ownedById(userId: string, id: string) {
+    return { _id: new Types.ObjectId(id), user_id: new Types.ObjectId(userId) };
+  }
+
   // Shared by findAll and getStats: both must honour the same filters
   // (subject_id/topic_id/onlyWrong/completed) applied to the test list, so that
   // the stats shown always match what is currently filtered
-  private buildFilterPipeline(filter: TestStatsFilterDto): PipelineStage[] {
-    const pipeline: PipelineStage[] = [];
+  private buildFilterPipeline(
+    userId: string,
+    filter: TestStatsFilterDto,
+  ): PipelineStage[] {
+    // First stage of both lists: the owner narrows the set before any optional
+    // filter is considered, so no query can leave it out by accident.
+    const pipeline: PipelineStage[] = [
+      { $match: { user_id: new Types.ObjectId(userId) } },
+    ];
 
     if (filter.onlyWrong) {
       pipeline.push({ $match: { 'questions.is_correct': false } });
@@ -246,9 +280,10 @@ export class TestService {
   }
 
   async findAll(
+    userId: string,
     filter: TestFilterDto,
   ): Promise<BasePaginatedResult<TestDocument>> {
-    const pipeline = this.buildFilterPipeline(filter);
+    const pipeline = this.buildFilterPipeline(userId, filter);
 
     // $facet runs several independent sub-pipelines over the *same* input
     // documents and returns each result under its own key, as one document.
@@ -283,8 +318,11 @@ export class TestService {
     };
   }
 
-  async getStats(filter: TestStatsFilterDto = {}): Promise<TestStats> {
-    const pipeline = this.buildFilterPipeline(filter);
+  async getStats(
+    userId: string,
+    filter: TestStatsFilterDto = {},
+  ): Promise<TestStats> {
+    const pipeline = this.buildFilterPipeline(userId, filter);
 
     pipeline.push(
       {
@@ -331,12 +369,12 @@ export class TestService {
     };
   }
 
-  async findOne(id: string): Promise<TestDocument> {
+  async findOne(userId: string, id: string): Promise<TestDocument> {
     assertValidObjectId(id);
 
     const [test] = await this.testModel
       .aggregate<TestDocument>([
-        { $match: { _id: new Types.ObjectId(id) } },
+        { $match: this.ownedById(userId, id) },
         ...this.subjectAndTopicStages(),
       ])
       .exec();

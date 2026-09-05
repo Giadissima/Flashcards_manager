@@ -3,6 +3,11 @@ import * as mongoose from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 import { Document } from 'mongoose';
+import {
+  Visibility,
+  defaultVisibility,
+  visibilities,
+} from 'src/common/visibility';
 
 export type FlashcardDocument = Flashcard & Document;
 
@@ -31,6 +36,21 @@ export class Flashcard {
     required: false,
   })
   subject_id: mongoose.Types.ObjectId;
+
+  /**
+   * Who this belongs to. Every list is scoped to it, and it is what the
+   * Community section will group by once it exists.
+   */
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+    index: true,
+  })
+  user_id: mongoose.Types.ObjectId;
+
+  @Prop({ required: true, enum: visibilities, default: defaultVisibility })
+  visibility: Visibility;
 }
 // ! known gap: by editing the request by hand a client can create a flashcard
 // whose topic and subject are not related to each other, since nothing checks

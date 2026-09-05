@@ -1,8 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Visibility, visibilities } from 'src/common/visibility';
 import {
   IsArray,
   IsInt,
   IsMongoId,
+  IsIn,
   IsOptional,
   IsString,
   Length,
@@ -49,6 +51,16 @@ export class ModifyFlashcardDto {
   @Length(idLength, idLength)
   @TrimToUndefined()
   subject_id?: string;
+
+  @IsOptional()
+  @IsIn(visibilities)
+  @ApiProperty({
+    description: 'Who may see it; defaults to private when left out',
+    enum: visibilities,
+    required: false,
+  })
+  visibility?: Visibility;
+
 }
 
 /** Subject/topic filters shared by the "count" and "random" endpoints. */

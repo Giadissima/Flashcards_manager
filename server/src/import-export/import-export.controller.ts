@@ -1,3 +1,5 @@
+import { CurrentUser } from 'src/auth/current-user.decorator';
+import { JwtPayload } from 'src/auth/auth.dto';
 import {
   Controller,
   Get,
@@ -34,9 +36,10 @@ export class ImportExportController {
   @Post('upload-flashcards')
   @UseInterceptors(FileInterceptor('file'))
   uploadFlashcardsJson(
+    @CurrentUser() user: JwtPayload,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<{ imported: number; skipped: number }> {
-    return this.importService.importFlashcardsFromFile(file);
+    return this.importService.importFlashcardsFromFile(user.sub, file);
   }
 
   @ApiOperation({
@@ -50,8 +53,15 @@ export class ImportExportController {
     type: String,
     description: 'L\'ID della materia per filtrare i risultati (opzionale)',
   })
-  async exportFlashcards(@Res() res: Response, @Query('subject_id') subject_id?: string): Promise<void> {
-    const zipBuffer = await this.importService.exportFlashcardsAsZip(subject_id);
+  async exportFlashcards(
+    @CurrentUser() user: JwtPayload,
+    @Res() res: Response,
+    @Query('subject_id') subject_id?: string,
+  ): Promise<void> {
+    const zipBuffer = await this.importService.exportFlashcardsAsZip(
+      user.sub,
+      subject_id,
+    );
     res.setHeader('Content-Type', 'application/zip');
     res.setHeader(
       'Content-Disposition',

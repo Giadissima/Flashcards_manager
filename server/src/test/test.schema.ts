@@ -31,6 +31,19 @@ export const QuestionSchema = SchemaFactory.createForClass(Question);
   timestamps: true,
 })
 export class Test {
+  /**
+   * Who sat this test. No visibility beside it, unlike a flashcard or a
+   * subject: a test is a record of one person's attempt, and there is nothing
+   * in it that another could use.
+   */
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+    index: true,
+  })
+  user_id: mongoose.Types.ObjectId;
+
   @Prop({ required: false })
   notes: string;
 

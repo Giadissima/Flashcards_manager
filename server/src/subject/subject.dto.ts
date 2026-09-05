@@ -1,7 +1,8 @@
-import { IsOptional, IsString, Length, Matches } from 'class-validator';
+import { IsIn, IsOptional, IsString, Length, Matches } from 'class-validator';
 import { charMinLength, descMaxLength, nameMaxLength } from 'src/config';
 
 import { ApiProperty } from '@nestjs/swagger';
+import { Visibility, visibilities } from 'src/common/visibility';
 import { IsHtmlTextLength } from 'src/common/validators/html-text-length.validator';
 import { Trim, TrimHtml } from 'src/common/transform.decorators';
 
@@ -37,4 +38,14 @@ export class ModifySubjectDto {
     required: false,
   })
   color?: string;
+
+  @IsOptional()
+  @IsIn(visibilities)
+  @ApiProperty({
+    description: 'Who may see it; defaults to private when left out',
+    enum: visibilities,
+    required: false,
+  })
+  visibility?: Visibility;
+
 }

@@ -1,6 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
 
+import {
+  Visibility,
+  defaultVisibility,
+  visibilities,
+} from 'src/common/visibility';
+
 export type TopicDocument = Topic & Document;
 
 // ? This file contains Topic MongoDb's schema
@@ -21,6 +27,21 @@ export class Topic {
     required: false,
   })
   subject_id: mongoose.Types.ObjectId;
+
+  /**
+   * Who this belongs to. Every list is scoped to it, and it is what the
+   * Community section will group by once it exists.
+   */
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+    index: true,
+  })
+  user_id: mongoose.Types.ObjectId;
+
+  @Prop({ required: true, enum: visibilities, default: defaultVisibility })
+  visibility: Visibility;
 }
 
 export const TopicSchema = SchemaFactory.createForClass(Topic);

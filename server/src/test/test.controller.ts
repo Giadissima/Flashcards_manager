@@ -1,3 +1,5 @@
+import { CurrentUser } from 'src/auth/current-user.decorator';
+import { JwtPayload } from 'src/auth/auth.dto';
 import {
   BadRequestException,
   Body,
@@ -31,22 +33,29 @@ export class TestController {
     type: NotFoundException,
     description: 'Error creating test',
   })
-  create(@Body() test: TestCreateRequest): Promise<TestDocument> {
-    return this.testService.create(test);
+  create(
+    @CurrentUser() user: JwtPayload,
+    @Body() test: TestCreateRequest,
+  ): Promise<TestDocument> {
+    return this.testService.create(user.sub, test);
   }
 
   @ApiOperation({ description: 'get all test from db with filters' })
   @Get('all')
   findAll(
+    @CurrentUser() user: JwtPayload,
     @Query() filters: TestFilterDto,
   ): Promise<BasePaginatedResult<TestDocument>> {
-    return this.testService.findAll(filters);
+    return this.testService.findAll(user.sub, filters);
   }
 
   @ApiOperation({ description: 'get aggregate stats across all tests' })
   @Get('stats')
-  getStats(@Query() filter: TestStatsFilterDto): Promise<TestStats> {
-    return this.testService.getStats(filter);
+  getStats(
+    @CurrentUser() user: JwtPayload,
+    @Query() filter: TestStatsFilterDto,
+  ): Promise<TestStats> {
+    return this.testService.getStats(user.sub, filter);
   }
 
   @ApiOperation({
@@ -54,17 +63,22 @@ export class TestController {
       'get a specific test from db (resume or check a finished test)',
   })
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<TestDocument> {
-    return this.testService.findOne(id);
+  findOne(
+    @CurrentUser() user: JwtPayload,
+    @Param('id') id: string,
+  ): Promise<TestDocument> {
+    return this.testService.findOne(user.sub, id);
   }
 
   @Patch(':test_id/answer/:question_id')
   updateAnswer(
+    @CurrentUser() user: JwtPayload,
     @Param('test_id') test_id: string,
     @Param('question_id') question_id: string,
     @Query('is_correct') is_correct?: string,
   ) {
     return this.testService.updateAnswer(
+      user.sub,
       test_id,
       question_id,
       is_correct === undefined ? undefined : is_correct === 'true',
@@ -76,18 +90,20 @@ export class TestController {
       'get the total number of questions of a test, without loading the questions array',
   })
   @Get(':id/questions/count')
-  getQuestionsCount(@Param('id') id: string) {
-    return this.testService.getQuestionsCount(id);
+  getQuestionsCount(@CurrentUser() user: JwtPayload, @Param('id') id: string) {
+    return this.testService.getQuestionsCount(user.sub, id);
   }
 
   @ApiOperation({ description: 'get one page of questions of a test' })
   @Get(':id/questions')
   getQuestionsPage(
+    @CurrentUser() user: JwtPayload,
     @Param('id') id: string,
     @Query('skip') skip: string,
     @Query('limit') limit: string,
   ) {
     return this.testService.getQuestionsPage(
+      user.sub,
       id,
       Number(skip) || 0,
       Number(limit) || 9,
@@ -99,25 +115,34 @@ export class TestController {
       'get the topics the questions of a test are on, with the flashcards of each',
   })
   @Get(':id/topics')
-  getTopics(@Param('id') id: string) {
-    return this.testService.getTopics(id);
+  getTopics(@CurrentUser() user: JwtPayload, @Param('id') id: string) {
+    return this.testService.getTopics(user.sub, id);
   }
 
   @Patch(':id/time')
-  updateelapsed_time(@Param('id') id: string, @Query('time') time: number) {
-    return this.testService.updateelapsed_time(id, time);
+  updateelapsed_time(
+    @CurrentUser() user: JwtPayload,
+    @Param('id') id: string,
+    @Query('time') time: number,
+  ) {
+    return this.testService.updateelapsed_time(user.sub, id, time);
   }
 
   @Patch(':id/complete')
-  complete(@Param('id') id: string, @Query('time') time: number) {
-    return this.testService.completeTest(id, Number(time));
+  complete(
+    @CurrentUser() user: JwtPayload,
+    @Param('id') id: string,
+    @Query('time') time: number,
+  ) {
+    return this.testService.completeTest(user.sub, id, Number(time));
   }
 
   @ApiOperation({ description: 'Delete one Flashcard from db' })
   @Delete(':id')
   delete(
+    @CurrentUser() user: JwtPayload,
     @Param('id') id: string,
   ): Promise<void | BadRequestException | NotFoundException> {
-    return this.testService.delete(id);
+    return this.testService.delete(user.sub, id);
   }
 }

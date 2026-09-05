@@ -11,9 +11,9 @@ import { FilterQuery, Model, Types } from 'mongoose';
 import { BasePaginatedResult, ListFilterRequest } from 'src/common.dto';
 import {
   assertValidObjectId,
-  findByIdOrThrow,
+  findOwnedOrThrow,
   findPaginated,
-  updateByIdOrThrow,
+  updateOwnedOrThrow,
 } from 'src/common/mongo.util';
 import { extractImageFileIds, replaceImageFileIds } from 'src/common/html.util';
 import { FileService } from 'src/file/file.service';
@@ -30,24 +30,31 @@ export class FlashcardsService {
     private readonly fileService: FileService,
   ) {}
 
-  async create(createFlashcardDto: ModifyFlashcardDto): Promise<void> {
-    const owned = await this.claimImages(createFlashcardDto);
-    await new this.flashcardModel(owned).save();
+  async create(
+    userId: string,
+    createFlashcardDto: ModifyFlashcardDto,
+  ): Promise<void> {
+    const owned = await this.claimImages(userId, createFlashcardDto);
+    await new this.flashcardModel({ ...owned, user_id: userId }).save();
   }
 
-  findOne(id: string): Promise<FlashcardDocument> {
-    return findByIdOrThrow<FlashcardDocument>(
+  findOne(userId: string, id: string): Promise<FlashcardDocument> {
+    return findOwnedOrThrow<FlashcardDocument>(
       this.flashcardModel,
       id,
+      userId,
       ENTITY,
       POPULATE,
     );
   }
 
   findAll(
+    userId: string,
     filter: ListFilterRequest,
   ): Promise<BasePaginatedResult<FlashcardDocument>> {
-    const query: FilterQuery<Flashcard> = {};
+    // The owner is not one of the optional filters: it is the first thing every
+    // query is narrowed by, so nobody can list what is not theirs.
+    const query: FilterQuery<Flashcard> = { user_id: userId };
     if (filter.subject_id) query.subject_id = filter.subject_id;
     if (filter.topic_id) query.topic_id = filter.topic_id;
     if (filter.title) query.title = { $regex: filter.title, $options: 'i' };
@@ -65,10 +72,13 @@ export class FlashcardsService {
    * keeps every topic it touches, and taking them from the cards that were
    * drawn saves reading those same cards again to find out.
    */
-  getRandom(filter: RandomFlashcardsDTO): Promise<RandomFlashcard[]> {
+  getRandom(
+    userId: string,
+    filter: RandomFlashcardsDTO,
+  ): Promise<RandomFlashcard[]> {
     return this.flashcardModel
       .aggregate<RandomFlashcard>([
-        { $match: this.buildObjectIdQuery(filter) },
+        { $match: this.buildObjectIdQuery(userId, filter) },
         { $sample: { size: filter.numFlashcard || defaultRandomSampleSize } },
         {
           $project: {
@@ -89,13 +99,19 @@ export class FlashcardsService {
    * which is where the test reads them from.
    */
   async getSubject(
+    userId: string,
     ids: (string | Types.ObjectId)[],
   ): Promise<Types.ObjectId | undefined> {
     if (!ids.length) return undefined;
 
     const [result] = await this.flashcardModel
       .aggregate<{ subject_id?: Types.ObjectId }>([
-        { $match: { _id: { $in: ids.map((id) => new Types.ObjectId(id)) } } },
+        {
+          $match: {
+            _id: { $in: ids.map((id) => new Types.ObjectId(id)) },
+            user_id: new Types.ObjectId(userId),
+          },
+        },
         { $group: { _id: null, subject_id: { $first: '$subject_id' } } },
       ])
       .exec();
@@ -103,18 +119,20 @@ export class FlashcardsService {
     return result?.subject_id ?? undefined;
   }
 
-  count(filter: CountFlashcardsDTO): Promise<number> {
+  count(userId: string, filter: CountFlashcardsDTO): Promise<number> {
     return this.flashcardModel
-      .countDocuments(this.buildObjectIdQuery(filter))
+      .countDocuments(this.buildObjectIdQuery(userId, filter))
       .exec();
   }
 
   // Not routed through deleteByIdOrThrow: the images live inside the HTML, so
   // the document has to be read before it goes to know what to delete with it.
-  async delete(id: string): Promise<void> {
+  async delete(userId: string, id: string): Promise<void> {
     assertValidObjectId(id);
 
-    const existing = await this.flashcardModel.findByIdAndDelete(id).exec();
+    const existing = await this.flashcardModel
+      .findOneAndDelete({ _id: id, user_id: userId })
+      .exec();
     if (!existing) {
       throw new NotFoundException(`${ENTITY} with id ${id} not found`);
     }
@@ -124,16 +142,23 @@ export class FlashcardsService {
     await this.deleteImagesOf(existing.question, existing.answer);
   }
 
-  async update(id: string, updateObj: ModifyFlashcardDto): Promise<void> {
+  async update(
+    userId: string,
+    id: string,
+    updateObj: ModifyFlashcardDto,
+  ): Promise<void> {
     assertValidObjectId(id);
 
-    const existing = await this.flashcardModel.findById(id).lean().exec();
+    const existing = await this.flashcardModel
+      .findOne({ _id: id, user_id: userId })
+      .lean()
+      .exec();
     if (!existing) {
       throw new NotFoundException(`${ENTITY} with id ${id} not found`);
     }
 
-    const owned = await this.claimImages(updateObj, id);
-    await updateByIdOrThrow(this.flashcardModel, id, owned, ENTITY);
+    const owned = await this.claimImages(userId, updateObj, id);
+    await updateOwnedOrThrow(this.flashcardModel, id, userId, owned, ENTITY);
 
     // Images the edit took out of the content have nothing left pointing at
     // them, so they go with it. Done after the update succeeded.
@@ -165,6 +190,7 @@ export class FlashcardsService {
    * file would turn one deletion into a broken image somewhere else.
    */
   private async claimImages(
+    userId: string,
     dto: ModifyFlashcardDto,
     selfId?: string,
   ): Promise<ModifyFlashcardDto> {
@@ -172,7 +198,10 @@ export class FlashcardsService {
     if (!ids.length) return dto;
 
     const pattern = ids.join('|');
+    // Only the cards of the same user can hold the same picture: content is
+    // copied between flashcards one can see, and nobody sees another's.
     const query: FilterQuery<Flashcard> = {
+      user_id: userId,
       $or: [{ question: { $regex: pattern } }, { answer: { $regex: pattern } }],
     };
     if (selfId) query._id = { $ne: new Types.ObjectId(selfId) };
@@ -206,9 +235,12 @@ export class FlashcardsService {
   // The aggregation pipeline does not cast strings to ObjectId the way find()
   // does, so subject_id/topic_id have to be converted explicitly here.
   private buildObjectIdQuery(
+    userId: string,
     filter: CountFlashcardsDTO,
   ): FilterQuery<Flashcard> {
-    const query: FilterQuery<Flashcard> = {};
+    const query: FilterQuery<Flashcard> = {
+      user_id: new Types.ObjectId(userId),
+    };
     if (filter.subject_id) {
       query.subject_id = new Types.ObjectId(filter.subject_id);
     }
@@ -221,4 +253,5 @@ export class FlashcardsService {
     }
     return query;
   }
+
 }

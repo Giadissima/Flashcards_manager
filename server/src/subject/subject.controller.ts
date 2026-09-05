@@ -12,6 +12,8 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
+import { CurrentUser } from 'src/auth/current-user.decorator';
+import { JwtPayload } from 'src/auth/auth.dto';
 import { SubjectService } from './subject.service';
 import { ModifySubjectDto } from './subject.dto';
 import { ApiBody, ApiConsumes, ApiOperation } from '@nestjs/swagger';
@@ -49,24 +51,26 @@ export class SubjectController {
     },
   })
   create(
+    @CurrentUser() user: JwtPayload,
     @Body() createSubjectDto: ModifySubjectDto,
     @UploadedFile() icon?: Express.Multer.File,
   ): Promise<void> {
-    return this.subjectService.create(createSubjectDto, icon);
+    return this.subjectService.create(user.sub, createSubjectDto, icon);
   }
 
   @ApiOperation({ description: 'get all subject from db with filters' })
   @Get('all')
   findAll(
+    @CurrentUser() user: JwtPayload,
     @Query() filters: ListFilterRequest,
   ): Promise<BasePaginatedResult<SubjectDocument>> {
-    return this.subjectService.findAll(filters);
+    return this.subjectService.findAll(user.sub, filters);
   }
 
   @ApiOperation({ description: 'get a specific subject from db' })
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.subjectService.findOne(id);
+  findOne(@CurrentUser() user: JwtPayload, @Param('id') id: string) {
+    return this.subjectService.findOne(user.sub, id);
   }
 
   @Patch(':id')
@@ -86,18 +90,21 @@ export class SubjectController {
     },
   })
   update(
+    @CurrentUser() user: JwtPayload,
     @Param('id') id: string,
     @Body() updateSubjectDto: ModifySubjectDto,
     @UploadedFile() icon?: Express.Multer.File,
   ) {
-    return this.subjectService.update(id, updateSubjectDto, icon);
+    return this.subjectService.update(user.sub, id, updateSubjectDto, icon);
   }
 
   @ApiOperation({ description: 'Delete one subject from db' })
   @Delete(':id')
   delete(
+    @CurrentUser() user: JwtPayload,
     @Param('id') id: string,
   ): Promise<void | BadRequestException | NotFoundException> {
-    return this.subjectService.delete(id);
+    return this.subjectService.delete(user.sub, id);
   }
+
 }

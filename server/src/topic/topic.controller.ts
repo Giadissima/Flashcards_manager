@@ -11,6 +11,8 @@ import {
   Query,
 } from '@nestjs/common';
 
+import { CurrentUser } from 'src/auth/current-user.decorator';
+import { JwtPayload } from 'src/auth/auth.dto';
 import { TopicService } from './topic.service';
 import { ModifyTopicDto } from './topic.dto';
 import { ApiOperation } from '@nestjs/swagger';
@@ -23,34 +25,44 @@ export class TopicController {
 
   @ApiOperation({ description: 'create a new Topic obj and push it on db' })
   @Post()
-  create(@Body() createTopicDto: ModifyTopicDto): Promise<void> {
-    return this.topicService.create(createTopicDto);
+  create(
+    @CurrentUser() user: JwtPayload,
+    @Body() createTopicDto: ModifyTopicDto,
+  ): Promise<void> {
+    return this.topicService.create(user.sub, createTopicDto);
   }
 
   @ApiOperation({ description: 'get all Topic from db with filters' })
   @Get()
   findAll(
+    @CurrentUser() user: JwtPayload,
     @Query() filters: ListFilterRequest,
   ): Promise<BasePaginatedResult<TopicDocument>> {
-    return this.topicService.findAll(filters);
+    return this.topicService.findAll(user.sub, filters);
   }
 
   @ApiOperation({ description: 'get a specific Topic from db' })
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.topicService.findOne(id);
+  findOne(@CurrentUser() user: JwtPayload, @Param('id') id: string) {
+    return this.topicService.findOne(user.sub, id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTopicDto: ModifyTopicDto) {
-    return this.topicService.update(id, updateTopicDto);
+  update(
+    @CurrentUser() user: JwtPayload,
+    @Param('id') id: string,
+    @Body() updateTopicDto: ModifyTopicDto,
+  ) {
+    return this.topicService.update(user.sub, id, updateTopicDto);
   }
 
   @ApiOperation({ description: 'Delete one Topic from db' })
   @Delete(':id')
   delete(
+    @CurrentUser() user: JwtPayload,
     @Param('id') id: string,
   ): Promise<void | BadRequestException | NotFoundException> {
-    return this.topicService.delete(id);
+    return this.topicService.delete(user.sub, id);
   }
+
 }

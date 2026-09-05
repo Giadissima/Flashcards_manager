@@ -5,10 +5,10 @@ import { Topic, TopicDocument } from './topic.schema';
 import { ModifyTopicDto } from './topic.dto';
 import { BasePaginatedResult, ListFilterRequest } from 'src/common.dto';
 import {
-  deleteByIdOrThrow,
-  findByIdOrThrow,
+  deleteOwnedOrThrow,
+  findOwnedOrThrow,
   findPaginated,
-  updateByIdOrThrow,
+  updateOwnedOrThrow,
 } from 'src/common/mongo.util';
 
 const ENTITY = 'Topic';
@@ -18,18 +18,27 @@ const POPULATE = 'subject_id';
 export class TopicService {
   constructor(@InjectModel(Topic.name) private topicModel: Model<Topic>) {}
 
-  async create(createTopicDto: ModifyTopicDto): Promise<void> {
-    await new this.topicModel({ ...createTopicDto }).save();
+  async create(userId: string, createTopicDto: ModifyTopicDto): Promise<void> {
+    await new this.topicModel({ ...createTopicDto, user_id: userId }).save();
   }
 
-  findOne(id: string): Promise<TopicDocument> {
-    return findByIdOrThrow<TopicDocument>(this.topicModel, id, ENTITY, POPULATE);
+  findOne(userId: string, id: string): Promise<TopicDocument> {
+    return findOwnedOrThrow<TopicDocument>(
+      this.topicModel,
+      id,
+      userId,
+      ENTITY,
+      POPULATE,
+    );
   }
 
   findAll(
+    userId: string,
     filter: ListFilterRequest,
   ): Promise<BasePaginatedResult<TopicDocument>> {
-    const query: FilterQuery<Topic> = {};
+    // The owner is not one of the optional filters: it is the first thing every
+    // query is narrowed by, so nobody can list what is not theirs.
+    const query: FilterQuery<Topic> = { user_id: userId };
     if (filter.subject_id) query.subject_id = filter.subject_id;
     if (filter.title) query.name = { $regex: filter.title, $options: 'i' };
 
@@ -41,11 +50,16 @@ export class TopicService {
     );
   }
 
-  delete(id: string): Promise<void> {
-    return deleteByIdOrThrow(this.topicModel, id, ENTITY);
+  delete(userId: string, id: string): Promise<void> {
+    return deleteOwnedOrThrow(this.topicModel, id, userId, ENTITY);
   }
 
-  update(id: string, updateObj: ModifyTopicDto): Promise<void> {
-    return updateByIdOrThrow(this.topicModel, id, updateObj, ENTITY);
+  update(
+    userId: string,
+    id: string,
+    updateObj: ModifyTopicDto,
+  ): Promise<void> {
+    return updateOwnedOrThrow(this.topicModel, id, userId, updateObj, ENTITY);
   }
+
 }

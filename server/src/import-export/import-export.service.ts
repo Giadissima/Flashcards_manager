@@ -39,6 +39,7 @@ export class ImportExportService {
   ) {}
 
   async importFlashcardsFromFile(
+    userId: string,
     file: Express.Multer.File,
   ): Promise<{ imported: number; skipped: number }> {
     const isZip = looksLikeZip(file.buffer);
@@ -80,7 +81,7 @@ export class ImportExportService {
       let subject_doc: SubjectDocument | undefined = undefined;
       if (subject_obj) {
         const existingSubject = await this.subjectModel
-          .findOne({ name: subject_obj.name })
+          .findOne({ name: subject_obj.name, user_id: userId })
           .exec();
 
         if (existingSubject) {
@@ -91,6 +92,7 @@ export class ImportExportService {
             name: subject_obj.name.trim(),
             desc: subject_obj.desc?.trim(),
             icon: icon_id,
+            user_id: userId,
           });
         }
       }
@@ -102,12 +104,17 @@ export class ImportExportService {
       if (topic_obj && subject_doc) {
         topic_doc = await this.topicModel
           .findOneAndUpdate(
-            { name: topic_obj.name, subject_id: subject_doc._id },
+            {
+              name: topic_obj.name,
+              subject_id: subject_doc._id,
+              user_id: userId,
+            },
             {
               $setOnInsert: {
                 name: topic_obj.name.trim(),
                 color: topic_obj.color.trim(),
                 subject_id: subject_doc._id,
+                user_id: userId,
               },
             },
             { upsert: true, new: true },
@@ -126,6 +133,7 @@ export class ImportExportService {
       // every restore) would break the match and create a duplicate with a
       // cloned image on every single import.
       const duplicateFilter: Record<string, unknown> = {
+        user_id: userId,
         title,
         question,
         answer,
@@ -157,6 +165,7 @@ export class ImportExportService {
         answer: finalAnswer,
         topic_id: topic_doc?._id,
         subject_id: subject_doc?._id,
+        user_id: userId,
       });
       imported++;
     }
@@ -212,8 +221,13 @@ export class ImportExportService {
     }
   }
 
-  async exportFlashcardsAsZip(subject_id: undefined | string): Promise<Buffer> {
-    const filter = subject_id ? { subject_id } : {};
+  async exportFlashcardsAsZip(
+    userId: string,
+    subject_id: undefined | string,
+  ): Promise<Buffer> {
+    // Only what the caller owns leaves the database, whatever subject is asked for
+    const filter: Record<string, unknown> = { user_id: userId };
+    if (subject_id) filter.subject_id = subject_id;
 
     const flashcards: any[] = await this.flashcardModel
       .find(filter)

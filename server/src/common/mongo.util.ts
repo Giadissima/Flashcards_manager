@@ -105,3 +105,61 @@ export async function updateByIdOrThrow(
     throw new NotFoundException(`${entityName} with id ${id} not found`);
   }
 }
+
+/**
+ * The owner-scoped versions of the three helpers above, used by everything a
+ * user owns: flashcards, subjects and topics.
+ *
+ * The owner is part of the filter rather than checked afterwards, so someone
+ * else's document is simply not found. Answering 404 instead of 403 is
+ * deliberate: a 403 would confirm that the id exists.
+ */
+export async function findOwnedOrThrow<T>(
+  model: Model<any>,
+  id: string,
+  userId: string,
+  entityName: string,
+  populate?: string | string[],
+): Promise<T> {
+  assertValidObjectId(id);
+
+  const query = model.findOne({ _id: id, user_id: userId });
+  if (populate) query.populate(populate as any);
+
+  const document = await query.exec();
+  if (!document) {
+    throw new NotFoundException(`${entityName} with id ${id} not found`);
+  }
+  return document as T;
+}
+
+export async function deleteOwnedOrThrow(
+  model: Model<any>,
+  id: string,
+  userId: string,
+  entityName: string,
+): Promise<void> {
+  assertValidObjectId(id);
+
+  const result = await model.deleteOne({ _id: id, user_id: userId });
+  if (result.deletedCount === 0) {
+    throw new NotFoundException(`${entityName} with id ${id} not found`);
+  }
+}
+
+export async function updateOwnedOrThrow(
+  model: Model<any>,
+  id: string,
+  userId: string,
+  update: UpdateQuery<any>,
+  entityName: string,
+): Promise<void> {
+  assertValidObjectId(id);
+
+  const result = await model
+    .findOneAndUpdate({ _id: id, user_id: userId }, update, { new: true })
+    .exec();
+  if (!result) {
+    throw new NotFoundException(`${entityName} with id ${id} not found`);
+  }
+}

@@ -1,7 +1,8 @@
-import { IsMongoId, IsOptional, IsString, Length } from 'class-validator';
+import { IsIn, IsMongoId, IsOptional, IsString, Length } from 'class-validator';
 import { charMinLength, idLength, nameMaxLength } from 'src/config';
 
 import { ApiProperty } from '@nestjs/swagger';
+import { Visibility, visibilities } from 'src/common/visibility';
 import { Trim, TrimToUndefined } from 'src/common/transform.decorators';
 
 /** The Dto file contains the description of the client requests and the server's responses*/
@@ -32,4 +33,14 @@ export class ModifyTopicDto {
   })
   @TrimToUndefined()
   subject_id: string;
+
+  @IsOptional()
+  @IsIn(visibilities)
+  @ApiProperty({
+    description: 'Who may see it; defaults to private when left out',
+    enum: visibilities,
+    required: false,
+  })
+  visibility?: Visibility;
+
 }
