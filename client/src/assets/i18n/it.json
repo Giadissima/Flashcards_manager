@@ -10,7 +10,8 @@
     "startTest": "Avvia Test",
     "results": "Risultati",
     "createCard": "Crea Flashcard",
-    "menu": "Menu"
+    "menu": "Menu",
+    "account": "Account"
   },
   "auth": {
     "username": "Nome utente",

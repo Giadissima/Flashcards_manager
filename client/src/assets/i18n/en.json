@@ -10,7 +10,8 @@
     "startTest": "Start Test",
     "results": "Results",
     "createCard": "Create Card",
-    "menu": "Menu"
+    "menu": "Menu",
+    "account": "Account"
   },
   "auth": {
     "username": "Username",

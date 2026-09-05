@@ -71,16 +71,22 @@ nav {
   background-color: var(--secondary-color);
 }
 
-/* Holds the avatar picture, so it has no padding of its own: the round image
-   is the whole button. */
-.avatar-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
+/* Avatar plus caret as one control. The padding of .menu-item is dropped: it
+   exists to make room for the underline under a text label, and there is no
+   label here. */
+.account-trigger {
   display: flex;
   align-items: center;
-  border-radius: 50%;
+  gap: 2px;
+  padding-bottom: 0;
+}
+
+/* The account menu hangs at the right end of the bar, where the shared
+   dropdown, centred under its trigger, would run past the window edge. */
+.account-dropdown .dropdown-content {
+  left: auto;
+  right: 0;
+  transform: none;
 }
 
 .navbar-avatar {
@@ -92,7 +98,7 @@ nav {
   border: 1px solid var(--border-color);
 }
 
-.avatar-btn:hover .navbar-avatar {
+.account-trigger:hover .navbar-avatar {
   border-color: var(--primary-color);
 }
 

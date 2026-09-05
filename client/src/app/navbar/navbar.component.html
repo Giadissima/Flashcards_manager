@@ -55,18 +55,22 @@
       [attr.aria-label]="'settings.title' | transloco">
       <span class="material-symbols-outlined">settings</span>
     </button>
-    <button routerLink="/profile" (click)="closeMobileMenu()" class="avatar-btn" type="button"
-      [title]="'auth.loggedInAs' | transloco:{ username: authService.user?.username }"
-      [attr.aria-label]="'profile.title' | transloco">
-      <img [src]="avatarUrl$ | async" alt="" class="navbar-avatar">
-    </button>
-    <!-- Ends the session: the title carries who is logged in, which the bar has
-         no room to spell out -->
-    <button (click)="logout()" class="theme-switch-btn" type="button"
-      [title]="'auth.loggedInAs' | transloco:{ username: authService.user?.username }"
-      [attr.aria-label]="'auth.logout' | transloco">
-      <span class="material-symbols-outlined">logout</span>
-    </button>
+    <!-- Profile and logout under one control: two account-level actions, neither
+         of which is used often enough to hold a place of its own in the bar.
+         The title carries who is logged in, which the bar has no room to spell
+         out. -->
+    <div class="dropdown account-dropdown" (appClickOutside)="closeDropdown('account')">
+      <span class="menu-item account-trigger" (click)="toggleDropdown('account')"
+        [title]="'auth.loggedInAs' | transloco:{ username: authService.user?.username }"
+        [attr.aria-label]="'navbar.account' | transloco" [attr.aria-expanded]="openDropdown === 'account'">
+        <img [src]="avatarUrl$ | async" alt="" class="navbar-avatar">
+        <span class="material-symbols-outlined">arrow_drop_down</span>
+      </span>
+      <div class="dropdown-content" [class.show]="openDropdown === 'account'">
+        <a routerLink="/profile" (click)="onNavigate('account')">{{ 'profile.title' | transloco }}</a>
+        <a (click)="logout()">{{ 'auth.logout' | transloco }}</a>
+      </div>
+    </div>
     <!-- Hamburger button: shown below the breakpoint, opens the menu as a drawer from the right -->
     <button type="button" class="hamburger-btn" [class.open]="isMobileMenuOpen" (click)="toggleMobileMenu()"
       [attr.aria-label]="'navbar.menu' | transloco" [attr.aria-expanded]="isMobileMenuOpen">

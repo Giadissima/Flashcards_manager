@@ -10,7 +10,7 @@ import { SettingsModalComponent } from '../settings-modal/settings-modal.compone
 import { ToastService } from '../shared/toast/toast.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 
-type NavbarDropdown = 'topics' | 'subjects' | 'test';
+type NavbarDropdown = 'topics' | 'subjects' | 'test' | 'account';
 
 @Component({
   selector: 'app-navbar',
