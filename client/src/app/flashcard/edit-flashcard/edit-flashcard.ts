@@ -1,9 +1,12 @@
 import { ActivatedRoute, Router } from '@angular/router';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder,
+  FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { answerMaxLength, charMinLength, questionMaxLength, titleMaxLength } from '../../../config/config';
 
 import { CommonModule } from '@angular/common';
+import { VisibilityToggleComponent } from '../../shared/visibility-toggle/visibility-toggle.component';
+import { Visibility, defaultVisibility } from '../../models/visibility.dto';
 import { Editor } from '@tiptap/core';
 import { createRichTextEditor } from '../../shared/rich-text-editor/editor.factory';
 import { Flashcard } from '../../models/flashcard.dto';
@@ -23,7 +26,7 @@ import { SearchableSelectComponent, SelectOption } from '../../shared/searchable
 @Component({
   selector: 'app-edit-flashcard',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RichTextEditorComponent, TranslocoModule, SearchableSelectComponent, LoadStateComponent, PageCardComponent],
+  imports: [CommonModule, ReactiveFormsModule, RichTextEditorComponent, TranslocoModule, SearchableSelectComponent, LoadStateComponent, PageCardComponent, VisibilityToggleComponent],
   templateUrl: './edit-flashcard.html',
 })
 export class EditFlashcard implements OnInit, OnDestroy {
@@ -45,6 +48,10 @@ export class EditFlashcard implements OnInit, OnDestroy {
 
   questionEditor: Editor;
   answerEditor: Editor;
+
+  get visibilityControl(): FormControl<Visibility> {
+    return this.editForm.get('visibility') as FormControl<Visibility>;
+  }
 
   constructor(
     private fb: FormBuilder,
@@ -70,6 +77,7 @@ export class EditFlashcard implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.editForm = this.fb.group({
+      visibility: [defaultVisibility as Visibility],
       title: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(titleMaxLength)]],
       question: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(questionMaxLength)]],
       answer: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(answerMaxLength)]],
@@ -141,12 +149,13 @@ export class EditFlashcard implements OnInit, OnDestroy {
       return;
     }
 
-    const { title, topic_id, subject_id } = this.editForm.value;
+    const { title, topic_id, subject_id, visibility } = this.editForm.value;
 
     const card: Omit<Flashcard, '_id'> = {
       topic_id,
       subject_id,
       title,
+      visibility,
       question: this.questionEditor.getHTML(),
       answer: this.answerEditor.getHTML(),
     };

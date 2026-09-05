@@ -1,4 +1,5 @@
 import { CardFilter, PaginatedResponse, RandomCardFIlter } from '../models/http.dto';
+import { Visibility } from '../models/visibility.dto';
 
 import { Flashcard, RandomFlashcard } from '../models/flashcard.dto';
 import { Injectable } from '@angular/core';
@@ -57,4 +58,13 @@ export class FlashcardService {
   delete(id: string): Promise<void>{
     return this.restClient.delete<void>(this.baseUrl + '/' + id)
   }
+
+  /**
+   * Only the visibility, for the quick toggle in the lists: the full update
+   * endpoint wants every field of the entity, which a list does not hold.
+   */
+  setVisibility(id: string, visibility: Visibility): Promise<void> {
+    return this.restClient.patch(`${this.baseUrl}/${id}/visibility`, { visibility });
+  }
+
 }

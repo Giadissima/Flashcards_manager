@@ -6,6 +6,8 @@ import { PaginationComponent } from '../shared/pagination/pagination.component';
 import { FilterBarComponent } from '../shared/filter-bar/filter-bar.component';
 
 import { CommonModule } from '@angular/common';
+import { VisibilityButtonComponent } from '../shared/visibility-toggle/visibility-button.component';
+import { Visibility } from '../models/visibility.dto';
 import { Flashcard } from '../models/flashcard.dto';
 import { FlashcardService } from '../flashcard/flashcard.service';
 import { KatexRendererPipe } from '../pipes/katex-renderer.pipe';
@@ -27,7 +29,7 @@ import { ContentOverflowDirective } from '../shared/content-overflow.directive';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, KatexRendererPipe, SearchableSelectComponent, SearchInputComponent, TranslocoModule, ImageLightboxComponent, ZoomableImagesDirective, ContentOverflowDirective, LoadStateComponent, PaginationComponent, FilterBarComponent],
+  imports: [CommonModule, KatexRendererPipe, SearchableSelectComponent, SearchInputComponent, TranslocoModule, ImageLightboxComponent, ZoomableImagesDirective, ContentOverflowDirective, LoadStateComponent, PaginationComponent, FilterBarComponent, VisibilityButtonComponent],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
@@ -417,4 +419,32 @@ export class Home extends PaginatedList implements OnInit, OnDestroy {
     this.selectedTopicId = id;
     this.onFilterChange();
   }
+
+  /** The row whose visibility is being changed, so it cannot be clicked twice. */
+  visibilityBusyId: string | undefined;
+
+  /**
+   * Applied to the row as soon as the server confirms, without reloading the
+   * page: nothing else about the list has changed.
+   */
+  async onVisibilityToggled(item: Flashcard, visibility: Visibility): Promise<void> {
+    if (!item._id || this.visibilityBusyId) return;
+
+    this.visibilityBusyId = item._id;
+    try {
+      await this.flashcardsService.setVisibility(item._id, visibility);
+      item.visibility = visibility;
+      this.toast.show(
+        this.transloco.translate(
+          visibility === 'public' ? 'visibility.toastPublic' : 'visibility.toastPrivate',
+        ),
+        'success',
+      );
+    } catch {
+      this.toast.show(this.transloco.translate('visibility.toastError'), 'error');
+    } finally {
+      this.visibilityBusyId = undefined;
+    }
+  }
+
 }

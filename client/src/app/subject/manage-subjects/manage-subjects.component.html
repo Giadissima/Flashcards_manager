@@ -40,6 +40,8 @@
             }
           </td>
           <td class="cell-actions">
+            <app-visibility-button [visibility]="subject.visibility ?? 'private'"
+              [busy]="visibilityBusyId === subject._id" (toggled)="onVisibilityToggled(subject, $event)"></app-visibility-button>
             <button class="btn btn-icon-ghost" (click)="editSubject(subject._id)" [attr.aria-label]="t('common.edit')">
               <span class="material-symbols-outlined">
               edit

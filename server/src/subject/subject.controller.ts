@@ -17,7 +17,11 @@ import { JwtPayload } from 'src/auth/auth.dto';
 import { SubjectService } from './subject.service';
 import { ModifySubjectDto } from './subject.dto';
 import { ApiBody, ApiConsumes, ApiOperation } from '@nestjs/swagger';
-import { BasePaginatedResult, ListFilterRequest } from 'src/common.dto';
+import {
+  BasePaginatedResult,
+  ListFilterRequest,
+  SetVisibilityDto,
+} from 'src/common.dto';
 import { SubjectDocument } from './subject.schema';
 import { FileInterceptor } from '@nestjs/platform-express';
 
@@ -105,6 +109,18 @@ export class SubjectController {
     @Param('id') id: string,
   ): Promise<void | BadRequestException | NotFoundException> {
     return this.subjectService.delete(user.sub, id);
+  }
+
+  @ApiOperation({
+    description: 'set only the visibility, for the quick toggle in the lists',
+  })
+  @Patch(':id/visibility')
+  setVisibility(
+    @CurrentUser() user: JwtPayload,
+    @Param('id') id: string,
+    @Body() dto: SetVisibilityDto,
+  ): Promise<void> {
+    return this.subjectService.setVisibility(user.sub, id, dto.visibility);
   }
 
 }

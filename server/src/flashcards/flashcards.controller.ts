@@ -15,7 +15,11 @@ import { CurrentUser } from 'src/auth/current-user.decorator';
 import { FlashcardsService } from './flashcards.service';
 import { JwtPayload } from 'src/auth/auth.dto';
 import { ApiOperation } from '@nestjs/swagger';
-import { BasePaginatedResult, ListFilterRequest } from 'src/common.dto';
+import {
+  BasePaginatedResult,
+  ListFilterRequest,
+  SetVisibilityDto,
+} from 'src/common.dto';
 import {
   CountFlashcardsDTO,
   ModifyFlashcardDto,
@@ -90,6 +94,18 @@ export class FlashcardsController {
     @Param('id') id: string,
   ): Promise<void | BadRequestException | NotFoundException> {
     return this.flashcardsService.delete(user.sub, id);
+  }
+
+  @ApiOperation({
+    description: 'set only the visibility, for the quick toggle in the lists',
+  })
+  @Patch(':id/visibility')
+  setVisibility(
+    @CurrentUser() user: JwtPayload,
+    @Param('id') id: string,
+    @Body() dto: SetVisibilityDto,
+  ): Promise<void> {
+    return this.flashcardsService.setVisibility(user.sub, id, dto.visibility);
   }
 
 }

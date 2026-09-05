@@ -415,5 +415,17 @@
       "saved": "Profilo aggiornato",
       "saveError": "Non è stato possibile salvare il profilo"
     }
+  },
+  "visibility": {
+    "label": "Visibilità",
+    "public": "Pubblica",
+    "private": "Privata",
+    "publicHint": "Comparirà agli altri nella sezione Community, raggruppata per il tuo corso di laurea.",
+    "privateHint": "La vedi solo tu.",
+    "makePublic": "Rendi pubblica",
+    "makePrivate": "Rendi privata",
+    "toastPublic": "Ora è pubblica",
+    "toastPrivate": "Ora è privata",
+    "toastError": "Non è stato possibile cambiare la visibilità"
   }
 }

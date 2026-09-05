@@ -1,7 +1,10 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder,
+  FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { VisibilityToggleComponent } from '../../shared/visibility-toggle/visibility-toggle.component';
+import { Visibility, defaultVisibility } from '../../models/visibility.dto';
 import { NgxColorsComponent, NgxColorsTriggerDirective } from 'ngx-colors';
 import { PageCardComponent } from '../../shared/page-card/page-card.component';
 import { TopicService } from './../topic.service';
@@ -19,7 +22,7 @@ import { toSubjectOptions } from '../../shared/select-options.util';
 @Component({
   selector: 'app-edit-topic',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, TranslocoModule, SearchableSelectComponent, NgxColorsComponent, NgxColorsTriggerDirective, LoadStateComponent, PageCardComponent],
+  imports: [ReactiveFormsModule, CommonModule, TranslocoModule, SearchableSelectComponent, NgxColorsComponent, NgxColorsTriggerDirective, LoadStateComponent, PageCardComponent, VisibilityToggleComponent],
   templateUrl: './edit-topic.component.html',
 })
 export class EditTopicComponent implements OnInit {
@@ -31,6 +34,10 @@ export class EditTopicComponent implements OnInit {
 
   get subjectOptions(): SelectOption[] {
     return toSubjectOptions(this.subjects);
+  }
+
+  get visibilityControl(): FormControl<Visibility> {
+    return this.editForm.get('visibility') as FormControl<Visibility>;
   }
 
   constructor(
@@ -46,6 +53,7 @@ export class EditTopicComponent implements OnInit {
 
   ngOnInit(): void {
     this.editForm = this.fb.group({
+      visibility: [defaultVisibility as Visibility],
       name: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(nameMaxLength)]],
       color: ['#000000'],
       subject_id: ['', Validators.required]

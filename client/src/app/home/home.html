@@ -99,6 +99,8 @@
           <button type="button" class="btn btn-icon-ghost btn-danger-hover" (click)="deleteCard(card)">
             <span class="material-symbols-outlined">delete</span>
           </button>
+          <app-visibility-button [visibility]="card.visibility ?? 'private'"
+            [busy]="visibilityBusyId === card._id" (toggled)="onVisibilityToggled(card, $event)"></app-visibility-button>
           <button type="button" class="btn btn-icon-ghost" (click)="modifyCard(card)">
             <span class="material-symbols-outlined">edit</span>
           </button>

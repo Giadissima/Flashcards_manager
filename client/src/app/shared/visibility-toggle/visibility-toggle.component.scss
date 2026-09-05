@@ -1,0 +1,12 @@
+.visibility-state {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--spacing-unit) * 0.5);
+  font-weight: 600;
+  color: var(--header-color);
+
+  .material-symbols-outlined {
+    font-size: 20px;
+    color: var(--accent-color);
+  }
+}

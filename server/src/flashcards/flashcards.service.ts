@@ -5,6 +5,7 @@ import {
   RandomFlashcardsDTO,
 } from './flashcards.dto';
 import { InjectModel } from '@nestjs/mongoose';
+import { Visibility } from 'src/common/visibility';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Flashcard, FlashcardDocument } from './flashcards.schema';
 import { FilterQuery, Model, Types } from 'mongoose';
@@ -252,6 +253,21 @@ export class FlashcardsService {
       };
     }
     return query;
+  }
+
+  /** Only the visibility, for the quick toggle in the lists. */
+  setVisibility(
+    userId: string,
+    id: string,
+    visibility: Visibility,
+  ): Promise<void> {
+    return updateOwnedOrThrow(
+      this.flashcardModel,
+      id,
+      userId,
+      { visibility },
+      ENTITY,
+    );
   }
 
 }

@@ -29,6 +29,8 @@
           (valueChange)="topicForm.get('subject_id')?.setValue($event)"></app-searchable-select>
       </div>
 
+      <app-visibility-toggle [control]="visibilityControl"></app-visibility-toggle>
+
       <div class="form-actions">
         <button type="submit" class="btn btn-primary" [disabled]="topicForm.invalid"><span
             class="material-symbols-outlined">add</span>{{ 'topic.create.createButton' | transloco }}</button>

@@ -16,7 +16,11 @@ import { JwtPayload } from 'src/auth/auth.dto';
 import { TopicService } from './topic.service';
 import { ModifyTopicDto } from './topic.dto';
 import { ApiOperation } from '@nestjs/swagger';
-import { BasePaginatedResult, ListFilterRequest } from '../common.dto';
+import {
+  BasePaginatedResult,
+  ListFilterRequest,
+  SetVisibilityDto,
+} from '../common.dto';
 import { TopicDocument } from './topic.schema';
 
 @Controller('topic')
@@ -63,6 +67,18 @@ export class TopicController {
     @Param('id') id: string,
   ): Promise<void | BadRequestException | NotFoundException> {
     return this.topicService.delete(user.sub, id);
+  }
+
+  @ApiOperation({
+    description: 'set only the visibility, for the quick toggle in the lists',
+  })
+  @Patch(':id/visibility')
+  setVisibility(
+    @CurrentUser() user: JwtPayload,
+    @Param('id') id: string,
+    @Body() dto: SetVisibilityDto,
+  ): Promise<void> {
+    return this.topicService.setVisibility(user.sub, id, dto.visibility);
   }
 
 }

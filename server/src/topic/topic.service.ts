@@ -1,3 +1,4 @@
+import { Visibility } from 'src/common/visibility';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
@@ -60,6 +61,21 @@ export class TopicService {
     updateObj: ModifyTopicDto,
   ): Promise<void> {
     return updateOwnedOrThrow(this.topicModel, id, userId, updateObj, ENTITY);
+  }
+
+  /** Only the visibility, for the quick toggle in the lists. */
+  setVisibility(
+    userId: string,
+    id: string,
+    visibility: Visibility,
+  ): Promise<void> {
+    return updateOwnedOrThrow(
+      this.topicModel,
+      id,
+      userId,
+      { visibility },
+      ENTITY,
+    );
   }
 
 }

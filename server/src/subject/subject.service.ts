@@ -1,3 +1,4 @@
+import { Visibility } from 'src/common/visibility';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
@@ -113,6 +114,21 @@ export class SubjectService {
     if (newIconId && previousIconId) {
       await this.fileService.delete(previousIconId.toString());
     }
+  }
+
+  /** Only the visibility, for the quick toggle in the lists. */
+  setVisibility(
+    userId: string,
+    id: string,
+    visibility: Visibility,
+  ): Promise<void> {
+    return updateOwnedOrThrow(
+      this.subjectModel,
+      id,
+      userId,
+      { visibility },
+      ENTITY,
+    );
   }
 
 }

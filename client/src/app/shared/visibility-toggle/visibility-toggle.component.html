@@ -1,0 +1,16 @@
+<div class="form-group">
+  <label class="form-label" [attr.for]="inputId">{{ 'visibility.label' | transloco }}</label>
+  <div class="d-flex align-items-center gap-2">
+    <div class="form-check form-switch mb-0">
+      <input class="form-check-input" type="checkbox" role="switch" [id]="inputId" [checked]="isPublic"
+        (change)="toggle()">
+    </div>
+    <span class="visibility-state">
+      <span class="material-symbols-outlined">{{ isPublic ? 'public' : 'lock' }}</span>
+      {{ (isPublic ? 'visibility.public' : 'visibility.private') | transloco }}
+    </span>
+  </div>
+  <!-- Says what the switch actually does, since "public" on its own does not
+       tell where the thing would show up. -->
+  <div class="form-text">{{ (isPublic ? 'visibility.publicHint' : 'visibility.privateHint') | transloco }}</div>
+</div>

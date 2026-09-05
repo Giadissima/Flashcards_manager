@@ -3,6 +3,8 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { CommonModule } from '@angular/common';
+import { VisibilityToggleComponent } from '../../shared/visibility-toggle/visibility-toggle.component';
+import { Visibility, defaultVisibility } from '../../models/visibility.dto';
 import { Editor } from '@tiptap/core';
 import { createRichTextEditor } from '../../shared/rich-text-editor/editor.factory';
 import { LoadStateComponent } from '../../shared/load-state/load-state.component';
@@ -29,6 +31,7 @@ import { SubjectIconSvgComponent } from '../subject-icon-svg/subject-icon-svg.co
     SubjectIconSvgComponent,
     LoadStateComponent,
     PageCardComponent,
+    VisibilityToggleComponent,
   ],
   templateUrl: './edit-subject.component.html',
 })
@@ -58,6 +61,10 @@ export class EditSubjectComponent implements OnInit, OnDestroy {
   readonly nameMaxLength = nameMaxLength;
   readonly descMaxLength = descMaxLength;
 
+  get visibilityControl(): FormControl<Visibility> {
+    return this.editForm.get('visibility') as FormControl<Visibility>;
+  }
+
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
@@ -77,6 +84,7 @@ export class EditSubjectComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.editForm = this.fb.group({
+      visibility: [defaultVisibility as Visibility],
       name: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(nameMaxLength)]],
       color: [defaultSubjectIconColor, Validators.required],
     });
@@ -151,6 +159,7 @@ export class EditSubjectComponent implements OnInit, OnDestroy {
     formData.append('desc', this.descEditor.getHTML());
     const color = this.editForm.get('color')?.value;
     formData.append('color', color);
+    formData.append('visibility', this.visibilityControl.value);
 
     let fileToUpload = this.selectedFile;
     if (!fileToUpload && this.resetToDefault && this.subject?.icon) {

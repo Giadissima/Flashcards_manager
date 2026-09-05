@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder,
+  FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
   SearchableSelectComponent,
   SelectOption,
@@ -8,6 +9,8 @@ import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { answerMaxLength, charMinLength, questionMaxLength, titleMaxLength } from '../../../config/config';
 
 import { CommonModule } from '@angular/common';
+import { VisibilityToggleComponent } from '../../shared/visibility-toggle/visibility-toggle.component';
+import { Visibility, defaultVisibility } from '../../models/visibility.dto';
 import { Editor } from '@tiptap/core';
 import { createRichTextEditor } from '../../shared/rich-text-editor/editor.factory';
 import { FlashcardService } from '../flashcard.service';
@@ -30,6 +33,7 @@ import { toSubjectOptions, toTopicOptions } from '../../shared/select-options.ut
     TranslocoModule,
     SearchableSelectComponent,
     PageCardComponent,
+    VisibilityToggleComponent,
   ],
   templateUrl: './create-flashcard.html',
 })
@@ -42,6 +46,10 @@ export class CreateFlashcard implements OnInit, OnDestroy {
 
   questionEditor: Editor;
   answerEditor: Editor;
+
+  get visibilityControl(): FormControl<Visibility> {
+    return this.cardForm.get('visibility') as FormControl<Visibility>;
+  }
 
   constructor(
     private fb: FormBuilder,
@@ -65,6 +73,7 @@ export class CreateFlashcard implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.cardForm = this.fb.group({
+      visibility: [defaultVisibility as Visibility],
       title: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(titleMaxLength)]],
       question: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(questionMaxLength)]],
       answer: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(answerMaxLength)]],

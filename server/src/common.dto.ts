@@ -10,6 +10,7 @@ import {
 } from 'class-validator';
 
 import { ApiProperty } from '@nestjs/swagger';
+import { Visibility, visibilities } from './common/visibility';
 import { Type } from 'class-transformer';
 
 export class BasicFilterRequest{
@@ -88,4 +89,16 @@ export class ListFilterRequest extends BasicFilterRequest {
 export interface BasePaginatedResult<T> {
   count: number;
   data: T[];
+}
+
+/**
+ * The whole body of the quick toggle in the lists. The full Modify*Dto cannot
+ * serve here: it requires every field of the entity, which a list does not
+ * hold - and for a flashcard would mean sending the question and answer HTML
+ * back and forth just to flip a flag.
+ */
+export class SetVisibilityDto {
+  @IsIn(visibilities)
+  @ApiProperty({ enum: visibilities, example: 'public' })
+  visibility: Visibility;
 }

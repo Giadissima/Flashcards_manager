@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { PaginationComponent } from '../../shared/pagination/pagination.component';
 
 import { CommonModule } from '@angular/common';
+import { VisibilityButtonComponent } from '../../shared/visibility-toggle/visibility-button.component';
+import { Visibility } from '../../models/visibility.dto';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
 import { ImageLightboxComponent } from '../../shared/image-lightbox/image-lightbox.component';
 import { PageCardComponent } from '../../shared/page-card/page-card.component';
@@ -19,7 +21,7 @@ import { hasHtmlContent } from '../../shared/html.util';
 @Component({
   selector: 'app-manage-subjects',
   standalone: true,
-  imports: [CommonModule, SearchInputComponent, TranslocoModule, ImageLightboxComponent, ZoomableImagesDirective, ConfirmDialogComponent, PageCardComponent, PaginationComponent],
+  imports: [CommonModule, SearchInputComponent, TranslocoModule, ImageLightboxComponent, ZoomableImagesDirective, ConfirmDialogComponent, PageCardComponent, PaginationComponent, VisibilityButtonComponent],
   templateUrl: './manage-subjects.component.html',
   styleUrls: ['./manage-subjects.component.scss']
 })
@@ -138,4 +140,32 @@ export class ManageSubjectsComponent extends PaginatedList implements OnInit {
       this.toastService.show(this.transloco.translate('subject.toast.deleteError'), 'error');
     }
   }
+
+  /** The row whose visibility is being changed, so it cannot be clicked twice. */
+  visibilityBusyId: string | undefined;
+
+  /**
+   * Applied to the row as soon as the server confirms, without reloading the
+   * page: nothing else about the list has changed.
+   */
+  async onVisibilityToggled(item: Subject, visibility: Visibility): Promise<void> {
+    if (!item._id || this.visibilityBusyId) return;
+
+    this.visibilityBusyId = item._id;
+    try {
+      await this.subjectService.setVisibility(item._id, visibility);
+      item.visibility = visibility;
+      this.toastService.show(
+        this.transloco.translate(
+          visibility === 'public' ? 'visibility.toastPublic' : 'visibility.toastPrivate',
+        ),
+        'success',
+      );
+    } catch {
+      this.toastService.show(this.transloco.translate('visibility.toastError'), 'error');
+    } finally {
+      this.visibilityBusyId = undefined;
+    }
+  }
+
 }

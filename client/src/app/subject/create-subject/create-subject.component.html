@@ -34,6 +34,8 @@
           <app-subject-icon-svg defaultIcon [fill]="colorControl.value" class="current-icon"></app-subject-icon-svg>
         </app-icon-preview>
 
+      <app-visibility-toggle [control]="visibilityControl"></app-visibility-toggle>
+
       <div class="form-actions">
         <button type="submit" class="btn btn-primary"
           [disabled]="subjectForm.invalid || descLength > descMaxLength"><span

@@ -1,12 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import {
   FormBuilder,
+  FormControl,
   FormGroup,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
 
 import { CommonModule } from '@angular/common';
+import { VisibilityToggleComponent } from '../../shared/visibility-toggle/visibility-toggle.component';
+import { Visibility, defaultVisibility } from '../../models/visibility.dto';
 import { NgxColorsComponent, NgxColorsTriggerDirective } from 'ngx-colors';
 import { PageCardComponent } from '../../shared/page-card/page-card.component';
 import { TopicService } from '../topic.service';
@@ -34,6 +37,7 @@ import { toSubjectOptions } from '../../shared/select-options.util';
     NgxColorsComponent,
     NgxColorsTriggerDirective,
     PageCardComponent,
+    VisibilityToggleComponent,
   ],
   templateUrl: './create-topic.component.html',
 })
@@ -43,6 +47,10 @@ export class CreateTopicComponent implements OnInit {
 
   get subjectOptions(): SelectOption[] {
     return toSubjectOptions(this.subjects);
+  }
+
+  get visibilityControl(): FormControl<Visibility> {
+    return this.topicForm.get('visibility') as FormControl<Visibility>;
   }
 
   constructor(
@@ -57,6 +65,7 @@ export class CreateTopicComponent implements OnInit {
 
   ngOnInit(): void {
     this.topicForm = this.fb.group({
+      visibility: [defaultVisibility as Visibility],
       name: [
         '',
         [

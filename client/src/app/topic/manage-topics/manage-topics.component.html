@@ -46,6 +46,8 @@
           </td>
           <td class="cell-meta">{{ getSubjectName(topic.subject_id) }}</td>
           <td class="cell-actions">
+            <app-visibility-button [visibility]="topic.visibility ?? 'private'"
+              [busy]="visibilityBusyId === topic._id" (toggled)="onVisibilityToggled(topic, $event)"></app-visibility-button>
             <button type="button" class="btn btn-icon-ghost" (click)="editTopic(topic._id)" [attr.aria-label]="t('common.edit')">
               <span class="material-symbols-outlined">edit</span>
             </button>

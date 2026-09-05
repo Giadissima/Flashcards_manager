@@ -4,6 +4,8 @@ import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { charMinLength, descMaxLength, nameMaxLength } from '../../../config/config';
 
 import { CommonModule } from '@angular/common';
+import { VisibilityToggleComponent } from '../../shared/visibility-toggle/visibility-toggle.component';
+import { Visibility, defaultVisibility } from '../../models/visibility.dto';
 import { Editor } from '@tiptap/core';
 import { createRichTextEditor } from '../../shared/rich-text-editor/editor.factory';
 import { PageCardComponent } from '../../shared/page-card/page-card.component';
@@ -26,6 +28,7 @@ import { RichTextEditorComponent } from '../../shared/rich-text-editor/rich-text
     IconPreviewComponent,
     SubjectIconSvgComponent,
     PageCardComponent,
+    VisibilityToggleComponent,
   ],
   templateUrl: './create-subject.component.html',
 })
@@ -44,6 +47,10 @@ export class CreateSubjectComponent implements OnInit, OnDestroy {
   readonly nameMaxLength = nameMaxLength;
   readonly descMaxLength = descMaxLength;
 
+  get visibilityControl(): FormControl<Visibility> {
+    return this.subjectForm.get('visibility') as FormControl<Visibility>;
+  }
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -59,6 +66,7 @@ export class CreateSubjectComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subjectForm = this.fb.group({
+      visibility: [defaultVisibility as Visibility],
       name: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(nameMaxLength)]],
       color: [defaultSubjectIconColor, Validators.required],
     });
@@ -99,6 +107,7 @@ export class CreateSubjectComponent implements OnInit, OnDestroy {
     formData.append('name', this.subjectForm.get('name')?.value);
     formData.append('desc', this.descEditor.getHTML());
     formData.append('color', this.subjectForm.get('color')?.value);
+    formData.append('visibility', this.visibilityControl.value);
     if (this.selectedFile) {
       formData.append('icon', this.selectedFile, this.selectedFile.name);
     }

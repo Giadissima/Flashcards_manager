@@ -1,4 +1,5 @@
 import { Subject } from "./subject.dto";
+import { Visibility } from './visibility.dto';
 import { Topic } from "./topic.dto";
 
 export interface Flashcard {
@@ -10,6 +11,9 @@ export interface Flashcard {
 
   topic_id?: string | Topic; // populated by the server, a plain id on the way back
   subject_id?: string | Subject; // populated by the server, a plain id on the way back
+
+  /** Who may see it; absent on payloads that leave it unchanged. */
+  visibility?: Visibility;
 }
 
 /** One of the flashcards drawn for a new test, with the topic it is on. */

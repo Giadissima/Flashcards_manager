@@ -415,5 +415,17 @@
       "saved": "Profile updated",
       "saveError": "The profile could not be saved"
     }
+  },
+  "visibility": {
+    "label": "Visibility",
+    "public": "Public",
+    "private": "Private",
+    "publicHint": "Others will find it in the Community section, grouped by your degree course.",
+    "privateHint": "Only you can see it.",
+    "makePublic": "Make it public",
+    "makePrivate": "Make it private",
+    "toastPublic": "Now public",
+    "toastPrivate": "Now private",
+    "toastError": "The visibility could not be changed"
   }
 }

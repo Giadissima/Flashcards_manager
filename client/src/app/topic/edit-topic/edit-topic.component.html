@@ -29,6 +29,8 @@
             (valueChange)="editForm.get('subject_id')?.setValue($event)"></app-searchable-select>
         </div>
 
+        <app-visibility-toggle [control]="visibilityControl"></app-visibility-toggle>
+
         <div class="form-actions">
           <button type="button" class="btn btn-outline-primary" (click)="cancel()"><span
               class="material-symbols-outlined">close</span>{{ 'common.cancel' | transloco }}</button>
