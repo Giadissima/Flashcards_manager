@@ -2,7 +2,7 @@ import { Model, Types } from 'mongoose';
 import { Notification, NotificationKind } from './notification.schema';
 
 import { BasePaginatedResult } from 'src/common.dto';
-import { BasicFilterRequest } from 'src/common.dto';
+import { NotificationFilterRequest } from './notification.dto';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
@@ -48,9 +48,14 @@ export class NotificationService {
 
   async findMine(
     userId: string,
-    filter: BasicFilterRequest,
+    filter: NotificationFilterRequest,
   ): Promise<BasePaginatedResult<Notification>> {
-    const query = { user_id: new Types.ObjectId(userId) };
+    const query: Record<string, unknown> = {
+      user_id: new Types.ObjectId(userId),
+    };
+    if (filter.kind) query.kind = filter.kind;
+    // Only when asked for: `unread=false` means "no filter", not "the read ones"
+    if (filter.unread) query.read = false;
 
     const [data, count] = await Promise.all([
       this.notificationModel

@@ -1,4 +1,4 @@
-import { AppNotification, Feedback } from '../models/social.dto';
+import { AppNotification, Feedback, NotificationKind, notificationKinds } from '../models/social.dto';
 import { Component, OnInit } from '@angular/core';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 
@@ -36,6 +36,11 @@ export class NotificationPanelComponent implements OnInit {
 
   /** Which of the two lists the panel is showing. */
   tab: 'all' | 'open' = 'all';
+
+  /** Narrows the list; empty means everything, which is what it opens on. */
+  kindFilter: NotificationKind | '' = '';
+  unreadOnly = false;
+  reloading = false;
   openReports: Feedback[] = [];
   openCount = 0;
 
@@ -95,6 +100,24 @@ export class NotificationPanelComponent implements OnInit {
   close(): void {
     this.isOpen = false;
     this.openThread = null;
+  }
+
+  readonly kinds = notificationKinds;
+
+  async onFilterChange(): Promise<void> {
+    await this.load();
+  }
+
+  /** Fetches again on demand: the panel has no way of hearing about new ones. */
+  async reload(): Promise<void> {
+    if (this.reloading) return;
+
+    this.reloading = true;
+    try {
+      await this.load();
+    } finally {
+      this.reloading = false;
+    }
   }
 
   iconOf(notification: AppNotification): string {
@@ -185,11 +208,16 @@ export class NotificationPanelComponent implements OnInit {
     this.loading = true;
     try {
       const [page, open] = await Promise.all([
-        this.notificationService.getMine(0, 20),
+        this.notificationService.getMine(0, 20, {
+          kind: this.kindFilter || undefined,
+          unread: this.unreadOnly,
+        }),
         this.communityService.getOpenFeedback(0, 20),
       ]);
       this.notifications = page.data;
-      this.unread = this.notifications.filter((n) => !n.read).length;
+      // Counted from the server, not from the page on screen: a filtered list
+      // says nothing about how many are unread in total
+      this.unread = Number(await this.notificationService.countUnread()) || 0;
       this.openReports = open.data;
       this.openCount = open.count;
     } finally {

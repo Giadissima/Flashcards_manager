@@ -485,6 +485,16 @@
     "resolveError": "It could not be marked",
     "tabAll": "All",
     "tabOpen": "To sort out",
-    "noOpen": "Nothing waiting on you"
+    "noOpen": "Nothing waiting on you",
+    "reload": "Refresh",
+    "filterAll": "All kinds",
+    "filterKind": "Kind",
+    "onlyUnread": "Unread",
+    "kindName": {
+      "upvote": "Ratings",
+      "comment": "Comments",
+      "feedback": "Reports",
+      "resolved": "Sorted"
+    }
   }
 }

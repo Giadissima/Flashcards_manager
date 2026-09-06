@@ -11,11 +11,17 @@
     @if (!openThread) {
     <div class="panel-header">
       <strong>{{ 'notifications.title' | transloco }}</strong>
-      @if (unread && tab === 'all') {
-      <a role="button" tabindex="0" (click)="markAllRead()" (keydown.enter)="markAllRead()">
-        {{ 'notifications.markAllRead' | transloco }}
-      </a>
-      }
+      <span class="header-actions">
+        @if (unread && tab === 'all') {
+        <a role="button" tabindex="0" (click)="markAllRead()" (keydown.enter)="markAllRead()">
+          {{ 'notifications.markAllRead' | transloco }}
+        </a>
+        }
+        <button type="button" class="btn btn-icon-ghost reload-btn" [disabled]="reloading" (click)="reload()"
+          [title]="'notifications.reload' | transloco" [attr.aria-label]="'notifications.reload' | transloco">
+          <span class="material-symbols-outlined" [class.is-spinning]="reloading">refresh</span>
+        </button>
+      </span>
     </div>
 
     <!-- Two lists and not one filtered: a notification is read and done with,
@@ -29,6 +35,22 @@
         @if (openCount) { <span class="tab-count">{{ openCount }}</span> }
       </button>
     </div>
+
+    @if (tab === 'all') {
+    <div class="panel-filters">
+      <select class="form-select form-select-sm" [(ngModel)]="kindFilter" (ngModelChange)="onFilterChange()"
+        [attr.aria-label]="'notifications.filterKind' | transloco">
+        <option value="">{{ 'notifications.filterAll' | transloco }}</option>
+        @for (kind of kinds; track kind) {
+        <option [value]="kind">{{ ('notifications.kindName.' + kind) | transloco }}</option>
+        }
+      </select>
+      <label class="unread-only">
+        <input type="checkbox" class="form-check-input" [(ngModel)]="unreadOnly" (ngModelChange)="onFilterChange()">
+        {{ 'notifications.onlyUnread' | transloco }}
+      </label>
+    </div>
+    }
 
     @if (loading) {
     <div class="panel-empty">{{ 'common.loading' | transloco }}</div>

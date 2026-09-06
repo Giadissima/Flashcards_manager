@@ -1,7 +1,8 @@
 import { Controller, Get, Param, Patch, Query } from '@nestjs/common';
 
 import { ApiOperation } from '@nestjs/swagger';
-import { BasePaginatedResult, BasicFilterRequest } from 'src/common.dto';
+import { BasePaginatedResult } from 'src/common.dto';
+import { NotificationFilterRequest } from './notification.dto';
 import { CurrentUser } from 'src/auth/current-user.decorator';
 import { JwtPayload } from 'src/auth/auth.dto';
 import { Notification } from './notification.schema';
@@ -15,7 +16,7 @@ export class NotificationController {
   @Get()
   findMine(
     @CurrentUser() user: JwtPayload,
-    @Query() filters: BasicFilterRequest,
+    @Query() filters: NotificationFilterRequest,
   ): Promise<BasePaginatedResult<Notification>> {
     return this.notificationService.findMine(user.sub, filters);
   }

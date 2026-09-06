@@ -485,6 +485,16 @@
     "resolveError": "Non è stato possibile segnarla",
     "tabAll": "Tutte",
     "tabOpen": "Da sistemare",
-    "noOpen": "Non c'è niente in sospeso"
+    "noOpen": "Non c'è niente in sospeso",
+    "reload": "Ricarica",
+    "filterAll": "Tutti i tipi",
+    "filterKind": "Tipo",
+    "onlyUnread": "Non lette",
+    "kindName": {
+      "upvote": "Voti",
+      "comment": "Commenti",
+      "feedback": "Segnalazioni",
+      "resolved": "Risolte"
+    }
   }
 }

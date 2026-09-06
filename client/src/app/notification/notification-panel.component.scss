@@ -88,6 +88,50 @@
   line-height: 18px;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-unit);
+}
+
+.reload-btn {
+  padding: 0;
+
+  /* Turns while it is fetching, which is the only sign that a click that
+     changes nothing on screen actually did something. */
+  .is-spinning {
+    animation: reload-spin 0.8s linear infinite;
+  }
+}
+
+@keyframes reload-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.panel-filters {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-unit);
+  padding: var(--spacing-unit) calc(var(--spacing-unit) * 1.5);
+  border-bottom: 1px solid var(--border-color);
+
+  .form-select {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.unread-only {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--spacing-unit) * 0.5);
+  white-space: nowrap;
+  color: var(--text-color);
+  margin: 0;
+}
+
 .panel-empty {
   padding: calc(var(--spacing-unit) * 2);
   color: var(--muted-color);
