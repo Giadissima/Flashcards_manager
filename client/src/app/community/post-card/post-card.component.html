@@ -109,6 +109,14 @@
 
     @if (commentsOpen) {
     <div class="comment-list">
+      <!-- On top, where the thread carries on from: the list is opened at its
+           recent end and older ones are added above it. -->
+      @if (hasOlderComments) {
+      <a class="link-action older-comments" role="button" tabindex="0" (click)="loadOlderComments()"
+        (keydown.enter)="loadOlderComments()">
+        {{ (loadingOlderComments ? 'common.loading' : 'community.olderComments') | transloco }}
+      </a>
+      }
       @for (comment of comments; track comment._id) {
       <div class="comment">
         <span class="comment-author">{{ comment.user_id.username }}</span>

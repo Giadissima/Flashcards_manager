@@ -265,6 +265,11 @@
   overflow-wrap: anywhere;
 }
 
+.older-comments {
+  margin-block: 0 var(--spacing-unit);
+  font-size: 0.85rem;
+}
+
 .comment-date {
   color: var(--muted-color);
   font-size: 0.85em;

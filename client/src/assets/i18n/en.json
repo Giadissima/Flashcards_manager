@@ -466,7 +466,8 @@
     "feedbackError": "The report could not be sent",
     "answerLabel": "Answer:",
     "expand": "Expand",
-    "collapse": "Collapse"
+    "collapse": "Collapse",
+    "olderComments": "Show older comments"
   },
   "notifications": {
     "title": "Notifications",

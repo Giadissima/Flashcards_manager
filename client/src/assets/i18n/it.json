@@ -466,7 +466,8 @@
     "feedbackError": "Non è stato possibile inviare la segnalazione",
     "answerLabel": "Risposta:",
     "expand": "Espandi",
-    "collapse": "Riduci"
+    "collapse": "Riduci",
+    "olderComments": "Mostra i commenti più vecchi"
   },
   "notifications": {
     "title": "Notifiche",

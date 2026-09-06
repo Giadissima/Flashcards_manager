@@ -20,6 +20,9 @@ import { baseUrlAPI } from '../../../config/config';
 /** How many cards the carousel holds at a time. */
 const pageSize = 3;
 
+/** How many comments are fetched at once, first time and every time after. */
+const commentPageSize = 20;
+
 /**
  * One post of the feed: who shared what, and a carousel over the flashcards it
  * covers.
@@ -202,6 +205,37 @@ export class PostCardComponent implements OnInit {
   commentsOpen = false;
   commentDraft = '';
   sendingComment = false;
+  loadingOlderComments = false;
+
+  /** There are older ones left when fewer are on screen than the post has. */
+  get hasOlderComments(): boolean {
+    return this.comments.length < this.commentCount;
+  }
+
+  /**
+   * Fetches the page before the oldest one on screen and puts it on top.
+   *
+   * Backwards, unlike every other list in the app: a thread is opened at its
+   * recent end, and going further is going back in time.
+   */
+  async loadOlderComments(): Promise<void> {
+    if (this.loadingOlderComments || !this.hasOlderComments) return;
+
+    this.loadingOlderComments = true;
+    try {
+      const page = await this.communityService.getComments(
+        this.post._id,
+        this.comments.length,
+        commentPageSize,
+      );
+      this.comments = [...[...page.data].reverse(), ...this.comments];
+      this.commentCount = page.count;
+    } catch {
+      this.toast.show(this.transloco.translate('community.commentError'), 'error');
+    } finally {
+      this.loadingOlderComments = false;
+    }
+  }
 
   async toggleComments(): Promise<void> {
     this.commentsOpen = !this.commentsOpen;
@@ -240,8 +274,15 @@ export class PostCardComponent implements OnInit {
   }
 
   private async loadComments(): Promise<void> {
-    const page = await this.communityService.getComments(this.post._id, 0, 20);
-    this.comments = page.data;
+    // As many as are already on screen, plus room for one just written: a
+    // reload after posting would otherwise throw away the older ones that
+    // were asked for.
+    const limit = Math.max(commentPageSize, this.comments.length + 1);
+    const page = await this.communityService.getComments(this.post._id, 0, limit);
+    // Asked for newest first and shown the other way round: the page worth
+    // having is the recent end of the thread, but an exchange is read
+    // downwards, each line answering the one above it.
+    this.comments = [...page.data].reverse();
     this.commentCount = page.count;
   }
 
