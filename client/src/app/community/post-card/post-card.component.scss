@@ -84,20 +84,23 @@
   overflow-x: auto;
 }
 
+/* Shape, corners and inner spacing all come from .card, .flashcard and
+   .flashcard-topic-color in styles.scss, the same three the home grid uses.
+   Only what belongs to a carousel is set here: how wide a card is in the row,
+   and the floor under its height, which is the home grid's own. */
 .post-flashcard {
-  position: relative;
-  flex: 1 0 220px;
-  min-height: 180px;
+  flex: 1 0 300px;
+  min-height: 240px;
+
+  /* The one departure from the home card: the post around it is already a
+     surface of its own, and a card in the same tone as what it sits on would
+     have nothing but its shadow to stand on. */
   background-color: var(--inset-background);
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-md);
-  padding: calc(var(--spacing-unit) * 1.5);
-  overflow: hidden;
+  --bs-card-bg: var(--inset-background);
 }
 
-.post-flashcard-title {
-  color: var(--header-color);
-  font-size: 0.95rem;
+.flashcard-meta {
+  font-size: 0.8rem;
 }
 
 .post-flashcard-label {
@@ -109,22 +112,21 @@
   letter-spacing: 0.03em;
 }
 
-.post-flashcard-body {
-  color: var(--text-color);
-  font-size: 0.9rem;
-
+.post-flashcard-content {
   ::ng-deep img {
     max-width: 100%;
   }
 }
 
 /* Same clamp as the home grid (see home.scss), for the same reason: the cards
-   of one page have to stay level with each other. Given in lines and not in
-   pixels so the cut falls between two of them rather than through one; the em
-   value is the fallback for browsers without the lh unit. */
-.post-flashcard-body.is-clamped {
-  max-height: 4.5em;
-  max-height: 3lh;
+   of one page have to stay level with each other. Six lines and not four,
+   because here the block holds the question and the answer both, and four
+   would leave the answer a single line. Given in lines and not in pixels so
+   the cut falls between two of them rather than through one; the em value is
+   the fallback for browsers without the lh unit. */
+.post-flashcard-content.is-clamped {
+  max-height: 9em;
+  max-height: 6lh;
   overflow: hidden;
 
   /* Faded rather than cut clean, which is what says there is more below. */
@@ -136,9 +138,13 @@
   }
 }
 
+/* Sized down and left in text colour, as on the home card: it is a way back
+   into the card, not a second action beside import. */
 .post-flashcard .link-action {
+  align-self: flex-start;
   margin-block: calc(var(--spacing-unit) * 0.5);
   font-size: 0.85rem;
+  color: var(--text-color);
 }
 
 .carousel-loading,
@@ -210,12 +216,15 @@
 
 /* In the corner of the card they belong to, so which one is being reported or
    taken is never in doubt when three sit side by side. */
+/* In the flow at the bottom of the card rather than floating in a corner: the
+   body under it is clamped and can end on any line, and a corner would drop
+   the buttons on top of whatever line that turned out to be. margin-top: auto
+   pins them down, so cards of different length line their buttons up. */
 .card-actions {
-  position: absolute;
-  bottom: calc(var(--spacing-unit) * 0.5);
-  right: calc(var(--spacing-unit) * 0.5);
   display: flex;
   gap: calc(var(--spacing-unit) * 0.5);
+  margin-top: auto;
+  padding-top: var(--spacing-unit);
 
   .btn {
     padding: calc(var(--spacing-unit) * 0.5);

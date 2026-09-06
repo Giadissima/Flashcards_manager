@@ -23,36 +23,54 @@
       </div>
       } @else {
       @for (card of cards; track card._id) {
-      <div class="post-flashcard">
-        <h5 class="post-flashcard-title">{{ card.title }}</h5>
-        <div class="post-flashcard-body" [innerHTML]="card.question | katexRenderer"></div>
-
-        <!-- The answer is shown with the question and not behind a click: in
-             the feed a card is being judged, not studied, and what tells a set
-             worth importing from one that is not is how the answers read. -->
-        <p class="post-flashcard-label">{{ 'community.answerLabel' | transloco }}</p>
-        <div class="post-flashcard-body" [class.is-clamped]="isClamped(card)" [class.is-cut]="isCut(card)"
-          [innerHTML]="card.answer | katexRenderer" (contentOverflow)="onAnswerOverflow(card, $event)"></div>
-        @if (canExpand(card)) {
-        <a class="link-action" role="button" tabindex="0" (click)="toggleAnswer(card)"
-          (keydown.enter)="toggleAnswer(card)">
-          {{ (isExpanded(card) ? 'community.collapse' : 'community.expand') | transloco }}
-        </a>
-        }
-        @if (!isMine) {
-        <div class="card-actions">
-          <button type="button" class="btn btn-icon-ghost" (click)="openFeedback(card)"
-            [title]="'community.feedback' | transloco" [attr.aria-label]="'community.feedback' | transloco">
-            <span class="material-symbols-outlined">feedback</span>
-          </button>
-          <button type="button" class="btn btn-icon-ghost" [disabled]="importingId === card._id"
-            (click)="importCard(card)"
-            [title]="(importedIds.has(card._id) ? 'community.alreadyImported' : 'community.import') | transloco"
-            [attr.aria-label]="'community.import' | transloco">
-            <span class="material-symbols-outlined">{{ importedIds.has(card._id) ? 'library_add_check' : 'library_add' }}</span>
-          </button>
+      <!-- The same card as the home grid, down to the classes: a flashcard is
+           read the same way wherever it turns up, and the strip in its topic
+           colour is what says which one it belongs to. -->
+      <div class="card flashcard flashcard-topic-color post-flashcard"
+        [style.border-top-color]="cardColor(card)">
+        <!-- No subject icon here, unlike the home card: a post is one subject,
+             so the icon in the header above already says which, and repeating
+             it on every card of the row says it three times over. -->
+        <div class="flashcard-title">
+          <div>
+            <h5 class="card-title mb-0">{{ card.title }}</h5>
+            <div class="flashcard-meta text-muted">{{ cardTopicName(card) }}</div>
+          </div>
         </div>
-        }
+
+        <div class="flashcard-body">
+          <!-- Question and answer are clamped as one block, under a single
+               link: the answer is shown with the question and not behind a
+               click, because in the feed a card is being judged, not studied,
+               and what tells a set worth importing from one that is not is how
+               the answers read. -->
+          <div class="post-flashcard-content" [class.is-clamped]="isClamped(card)" [class.is-cut]="isCut(card)"
+            (contentOverflow)="onContentOverflow(card, $event)">
+            <div class="flashcard-text" [innerHTML]="cardQuestion(card) | katexRenderer"></div>
+            <p class="post-flashcard-label">{{ 'community.answerLabel' | transloco }}</p>
+            <div class="flashcard-text" [innerHTML]="cardAnswer(card) | katexRenderer"></div>
+          </div>
+          @if (canExpand(card)) {
+          <a class="link-action" role="button" tabindex="0" (click)="toggleExpanded(card)"
+            (keydown.enter)="toggleExpanded(card)">
+            {{ (isExpanded(card) ? 'community.collapse' : 'community.expand') | transloco }}
+          </a>
+          }
+          @if (!isMine) {
+          <div class="card-actions">
+            <button type="button" class="btn btn-icon-ghost" (click)="openFeedback(card)"
+              [title]="'community.feedback' | transloco" [attr.aria-label]="'community.feedback' | transloco">
+              <span class="material-symbols-outlined">feedback</span>
+            </button>
+            <button type="button" class="btn btn-icon-ghost" [disabled]="importingId === card._id"
+              (click)="importCard(card)"
+              [title]="(importedIds.has(card._id) ? 'community.alreadyImported' : 'community.import') | transloco"
+              [attr.aria-label]="'community.import' | transloco">
+              <span class="material-symbols-outlined">{{ importedIds.has(card._id) ? 'library_add_check' : 'library_add' }}</span>
+            </button>
+          </div>
+          }
+        </div>
       </div>
       } @empty {
       <p class="carousel-empty">{{ 'community.noFlashcards' | transloco }}</p>

@@ -12,6 +12,7 @@ import { PostComment } from '../../models/social.dto';
 import { KatexRendererPipe } from '../../pipes/katex-renderer.pipe';
 import { ToastService } from '../../shared/toast/toast.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
+import * as cardView from '../../shared/flashcard-view.util';
 import { getAvatarUrl } from '../../shared/avatar/avatar.util';
 import { getDefaultSubjectIconDataUrl } from '../../subject/subject-icon.util';
 import { baseUrlAPI } from '../../../config/config';
@@ -63,8 +64,26 @@ export class PostCardComponent implements OnInit {
     private transloco: TranslocoService,
   ) {}
 
-  // The answer is clamped until asked for: three cards sit side by side, and
-  // one long answer would otherwise stretch the row it is in.
+  // The strip on top, the icon and the topic under the title: the same four
+  // helpers the home grid and the test runner draw a card with.
+  cardColor(card: Flashcard): string {
+    return cardView.getCardColor(card);
+  }
+
+  cardTopicName(card: Flashcard): string {
+    return cardView.getCardTopicName(card);
+  }
+
+  cardQuestion(card: Flashcard): string {
+    return cardView.getCardBody(card, false);
+  }
+
+  cardAnswer(card: Flashcard): string {
+    return cardView.getCardBody(card, true);
+  }
+
+  // Clamped until asked for: the cards of a page stand side by side, and one
+  // long answer would otherwise set the height of the whole row.
   isClamped(card: Flashcard): boolean {
     return !this.expandedMap[card._id];
   }
@@ -83,7 +102,7 @@ export class PostCardComponent implements OnInit {
     return !!this.overflowMap[card._id];
   }
 
-  onAnswerOverflow(card: Flashcard, overflows: boolean): void {
+  onContentOverflow(card: Flashcard, overflows: boolean): void {
     // Only the clamped state measures anything: expanded, the container is as
     // tall as its content and would always report "fits", which would take the
     // collapse control away and clamp the card again on the next pass.
@@ -91,7 +110,7 @@ export class PostCardComponent implements OnInit {
     this.overflowMap[card._id] = overflows;
   }
 
-  toggleAnswer(card: Flashcard): void {
+  toggleExpanded(card: Flashcard): void {
     this.expandedMap[card._id] = !this.expandedMap[card._id];
   }
 
