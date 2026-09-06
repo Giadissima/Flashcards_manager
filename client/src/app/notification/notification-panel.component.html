@@ -57,7 +57,7 @@
     } @else if (tab === 'open') {
     @for (report of openReports; track report._id) {
     <a class="notification" (click)="openReport(report)" (keydown.enter)="openReport(report)" tabindex="0">
-      <span class="material-symbols-outlined notification-icon">flag</span>
+      <span class="material-symbols-outlined notification-icon">feedback</span>
       <span class="notification-body">
         <span class="notification-line"><strong>{{ report.flashcard_id.title }}</strong></span>
         <span class="notification-preview">{{ firstLine(report) }}</span>

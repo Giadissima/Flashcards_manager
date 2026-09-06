@@ -121,9 +121,11 @@ export class NotificationPanelComponent implements OnInit {
   }
 
   iconOf(notification: AppNotification): string {
+    // The same glyphs the Community shows: a notification is read next to the
+    // thing it is about, and two symbols for one thing read as two things.
     if (notification.kind === 'upvote') return 'thumb_up';
     if (notification.kind === 'comment') return 'chat_bubble';
-    return notification.kind === 'resolved' ? 'task_alt' : 'flag';
+    return notification.kind === 'resolved' ? 'task_alt' : 'feedback';
   }
 
   /** Only the author closes a report, and only once. */
