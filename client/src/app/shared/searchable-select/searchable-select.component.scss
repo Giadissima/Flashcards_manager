@@ -7,9 +7,20 @@
   width: 100%;
 }
 
+/* Laid out as a row so the label can be told to shrink: on an inline span
+   overflow: hidden does nothing, and a name as long as a university's runs
+   straight past the field instead of being cut short with an ellipsis. */
 .form-select {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--spacing-unit) * 0.75);
   width: 100%;
   text-align: left;
+
+  /* A flex item refuses to shrink below its own text by default. */
+  > .text-truncate {
+    min-width: 0;
+  }
 }
 
 /* The panel is never narrower than the button, but it may grow (up to a
@@ -29,6 +40,10 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+
+  > .text-truncate {
+    min-width: 0;
+  }
 }
 
 .select-option-icon {
