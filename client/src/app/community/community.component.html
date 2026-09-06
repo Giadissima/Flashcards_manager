@@ -1,17 +1,23 @@
-<div class="container-md" *transloco="let t">
-  <app-page-card icon="diversity_3" [title]="t('community.title')" [subtitle]="t('community.subtitle')">
+<!-- The transloco pipe and not the structural directive: the directive puts
+     everything under it into an embedded view, where the static ViewChild that
+     starts the load no longer finds app-load-state and the spinner never ends.
+     Elsewhere app-load-state sits outside the directive; here it is nested in
+     the card, so the pipe is what keeps the header on screen while loading. -->
+<div class="container-md">
+  <app-page-card icon="diversity_3" [title]="'community.title' | transloco"
+    [subtitle]="'community.subtitle' | transloco">
     <app-segmented-filter [options]="[
-        { value: 'created', label: t('community.sortCreated') },
-        { value: 'updated', label: t('community.sortUpdated') },
-        { value: 'popular', label: t('community.sortPopular') }
-      ]" [value]="sort" [label]="t('community.sortLabel')" (valueChange)="onSortChange($event)">
+        { value: 'created', label: ('community.sortCreated' | transloco) },
+        { value: 'updated', label: ('community.sortUpdated' | transloco) },
+        { value: 'popular', label: ('community.sortPopular' | transloco) }
+      ]" [value]="sort" [label]="'community.sortLabel' | transloco" (valueChange)="onSortChange($event)">
     </app-segmented-filter>
 
     <app-load-state errorMessageKey="community.loadError">
       @for (post of posts; track post._id) {
       <app-post-card [post]="post"></app-post-card>
       } @empty {
-      <p class="community-empty">{{ t('community.empty') }}</p>
+      <p class="community-empty">{{ 'community.empty' | transloco }}</p>
       }
 
       @if (totalPages > 1) {
