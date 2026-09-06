@@ -1,4 +1,9 @@
-import { CardFilter, PaginatedResponse, RandomCardFIlter } from '../models/http.dto';
+import {
+  CardFilter,
+  CountCardFilter,
+  PaginatedResponse,
+  RandomCardFIlter,
+} from '../models/http.dto';
 import { Visibility } from '../models/visibility.dto';
 
 import { Flashcard, RandomFlashcard } from '../models/flashcard.dto';
@@ -32,7 +37,7 @@ export class FlashcardService {
 
 
   // Counts the flashcards matching the filters
-  count(filter: Pick<RandomCardFIlter, 'subject_id' | 'topic_ids'>): Promise<number> {
+  count(filter: CountCardFilter): Promise<number> {
     return this.restClient.get<number>(
       this.baseUrl + '/count',
       filter

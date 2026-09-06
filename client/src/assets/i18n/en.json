@@ -433,7 +433,9 @@
     "toastError": "The visibility could not be changed",
     "cascadeSubject": "Its topics and flashcards follow it, both when it is published and when it is taken back.",
     "cascadeTopic": "Its flashcards follow it, both when it is published and when it is taken back.",
-    "imported": "Imported card"
+    "imported": "Imported card",
+    "publicSubjectNoCards": "This subject has no flashcards yet, so it does not show up in the Community.",
+    "publicSubjectAllPrivate": "Every flashcard in this subject is private, so it does not show up in the Community until you share at least one."
   },
   "community": {
     "title": "Community",

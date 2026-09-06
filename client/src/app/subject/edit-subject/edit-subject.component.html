@@ -36,6 +36,16 @@
 
         <app-visibility-toggle [control]="visibilityControl" kind="subject"></app-visibility-toggle>
 
+        <!-- Under the switch that causes it: a subject shared with nothing in
+             it is not an error to correct here, it is a thing to know about
+             where it ended up. -->
+        @if (emptyPublicWarning) {
+        <div class="alert alert-warning d-flex align-items-center gap-2" role="status">
+          <span class="material-symbols-outlined">info</span>
+          {{ emptyPublicWarning | transloco }}
+        </div>
+        }
+
         <div class="form-actions">
           <button type="button" class="btn btn-outline-primary" (click)="cancel()"><span
               class="material-symbols-outlined">close</span>{{ 'common.cancel' | transloco }}</button>

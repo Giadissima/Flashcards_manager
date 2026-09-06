@@ -65,7 +65,8 @@ export class ModifyFlashcardDto {
 }
 
 /** Subject/topic filters shared by the "count" and "random" endpoints. */
-export class CountFlashcardsDTO {
+/** Where a set of cards is taken from: a subject, and any of its topics. */
+export class CardSetFilter {
   @IsOptional()
   @IsMongoId()
   @ApiProperty({
@@ -87,7 +88,23 @@ export class CountFlashcardsDTO {
   topic_ids?: string[];
 }
 
-export class RandomFlashcardsDTO extends CountFlashcardsDTO {
+export class CountFlashcardsDTO extends CardSetFilter {
+  /**
+   * Only on the count, and not on the draw above it: a test is built from
+   * one's own cards whether they are shared or not, so letting /random take
+   * this would be offering a choice that means nothing.
+   */
+  @IsOptional()
+  @IsIn(visibilities)
+  @ApiProperty({
+    description: 'Count only the cards with this visibility',
+    enum: visibilities,
+    required: false,
+  })
+  visibility?: Visibility;
+}
+
+export class RandomFlashcardsDTO extends CardSetFilter {
   @IsOptional()
   @Type(() => Number)
   @IsInt()

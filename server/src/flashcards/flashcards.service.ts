@@ -296,7 +296,7 @@ export class FlashcardsService {
   // does, so subject_id/topic_id have to be converted explicitly here.
   private buildObjectIdQuery(
     userId: string,
-    filter: CountFlashcardsDTO,
+    filter: CountFlashcardsDTO | RandomFlashcardsDTO,
   ): FilterQuery<Flashcard> {
     const query: FilterQuery<Flashcard> = {
       user_id: new Types.ObjectId(userId),
@@ -310,6 +310,9 @@ export class FlashcardsService {
       query.topic_id = {
         $in: filter.topic_ids.map((id) => new Types.ObjectId(id)),
       };
+    }
+    if ('visibility' in filter && filter.visibility) {
+      query.visibility = filter.visibility;
     }
     return query;
   }

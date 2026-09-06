@@ -433,7 +433,9 @@
     "toastError": "Non è stato possibile cambiare la visibilità",
     "cascadeSubject": "I suoi argomenti e le sue flashcard la seguono, sia quando la pubblichi sia quando la togli.",
     "cascadeTopic": "Le sue flashcard lo seguono, sia quando lo pubblichi sia quando lo togli.",
-    "imported": "Card importata"
+    "imported": "Card importata",
+    "publicSubjectNoCards": "Questa materia non ha ancora nessuna flashcard, quindi non compare nella Community.",
+    "publicSubjectAllPrivate": "Le flashcard di questa materia sono tutte private, quindi non compare nella Community finché non ne condividi almeno una."
   },
   "community": {
     "title": "Community",

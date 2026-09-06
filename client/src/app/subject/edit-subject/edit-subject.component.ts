@@ -12,6 +12,7 @@ import { PageCardComponent } from '../../shared/page-card/page-card.component';
 import { RichTextEditorComponent } from '../../shared/rich-text-editor/rich-text-editor.component';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../subject.service';
+import { FlashcardService } from '../../flashcard/flashcard.service';
 import { ToastService } from '../../shared/toast/toast.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { charMinLength, nameMaxLength, descMaxLength } from '../../../config/config';
@@ -53,6 +54,31 @@ export class EditSubjectComponent implements OnInit, OnDestroy {
   // the default SVG, generated on the fly with the colour chosen at that moment
   private resetToDefault = false;
 
+  // How many cards the subject holds, and how many of those are shared. Read
+  // when the page opens, to say whether the subject reaches the Community.
+  private cardCount = 0;
+  private publicCardCount = 0;
+
+  /**
+   * What keeps a public subject out of the Community, or null when nothing
+   * does. Two different things, and worth telling apart: a subject with no
+   * cards at all is waiting to be written, one whose cards are all private is
+   * waiting to be shared, and the second message on the first case would have
+   * somebody hunting for flashcards that do not exist.
+   *
+   * A subject already public is judged on the cards that are public now; one
+   * about to be published only on whether it holds any, since publishing
+   * carries them along.
+   */
+  get emptyPublicWarning(): string | null {
+    if (this.visibilityControl.value !== 'public') return null;
+    if (this.cardCount === 0) return 'visibility.publicSubjectNoCards';
+
+    const stillPrivate =
+      this.subject?.visibility === 'public' && this.publicCardCount === 0;
+    return stillPrivate ? 'visibility.publicSubjectAllPrivate' : null;
+  }
+
   get colorControl(): FormControl<string> {
     return this.editForm.get('color') as FormControl<string>;
   }
@@ -70,6 +96,7 @@ export class EditSubjectComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private subjectService: SubjectService,
+    private flashcardService: FlashcardService,
     private toastService: ToastService,
     private transloco: TranslocoService
   ) {
@@ -112,6 +139,11 @@ export class EditSubjectComponent implements OnInit, OnDestroy {
     this.descEditor.commands.setContent(this.subject.desc ?? '');
     this.descLength = this.descEditor.getText().length;
     this.previewUrl = this.subject.icon ? getSubjectIconUrl(this.subject) : null;
+
+    [this.cardCount, this.publicCardCount] = await Promise.all([
+      this.flashcardService.count({ subject_id: id }),
+      this.flashcardService.count({ subject_id: id, visibility: 'public' }),
+    ]);
   }
 
   // Already cropped by app-subject-icon-preview: what arrives here is the icon

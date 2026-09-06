@@ -1,3 +1,5 @@
+import { Visibility } from './visibility.dto';
+
 export interface PaginatedResponse<T> {
   count: number;
   data: T[]; // TODO rename to "result" on the server side too
@@ -27,6 +29,13 @@ export interface CardFilter extends SimplePaginatedResponse {
   from?: string;
   to?: string;
 }
+
+/** What the count endpoint takes: a set of cards, narrowed by visibility. */
+export type CountCardFilter = {
+  subject_id?: string;
+  topic_ids?: string[];
+  visibility?: Visibility;
+};
 
 export type RandomCardFIlter = Pick<CardFilter, 'subject_id'> & {
   // Several topics of the subject at once; empty or absent means all of them.
