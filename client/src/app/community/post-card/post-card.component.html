@@ -30,7 +30,7 @@
         <div class="card-actions">
           <button type="button" class="btn btn-icon-ghost" (click)="openFeedback(card)"
             [title]="'community.feedback' | transloco" [attr.aria-label]="'community.feedback' | transloco">
-            <span class="material-symbols-outlined">flag</span>
+            <span class="material-symbols-outlined">feedback</span>
           </button>
           <button type="button" class="btn btn-icon-ghost" [disabled]="importingId === card._id"
             (click)="importCard(card)"
