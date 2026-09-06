@@ -126,6 +126,14 @@ export class SubjectService {
       await this.fileService.delete(previousIconId.toString());
     }
 
+    // The form promises it too, not just the quick toggle in the list: it says
+    // in so many words that the topics and the cards follow. Only on a change,
+    // so that saving a name does not re-publish the cards their author had
+    // taken back one by one.
+    if (updateObj.visibility && updateObj.visibility !== existing.visibility) {
+      await this.cascadeVisibility(userId, id, updateObj.visibility);
+    }
+
     await this.postService.refresh(userId, id);
   }
 
