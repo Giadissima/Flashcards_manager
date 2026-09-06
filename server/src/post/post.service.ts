@@ -43,7 +43,7 @@ export class PostService {
 
   /**
    * Rebuilds the post of one user and subject from what is public right now,
-   * and drops it when nothing is.
+   * and hides it when nothing is.
    *
    * Recomputed rather than edited piece by piece on every change: an
    * incremental post drifts from the data the first time an update is missed,
@@ -92,10 +92,19 @@ export class PostService {
           .exec();
     const flashcard_ids = looseCards.map((card) => card._id as Types.ObjectId);
 
-    if (!wholeSubject && !topic_ids.length && !flashcard_ids.length) {
-      await this.postModel.deleteOne({ user_id: owner, subject_id }).exec();
-      return;
-    }
+    // What the carousel would actually hold. Counted rather than inferred from
+    // the three ids above, since a public topic holding no public cards comes
+    // to the same nothing - and stored, because a post with nothing in it is a
+    // heading over an empty box and has no business in the feed.
+    const cardCount = await this.flashcardModel.countDocuments(
+      this.visibleCardsQuery({
+        user_id: owner,
+        subject_id,
+        scope: wholeSubject ? 'subject' : 'partial',
+        topic_ids,
+        flashcard_ids,
+      }),
+    );
 
     await this.postModel
       .findOneAndUpdate(
@@ -105,6 +114,7 @@ export class PostService {
             scope: wholeSubject ? 'subject' : 'partial',
             topic_ids,
             flashcard_ids,
+            cardCount,
           },
         },
         { upsert: true, new: true, setDefaultsOnInsert: true },
@@ -133,7 +143,11 @@ export class PostService {
     // On when the post first went up and not on when it last changed, whatever
     // the chosen order: "shared in March" is a fact about the post, while the
     // other date moves every time a card is added to it.
-    const query: FilterQuery<Post> = {};
+    //
+    // The empty ones are left out here rather than deleted when they run dry:
+    // a subject taken back by mistake would otherwise cost its author every
+    // like and comment the post had earned, with no way back.
+    const query: FilterQuery<Post> = { cardCount: { $gt: 0 } };
     const createdAt = dateRangeQuery(filter);
     if (createdAt) query.createdAt = createdAt;
 
@@ -632,7 +646,12 @@ export class PostService {
    * The cards a post shows. Read from their own visibility every time rather
    * than from a stored list, so a card taken back stops appearing at once.
    */
-  private visibleCardsQuery(post: Post): FilterQuery<Flashcard> {
+  private visibleCardsQuery(
+    post: Pick<
+      Post,
+      'user_id' | 'subject_id' | 'scope' | 'topic_ids' | 'flashcard_ids'
+    >,
+  ): FilterQuery<Flashcard> {
     const base = {
       user_id: post.user_id,
       subject_id: post.subject_id,
@@ -709,9 +728,7 @@ export class PostService {
       // The header names the subject alone when all of it is shared
       topics: wholeSubject ? [] : await this.headerTopics(post),
       wholeSubject,
-      flashcardCount: await this.flashcardModel.countDocuments(
-        this.visibleCardsQuery(post as unknown as Post),
-      ),
+      flashcardCount: post.cardCount ?? 0,
       commentCount,
       likes: post.score ?? 0,
       liked,
@@ -750,6 +767,7 @@ interface PopulatedPost {
   };
   topic_ids: { _id: Types.ObjectId; name: string; color?: string }[];
   flashcard_ids: Types.ObjectId[];
+  cardCount: number;
   score: number;
   createdAt: Date;
   updatedAt: Date;

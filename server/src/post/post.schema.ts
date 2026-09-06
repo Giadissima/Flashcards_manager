@@ -63,6 +63,21 @@ export class Post {
   flashcard_ids: mongoose.Types.ObjectId[];
 
   /**
+   * How many flashcards the post would show right now.
+   *
+   * Kept on the post so the feed can leave out the empty ones without counting
+   * cards for each, and so the carousel's own count comes with the page. Zero
+   * is how a post is hidden: taking a subject back makes it drop out of the
+   * feed, but its likes, its comments and the day it went up are still there
+   * for when it goes public again - deleting it would spend somebody else's
+   * ratings on one wrong click.
+   *
+   * Recounted by refresh() on every change, like everything else here.
+   */
+  @Prop({ required: true, default: 0 })
+  cardCount: number;
+
+  /**
    * How many people have liked it, kept here so the feed can order by it in
    * the database instead of counting likes for every post it returns.
    * Recounted from the likes on every change rather than nudged up and down,
