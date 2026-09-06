@@ -74,6 +74,13 @@
     <div class="flashcard-grid">
     @for (card of flashcards; track card._id) {
     <div class="card flashcard flashcard-topic-color" [style.border-top-color]="getCardColor(card)">
+      <!-- Top right, out of the row of actions: it is the state of the card,
+           not one more thing to do to it, and the corner is where a lock is
+           looked for. -->
+      <app-visibility-button class="card-visibility" [visibility]="card.visibility ?? 'private'"
+        [imported]="!!card.imported" [busy]="visibilityBusyId === card._id"
+        (toggled)="onVisibilityToggled(card, $event)"></app-visibility-button>
+
       <div class="flashcard-title">
         <img [src]="getCardSubjectIconUrl(card)" alt="" class="flashcard-subject-icon">
         <div>
@@ -99,8 +106,6 @@
           <button type="button" class="btn btn-icon-ghost btn-danger-hover" (click)="deleteCard(card)">
             <span class="material-symbols-outlined">delete</span>
           </button>
-          <app-visibility-button [visibility]="card.visibility ?? 'private'"
-            [busy]="visibilityBusyId === card._id" (toggled)="onVisibilityToggled(card, $event)"></app-visibility-button>
           <button type="button" class="btn btn-icon-ghost" (click)="modifyCard(card)">
             <span class="material-symbols-outlined">edit</span>
           </button>

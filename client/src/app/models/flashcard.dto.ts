@@ -14,6 +14,9 @@ export interface Flashcard {
 
   /** Who may see it; absent on payloads that leave it unchanged. */
   visibility?: Visibility;
+
+  /** True on a copy taken from someone else's post, which can never go back out. */
+  imported?: boolean;
 }
 
 /** One of the flashcards drawn for a new test, with the topic it is on. */

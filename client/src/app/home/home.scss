@@ -13,6 +13,8 @@
      has to fill its pane. Here the percentage resolves against the grid area,
      which is still as tall as the row, and would undo align-items: start. */
   .flashcard {
+    /* The anchor for the lock in the corner, see .card-visibility. */
+    position: relative;
     height: auto;
     /* A floor, not a fixed height: cards holding a one-line question would
        otherwise come out as thin strips next to their neighbours. Everything
@@ -109,6 +111,19 @@
   &:focus-visible {
     color: var(--header-color);
   }
+}
+
+.card-visibility {
+  position: absolute;
+  top: var(--spacing-unit);
+  right: var(--spacing-unit);
+  z-index: 1;
+}
+
+/* Room kept for it, so a long title breaks before it rather than running
+   underneath. */
+.flashcard-title {
+  padding-right: calc(var(--spacing-unit) * 6);
 }
 
 .flashcard-subject-icon {

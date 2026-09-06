@@ -429,7 +429,8 @@
     "toastPrivate": "Now private",
     "toastError": "The visibility could not be changed",
     "cascadeSubject": "Its topics and flashcards follow it, both when it is published and when it is taken back.",
-    "cascadeTopic": "Its flashcards follow it, both when it is published and when it is taken back."
+    "cascadeTopic": "Its flashcards follow it, both when it is published and when it is taken back.",
+    "imported": "Imported card"
   },
   "community": {
     "title": "Community",

@@ -429,7 +429,8 @@
     "toastPrivate": "Ora è privata",
     "toastError": "Non è stato possibile cambiare la visibilità",
     "cascadeSubject": "I suoi argomenti e le sue flashcard la seguono, sia quando la pubblichi sia quando la togli.",
-    "cascadeTopic": "Le sue flashcard lo seguono, sia quando lo pubblichi sia quando lo togli."
+    "cascadeTopic": "Le sue flashcard lo seguono, sia quando lo pubblichi sia quando lo togli.",
+    "imported": "Card importata"
   },
   "community": {
     "title": "Community",
