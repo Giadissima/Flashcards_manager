@@ -100,6 +100,15 @@
   font-size: 0.95rem;
 }
 
+.post-flashcard-label {
+  margin: var(--spacing-unit) 0 calc(var(--spacing-unit) * 0.25);
+  color: var(--muted-color);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
 .post-flashcard-body {
   color: var(--text-color);
   font-size: 0.9rem;
@@ -107,6 +116,29 @@
   ::ng-deep img {
     max-width: 100%;
   }
+}
+
+/* Same clamp as the home grid (see home.scss), for the same reason: the cards
+   of one page have to stay level with each other. Given in lines and not in
+   pixels so the cut falls between two of them rather than through one; the em
+   value is the fallback for browsers without the lh unit. */
+.post-flashcard-body.is-clamped {
+  max-height: 4.5em;
+  max-height: 3lh;
+  overflow: hidden;
+
+  /* Faded rather than cut clean, which is what says there is more below. */
+  &.is-cut {
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 2.25em), transparent);
+    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 2.25em), transparent);
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 1.5lh), transparent);
+    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 1.5lh), transparent);
+  }
+}
+
+.post-flashcard .link-action {
+  margin-block: calc(var(--spacing-unit) * 0.5);
+  font-size: 0.85rem;
 }
 
 .carousel-loading,

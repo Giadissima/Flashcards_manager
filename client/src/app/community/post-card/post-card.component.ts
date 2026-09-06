@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
+import { ContentOverflowDirective } from '../../shared/content-overflow.directive';
 import { AuthService } from '../../auth/auth.service';
 import { CommunityService } from '../community.service';
 import { FeedPost } from '../../models/post.dto';
@@ -29,7 +30,14 @@ const pageSize = 3;
 @Component({
   selector: 'app-post-card',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslocoModule, KatexRendererPipe, ModalComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    TranslocoModule,
+    KatexRendererPipe,
+    ModalComponent,
+    ContentOverflowDirective,
+  ],
   templateUrl: './post-card.component.html',
   styleUrl: './post-card.component.scss',
 })
@@ -43,12 +51,49 @@ export class PostCardComponent implements OnInit {
   /** First card of the window currently shown. */
   skip = 0;
 
+  // Both keyed by flashcard id: which answers the reader has opened out, and
+  // which ones are long enough to be worth offering it on.
+  private expandedMap: Record<string, boolean> = {};
+  private overflowMap: Record<string, boolean> = {};
+
   constructor(
     private communityService: CommunityService,
     private authService: AuthService,
     private toast: ToastService,
     private transloco: TranslocoService,
   ) {}
+
+  // The answer is clamped until asked for: three cards sit side by side, and
+  // one long answer would otherwise stretch the row it is in.
+  isClamped(card: Flashcard): boolean {
+    return !this.expandedMap[card._id];
+  }
+
+  // The fade is only drawn when something is actually hidden behind it, or it
+  // would veil the last line of an answer that fits.
+  isCut(card: Flashcard): boolean {
+    return this.isClamped(card) && !!this.overflowMap[card._id];
+  }
+
+  isExpanded(card: Flashcard): boolean {
+    return !!this.expandedMap[card._id];
+  }
+
+  canExpand(card: Flashcard): boolean {
+    return !!this.overflowMap[card._id];
+  }
+
+  onAnswerOverflow(card: Flashcard, overflows: boolean): void {
+    // Only the clamped state measures anything: expanded, the container is as
+    // tall as its content and would always report "fits", which would take the
+    // collapse control away and clamp the card again on the next pass.
+    if (!this.isClamped(card)) return;
+    this.overflowMap[card._id] = overflows;
+  }
+
+  toggleAnswer(card: Flashcard): void {
+    this.expandedMap[card._id] = !this.expandedMap[card._id];
+  }
 
   /** Nobody imports their own work, so the button stays off their own posts. */
   get isMine(): boolean {

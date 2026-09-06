@@ -26,6 +26,19 @@
       <div class="post-flashcard">
         <h5 class="post-flashcard-title">{{ card.title }}</h5>
         <div class="post-flashcard-body" [innerHTML]="card.question | katexRenderer"></div>
+
+        <!-- The answer is shown with the question and not behind a click: in
+             the feed a card is being judged, not studied, and what tells a set
+             worth importing from one that is not is how the answers read. -->
+        <p class="post-flashcard-label">{{ 'community.answerLabel' | transloco }}</p>
+        <div class="post-flashcard-body" [class.is-clamped]="isClamped(card)" [class.is-cut]="isCut(card)"
+          [innerHTML]="card.answer | katexRenderer" (contentOverflow)="onAnswerOverflow(card, $event)"></div>
+        @if (canExpand(card)) {
+        <a class="link-action" role="button" tabindex="0" (click)="toggleAnswer(card)"
+          (keydown.enter)="toggleAnswer(card)">
+          {{ (isExpanded(card) ? 'community.collapse' : 'community.expand') | transloco }}
+        </a>
+        }
         @if (!isMine) {
         <div class="card-actions">
           <button type="button" class="btn btn-icon-ghost" (click)="openFeedback(card)"

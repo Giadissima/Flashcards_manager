@@ -463,7 +463,10 @@
     "feedbackSend": "Send",
     "feedbackSent": "Sent to the author",
     "feedbackAlready": "You already reported this flashcard",
-    "feedbackError": "The report could not be sent"
+    "feedbackError": "The report could not be sent",
+    "answerLabel": "Answer:",
+    "expand": "Expand",
+    "collapse": "Collapse"
   },
   "notifications": {
     "title": "Notifications",
