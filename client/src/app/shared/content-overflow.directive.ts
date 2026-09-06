@@ -13,10 +13,10 @@ import {
  * space the clamp leaves it, false once it fits. Used to show an "expand"
  * control only on the cards that actually need one.
  *
- * The measurement has to be redone in three cases, hence the three observers:
- * the container changes width (the grid reflows), its content is replaced (the
- * card flips between question and answer, through [innerHTML]), or an image
- * inside it finishes loading and only then takes up its real height.
+ * The measurement has to be redone in four cases: the container changes width
+ * (the grid reflows), its content is replaced (the card flips between question
+ * and answer, through [innerHTML]), an image inside it finishes loading and
+ * only then takes up its real height, or the web fonts arrive.
  */
 @Directive({
   selector: '[contentOverflow]',
@@ -31,6 +31,7 @@ export class ContentOverflowDirective implements AfterViewInit, OnDestroy {
   // observer callback, and stops a measurement loop: showing the control
   // changes the layout, which would measure again.
   private lastEmitted: boolean | null = null;
+  private destroyed = false;
 
   constructor(private host: ElementRef<HTMLElement>, private zone: NgZone) {}
 
@@ -54,10 +55,21 @@ export class ContentOverflowDirective implements AfterViewInit, OnDestroy {
       element.addEventListener('load', this.measure, true);
     });
 
+    // Neither observer sees the fonts land: nothing in the DOM changes, and a
+    // clamped box keeps its own size while only the text inside it grows past
+    // the clamp. Without this the first cards on screen are measured in the
+    // fallback font, which is narrow enough to fit where the real one does
+    // not, and they end up cut with no way to open them out.
+    void document.fonts?.ready.then(this.measure);
+
     this.measure();
   }
 
   private measure = (): void => {
+    // The fonts promise can land after the card has gone: an element out of
+    // the document measures as empty and would report "fits" on the way out.
+    if (this.destroyed) return;
+
     const element = this.host.nativeElement;
     // The rounding slack keeps a sub-pixel line height from reading as overflow.
     const overflows = element.scrollHeight - element.clientHeight > 1;
@@ -68,6 +80,7 @@ export class ContentOverflowDirective implements AfterViewInit, OnDestroy {
   };
 
   ngOnDestroy(): void {
+    this.destroyed = true;
     this.resizeObserver?.disconnect();
     this.mutationObserver?.disconnect();
     this.host.nativeElement.removeEventListener('load', this.measure, true);
