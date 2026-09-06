@@ -82,6 +82,11 @@
       <div class="comment">
         <span class="comment-author">{{ comment.user_id.username }}</span>
         <span class="comment-text">{{ comment.text }}</span>
+        <!-- Short in the row and whole in the title: the day and the hour are
+             what tells a reply from last week apart from one from an hour ago,
+             and the rest only matters when somebody goes looking for it. -->
+        <time class="comment-date" [attr.datetime]="comment.createdAt"
+          [title]="comment.createdAt | date:'medium'">{{ comment.createdAt | date:'short' }}</time>
         @if (isMyComment(comment)) {
         <button type="button" class="btn btn-icon-ghost btn-danger-hover comment-delete"
           (click)="removeComment(comment)" [attr.aria-label]="'common.delete' | transloco">

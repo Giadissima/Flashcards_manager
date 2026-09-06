@@ -224,6 +224,13 @@
   overflow-wrap: anywhere;
 }
 
+.comment-date {
+  color: var(--muted-color);
+  font-size: 0.85em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
 .comment-delete {
   padding: 0;
 }
