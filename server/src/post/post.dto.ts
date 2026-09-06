@@ -69,6 +69,8 @@ export interface FeedPost {
   wholeSubject: boolean;
   /** How many flashcards the carousel can page through. */
   flashcardCount: number;
+  /** Shown on the comments button, which is why it travels with the feed. */
+  commentCount: number;
   score: number;
   /** How the person reading voted: 1, -1, or 0 when they have not. */
   myVote: number;

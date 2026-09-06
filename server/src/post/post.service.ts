@@ -155,11 +155,26 @@ export class PostService {
       myVotes.map((vote) => [String(vote.post_id), vote.value]),
     );
 
+    // Grouped in one query for the whole page rather than counted per post:
+    // the number belongs on the button before anyone opens it, and asking for
+    // it post by post would be a round trip each
+    const commentCounts = await this.commentModel.aggregate<{
+      _id: Types.ObjectId;
+      count: number;
+    }>([
+      { $match: { post_id: { $in: posts.map((post) => post._id) } } },
+      { $group: { _id: '$post_id', count: { $sum: 1 } } },
+    ]);
+    const commentsByPost = new Map(
+      commentCounts.map((row) => [String(row._id), row.count]),
+    );
+
     const data = await Promise.all(
       posts.map((post) =>
         this.toFeedPost(
           post as unknown as PopulatedPost,
           voteByPost.get(String(post._id)) ?? 0,
+          commentsByPost.get(String(post._id)) ?? 0,
         ),
       ),
     );
@@ -665,6 +680,7 @@ export class PostService {
   private async toFeedPost(
     post: PopulatedPost,
     myVote: number,
+    commentCount: number,
   ): Promise<FeedPost> {
     const wholeSubject = post.scope === 'subject';
     return {
@@ -687,6 +703,7 @@ export class PostService {
       flashcardCount: await this.flashcardModel.countDocuments(
         this.visibleCardsQuery(post as unknown as Post),
       ),
+      commentCount,
       score: post.score ?? 0,
       myVote,
       createdAt: post.createdAt,

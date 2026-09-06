@@ -101,6 +101,9 @@ export class PostCardComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Comes with the feed, so the button carries the number from the start;
+    // opening them replaces it with what was actually fetched
+    this.commentCount = this.post.commentCount;
     void this.loadPage(0);
   }
 
