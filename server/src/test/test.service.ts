@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { BasePaginatedResult } from 'src/common.dto';
+import { dateRangeQuery } from 'src/common/date-range.util';
 import {
   assertValidObjectId,
   deleteOwnedOrThrow,
@@ -200,6 +201,12 @@ export class TestService {
     const pipeline: PipelineStage[] = [
       { $match: { user_id: new Types.ObjectId(userId) } },
     ];
+
+    // On when the test was taken. The list shows the day it was finished when
+    // there is one, but an unfinished test has no such day and would drop out
+    // of every range it belongs in.
+    const createdAt = dateRangeQuery(filter);
+    if (createdAt) pipeline.push({ $match: { createdAt } });
 
     if (filter.onlyWrong) {
       pipeline.push({ $match: { 'questions.is_correct': false } });

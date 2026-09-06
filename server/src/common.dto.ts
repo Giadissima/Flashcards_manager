@@ -1,5 +1,6 @@
 import { Filters, nameMaxLength } from './config';
 import {
+  IsDateString,
   IsIn,
   IsMongoId,
   IsOptional,
@@ -84,6 +85,34 @@ export class ListFilterRequest extends BasicFilterRequest {
     required: false,
   })
   title?: string;
+}
+
+/**
+ * The two ends of a date range, both optional and both taken as whole days.
+ *
+ * Its own class rather than two more fields on the shared list filter: the
+ * three lists that offer a range - flashcards, tests, the feed - have nothing
+ * else in common, and the lists that do not offer one have to go on refusing
+ * the two parameters, which is what forbidNonWhitelisted is there for.
+ */
+export class DateRangeRequest {
+  @IsOptional()
+  @IsDateString()
+  @ApiProperty({
+    description: 'Only what is dated on this day or after it (YYYY-MM-DD)',
+    required: false,
+    example: '2026-01-01',
+  })
+  from?: string;
+
+  @IsOptional()
+  @IsDateString()
+  @ApiProperty({
+    description: 'Only what is dated on this day or before it (YYYY-MM-DD)',
+    required: false,
+    example: '2026-12-31',
+  })
+  to?: string;
 }
 
 export interface BasePaginatedResult<T> {

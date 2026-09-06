@@ -25,6 +25,10 @@
         ></app-searchable-select>
       </div>
       <div class="col-12 col-sm-auto">
+        <app-date-range-filter [from]="dateFrom" [to]="dateTo" [disabled]="isReloading"
+          (rangeChange)="onDateRangeChange($event)"></app-date-range-filter>
+      </div>
+      <div class="col-12 col-sm-auto">
         <app-search-input
           [value]="searchTerm"
           [placeholder]="t('home.searchPlaceholder')"

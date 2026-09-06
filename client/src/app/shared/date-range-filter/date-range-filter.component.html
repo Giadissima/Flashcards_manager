@@ -1,0 +1,22 @@
+<div class="date-range">
+  <span class="material-symbols-outlined date-range-icon">date_range</span>
+
+  <!-- The far end limits the near one and the other way round, so the calendar
+       itself cannot offer a range that runs backwards. -->
+  <input type="date" class="form-control date-range-input" [value]="from ?? ''" [attr.max]="to || null"
+    [disabled]="disabled" [title]="'common.dateFrom' | transloco" [attr.aria-label]="'common.dateFrom' | transloco"
+    (change)="onFrom($any($event.target).value)">
+
+  <span class="date-range-dash" aria-hidden="true">–</span>
+
+  <input type="date" class="form-control date-range-input" [value]="to ?? ''" [attr.min]="from || null"
+    [disabled]="disabled" [title]="'common.dateTo' | transloco" [attr.aria-label]="'common.dateTo' | transloco"
+    (change)="onTo($any($event.target).value)">
+
+  @if (from || to) {
+  <button type="button" class="btn btn-icon-ghost date-range-clear" [disabled]="disabled" (click)="clear()"
+    [title]="'common.dateClear' | transloco" [attr.aria-label]="'common.dateClear' | transloco">
+    <span class="material-symbols-outlined">close</span>
+  </button>
+  }
+</div>

@@ -48,7 +48,9 @@ private baseUrl = 'test';
   }
 
   // Aggregate stats over the tests, filtered the same way as getAll
-  getStats(filter?: Pick<TestFilter, 'subject_id' | 'topic_id' | 'onlyWrong' | 'completed'>): Promise<TestStats> {
+  getStats(
+    filter?: Pick<TestFilter, 'subject_id' | 'topic_id' | 'onlyWrong' | 'completed' | 'from' | 'to'>,
+  ): Promise<TestStats> {
     return this.restClient.get<TestStats>(this.baseUrl + '/stats', filter);
   }
 

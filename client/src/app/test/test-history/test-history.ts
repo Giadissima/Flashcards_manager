@@ -16,6 +16,10 @@ import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 
 import { CommonModule } from '@angular/common';
 import { DurationPipe } from '../../pipes/duration.pipe';
+import {
+  DateRange,
+  DateRangeFilterComponent,
+} from '../../shared/date-range-filter/date-range-filter.component';
 import { FormsModule } from '@angular/forms';
 import { PageCardComponent } from '../../shared/page-card/page-card.component';
 import { PaginatedList } from '../../shared/paginated-list';
@@ -42,6 +46,7 @@ import { TopicService } from '../../topic/topic.service';
     FilterBarComponent,
     ScoreBarComponent,
     SegmentedFilterComponent,
+    DateRangeFilterComponent,
   ],
   templateUrl: './test-history.html',
   styleUrl: './test-history.scss',
@@ -83,6 +88,9 @@ export class TestHistory extends PaginatedList implements OnInit, OnDestroy {
   selectedTopicId: string | null = null;
   onlyWrong = false;
   selectedStatus: string | null = null;
+  /** The two ends of the range, as YYYY-MM-DD days; null is an open end. */
+  dateFrom: string | null = null;
+  dateTo: string | null = null;
 
   get activeFilterCount(): number {
     return [
@@ -90,6 +98,8 @@ export class TestHistory extends PaginatedList implements OnInit, OnDestroy {
       this.selectedTopicId,
       this.selectedStatus && this.selectedStatus !== 'all' ? this.selectedStatus : null,
       this.onlyWrong || null,
+      // One filter and not two: an open end is still the same range
+      this.dateFrom || this.dateTo,
     ].filter(Boolean).length;
   }
 
@@ -180,6 +190,12 @@ export class TestHistory extends PaginatedList implements OnInit, OnDestroy {
     this.onFilterChange();
   }
 
+  onDateRangeChange(range: DateRange): void {
+    this.dateFrom = range.from;
+    this.dateTo = range.to;
+    this.onFilterChange();
+  }
+
   onStatusChange(statusFilter: string | null | undefined): void {
     this.selectedStatus = statusFilter ?? 'all';
     this.onFilterChange();
@@ -190,6 +206,8 @@ export class TestHistory extends PaginatedList implements OnInit, OnDestroy {
       subject_id: this.selectedSubjectId || undefined,
       topic_id: this.selectedTopicId || undefined,
       onlyWrong: this.onlyWrong || undefined,
+      from: this.dateFrom || undefined,
+      to: this.dateTo || undefined,
       completed:
         this.selectedStatus === 'completed'
           ? true

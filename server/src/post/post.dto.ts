@@ -6,8 +6,8 @@ import {
   Length,
 } from 'class-validator';
 
-import { ApiProperty } from '@nestjs/swagger';
-import { BasicFilterRequest } from 'src/common.dto';
+import { ApiProperty, IntersectionType } from '@nestjs/swagger';
+import { BasicFilterRequest, DateRangeRequest } from 'src/common.dto';
 import { Trim } from 'src/common/transform.decorators';
 
 /**
@@ -18,7 +18,10 @@ import { Trim } from 'src/common/transform.decorators';
 export const feedSorts = ['created', 'updated', 'popular'] as const;
 export type FeedSort = (typeof feedSorts)[number];
 
-export class FeedFilterRequest extends BasicFilterRequest {
+export class FeedFilterRequest extends IntersectionType(
+  BasicFilterRequest,
+  DateRangeRequest,
+) {
   @IsOptional()
   @IsString()
   @IsIn(feedSorts)

@@ -1,4 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, IntersectionType } from '@nestjs/swagger';
+import { DateRangeRequest, ListFilterRequest } from 'src/common.dto';
 import { Visibility, visibilities } from 'src/common/visibility';
 import {
   IsArray,
@@ -106,3 +107,14 @@ export interface RandomFlashcard {
   _id: string;
   topic_id: string;
 }
+
+/**
+ * The query string of the flashcard list: the shared list filter, plus the two
+ * ends of a date range. On top of it rather than inside it, so the subject and
+ * topic lists, which share that filter and offer no dates, go on refusing the
+ * two parameters.
+ */
+export class CardListFilterRequest extends IntersectionType(
+  ListFilterRequest,
+  DateRangeRequest,
+) {}

@@ -1,4 +1,5 @@
 import {
+  CardListFilterRequest,
   CountFlashcardsDTO,
   ModifyFlashcardDto,
   RandomFlashcard,
@@ -13,7 +14,8 @@ import {
 } from '@nestjs/common';
 import { Flashcard, FlashcardDocument } from './flashcards.schema';
 import { FilterQuery, Model, Types } from 'mongoose';
-import { BasePaginatedResult, ListFilterRequest } from 'src/common.dto';
+import { BasePaginatedResult } from 'src/common.dto';
+import { dateRangeQuery } from 'src/common/date-range.util';
 import {
   assertValidObjectId,
   findOwnedOrThrow,
@@ -94,7 +96,7 @@ export class FlashcardsService {
 
   findAll(
     userId: string,
-    filter: ListFilterRequest,
+    filter: CardListFilterRequest,
   ): Promise<BasePaginatedResult<FlashcardDocument>> {
     // The owner is not one of the optional filters: it is the first thing every
     // query is narrowed by, so nobody can list what is not theirs.
@@ -102,6 +104,11 @@ export class FlashcardsService {
     if (filter.subject_id) query.subject_id = filter.subject_id;
     if (filter.topic_id) query.topic_id = filter.topic_id;
     if (filter.title) query.title = { $regex: filter.title, $options: 'i' };
+
+    // On when the card was written, which is the only date it has and the one
+    // the list can already be sorted by.
+    const createdAt = dateRangeQuery(filter);
+    if (createdAt) query.createdAt = createdAt;
 
     return findPaginated<FlashcardDocument>(
       this.flashcardModel,

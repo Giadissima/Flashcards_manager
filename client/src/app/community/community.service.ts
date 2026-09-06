@@ -14,11 +14,18 @@ export class CommunityService {
 
   constructor(private restClient: RestClientService) {}
 
-  getFeed(skip: number, limit: number, sort: FeedSort): Promise<PaginatedResponse<FeedPost>> {
+  getFeed(
+    skip: number,
+    limit: number,
+    sort: FeedSort,
+    range: { from?: string; to?: string } = {},
+  ): Promise<PaginatedResponse<FeedPost>> {
     return this.restClient.get<PaginatedResponse<FeedPost>>(this.baseUrl, {
       skip,
       limit,
       sort,
+      ...(range.from ? { from: range.from } : {}),
+      ...(range.to ? { to: range.to } : {}),
       // The server asks every paginated list for these two; the feed decides
       // its own order from `sort`, so they are only here to satisfy the DTO.
       sortField: '_id',

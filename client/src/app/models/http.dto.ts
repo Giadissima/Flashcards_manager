@@ -23,6 +23,9 @@ export interface CardFilter extends SimplePaginatedResponse {
   subject_id?: string;
   topic_id?: string;
   title?: string;
+  /** The two ends of a date range over createdAt, as YYYY-MM-DD days. */
+  from?: string;
+  to?: string;
 }
 
 export type RandomCardFIlter = Pick<CardFilter, 'subject_id'> & {

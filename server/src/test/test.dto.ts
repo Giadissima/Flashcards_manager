@@ -3,7 +3,7 @@ import { IsArray, IsBoolean, IsMongoId, IsOptional, IsString, ValidateNested } f
 
 import { ApiProperty, IntersectionType } from "@nestjs/swagger";
 import { Transform, Type } from "class-transformer";
-import { BasicFilterRequest } from "src/common.dto";
+import { BasicFilterRequest, DateRangeRequest } from "src/common.dto";
 
 export class QuestionDto {
   @IsString()
@@ -25,8 +25,10 @@ export class TestCreateRequest {
 }
 
 // Filters shared between the test list (TestFilterDto) and the aggregate stats
-// (getStats), so the stats shown always match the applied filters
-export class TestStatsFilterDto {
+// (getStats), so the stats shown always match the applied filters - the two
+// dates included: a range that narrowed the list but not the numbers above it
+// would leave them describing a different set of tests.
+export class TestStatsFilterDto extends DateRangeRequest {
   @IsOptional()
   @IsMongoId()
   @ApiProperty({

@@ -102,7 +102,10 @@
     "cropHint": "Trascina l'immagine per spostarla e usa i controlli per lo zoom.",
     "cropConfirm": "Usa questo ritaglio",
     "cropLoadError": "Non è stato possibile aprire questa immagine",
-    "zoomLevel": "Livello di zoom"
+    "zoomLevel": "Livello di zoom",
+    "dateFrom": "Dal",
+    "dateTo": "Al",
+    "dateClear": "Azzera le date"
   },
   "notFound": {
     "message": "La pagina che stai cercando non esiste.",

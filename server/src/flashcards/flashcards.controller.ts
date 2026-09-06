@@ -15,12 +15,9 @@ import { CurrentUser } from 'src/auth/current-user.decorator';
 import { FlashcardsService } from './flashcards.service';
 import { JwtPayload } from 'src/auth/auth.dto';
 import { ApiOperation } from '@nestjs/swagger';
+import { BasePaginatedResult, SetVisibilityDto } from 'src/common.dto';
 import {
-  BasePaginatedResult,
-  ListFilterRequest,
-  SetVisibilityDto,
-} from 'src/common.dto';
-import {
+  CardListFilterRequest,
   CountFlashcardsDTO,
   ModifyFlashcardDto,
   RandomFlashcard,
@@ -45,7 +42,7 @@ export class FlashcardsController {
   @Get('all')
   findAll(
     @CurrentUser() user: JwtPayload,
-    @Query() filters: ListFilterRequest,
+    @Query() filters: CardListFilterRequest,
   ): Promise<BasePaginatedResult<FlashcardDocument>> {
     return this.flashcardsService.findAll(user.sub, filters);
   }

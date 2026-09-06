@@ -3,6 +3,7 @@ import { FilterQuery, Model, Types } from 'mongoose';
 import { Post, PostDocument } from './post.schema';
 
 import { BasePaginatedResult, BasicFilterRequest } from 'src/common.dto';
+import { dateRangeQuery } from 'src/common/date-range.util';
 import { Flashcard, FlashcardDocument } from 'src/flashcards/flashcards.schema';
 import {
   ForbiddenException,
@@ -129,9 +130,16 @@ export class PostService {
           ? { updatedAt: -1 }
           : { createdAt: -1 };
 
+    // On when the post first went up and not on when it last changed, whatever
+    // the chosen order: "shared in March" is a fact about the post, while the
+    // other date moves every time a card is added to it.
+    const query: FilterQuery<Post> = {};
+    const createdAt = dateRangeQuery(filter);
+    if (createdAt) query.createdAt = createdAt;
+
     const [posts, count] = await Promise.all([
       this.postModel
-        .find()
+        .find(query)
         .sort({ ...order, _id: -1 })
         .skip(filter.skip)
         .limit(filter.limit)
@@ -140,7 +148,7 @@ export class PostService {
         .populate('topic_ids', 'name color')
         .lean()
         .exec(),
-      this.postModel.countDocuments(),
+      this.postModel.countDocuments(query),
     ]);
 
     // The reader's own likes for this page in one query, rather than one per

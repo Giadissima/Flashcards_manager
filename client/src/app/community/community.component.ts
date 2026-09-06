@@ -3,6 +3,10 @@ import { FeedPost, FeedSort } from '../models/post.dto';
 
 import { CommonModule } from '@angular/common';
 import { CommunityService } from './community.service';
+import {
+  DateRange,
+  DateRangeFilterComponent,
+} from '../shared/date-range-filter/date-range-filter.component';
 import { LoadStateComponent } from '../shared/load-state/load-state.component';
 import { PageCardComponent } from '../shared/page-card/page-card.component';
 import { PaginationComponent } from '../shared/pagination/pagination.component';
@@ -30,6 +34,7 @@ const pageSize = 5;
     PaginationComponent,
     PostCardComponent,
     SegmentedFilterComponent,
+    DateRangeFilterComponent,
   ],
   templateUrl: './community.component.html',
   styleUrl: './community.component.scss',
@@ -41,6 +46,9 @@ export class CommunityComponent implements OnInit {
   total = 0;
   page = 0;
   sort: FeedSort = 'created';
+  /** The two ends of the range, as YYYY-MM-DD days; null is an open end. */
+  dateFrom: string | null = null;
+  dateTo: string | null = null;
   readonly pageSize = pageSize;
 
   constructor(private communityService: CommunityService) {}
@@ -57,6 +65,15 @@ export class CommunityComponent implements OnInit {
     this.sort = sort as FeedSort;
     // Back to the first page: the second page of one order says nothing about
     // the same position in the other
+    this.page = 0;
+    await this.loadFeed();
+  }
+
+  async onDateRangeChange(range: DateRange): Promise<void> {
+    this.dateFrom = range.from;
+    this.dateTo = range.to;
+    // Back to the first page, as with the order: the second page of one range
+    // has nothing to do with the second page of another
     this.page = 0;
     await this.loadFeed();
   }
@@ -83,6 +100,7 @@ export class CommunityComponent implements OnInit {
       this.page * pageSize,
       pageSize,
       this.sort,
+      { from: this.dateFrom ?? undefined, to: this.dateTo ?? undefined },
     );
     this.posts = feed.data;
     this.total = feed.count;

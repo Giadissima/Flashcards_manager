@@ -13,6 +13,9 @@
       ]" [value]="sort" [label]="'community.sortLabel' | transloco" (valueChange)="onSortChange($event)">
     </app-segmented-filter>
 
+    <app-date-range-filter class="feed-dates" [from]="dateFrom" [to]="dateTo"
+      (rangeChange)="onDateRangeChange($event)"></app-date-range-filter>
+
     <app-load-state errorMessageKey="community.loadError">
       @for (post of posts; track post._id) {
       <app-post-card [post]="post"></app-post-card>

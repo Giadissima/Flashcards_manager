@@ -102,7 +102,10 @@
     "cropHint": "Drag the image to move it, and use the controls to zoom.",
     "cropConfirm": "Use this crop",
     "cropLoadError": "This image could not be opened",
-    "zoomLevel": "Zoom level"
+    "zoomLevel": "Zoom level",
+    "dateFrom": "From",
+    "dateTo": "To",
+    "dateClear": "Clear the dates"
   },
   "notFound": {
     "message": "The page you are looking for does not exist.",

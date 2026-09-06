@@ -19,6 +19,11 @@
         </div>
 
         <div class="col-12 col-sm-auto">
+          <app-date-range-filter [from]="dateFrom" [to]="dateTo"
+            (rangeChange)="onDateRangeChange($event)"></app-date-range-filter>
+        </div>
+
+        <div class="col-12 col-sm-auto">
           <app-segmented-filter [options]="statusOptions" [value]="selectedStatus ?? 'all'"
             [label]="t('test.history.statusLabel')"
             (valueChange)="onStatusChange($event)"></app-segmented-filter>

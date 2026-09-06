@@ -1,0 +1,40 @@
+:host {
+  display: block;
+}
+
+.date-range {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--spacing-unit) * 0.5);
+}
+
+.date-range-icon {
+  color: var(--muted-color);
+  flex-shrink: 0;
+}
+
+.date-range-input {
+  /* Wide enough for a whole date in the browser's own format, and no wider:
+     two of these sit in a filter bar beside the selects. */
+  width: auto;
+  min-width: 9.5rem;
+  padding-block: calc(var(--spacing-unit) * 0.9);
+
+  /* Tells the browser which palette to draw its own parts in - the calendar
+     button, the spinners and the popup are all rendered by the browser, and on
+     the dark theme they come out white on white without this. */
+  color-scheme: light;
+}
+
+:host-context([data-theme='dark']) .date-range-input {
+  color-scheme: dark;
+}
+
+.date-range-dash {
+  color: var(--muted-color);
+}
+
+.date-range-clear {
+  padding: calc(var(--spacing-unit) * 0.25);
+  flex-shrink: 0;
+}

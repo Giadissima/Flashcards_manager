@@ -25,11 +25,15 @@ import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { ImageLightboxComponent } from '../shared/image-lightbox/image-lightbox.component';
 import { ZoomableImagesDirective } from '../shared/zoomable-images.directive';
 import { ContentOverflowDirective } from '../shared/content-overflow.directive';
+import {
+  DateRange,
+  DateRangeFilterComponent,
+} from '../shared/date-range-filter/date-range-filter.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, KatexRendererPipe, SearchableSelectComponent, SearchInputComponent, TranslocoModule, ImageLightboxComponent, ZoomableImagesDirective, ContentOverflowDirective, LoadStateComponent, PaginationComponent, FilterBarComponent, VisibilityButtonComponent],
+  imports: [CommonModule, KatexRendererPipe, SearchableSelectComponent, SearchInputComponent, TranslocoModule, ImageLightboxComponent, ZoomableImagesDirective, ContentOverflowDirective, LoadStateComponent, PaginationComponent, FilterBarComponent, VisibilityButtonComponent, DateRangeFilterComponent],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
@@ -46,10 +50,18 @@ export class Home extends PaginatedList implements OnInit, OnDestroy {
   sortDirection: 'asc' | 'desc' = 'asc';
 
   // Sorting is left out: it always has a value, so it would never read as off.
+  /** The two ends of the range, as YYYY-MM-DD days; null is an open end. */
+  dateFrom: string | null = null;
+  dateTo: string | null = null;
+
   get activeFilterCount(): number {
-    return [this.selectedSubjectId, this.selectedTopicId, this.searchTerm].filter(
-      Boolean,
-    ).length;
+    return [
+      this.selectedSubjectId,
+      this.selectedTopicId,
+      this.searchTerm,
+      // One filter and not two: an open end is still the same range
+      this.dateFrom || this.dateTo,
+    ].filter(Boolean).length;
   }
 
   override pageSize = 21;
@@ -115,6 +127,8 @@ export class Home extends PaginatedList implements OnInit, OnDestroy {
       this.selectedSubjectId = qp.get('subject_id') || null;
       this.selectedTopicId = qp.get('topic_id') || null;
       this.searchTerm = qp.get('search') || '';
+      this.dateFrom = qp.get('from') || null;
+      this.dateTo = qp.get('to') || null;
       this.sortBy = (qp.get('sortBy') as 'title' | 'createdAt') || 'title';
       this.sortDirection = (qp.get('sortDirection') as 'asc' | 'desc') || 'asc';
       this.currentPage = Number(qp.get('page')) || 1;
@@ -177,6 +191,8 @@ export class Home extends PaginatedList implements OnInit, OnDestroy {
         subject_id: this.selectedSubjectId || null,
         topic_id: this.selectedTopicId || null,
         search: this.searchTerm || null,
+        from: this.dateFrom,
+        to: this.dateTo,
         sortBy: this.sortBy,
         sortDirection: this.sortDirection,
         page: this.currentPage,
@@ -195,6 +211,8 @@ export class Home extends PaginatedList implements OnInit, OnDestroy {
       subject_id: this.selectedSubjectId || undefined,
       topic_id: this.selectedTopicId || undefined,
       title: this.searchTerm || undefined,
+      from: this.dateFrom || undefined,
+      to: this.dateTo || undefined,
     });
     this.flashcards = data.data;
     this.totalCount = data.count;
@@ -212,6 +230,12 @@ export class Home extends PaginatedList implements OnInit, OnDestroy {
   onFilterChange(): void {
     this.currentPage = 1;
     this.updateQueryParams();
+  }
+
+  onDateRangeChange(range: DateRange): void {
+    this.dateFrom = range.from;
+    this.dateTo = range.to;
+    this.onFilterChange();
   }
 
   onSearchTermChange(term: string): void {
