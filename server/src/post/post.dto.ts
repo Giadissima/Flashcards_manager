@@ -1,4 +1,10 @@
-import { IsIn, IsOptional, IsString, Length } from 'class-validator';
+import {
+  IsBoolean,
+  IsIn,
+  IsOptional,
+  IsString,
+  Length,
+} from 'class-validator';
 
 import { ApiProperty } from '@nestjs/swagger';
 import { BasicFilterRequest } from 'src/common.dto';
@@ -26,11 +32,11 @@ export class FeedFilterRequest extends BasicFilterRequest {
   sort?: FeedSort;
 }
 
-/** What an up or down arrow sends. 0 takes the vote back. */
-export class CastVoteDto {
-  @IsIn([1, -1, 0])
-  @ApiProperty({ enum: [1, -1, 0], example: 1 })
-  value: number;
+/** True likes a post, false takes the like back. */
+export class SetLikeDto {
+  @IsBoolean()
+  @ApiProperty({ example: true })
+  liked: boolean;
 }
 
 /** How long a comment or a feedback message may be. */
@@ -71,9 +77,9 @@ export interface FeedPost {
   flashcardCount: number;
   /** Shown on the comments button, which is why it travels with the feed. */
   commentCount: number;
-  score: number;
-  /** How the person reading voted: 1, -1, or 0 when they have not. */
-  myVote: number;
+  likes: number;
+  /** Whether the person reading has liked it. */
+  liked: boolean;
   createdAt: Date;
   updatedAt: Date;
 }

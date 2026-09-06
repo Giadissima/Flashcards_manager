@@ -49,8 +49,8 @@ export class PostCardComponent implements OnInit {
   @Input({ required: true }) post!: FeedPost;
 
   cards: Flashcard[] = [];
-  /** Set while a vote is in flight, so a double click cannot send two. */
-  voting = false;
+  /** Set while a like is in flight, so a double click cannot send two. */
+  liking = false;
   loading = false;
   /** First card of the window currently shown. */
   skip = 0;
@@ -117,7 +117,7 @@ export class PostCardComponent implements OnInit {
     this.expandedMap[card._id] = !this.expandedMap[card._id];
   }
 
-  /** Nobody imports their own work, so the button stays off their own posts. */
+  /** Nobody imports or likes their own work, so both stay off their posts. */
   get isMine(): boolean {
     return this.authService.user?._id === this.post.author._id;
   }
@@ -149,26 +149,29 @@ export class PostCardComponent implements OnInit {
 
   /**
    * Applied on screen before the server answers, and rolled back if it
-   * refuses: a vote that waits for a round trip feels broken, and the only
+   * refuses: a like that waits for a round trip feels broken, and the only
    * thing at stake is a number.
+   *
+   * Clicking the button already lit takes the like back. The server refuses
+   * an author liking their own post as well, since a disabled button is a
+   * courtesy and not a rule.
    */
-  async castVote(value: number): Promise<void> {
-    if (this.voting) return;
+  async toggleLike(): Promise<void> {
+    if (this.liking || this.isMine) return;
 
-    const previous = { myVote: this.post.myVote, score: this.post.score };
-    // Clicking the arrow already lit takes the vote back
-    const wanted = this.post.myVote === value ? 0 : value;
+    const previous = { liked: this.post.liked, likes: this.post.likes };
+    const wanted = !this.post.liked;
 
-    this.post.score += wanted - this.post.myVote;
-    this.post.myVote = wanted;
-    this.voting = true;
+    this.post.liked = wanted;
+    this.post.likes += wanted ? 1 : -1;
+    this.liking = true;
     try {
-      await this.communityService.vote(this.post._id, wanted);
+      await this.communityService.setLike(this.post._id, wanted);
     } catch {
-      this.post.myVote = previous.myVote;
-      this.post.score = previous.score;
+      this.post.liked = previous.liked;
+      this.post.likes = previous.likes;
     } finally {
-      this.voting = false;
+      this.liking = false;
     }
   }
 

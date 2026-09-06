@@ -21,9 +21,9 @@ export interface FeedPost {
   flashcardCount: number;
   /** Shown on the comments button, without having to open them first. */
   commentCount: number;
-  score: number;
-  /** How the person reading voted: 1, -1, or 0 when they have not. */
-  myVote: number;
+  likes: number;
+  /** Whether the person reading has liked it. */
+  liked: boolean;
   createdAt: string;
   updatedAt: string;
 }

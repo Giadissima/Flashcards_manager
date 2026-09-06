@@ -445,8 +445,6 @@
     "cardCount": "{{count}} flashcard",
     "updatedAt": "Aggiornato il {{date}}",
     "sortPopular": "Più votati",
-    "upvote": "Utile",
-    "downvote": "Poco utile",
     "voteError": "Non è stato possibile salvare il voto",
     "import": "Aggiungi alle mie flashcard",
     "imported": "Aggiunta alle tue flashcard",
@@ -467,7 +465,10 @@
     "answerLabel": "Risposta:",
     "expand": "Espandi",
     "collapse": "Riduci",
-    "olderComments": "Mostra i commenti più vecchi"
+    "olderComments": "Mostra i commenti più vecchi",
+    "like": "Mi piace",
+    "unlike": "Togli mi piace",
+    "ownPost": "Non puoi mettere mi piace ai tuoi post"
   },
   "notifications": {
     "title": "Notifiche",
@@ -478,7 +479,7 @@
     "threadError": "Non è stato possibile aprire lo scambio",
     "threadClosed": "Questo scambio è chiuso",
     "kind": {
-      "upvote": "ha trovato utile il tuo post",
+      "upvote": "ha messo mi piace al tuo post",
       "comment": "ha commentato il tuo post",
       "feedback": "ti ha scritto su una flashcard",
       "resolved": "ha preso nota della tua segnalazione"
@@ -495,7 +496,7 @@
     "filterKind": "Tipo",
     "onlyUnread": "Non lette",
     "kindName": {
-      "upvote": "Voti",
+      "upvote": "Mi piace",
       "comment": "Commenti",
       "feedback": "Segnalazioni",
       "resolved": "Risolte"

@@ -34,9 +34,9 @@ export class CommunityService {
     );
   }
 
-  /** 1 up, -1 down, 0 to take the vote back. */
-  vote(postId: string, value: number): Promise<void> {
-    return this.restClient.patch(`${this.baseUrl}/${postId}/vote`, { value });
+  /** True likes the post, false takes the like back. */
+  setLike(postId: string, liked: boolean): Promise<void> {
+    return this.restClient.patch(`${this.baseUrl}/${postId}/like`, { liked });
   }
 
 

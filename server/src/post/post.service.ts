@@ -4,7 +4,11 @@ import { Post, PostDocument } from './post.schema';
 
 import { BasePaginatedResult, BasicFilterRequest } from 'src/common.dto';
 import { Flashcard, FlashcardDocument } from 'src/flashcards/flashcards.schema';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ConflictException } from '@nestjs/common';
 import { FileService } from 'src/file/file.service';
@@ -18,7 +22,7 @@ import { BadRequestException } from '@nestjs/common';
 import { Comment } from './comment.schema';
 import { Feedback, maxFeedbackMessages } from './feedback.schema';
 import { NotificationService } from 'src/notification/notification.service';
-import { Vote, VoteValue } from './vote.schema';
+import { Vote } from './vote.schema';
 
 const ENTITY = 'Post';
 
@@ -139,21 +143,19 @@ export class PostService {
       this.postModel.countDocuments(),
     ]);
 
-    // The reader's own votes for this page in one query, rather than one per
-    // post: the arrows have to show which way they already clicked
-    const myVotes = await this.voteModel
+    // The reader's own likes for this page in one query, rather than one per
+    // post: the button has to show whether they have already clicked it
+    const myLikes = await this.voteModel
       .find(
         {
           user_id: new Types.ObjectId(userId),
           post_id: { $in: posts.map((post) => post._id) },
         },
-        { post_id: 1, value: 1 },
+        { post_id: 1 },
       )
       .lean()
       .exec();
-    const voteByPost = new Map(
-      myVotes.map((vote) => [String(vote.post_id), vote.value]),
-    );
+    const likedPosts = new Set(myLikes.map((like) => String(like.post_id)));
 
     // Grouped in one query for the whole page rather than counted per post:
     // the number belongs on the button before anyone opens it, and asking for
@@ -173,7 +175,7 @@ export class PostService {
       posts.map((post) =>
         this.toFeedPost(
           post as unknown as PopulatedPost,
-          voteByPost.get(String(post._id)) ?? 0,
+          likedPosts.has(String(post._id)),
           commentsByPost.get(String(post._id)) ?? 0,
         ),
       ),
@@ -182,50 +184,49 @@ export class PostService {
   }
 
   /**
-   * Records how someone rated a post; 0 takes their vote back.
+   * Adds the caller's like to a post, or takes it back.
    *
-   * The totals are recounted from the votes rather than nudged by one, so they
-   * cannot drift from what was actually cast - and the recount deliberately
-   * leaves updatedAt alone: a vote is not a change to the post, and bumping it
+   * The total is recounted from the likes rather than nudged by one, so it
+   * cannot drift from what was actually given - and the recount deliberately
+   * leaves updatedAt alone: a like is not a change to the post, and bumping it
    * would shuffle the "recently updated" order every time somebody clicked.
    */
-  async vote(userId: string, postId: string, value: number): Promise<void> {
+  async setLike(userId: string, postId: string, liked: boolean): Promise<void> {
     const post = await this.findOneOrThrow(postId);
     const user_id = new Types.ObjectId(userId);
     const post_id = post._id as Types.ObjectId;
 
-    // Read before the change: an upvote already there is somebody clicking
-    // twice, and the author has been told about it once already
+    // Nobody likes their own post. The number stands for what other people
+    // made of it, and one the author can raise on their own says nothing.
+    if (String(post.user_id) === userId) {
+      throw new ForbiddenException('You cannot like your own post');
+    }
+
+    // Read before the change: a like already there is somebody clicking twice,
+    // and the author has been told about it once already
     const previous = await this.voteModel
-      .findOne({ user_id, post_id }, { value: 1 })
+      .findOne({ user_id, post_id }, { _id: 1 })
       .lean()
       .exec();
 
-    if (value === 0) {
-      await this.voteModel.deleteOne({ user_id, post_id }).exec();
-    } else {
+    if (liked) {
       await this.voteModel
-        .findOneAndUpdate(
+        .updateOne(
           { user_id, post_id },
-          { $set: { value: value as VoteValue } },
+          { $setOnInsert: { user_id, post_id } },
           { upsert: true },
         )
         .exec();
+    } else {
+      await this.voteModel.deleteOne({ user_id, post_id }).exec();
     }
 
-    const [upvotes, downvotes] = await Promise.all([
-      this.voteModel.countDocuments({ post_id, value: 1 }),
-      this.voteModel.countDocuments({ post_id, value: -1 }),
-    ]);
-
+    const score = await this.voteModel.countDocuments({ post_id });
     await this.postModel
-      .updateOne(
-        { _id: post_id },
-        { $set: { upvotes, downvotes, score: upvotes - downvotes } },
-        { timestamps: false },
-      )
+      .updateOne({ _id: post_id }, { $set: { score } }, { timestamps: false })
       .exec();
-    if (value === 1 && previous?.value !== 1) {
+
+    if (liked && !previous) {
       await this.notificationService.record({
         userId: post.user_id,
         actorId: userId,
@@ -386,7 +387,7 @@ export class PostService {
    * Kept apart from the notification list rather than filtered out of it: a
    * notification is something that happened once and is then read, while an
    * open report is a thing still to do. Mixing them means the second is lost
-   * among the first the moment a post gets a few upvotes.
+   * among the first the moment a post gets a few likes.
    */
   async findOpenFeedback(
     userId: string,
@@ -679,7 +680,7 @@ export class PostService {
 
   private async toFeedPost(
     post: PopulatedPost,
-    myVote: number,
+    liked: boolean,
     commentCount: number,
   ): Promise<FeedPost> {
     const wholeSubject = post.scope === 'subject';
@@ -704,8 +705,8 @@ export class PostService {
         this.visibleCardsQuery(post as unknown as Post),
       ),
       commentCount,
-      score: post.score ?? 0,
-      myVote,
+      likes: post.score ?? 0,
+      liked,
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,
     };

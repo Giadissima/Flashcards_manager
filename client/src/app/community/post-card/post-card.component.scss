@@ -165,16 +165,16 @@
   color: var(--muted-color);
 }
 
-/* The arrows sit under the carousel, in a row of their own: on the sides they
-   would fight with the ones that page through the cards. */
-.post-votes {
+/* Under the carousel, in a row of its own: beside the cards it would fight
+   with the arrows that page through them. */
+.post-likes {
   display: flex;
   align-items: center;
   gap: var(--spacing-unit);
   margin-top: calc(var(--spacing-unit) * 1.5);
 }
 
-.vote-arrow {
+.like-button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -190,8 +190,14 @@
     color: var(--accent-color);
   }
 
+  /* Filled once it is yours, through the variable font's own FILL axis: the
+     outline and the solid glyph are the same symbol, so nothing shifts. */
   &.is-active {
     color: var(--accent-color);
+
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 1;
+    }
   }
 
   &:disabled {
@@ -199,19 +205,10 @@
   }
 }
 
-.vote-score {
+.like-count {
   min-width: 2ch;
-  text-align: center;
   font-weight: 700;
   color: var(--text-color);
-
-  &.is-positive {
-    color: var(--accent-color);
-  }
-
-  &.is-negative {
-    color: var(--danger-color);
-  }
 }
 
 /* In the corner of the card they belong to, so which one is being reported or

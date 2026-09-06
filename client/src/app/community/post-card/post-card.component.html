@@ -84,20 +84,17 @@
     </button>
   </div>
 
-  <div class="post-votes">
-    <button type="button" class="vote-arrow" [class.is-active]="post.myVote === 1" [disabled]="voting"
-      (click)="castVote(1)" [attr.aria-label]="'community.upvote' | transloco"
-      [title]="'community.upvote' | transloco">
-      <span class="material-symbols-outlined">arrow_upward</span>
+  <!-- One button and no counterpart: what a shared set needs is a way of
+       saying it was worth sharing, and nothing is gained by letting people
+       mark down someone who put their notes up. -->
+  <div class="post-likes">
+    <button type="button" class="like-button" [class.is-active]="post.liked" [disabled]="liking || isMine"
+      (click)="toggleLike()"
+      [title]="(isMine ? 'community.ownPost' : post.liked ? 'community.unlike' : 'community.like') | transloco"
+      [attr.aria-label]="'community.like' | transloco" [attr.aria-pressed]="post.liked">
+      <span class="material-symbols-outlined">thumb_up</span>
     </button>
-    <span class="vote-score" [class.is-positive]="post.score > 0" [class.is-negative]="post.score < 0">
-      {{ post.score }}
-    </span>
-    <button type="button" class="vote-arrow" [class.is-active]="post.myVote === -1" [disabled]="voting"
-      (click)="castVote(-1)" [attr.aria-label]="'community.downvote' | transloco"
-      [title]="'community.downvote' | transloco">
-      <span class="material-symbols-outlined">arrow_downward</span>
-    </button>
+    <span class="like-count">{{ post.likes }}</span>
   </div>
 
   <div class="post-comments">

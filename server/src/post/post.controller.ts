@@ -9,9 +9,9 @@ import {
   Query,
 } from '@nestjs/common';
 import {
-  CastVoteDto,
   FeedFilterRequest,
   FeedPost,
+  SetLikeDto,
   WriteMessageDto,
 } from './post.dto';
 
@@ -61,15 +61,15 @@ export class PostController {
   }
 
   @ApiOperation({
-    description: 'rate a post: 1 up, -1 down, 0 to take the vote back',
+    description: 'like a post, or take your like back; never your own',
   })
-  @Patch(':id/vote')
-  vote(
+  @Patch(':id/like')
+  setLike(
     @CurrentUser() user: JwtPayload,
     @Param('id') id: string,
-    @Body() dto: CastVoteDto,
+    @Body() dto: SetLikeDto,
   ): Promise<void> {
-    return this.postService.vote(user.sub, id, dto.value);
+    return this.postService.setLike(user.sub, id, dto.liked);
   }
 
 

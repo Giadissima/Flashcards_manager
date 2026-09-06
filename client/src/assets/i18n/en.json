@@ -445,8 +445,6 @@
     "cardCount": "{{count}} flashcards",
     "updatedAt": "Updated {{date}}",
     "sortPopular": "Most rated",
-    "upvote": "Useful",
-    "downvote": "Not useful",
     "voteError": "The vote could not be saved",
     "import": "Add to my flashcards",
     "imported": "Added to your flashcards",
@@ -467,7 +465,10 @@
     "answerLabel": "Answer:",
     "expand": "Expand",
     "collapse": "Collapse",
-    "olderComments": "Show older comments"
+    "olderComments": "Show older comments",
+    "like": "Like",
+    "unlike": "Undo like",
+    "ownPost": "You cannot like your own post"
   },
   "notifications": {
     "title": "Notifications",
@@ -478,7 +479,7 @@
     "threadError": "The exchange could not be opened",
     "threadClosed": "This exchange is closed",
     "kind": {
-      "upvote": "found your post useful",
+      "upvote": "liked your post",
       "comment": "commented on your post",
       "feedback": "wrote about a flashcard",
       "resolved": "took note of your report"
@@ -495,7 +496,7 @@
     "filterKind": "Kind",
     "onlyUnread": "Unread",
     "kindName": {
-      "upvote": "Ratings",
+      "upvote": "Likes",
       "comment": "Comments",
       "feedback": "Reports",
       "resolved": "Sorted"

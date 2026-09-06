@@ -15,7 +15,7 @@ const maxFeedbackMessages = 3;
 
 /**
  * The bell and its panel: everything somebody else did that the user should
- * hear about - an upvote, a comment, a private report on one of their cards.
+ * hear about - a like, a comment, a private report on one of their cards.
  *
  * A report opens its exchange right here rather than on a page of its own.
  * It is at most three messages long, so a page would be a lot of navigation
@@ -121,7 +121,7 @@ export class NotificationPanelComponent implements OnInit {
   }
 
   iconOf(notification: AppNotification): string {
-    if (notification.kind === 'upvote') return 'arrow_upward';
+    if (notification.kind === 'upvote') return 'thumb_up';
     if (notification.kind === 'comment') return 'chat_bubble';
     return notification.kind === 'resolved' ? 'task_alt' : 'flag';
   }
