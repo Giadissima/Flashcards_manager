@@ -106,20 +106,32 @@ export class PostService {
       }),
     );
 
-    await this.postModel
-      .findOneAndUpdate(
-        { user_id: owner, subject_id },
-        {
-          $set: {
-            scope: wholeSubject ? 'subject' : 'partial',
-            topic_ids,
-            flashcard_ids,
-            cardCount,
-          },
-        },
-        { upsert: true, new: true, setDefaultsOnInsert: true },
-      )
-      .exec();
+    const state = {
+      $set: {
+        scope: wholeSubject ? 'subject' : 'partial',
+        topic_ids,
+        flashcard_ids,
+        cardCount,
+      },
+    };
+
+    // Never created empty, but kept once it exists. A post nobody has ever
+    // seen is nothing to keep, and every private subject would otherwise leave
+    // one behind; a post that has been up has likes and comments on it, and
+    // running dry must not cost them.
+    if (cardCount) {
+      await this.postModel
+        .findOneAndUpdate({ user_id: owner, subject_id }, state, {
+          upsert: true,
+          new: true,
+          setDefaultsOnInsert: true,
+        })
+        .exec();
+    } else {
+      await this.postModel
+        .updateOne({ user_id: owner, subject_id }, state)
+        .exec();
+    }
   }
 
   /**
