@@ -43,10 +43,53 @@ nav {
   position: relative;
   padding-bottom: var(--spacing-unit);
   transition: color 0.2s ease;
+
+  /* The entries of the bar are dropdown triggers, which are spans, except
+     Community, which goes straight to a page and so is a link: without this it
+     is the one word in the bar carrying the browser's underline. All of them
+     answer the pointer the same way, by taking the primary colour. */
+  text-decoration: none;
+
+  /* Label and caret as two boxes rather than one line of text. The gap stands
+     in for the space between them, which flex layout drops. */
+  display: flex;
+  align-items: center;
+  gap: calc(var(--spacing-unit) * 0.5);
+}
+
+/* What the mark hangs from, so it ends with the word and does not run on under
+   the caret. Every entry has one, caret or no caret, which is what keeps the
+   four marks on one line. */
+.menu-label {
+  position: relative;
 }
 
 .menu-item:hover {
     color: var(--primary-color);
+}
+
+/* Where you are, on the entry that took you there. The bar sits in the padding
+   .menu-item already reserves under its label, so nothing in the row moves as
+   it appears. Colour alone would not do it: the same colour is what hovering
+   does, and a mark that a passing pointer can imitate says nothing. */
+.menu-item.is-active,
+.dropdown.is-active .menu-item {
+  color: var(--primary-color);
+}
+
+.menu-item.is-active .menu-label::after,
+.dropdown.is-active .menu-label::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  /* Hung below the word by the padding the entry already reserves, rather than
+     pinned to the bottom of the entry: the entries are not all as tall as each
+     other, and a mark measured from the word sits at one height under all four. */
+  bottom: calc(-1 * var(--spacing-unit));
+  height: 2px;
+  border-radius: 1px;
+  background-color: var(--primary-color);
 }
 
 .actions-container {
@@ -214,6 +257,14 @@ nav {
     justify-content: space-between;
     padding: calc(var(--spacing-unit) * 1.5) 0;
     border-bottom: 1px solid var(--border-color);
+  }
+
+  /* In the drawer the entries are stacked rows with a rule under each, and a
+     bar of its own would land on that rule: down here the colour carries it,
+     with nothing beside it to be mistaken for. */
+  .menu-item.is-active .menu-label::after,
+  .dropdown.is-active .menu-label::after {
+    display: none;
   }
 
   .menu-container .dropdown-content {

@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
 import { Component, HostListener } from '@angular/core';
 import { ImportExportModalComponent } from '../import-export-modal/import-export-modal.component';
 import { NotificationPanelComponent } from '../notification/notification-panel.component';
-import { RouterLink } from '@angular/router';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import { SettingsModalComponent } from '../settings-modal/settings-modal.component';
 import { ToastService } from '../shared/toast/toast.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
@@ -16,7 +16,7 @@ type NavbarDropdown = 'topics' | 'subjects' | 'test' | 'account';
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterLink, CommonModule, ImportExportModalComponent, SettingsModalComponent, ClickOutsideDirective, TranslocoModule, NotificationPanelComponent],
+  imports: [RouterLink, RouterLinkActive, CommonModule, ImportExportModalComponent, SettingsModalComponent, ClickOutsideDirective, TranslocoModule, NotificationPanelComponent],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss']
 })

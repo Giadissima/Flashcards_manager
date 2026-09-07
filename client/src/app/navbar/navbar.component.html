@@ -7,9 +7,13 @@
 
   <!-- Centre: menu. Below the breakpoint it becomes a drawer opened by the hamburger -->
   <div class="menu-container" [class.open]="isMobileMenuOpen" [class.no-transition]="isResizing">
-    <div class="dropdown" (appClickOutside)="closeDropdown('topics')">
+    <!-- routerLinkActive on the whole group and not on its trigger: the
+         trigger is a span and goes nowhere, so what marks the menu is one of
+         the pages inside it being open. The directive reads the links below
+         it, which are in the DOM even while the menu is shut. -->
+    <div class="dropdown" routerLinkActive="is-active" (appClickOutside)="closeDropdown('topics')">
       <span class="menu-item" (click)="toggleDropdown('topics')">
-        {{ 'navbar.topics' | transloco }}
+        <span class="menu-label">{{ 'navbar.topics' | transloco }}</span>
         <span class="material-symbols-outlined">arrow_drop_down</span>
       </span>
       <div class="dropdown-content" [class.show]="openDropdown === 'topics'">
@@ -17,9 +21,9 @@
         <a routerLink="/manage-topics" (click)="onNavigate('topics')">{{ 'navbar.manageTopics' | transloco }}</a>
       </div>
     </div>
-    <div class="dropdown" (appClickOutside)="closeDropdown('subjects')">
+    <div class="dropdown" routerLinkActive="is-active" (appClickOutside)="closeDropdown('subjects')">
       <span class="menu-item" (click)="toggleDropdown('subjects')">
-        {{ 'navbar.subjects' | transloco }}
+        <span class="menu-label">{{ 'navbar.subjects' | transloco }}</span>
         <span class="material-symbols-outlined">arrow_drop_down</span>
       </span>
       <div class="dropdown-content" [class.show]="openDropdown === 'subjects'">
@@ -27,12 +31,12 @@
         <a routerLink="/manage-subjects" (click)="onNavigate('subjects')">{{ 'navbar.manageSubjects' | transloco }}</a>
       </div>
     </div>
-    <a routerLink="/community" class="menu-item" (click)="closeMobileMenu()">
-      {{ 'navbar.community' | transloco }}
+    <a routerLink="/community" class="menu-item" routerLinkActive="is-active" (click)="closeMobileMenu()">
+      <span class="menu-label">{{ 'navbar.community' | transloco }}</span>
     </a>
-    <div class="dropdown" (appClickOutside)="closeDropdown('test')">
+    <div class="dropdown" routerLinkActive="is-active" (appClickOutside)="closeDropdown('test')">
       <span class="menu-item" (click)="toggleDropdown('test')">
-        {{ 'navbar.test' | transloco }}
+        <span class="menu-label">{{ 'navbar.test' | transloco }}</span>
         <span class="material-symbols-outlined">arrow_drop_down</span>
       </span>
       <div class="dropdown-content" [class.show]="openDropdown === 'test'">
