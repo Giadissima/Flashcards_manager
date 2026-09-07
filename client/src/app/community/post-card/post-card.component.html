@@ -14,20 +14,16 @@
       <span class="material-symbols-outlined">chevron_left</span>
     </button>
 
-    <div class="carousel-track">
-      @if (loading) {
-      <div class="carousel-loading">
-        <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">{{ 'common.loading' | transloco }}</span>
-        </div>
-      </div>
-      } @else {
+    <div class="carousel-track" [class.is-back]="pageDirection === 'back'">
       @for (card of cards; track card._id) {
       <!-- The same card as the home grid, down to the classes: a flashcard is
            read the same way wherever it turns up, and the strip in its topic
            colour is what says which one it belongs to. -->
+      <!-- One after the other by a hair: three cards landing together read as
+           a new block dropped in, while a beat between them reads as the row
+           moving along - which is why the beat runs the way it was paged. -->
       <div class="card flashcard flashcard-topic-color post-flashcard"
-        [style.border-top-color]="cardColor(card)">
+        [style.border-top-color]="cardColor(card)" [style.animation-delay.ms]="cardDelay($index)">
         <!-- No subject icon here, unlike the home card: a post is one subject,
              so the icon in the header above already says which, and repeating
              it on every card of the row says it three times over. -->
@@ -73,8 +69,24 @@
         </div>
       </div>
       } @empty {
+      @if (!loading) {
       <p class="carousel-empty">{{ 'community.noFlashcards' | transloco }}</p>
       }
+      }
+
+      <!-- The slots the last page leaves empty, kept rather than closed up: the
+           cards share the row between them, so one card alone would be stretched
+           across the whole width - as wide as three and no taller, since the
+           body is clamped either way. The first empty slot says why the row is
+           short; the others are only spacing. -->
+      @for (slot of emptySlots; track $index) {
+      <div class="carousel-filler" [class.is-end]="$first"
+        [style.animation-delay.ms]="cardDelay(cards.length + $index)">
+        @if ($first) {
+        <span class="material-symbols-outlined">done_all</span>
+        <span>{{ 'community.endOfCards' | transloco }}</span>
+        }
+      </div>
       }
     </div>
 
@@ -82,6 +94,23 @@
       [attr.aria-label]="'community.next' | transloco">
       <span class="material-symbols-outlined">chevron_right</span>
     </button>
+
+    <!-- Over the page it is replacing and not in its place, the way the home
+         grid reloads: taking the cards out for the length of a fetch takes the
+         height of the row with them, and the post - and everything under it -
+         collapses and springs back for a frame.
+
+         Always in the DOM and shown by a class, unlike the home overlay: it
+         has to be there to fade back out, and an @if would take it away on the
+         first frame of the fade. The spinner inside is not, so a feed of posts
+         does not keep a dozen hidden ones turning. -->
+    <div class="carousel-loading" [class.is-loading]="loading">
+      @if (loading) {
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">{{ 'common.loading' | transloco }}</span>
+      </div>
+      }
+    </div>
   </div>
 
   <!-- One button and no counterpart: what a shared set needs is a way of

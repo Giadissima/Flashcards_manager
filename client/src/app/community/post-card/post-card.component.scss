@@ -54,6 +54,9 @@
 }
 
 .post-carousel {
+  /* Holds the loading veil, which covers the arrows along with the cards:
+     while a page is on its way there is nothing to page to. */
+  position: relative;
   display: flex;
   align-items: stretch;
   gap: var(--spacing-unit);
@@ -79,9 +82,25 @@
 .carousel-track {
   flex: 1;
   min-width: 0;
+  /* The height of a card, kept even when there is none: the first fetch of a
+     post has nothing to hold the row open, and the spinner would sit in a
+     strip that grows to full height the moment the cards land. */
+  min-height: 240px;
   display: flex;
   gap: calc(var(--spacing-unit) * 2);
   overflow-x: auto;
+
+  /* Scrolls, but draws no bar. The cards come in shifted a few pixels to the
+     right, and for the length of that animation those pixels count as content
+     past the right edge: enough for the browser to flash a scrollbar in and
+     back out under every page turn. Only the bar goes - the row still scrolls
+     under a finger or a trackpad, and the arrows beside it are the way through
+     it anyway. */
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 /* Shape, corners and inner spacing all come from .card, .flashcard and
@@ -97,6 +116,56 @@
      have nothing but its shadow to stand on. */
   background-color: var(--inset-background);
   --bs-card-bg: var(--inset-background);
+
+  /* "both" for the staggered delay: without it a card would be drawn in place
+     for its first frames and then jump back to the start of the animation. */
+  animation: carousel-card-in 0.32s ease both;
+}
+
+.carousel-track.is-back .post-flashcard {
+  animation-name: carousel-card-in-back;
+}
+
+/* Holds a card's share of the row without being one. Shrinkable, unlike the
+   cards: on a track too narrow for three it collapses to nothing instead of
+   leaving empty width to swipe through to. */
+.carousel-filler {
+  flex: 1 1 300px;
+  min-width: 0;
+  animation: carousel-card-in 0.32s ease both;
+}
+
+/* Outlined and not filled: it stands where a card would, and drawn as one it
+   would be read as a card that failed to load rather than as the end of them. */
+.carousel-filler.is-end {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--spacing-unit) * 0.5);
+  padding: var(--spacing-unit);
+  overflow: hidden;
+  border: 1px dashed var(--border-color);
+  border-radius: var(--border-radius-md);
+  color: var(--muted-color);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.carousel-track.is-back .carousel-filler {
+  animation-name: carousel-card-in-back;
+}
+
+/* Everything above is decoration on top of a swap that works without it. */
+@media (prefers-reduced-motion: reduce) {
+  .carousel-loading {
+    transition: none;
+  }
+
+  .post-flashcard,
+  .carousel-filler {
+    animation: none;
+  }
 }
 
 .flashcard-meta {
@@ -147,13 +216,65 @@
   color: var(--text-color);
 }
 
-.carousel-loading,
+/* Same veil as the home grid's reload overlay, for the same reason: the cards
+   underneath keep the row at its size, so nothing on the page moves. */
+.carousel-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--component-background) 70%, transparent);
+  border-radius: var(--border-radius-md);
+
+  /* Faded in and out rather than switched on and off: against a server on the
+     same machine the veil lasts a handful of frames, and appearing at once it
+     would register as a flash rather than as something loading. Visibility
+     rides along so the hidden veil does not eat clicks meant for the cards.
+     0.2s, the same as the modal in shared/modal. */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s;
+
+  &.is-loading {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+/* The page comes in from the side it was paged towards, so the swap reads as
+   the row moving rather than as its contents being replaced. Small on purpose:
+   24px and a third of a second, which is enough to be followed by the eye and
+   not enough to be waited for. The distance carries the direction along with
+   the order the cards come in, so both say the same thing. */
+@keyframes carousel-card-in {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes carousel-card-in-back {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 .carousel-empty {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 180px;
   color: var(--muted-color);
 }
 

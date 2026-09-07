@@ -482,6 +482,7 @@
     "ownPost": "You cannot like your own post",
     "searchPlaceholder": "Search by user, subject or topic",
     "filterStudy": "Where it was shared from",
+    "endOfCards": "No more flashcards",
     "dateCreated": "Shared",
     "dateUpdated": "Last changed"
   },

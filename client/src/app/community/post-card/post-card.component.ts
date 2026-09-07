@@ -20,6 +20,9 @@ import { baseUrlAPI } from '../../../config/config';
 /** How many cards the carousel holds at a time. */
 const pageSize = 3;
 
+/** The beat between one card of a page coming in and the next one. */
+const cardStaggerMs = 80;
+
 /** How many comments are fetched at once, first time and every time after. */
 const commentPageSize = 20;
 
@@ -54,6 +57,8 @@ export class PostCardComponent implements OnInit {
   loading = false;
   /** First card of the window currently shown. */
   skip = 0;
+  /** Which way the last page was asked for, which is the way it comes in. */
+  pageDirection: 'forward' | 'back' = 'forward';
 
   // Both keyed by flashcard id: which answers the reader has opened out, and
   // which ones are long enough to be worth offering it on.
@@ -115,6 +120,34 @@ export class PostCardComponent implements OnInit {
 
   toggleExpanded(card: Flashcard): void {
     this.expandedMap[card._id] = !this.expandedMap[card._id];
+  }
+
+  /**
+   * One entry per slot the current page leaves empty, so the last page keeps
+   * the shape of a full one.
+   *
+   * Empty while a page is on its way, or the row would be redrawn short for a
+   * moment on the way to a page that fills it.
+   */
+  get emptySlots(): number[] {
+    if (this.loading || !this.cards.length) return [];
+    return Array.from({ length: Math.max(0, pageSize - this.cards.length) });
+  }
+
+  /**
+   * When each card of the new page starts coming in.
+   *
+   * Reversed when paging back, so the last card moves first: the slide is
+   * sixteen pixels and the order the cards arrive in is what actually reads as
+   * a direction, so a stagger fixed left to right would say "forward" over the
+   * top of it whichever arrow was pressed.
+   */
+  cardDelay(index: number): number {
+    const step = this.pageDirection === 'back' ? this.cards.length - 1 - index : index;
+    // Never negative: the empty slots sit past the last card, and paging back
+    // would count them below zero, which CSS reads as an animation already
+    // half over.
+    return Math.max(0, step) * cardStaggerMs;
   }
 
   /** Nobody imports or likes their own work, so both stay off their posts. */
@@ -335,11 +368,17 @@ export class PostCardComponent implements OnInit {
   }
 
   previous(): void {
-    if (this.canGoBack) void this.loadPage(Math.max(0, this.skip - pageSize));
+    if (!this.canGoBack) return;
+
+    this.pageDirection = 'back';
+    void this.loadPage(Math.max(0, this.skip - pageSize));
   }
 
   next(): void {
-    if (this.canGoForward) void this.loadPage(this.skip + pageSize);
+    if (!this.canGoForward) return;
+
+    this.pageDirection = 'forward';
+    void this.loadPage(this.skip + pageSize);
   }
 
   private async loadPage(skip: number): Promise<void> {
