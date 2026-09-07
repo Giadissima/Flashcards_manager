@@ -30,6 +30,13 @@
   color-scheme: dark;
 }
 
+/* Sized to its own text: it names a date and does not need the width of one. */
+.date-range-field {
+  width: auto;
+  flex-shrink: 0;
+  padding-block: calc(var(--spacing-unit) * 0.9);
+}
+
 .date-range-dash {
   color: var(--muted-color);
 }

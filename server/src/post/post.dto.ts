@@ -18,10 +18,66 @@ import { Trim } from 'src/common/transform.decorators';
 export const feedSorts = ['created', 'updated', 'popular'] as const;
 export type FeedSort = (typeof feedSorts)[number];
 
+/**
+ * Which of a post's two dates the range narrows.
+ *
+ * Worth choosing rather than fixed: "shared in March" and "touched in March"
+ * are different questions, and a post that has grown a card a week since it
+ * went up answers only one of them.
+ */
+export const feedDateFields = ['created', 'updated'] as const;
+export type FeedDateField = (typeof feedDateFields)[number];
+
 export class FeedFilterRequest extends IntersectionType(
   BasicFilterRequest,
   DateRangeRequest,
 ) {
+  @IsOptional()
+  @IsString()
+  @ApiProperty({
+    description: 'Only the posts of people studying at this university',
+    required: false,
+  })
+  universityCode?: string;
+
+  @IsOptional()
+  @IsString()
+  @ApiProperty({
+    description: 'Only the posts of people on this degree course',
+    required: false,
+  })
+  course?: string;
+
+  // The name of a course does not pin it down on its own: "Informatica" is a
+  // different course as a Laurea and as a Laurea Magistrale.
+  @IsOptional()
+  @IsString()
+  @ApiProperty({
+    description: 'The level of that course',
+    required: false,
+  })
+  courseKind?: string;
+
+  @IsOptional()
+  @IsString()
+  @Trim()
+  @ApiProperty({
+    description: 'Matches a username, a subject or a topic',
+    required: false,
+  })
+  search?: string;
+
+  @IsOptional()
+  @IsString()
+  @IsIn(feedDateFields)
+  @ApiProperty({
+    description: 'Which date the from/to range applies to',
+    enum: feedDateFields,
+    required: false,
+    default: 'created',
+  })
+  dateField?: FeedDateField;
+
   @IsOptional()
   @IsString()
   @IsIn(feedSorts)

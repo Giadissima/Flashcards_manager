@@ -38,7 +38,26 @@ export class StudyFieldsComponent implements OnInit {
   /** Read once, to fill the controls: later edits are reported through (valueChange). */
   @Input() value: StudyFields = emptyStudyFields();
 
+  /**
+   * A form asks where somebody studies; a filter asks which corner of the
+   * Community to look at. Same two dropdowns, but the filter has no reason to
+   * explain itself and its empty choice means "all of them", not "clear it".
+   */
+  @Input() variant: 'form' | 'filter' = 'form';
+
   @Output() valueChange = new EventEmitter<StudyFields>();
+
+  get universityAllLabel(): string {
+    return this.variant === 'filter'
+      ? 'studyFields.allUniversities'
+      : 'studyFields.clear';
+  }
+
+  get courseAllLabel(): string {
+    return this.variant === 'filter'
+      ? 'studyFields.allCourses'
+      : 'studyFields.clear';
+  }
 
   universityOptions: SelectOption[] = [];
   courseOptions: SelectOption[] = [];

@@ -1,8 +1,17 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { FeedPost, FeedSort } from '../models/post.dto';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Subject as RxSubject, Subscription, debounceTime } from 'rxjs';
+import { FeedDateField, FeedPost, FeedSort } from '../models/post.dto';
 
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../auth/auth.service';
 import { CommunityService } from './community.service';
+import { FilterBarComponent } from '../shared/filter-bar/filter-bar.component';
+import { SearchInputComponent } from '../shared/search-input/search-input.component';
+import {
+  StudyFields,
+  StudyFieldsComponent,
+  emptyStudyFields,
+} from '../university/study-fields/study-fields.component';
 import {
   DateRange,
   DateRangeFilterComponent,
@@ -35,11 +44,14 @@ const pageSize = 5;
     PostCardComponent,
     SegmentedFilterComponent,
     DateRangeFilterComponent,
+    FilterBarComponent,
+    SearchInputComponent,
+    StudyFieldsComponent,
   ],
   templateUrl: './community.component.html',
   styleUrl: './community.component.scss',
 })
-export class CommunityComponent implements OnInit {
+export class CommunityComponent implements OnInit, OnDestroy {
   @ViewChild(LoadStateComponent, { static: true }) loadState!: LoadStateComponent;
 
   posts: FeedPost[] = [];
@@ -49,12 +61,69 @@ export class CommunityComponent implements OnInit {
   /** The two ends of the range, as YYYY-MM-DD days; null is an open end. */
   dateFrom: string | null = null;
   dateTo: string | null = null;
+  /** Which of the two dates that range reads. */
+  dateField: FeedDateField = 'created';
+
+  /** Which university and course the feed is being read from. */
+  study: StudyFields = emptyStudyFields();
+  searchTerm = '';
+
+  // Typed letter by letter, so the request waits for the typing to stop: a
+  // search is three collections asked at once on the server side.
+  private readonly searchChanges = new RxSubject<void>();
+  private searchSubscription?: Subscription;
+
+  get activeFilterCount(): number {
+    return [
+      this.searchTerm,
+      // One filter and not two: an open end is still the same range
+      this.dateFrom || this.dateTo,
+      this.study.universityCode,
+      this.study.course,
+    ].filter(Boolean).length;
+  }
   readonly pageSize = pageSize;
 
-  constructor(private communityService: CommunityService) {}
+  constructor(
+    private communityService: CommunityService,
+    private authService: AuthService,
+  ) {}
 
   ngOnInit(): void {
+    // Where the reader studies, which is the corner of the Community their own
+    // course is in: the one place worth opening on.
+    const user = this.authService.user;
+    this.study = {
+      universityCode: user?.universityCode ?? null,
+      course: user?.course ?? null,
+      courseKind: user?.courseKind ?? null,
+    };
+
+    this.searchSubscription = this.searchChanges
+      .pipe(debounceTime(500))
+      .subscribe(() => void this.reload());
+
     this.loadState.run(() => this.loadFeed());
+  }
+
+  ngOnDestroy(): void {
+    this.searchSubscription?.unsubscribe();
+  }
+
+  onSearchTermChange(term: string): void {
+    this.searchTerm = term;
+    this.searchChanges.next();
+  }
+
+  async onStudyChange(study: StudyFields): Promise<void> {
+    this.study = study;
+    await this.reload();
+  }
+
+  /** Any filter change: back to the first page, since the pages have moved. */
+  private async reload(): Promise<void> {
+    this.page = 0;
+    await this.loadFeed();
   }
 
   get totalPages(): number {
@@ -72,10 +141,14 @@ export class CommunityComponent implements OnInit {
   async onDateRangeChange(range: DateRange): Promise<void> {
     this.dateFrom = range.from;
     this.dateTo = range.to;
-    // Back to the first page, as with the order: the second page of one range
-    // has nothing to do with the second page of another
-    this.page = 0;
-    await this.loadFeed();
+    await this.reload();
+  }
+
+  async onDateFieldChange(field: string): Promise<void> {
+    this.dateField = field as FeedDateField;
+    // Only worth a request when there is a range for it to read: with both
+    // ends open, either date matches every post there is.
+    if (this.dateFrom || this.dateTo) await this.reload();
   }
 
   /** app-pagination counts from 1, the feed skips from 0. */
@@ -100,7 +173,15 @@ export class CommunityComponent implements OnInit {
       this.page * pageSize,
       pageSize,
       this.sort,
-      { from: this.dateFrom ?? undefined, to: this.dateTo ?? undefined },
+      {
+        from: this.dateFrom ?? undefined,
+        to: this.dateTo ?? undefined,
+        dateField: this.dateField,
+        universityCode: this.study.universityCode ?? undefined,
+        course: this.study.course ?? undefined,
+        courseKind: this.study.courseKind ?? undefined,
+        search: this.searchTerm.trim() || undefined,
+      },
     );
     this.posts = feed.data;
     this.total = feed.count;

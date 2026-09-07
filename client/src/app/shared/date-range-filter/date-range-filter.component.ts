@@ -9,6 +9,12 @@ export interface DateRange {
   to: string | null;
 }
 
+/** One of the dates a list can be narrowed by, as offered in the dropdown. */
+export interface DateFieldOption {
+  value: string;
+  label: string;
+}
+
 /**
  * The date range every list is narrowed by: flashcards, tests and the feed.
  *
@@ -34,7 +40,24 @@ export class DateRangeFilterComponent {
   @Input() to: string | null = null;
   @Input() disabled = false;
 
+  /**
+   * The dates this list can be narrowed by, when it has more than one.
+   *
+   * Left empty by the lists that have a single date worth filtering on, which
+   * then show the range on its own. Where there are two, naming them is not a
+   * convenience but the point: two identical date boxes say nothing about
+   * which of the two dates they read, and the answer changes the results.
+   */
+  @Input() fields: DateFieldOption[] = [];
+  @Input() field: string | null = null;
+
   @Output() rangeChange = new EventEmitter<DateRange>();
+  @Output() fieldChange = new EventEmitter<string>();
+
+  onField(value: string): void {
+    this.field = value;
+    this.fieldChange.emit(value);
+  }
 
   onFrom(value: string): void {
     this.emit(value || null, this.to);

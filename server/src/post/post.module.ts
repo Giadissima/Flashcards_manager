@@ -1,4 +1,5 @@
 import { Flashcard, FlashcardSchema } from 'src/flashcards/flashcards.schema';
+import { User, UserSchema } from 'src/auth/user.schema';
 import { Comment, CommentSchema } from './comment.schema';
 import { Feedback, FeedbackSchema } from './feedback.schema';
 import { NotificationModule } from 'src/notification/notification.module';
@@ -23,6 +24,7 @@ import { PostService } from './post.service';
       { name: Vote.name, schema: VoteSchema },
       { name: Comment.name, schema: CommentSchema },
       { name: Feedback.name, schema: FeedbackSchema },
+      { name: User.name, schema: UserSchema },
     ]),
     FileModule,
     NotificationModule,

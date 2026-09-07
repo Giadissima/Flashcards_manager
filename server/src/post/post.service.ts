@@ -23,7 +23,9 @@ import { BadRequestException } from '@nestjs/common';
 import { Comment } from './comment.schema';
 import { Feedback, maxFeedbackMessages } from './feedback.schema';
 import { NotificationService } from 'src/notification/notification.service';
+import { User } from 'src/auth/user.schema';
 import { Vote } from './vote.schema';
+import { escapeRegex } from 'src/common/regex.util';
 
 const ENTITY = 'Post';
 
@@ -35,6 +37,7 @@ export class PostService {
     @InjectModel(Topic.name) private topicModel: Model<Topic>,
     @InjectModel(Flashcard.name) private flashcardModel: Model<Flashcard>,
     @InjectModel(Vote.name) private voteModel: Model<Vote>,
+    @InjectModel(User.name) private userModel: Model<User>,
     @InjectModel(Comment.name) private commentModel: Model<Comment>,
     @InjectModel(Feedback.name) private feedbackModel: Model<Feedback>,
     private readonly fileService: FileService,
@@ -152,16 +155,25 @@ export class PostService {
           ? { updatedAt: -1 }
           : { createdAt: -1 };
 
-    // On when the post first went up and not on when it last changed, whatever
-    // the chosen order: "shared in March" is a fact about the post, while the
-    // other date moves every time a card is added to it.
-    //
     // The empty ones are left out here rather than deleted when they run dry:
     // a subject taken back by mistake would otherwise cost its author every
     // like and comment the post had earned, with no way back.
     const query: FilterQuery<Post> = { cardCount: { $gt: 0 } };
-    const createdAt = dateRangeQuery(filter);
-    if (createdAt) query.createdAt = createdAt;
+
+    // Which date the range reads is the caller's to say, and independent of
+    // the order: when the post went up is a fact that stays put, while when it
+    // last changed moves every time a card is added to it. Creation is the
+    // default, being the one date every post has only one of.
+    const range = dateRangeQuery(filter);
+    if (range) {
+      query[filter.dateField === 'updated' ? 'updatedAt' : 'createdAt'] = range;
+    }
+
+    const authors = await this.authorsStudying(filter);
+    if (authors) query.user_id = { $in: authors };
+
+    const found = await this.searchQuery(filter.search);
+    if (found) query.$or = found;
 
     const [posts, count] = await Promise.all([
       this.postModel
@@ -215,6 +227,57 @@ export class PostService {
       ),
     );
     return { data, count };
+  }
+
+  /**
+   * The people a feed filtered by university and course is about, or null when
+   * it was not filtered by either.
+   *
+   * Looked up as a list of ids rather than joined onto the posts: the feed
+   * reads them with populate, and turning it into an aggregation to reach one
+   * field of the author would mean rewriting the sort, the paging and the
+   * count around it. The list is a student body, not the web.
+   */
+  private async authorsStudying(
+    filter: FeedFilterRequest,
+  ): Promise<Types.ObjectId[] | null> {
+    const query: FilterQuery<User> = {};
+    if (filter.universityCode) query.universityCode = filter.universityCode;
+    if (filter.course) query.course = filter.course;
+    if (filter.courseKind) query.courseKind = filter.courseKind;
+
+    if (!Object.keys(query).length) return null;
+
+    const users = await this.userModel.find(query, { _id: 1 }).lean().exec();
+    return users.map((user) => user._id as Types.ObjectId);
+  }
+
+  /**
+   * One search term against the three things a post is known by: who shared
+   * it, the subject it is on, and the topics it covers.
+   *
+   * Three collections asked separately and matched by id, because not one of
+   * those names is on the post itself - the header builds them from what it
+   * populates. Written as an $or, so a word that is a subject to one person
+   * and a topic to another finds both.
+   */
+  private async searchQuery(
+    term: string | undefined,
+  ): Promise<FilterQuery<Post>[] | null> {
+    if (!term) return null;
+
+    const like = { $regex: escapeRegex(term), $options: 'i' };
+    const [users, subjects, topics] = await Promise.all([
+      this.userModel.find({ username: like }, { _id: 1 }).lean().exec(),
+      this.subjectModel.find({ name: like }, { _id: 1 }).lean().exec(),
+      this.topicModel.find({ name: like }, { _id: 1 }).lean().exec(),
+    ]);
+
+    return [
+      { user_id: { $in: users.map((user) => user._id) } },
+      { subject_id: { $in: subjects.map((subject) => subject._id) } },
+      { topic_ids: { $in: topics.map((topic) => topic._id) } },
+    ];
   }
 
   /**

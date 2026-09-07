@@ -1,10 +1,22 @@
-import { FeedPost, FeedSort } from '../models/post.dto';
+import { FeedDateField, FeedPost, FeedSort } from '../models/post.dto';
 
 import { Feedback, PostComment } from '../models/social.dto';
 import { Flashcard } from '../models/flashcard.dto';
 import { Injectable } from '@angular/core';
 import { PaginatedResponse } from '../models/http.dto';
 import { RestClientService } from '../api/rest-api.service';
+
+/** Everything the feed can be narrowed by, beside its order and its page. */
+export interface FeedFilters {
+  from?: string;
+  to?: string;
+  /** Which date the range reads; the server defaults to when it was shared. */
+  dateField?: FeedDateField;
+  universityCode?: string;
+  course?: string;
+  courseKind?: string;
+  search?: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -18,14 +30,21 @@ export class CommunityService {
     skip: number,
     limit: number,
     sort: FeedSort,
-    range: { from?: string; to?: string } = {},
+    filters: FeedFilters = {},
   ): Promise<PaginatedResponse<FeedPost>> {
     return this.restClient.get<PaginatedResponse<FeedPost>>(this.baseUrl, {
       skip,
       limit,
       sort,
-      ...(range.from ? { from: range.from } : {}),
-      ...(range.to ? { to: range.to } : {}),
+      // Left out when empty rather than sent as an empty string: the server
+      // reads a parameter that is there as a filter to apply
+      ...(filters.from ? { from: filters.from } : {}),
+      ...(filters.to ? { to: filters.to } : {}),
+      ...(filters.dateField ? { dateField: filters.dateField } : {}),
+      ...(filters.universityCode ? { universityCode: filters.universityCode } : {}),
+      ...(filters.course ? { course: filters.course } : {}),
+      ...(filters.courseKind ? { courseKind: filters.courseKind } : {}),
+      ...(filters.search ? { search: filters.search } : {}),
       // The server asks every paginated list for these two; the feed decides
       // its own order from `sort`, so they are only here to satisfy the DTO.
       sortField: '_id',

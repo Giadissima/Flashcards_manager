@@ -1,3 +1,16 @@
+/* Side by side in a filter bar, one under the other in a form: a bar is read
+   across, and two full-width rows in it would push everything else down. */
+.study-fields.is-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--spacing-unit) * 2);
+
+  .form-group {
+    flex: 1 1 220px;
+    margin-bottom: 0;
+  }
+}
+
 /* Explains what the university and course fields are for, right before asking:
    they are the only two fields whose point is not self-evident. */
 .study-callout {

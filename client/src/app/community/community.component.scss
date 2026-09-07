@@ -9,8 +9,3 @@ app-segmented-filter {
   margin: calc(var(--spacing-unit) * 4) 0;
 }
 
-/* Under the order strip on a narrow screen, beside it when there is room: two
-   rows of controls over a feed of cards is one row too many. */
-.feed-dates {
-  margin-bottom: calc(var(--spacing-unit) * 2);
-}

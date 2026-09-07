@@ -105,7 +105,8 @@
     "zoomLevel": "Zoom level",
     "dateFrom": "From",
     "dateTo": "To",
-    "dateClear": "Clear the dates"
+    "dateClear": "Clear the dates",
+    "dateFieldLabel": "Which date to filter by"
   },
   "notFound": {
     "message": "The page you are looking for does not exist.",
@@ -405,7 +406,9 @@
     "noCoursesHint": "This institution only offers post-graduate programmes, which are not in the ministry's list.",
     "clear": "Clear the selection",
     "universitiesError": "The list of universities could not be loaded",
-    "coursesError": "The courses of this university could not be loaded"
+    "coursesError": "The courses of this university could not be loaded",
+    "allUniversities": "All universities",
+    "allCourses": "All courses"
   },
   "profile": {
     "title": "Profile",
@@ -474,7 +477,11 @@
     "olderComments": "Show older comments",
     "like": "Like",
     "unlike": "Undo like",
-    "ownPost": "You cannot like your own post"
+    "ownPost": "You cannot like your own post",
+    "searchPlaceholder": "Search by user, subject or topic",
+    "filterStudy": "Where it was shared from",
+    "dateCreated": "Shared",
+    "dateUpdated": "Last changed"
   },
   "notifications": {
     "title": "Notifications",

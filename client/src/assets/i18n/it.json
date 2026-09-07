@@ -105,7 +105,8 @@
     "zoomLevel": "Livello di zoom",
     "dateFrom": "Dal",
     "dateTo": "Al",
-    "dateClear": "Azzera le date"
+    "dateClear": "Azzera le date",
+    "dateFieldLabel": "Per quale data filtrare"
   },
   "notFound": {
     "message": "La pagina che stai cercando non esiste.",
@@ -405,7 +406,9 @@
     "noCoursesHint": "Questa istituzione offre solo percorsi post-lauream, che non compaiono nell'elenco ministeriale.",
     "clear": "Annulla la selezione",
     "universitiesError": "Non è stato possibile caricare l'elenco delle università",
-    "coursesError": "Non è stato possibile caricare i corsi di questa università"
+    "coursesError": "Non è stato possibile caricare i corsi di questa università",
+    "allUniversities": "Tutte le università",
+    "allCourses": "Tutti i corsi"
   },
   "profile": {
     "title": "Profilo",
@@ -474,7 +477,11 @@
     "olderComments": "Mostra i commenti più vecchi",
     "like": "Mi piace",
     "unlike": "Togli mi piace",
-    "ownPost": "Non puoi mettere mi piace ai tuoi post"
+    "ownPost": "Non puoi mettere mi piace ai tuoi post",
+    "searchPlaceholder": "Cerca per utente, materia o argomento",
+    "filterStudy": "Da dove arriva",
+    "dateCreated": "Pubblicazione",
+    "dateUpdated": "Ultima modifica"
   },
   "notifications": {
     "title": "Notifiche",

@@ -2,6 +2,10 @@
 export const feedSorts = ['created', 'updated', 'popular'] as const;
 export type FeedSort = (typeof feedSorts)[number];
 
+/** Which of a post's two dates the range filter reads. */
+export const feedDateFields = ['created', 'updated'] as const;
+export type FeedDateField = (typeof feedDateFields)[number];
+
 export interface PostAuthor {
   _id: string;
   username: string;
