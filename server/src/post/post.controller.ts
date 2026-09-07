@@ -11,6 +11,10 @@ import {
 import {
   FeedFilterRequest,
   FeedPost,
+  ImportPostDto,
+  ImportResult,
+  ImportTargetDto,
+  PostContents,
   SetLikeDto,
   WriteMessageDto,
 } from './post.dto';
@@ -74,14 +78,38 @@ export class PostController {
 
 
   @ApiOperation({
+    description: 'the topics of a post, with how many shared cards are in each',
+  })
+  @Get(':id/contents')
+  findContents(
+    @CurrentUser() user: JwtPayload,
+    @Param('id') id: string,
+  ): Promise<PostContents> {
+    return this.postService.findContents(user.sub, id);
+  }
+
+  @ApiOperation({
+    description: 'copy a whole shared set into your own library',
+  })
+  @Post(':id/import')
+  importPost(
+    @CurrentUser() user: JwtPayload,
+    @Param('id') id: string,
+    @Body() dto: ImportPostDto,
+  ): Promise<ImportResult> {
+    return this.postService.importPost(user.sub, id, dto);
+  }
+
+  @ApiOperation({
     description: 'copy a public flashcard into your own library',
   })
   @Post('flashcards/:id/import')
   importFlashcard(
     @CurrentUser() user: JwtPayload,
     @Param('id') id: string,
+    @Body() dto: ImportTargetDto,
   ): Promise<void> {
-    return this.postService.importFlashcard(user.sub, id);
+    return this.postService.importFlashcard(user.sub, id, dto);
   }
 
 

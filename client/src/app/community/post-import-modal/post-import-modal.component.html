@@ -1,0 +1,140 @@
+<app-modal [isOpen]="isOpen"
+  [title]="(isCard ? 'community.importSet.titleCard' : 'community.importSet.title') | transloco"
+  [showFooter]="true" dialogClass="modal-lg" (closed)="close()">
+  @if (loading) {
+  <div class="import-loading">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">{{ 'common.loading' | transloco }}</span>
+    </div>
+  </div>
+  } @else if (contents) {
+
+  <!-- What to take is a question only a set raises: a card is one card. -->
+  @if (!isCard) {
+  <section class="import-section">
+    <h6 class="import-heading">{{ 'community.importSet.what' | transloco }}</h6>
+
+    <!-- The subject is the root of the tree and not a choice of its own: the
+         cards hang from the topics, and ticking it is a way of ticking them
+         all at once. -->
+    <label class="import-row is-root">
+      <input type="checkbox" class="form-check-input" [checked]="allChosen"
+        [indeterminate]="someChosen" (change)="toggleAll()">
+      <span class="import-name">{{ contents.subject.name }}</span>
+      <span class="import-count">{{ 'community.importSet.cards' | transloco:{ count: contents.total } }}</span>
+    </label>
+
+    <div class="import-children">
+      @for (topic of contents.topics; track topic._id) {
+      <label class="import-row">
+        <input type="checkbox" class="form-check-input" [checked]="isChosen(topic._id)"
+          (change)="toggleTopic(topic._id)">
+        <span class="import-dot" [style.background-color]="topic.color || 'transparent'"></span>
+        <span class="import-name">{{ topic.name }}</span>
+        <span class="import-count">{{ 'community.importSet.cards' | transloco:{ count: topic.cardCount } }}</span>
+      </label>
+      }
+
+    </div>
+
+    @if (contents.alreadyImported) {
+    <p class="import-note">{{ 'community.importSet.alreadyHave' | transloco:{ count: contents.alreadyImported } }}</p>
+    }
+  </section>
+  }
+
+  <!-- ------------------------------------------------------ where it goes -->
+  <section class="import-section">
+    <h6 class="import-heading">{{ 'community.importSet.where' | transloco }}</h6>
+
+    <select class="form-select" [value]="target" (change)="onTargetChange($any($event.target).value)">
+      <option [value]="newSubject" [selected]="isNewSubject">{{ 'community.importSet.newSubject' | transloco }}</option>
+      @for (subject of subjects; track subject._id) {
+      <option [value]="subject._id" [selected]="subject._id === target">{{ subject.name }}</option>
+      }
+    </select>
+
+    @if (isNewSubject) {
+    <input type="text" class="form-control mt-2" [(ngModel)]="subjectName" maxlength="30"
+      [placeholder]="'community.importSet.newSubjectName' | transloco">
+    }
+  </section>
+
+  <!-- --------------------------------------------------- and how it lands -->
+  <section class="import-section">
+    <h6 class="import-heading">{{ 'community.importSet.topics' | transloco }}</h6>
+
+    <label class="import-choice">
+      <input type="radio" class="form-check-input" name="topicMode" [checked]="topicMode === 'keep'"
+        (change)="onTopicModeChange('keep')">
+      <span>{{ (isCard ? 'community.importSet.topicKeepOne' : 'community.importSet.topicKeep') | transloco }}</span>
+    </label>
+
+    <!-- Said before it can happen, and only while it still cannot be seen: the
+         fear this answers is of a set quietly landing on top of one's own work,
+         and a promise that the question will be asked is what makes the option
+         safe to try. Once names really do clash the section below is that
+         question, and repeating it here would be saying it twice. -->
+    @if (topicMode === 'keep' && !collisions.length) {
+    <p class="import-note import-indent">{{ 'community.importSet.keepHint' | transloco }}</p>
+    }
+
+
+    <label class="import-choice">
+      <input type="radio" class="form-check-input" name="topicMode" [checked]="topicMode === 'single'"
+        (change)="onTopicModeChange('single')">
+      <span>{{ (isCard ? 'community.importSet.topicSingleOne' : 'community.importSet.topicSingle') | transloco }}</span>
+    </label>
+    @if (topicMode === 'single') {
+    <input type="text" class="form-control import-indent" [(ngModel)]="topicName" maxlength="30"
+      [placeholder]="'community.importSet.topicNamePlaceholder' | transloco">
+    }
+
+  </section>
+
+  <!-- Only ever asked when there is something to ask about: a new subject has
+       no topics, so nothing in it can be called what these are called. -->
+  @if (collisions.length) {
+  <section class="import-section is-collision">
+    <h6 class="import-heading">{{ 'community.importSet.collisionTitle' | transloco }}</h6>
+    <p class="import-note">{{ 'community.importSet.collisionHint' | transloco }}</p>
+
+    <label class="import-choice">
+      <input type="radio" class="form-check-input" name="onCollision" [checked]="onCollision === 'merge'"
+        (change)="onCollision = 'merge'">
+      <span>{{ 'community.importSet.collisionMerge' | transloco }}</span>
+    </label>
+
+    <label class="import-choice">
+      <input type="radio" class="form-check-input" name="onCollision" [checked]="onCollision === 'rename'"
+        (change)="onCollision = 'rename'">
+      <span>{{ 'community.importSet.collisionRename' | transloco }}</span>
+    </label>
+
+    @if (onCollision === 'rename') {
+    <div class="import-indent">
+      @for (topic of collisions; track topic._id) {
+      <div class="import-rename">
+        <span class="import-rename-from">{{ topic.name }}</span>
+        <span class="material-symbols-outlined" aria-hidden="true">arrow_right_alt</span>
+        <input type="text" class="form-control" maxlength="30" [value]="renameOf(topic)"
+          [attr.aria-label]="'community.importSet.collisionRename' | transloco"
+          (input)="onRename(topic._id, $any($event.target).value)">
+      </div>
+      }
+    </div>
+    }
+  </section>
+  }
+  }
+
+  <ng-container modal-footer>
+    <button type="button" class="btn btn-outline-primary" (click)="close()">
+      <span class="material-symbols-outlined">close</span>{{ 'common.cancel' | transloco }}
+    </button>
+    <button type="button" class="btn btn-primary" [disabled]="!canImport" (click)="confirm()">
+      <span class="material-symbols-outlined">playlist_add</span>
+      {{ (isCard ? 'community.importSet.confirmOne' : 'community.importSet.confirm') | transloco:{ count: selectedCount } }}
+    </button>
+  </ng-container>
+</app-modal>

@@ -58,8 +58,8 @@
               [title]="'community.feedback' | transloco" [attr.aria-label]="'community.feedback' | transloco">
               <span class="material-symbols-outlined">feedback</span>
             </button>
-            <button type="button" class="btn btn-icon-ghost" [disabled]="importingId === card._id"
-              (click)="importCard(card)"
+            <button type="button" class="btn btn-icon-ghost" [disabled]="importedIds.has(card._id)"
+              (click)="openCardImport(card)"
               [title]="(importedIds.has(card._id) ? 'community.alreadyImported' : 'community.import') | transloco"
               [attr.aria-label]="'community.import' | transloco">
               <span class="material-symbols-outlined">{{ importedIds.has(card._id) ? 'library_add_check' : 'library_add' }}</span>
@@ -124,6 +124,21 @@
       <span class="material-symbols-outlined">thumb_up</span>
     </button>
     <span class="like-count">{{ post.likes }}</span>
+
+    <!-- At the far end of the same row: what is done to the post as a whole,
+         where the per-card buttons on the cards themselves are not. -->
+    @if (!isMine) {
+    <div class="post-actions">
+      <button type="button" class="btn btn-icon-ghost" [title]="'community.reportPost' | transloco"
+        [attr.aria-label]="'community.reportPost' | transloco">
+        <span class="material-symbols-outlined">flag</span>
+      </button>
+      <button type="button" class="btn btn-icon-ghost" (click)="openImport()"
+        [title]="'community.importAll' | transloco" [attr.aria-label]="'community.importAll' | transloco">
+        <span class="material-symbols-outlined">playlist_add</span>
+      </button>
+    </div>
+    }
   </div>
 
   <div class="post-comments">
@@ -180,6 +195,11 @@
     <span>{{ 'community.updatedAt' | transloco:{ date: post.updatedAt | date:'short' } }}</span>
   </footer>
 </article>
+
+<!-- The whole set at once, with the choosing that takes: which topics, and
+     where they land in a library that is already somebody's own. -->
+<app-post-import-modal [post]="post" [card]="importingCard" [isOpen]="importOpen"
+  (closed)="importOpen = false" (done)="onImported()"></app-post-import-modal>
 
 <!-- Private, and addressed to the author alone: correcting a stranger in the
      open is awkward enough that most people simply would not. -->

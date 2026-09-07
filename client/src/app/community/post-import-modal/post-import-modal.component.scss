@@ -1,0 +1,108 @@
+.import-loading {
+  display: flex;
+  justify-content: center;
+  padding: calc(var(--spacing-unit) * 4);
+}
+
+/* The three questions read as three blocks, in the order they are answered. */
+.import-section {
+  & + & {
+    margin-top: calc(var(--spacing-unit) * 2.5);
+    padding-top: calc(var(--spacing-unit) * 2);
+    border-top: 1px solid var(--border-color);
+  }
+}
+
+.import-heading {
+  color: var(--header-color);
+  margin-bottom: var(--spacing-unit);
+}
+
+.import-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-unit);
+  padding: calc(var(--spacing-unit) * 0.5) 0;
+  cursor: pointer;
+}
+
+.import-row.is-root {
+  font-weight: 700;
+  color: var(--header-color);
+}
+
+/* Indented under the subject, with the line that says what hangs from what. */
+.import-children {
+  margin-left: calc(var(--spacing-unit) * 1.5);
+  padding-left: calc(var(--spacing-unit) * 1.5);
+  border-left: 1px solid var(--border-color);
+}
+
+/* The topic's own colour, the same mark the cards carry on their top edge. */
+.import-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.import-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.import-count {
+  color: var(--muted-color);
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.import-note {
+  color: var(--muted-color);
+  font-size: 0.85rem;
+  margin: var(--spacing-unit) 0 0;
+}
+
+/* Tight under the choice it reassures about, rather than a paragraph's width
+   away from it. */
+.import-note.import-indent {
+  margin-top: 0;
+}
+
+.import-choice {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-unit);
+  padding: calc(var(--spacing-unit) * 0.5) 0;
+  cursor: pointer;
+}
+
+/* Hangs under the choice it belongs to, so it is read as part of it. */
+.import-indent {
+  margin-left: calc(var(--spacing-unit) * 3);
+  margin-bottom: var(--spacing-unit);
+}
+
+.import-rename {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-unit);
+  margin-bottom: var(--spacing-unit);
+
+  .form-control {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.import-rename-from {
+  color: var(--muted-color);
+  flex: 0 1 40%;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

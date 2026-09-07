@@ -1,4 +1,12 @@
-import { FeedFilterRequest, FeedPost } from './post.dto';
+import {
+  FeedFilterRequest,
+  FeedPost,
+  ImportPostDto,
+  ImportResult,
+  ImportTargetDto,
+  PostContents,
+} from './post.dto';
+import { nameMaxLength } from 'src/config';
 import { FilterQuery, Model, Types } from 'mongoose';
 import { Post, PostDocument } from './post.schema';
 
@@ -591,7 +599,11 @@ export class PostService {
    * zip import already does, so the card lands somewhere that makes sense
    * instead of loose at the top of the library.
    */
-  async importFlashcard(userId: string, cardId: string): Promise<void> {
+  async importFlashcard(
+    userId: string,
+    cardId: string,
+    dto: ImportTargetDto,
+  ): Promise<void> {
     const owner = new Types.ObjectId(userId);
     const source = (await this.flashcardModel
       .findOne({ _id: cardId, visibility: 'public' })
@@ -612,8 +624,11 @@ export class PostService {
       throw new ConflictException('This flashcard was already imported');
     }
 
-    const subject_id = await this.mirrorSubject(owner, source);
-    const topic_id = await this.mirrorTopic(owner, source, subject_id);
+    // The same two steps a whole set goes through, over a list of one: a card
+     // taken on its own lands in the same library and has to answer the same
+     // questions, the one about a topic name already in use included.
+    const subject_id = await this.importTarget(owner, source.subject_id?._id, dto);
+    const topicOf = await this.importTopics(owner, subject_id, [source], dto);
     const { question, answer } = await this.copyImages(source);
 
     await this.flashcardModel.create({
@@ -621,7 +636,7 @@ export class PostService {
       question,
       answer,
       subject_id,
-      topic_id,
+      topic_id: topicOf(source),
       user_id: owner,
       visibility: 'private',
       imported: true,
@@ -629,46 +644,264 @@ export class PostService {
     });
   }
 
-  /** The caller's own subject of the same name, created if they have none. */
-  private async mirrorSubject(
-    owner: Types.ObjectId,
-    source: SourceCard,
-  ): Promise<Types.ObjectId | undefined> {
-    const name = source.subject_id?.name;
-    if (!name) return undefined;
 
+  /**
+   * The tree the import dialog is drawn from: the topics of a post that
+   * actually hold shared cards, and how many each holds.
+   *
+   * Read from the cards and not from the post's topic list: a topic shared
+   * whole but emptied since would otherwise be offered with nothing in it.
+   */
+  async findContents(userId: string, postId: string): Promise<PostContents> {
+    const post = await this.findOneOrThrow(postId);
     const subject = await this.subjectModel
-      .findOneAndUpdate(
-        { user_id: owner, name },
-        {
-          $setOnInsert: {
-            name,
-            color: source.subject_id?.color,
-            user_id: owner,
-            visibility: 'private',
-          },
-        },
-        { upsert: true, new: true },
-      )
+      .findById(post.subject_id, { name: 1, color: 1 })
+      .lean()
       .exec();
-    return subject._id as Types.ObjectId;
+
+    const cards = await this.flashcardModel
+      .find(this.visibleCardsQuery(post), { _id: 1, topic_id: 1 })
+      .lean()
+      .exec();
+
+    // Counted by topic, and a card under none is not counted at all: one
+    // cannot be made any more, and the few left from before are not something
+    // to hand on to somebody else's library.
+    const counts = new Map<string, number>();
+    for (const card of cards) {
+      if (!card.topic_id) continue;
+      const key = String(card.topic_id);
+      counts.set(key, (counts.get(key) ?? 0) + 1);
+    }
+
+    const topics = await this.topicModel
+      .find({ _id: { $in: [...counts.keys()] } }, { name: 1, color: 1 })
+      .lean()
+      .exec();
+
+    // What the reader already holds, so the dialog can say up front how much
+    // of the set would actually be new to them
+    const alreadyImported = await this.flashcardModel
+      .countDocuments({
+        user_id: new Types.ObjectId(userId),
+        imported_from: { $in: cards.map((card) => card._id) },
+      })
+      .exec();
+
+    return {
+      subject: {
+        _id: String(post.subject_id),
+        name: subject?.name ?? '',
+        color: subject?.color,
+      },
+      topics: topics
+        .map((topic) => ({
+          _id: String(topic._id),
+          name: topic.name,
+          color: topic.color,
+          cardCount: counts.get(String(topic._id)) ?? 0,
+        }))
+        .sort((a, b) => a.name.localeCompare(b.name)),
+      total: [...counts.values()].reduce((sum, n) => sum + n, 0),
+      alreadyImported,
+    };
   }
 
-  private async mirrorTopic(
-    owner: Types.ObjectId,
-    source: SourceCard,
-    subject_id?: Types.ObjectId,
-  ): Promise<Types.ObjectId | undefined> {
-    const name = source.topic_id?.name;
-    if (!name || !subject_id) return undefined;
+  /**
+   * Copies a whole set of shared cards into the reader's own library.
+   *
+   * The same copy as importFlashcard, done in bulk: private, marked as
+   * imported, with images of its own. What this adds is the choosing - which
+   * topics to take, which subject of theirs to put them in, and what to do
+   * with a topic name they already use - because a set of two hundred cards
+   * lands in a library that is already organised, and dropping it in under the
+   * author's own names would be reorganising somebody else's shelf.
+   */
+  async importPost(
+    userId: string,
+    postId: string,
+    dto: ImportPostDto,
+  ): Promise<ImportResult> {
+    const owner = new Types.ObjectId(userId);
+    const post = await this.findOneOrThrow(postId);
+    if (String(post.user_id) === userId) {
+      throw new ConflictException('This post is your own');
+    }
 
+    const chosenTopics = (dto.topicIds ?? []).map((id) => new Types.ObjectId(id));
+    if (!chosenTopics.length) {
+      throw new BadRequestException('Choose at least one topic to import');
+    }
+
+    // The post's own rule on what is visible, and on top of it what was ticked
+    const sources = (await this.flashcardModel
+      .find({
+        $and: [
+          this.visibleCardsQuery(post),
+          { topic_id: { $in: chosenTopics } },
+        ],
+      })
+      .populate(['subject_id', 'topic_id'])
+      .lean()
+      .exec()) as unknown as SourceCard[];
+
+    if (!sources.length) return { imported: 0, skipped: 0, subjectId: '' };
+
+    // Taken once and only once: a second import of the same set adds what has
+    // been shared since and leaves the rest alone
+    const mine = await this.flashcardModel
+      .find(
+        {
+          user_id: owner,
+          imported_from: { $in: sources.map((card) => card._id) },
+        },
+        { imported_from: 1 },
+      )
+      .lean()
+      .exec();
+    const already = new Set(mine.map((card) => String(card.imported_from)));
+    const fresh = sources.filter((card) => !already.has(String(card._id)));
+
+    const subject_id = await this.importTarget(owner, post.subject_id, dto);
+    const topicOf = await this.importTopics(owner, subject_id, fresh, dto);
+
+    const copies: Record<string, unknown>[] = [];
+    for (const source of fresh) {
+      const { question, answer } = await this.copyImages(source);
+      copies.push({
+        title: source.title,
+        question,
+        answer,
+        subject_id,
+        topic_id: topicOf(source),
+        user_id: owner,
+        visibility: 'private',
+        imported: true,
+        imported_from: source._id,
+      });
+    }
+    if (copies.length) await this.flashcardModel.insertMany(copies);
+
+    return {
+      imported: copies.length,
+      skipped: sources.length - copies.length,
+      subjectId: String(subject_id),
+    };
+  }
+
+  /** The subject the copies land in: one of the reader's own, or a new one. */
+  private async importTarget(
+    owner: Types.ObjectId,
+    sourceSubjectId: Types.ObjectId | undefined,
+    dto: ImportTargetDto,
+  ): Promise<Types.ObjectId> {
+    if (dto.subjectId) {
+      const mine = await this.subjectModel
+        .findOne({ _id: dto.subjectId, user_id: owner }, { _id: 1 })
+        .lean()
+        .exec();
+      if (!mine) throw new NotFoundException('Subject not found');
+      return mine._id as Types.ObjectId;
+    }
+
+    const name = dto.subjectName?.trim();
+    if (!name) throw new BadRequestException('Name the subject to create');
+
+    // Refused rather than renamed behind their back: the reader has that name
+    // on a shelf already, and which of the two they meant is theirs to say -
+    // the dialog offers it in the same dropdown.
+    const clash = await this.subjectModel
+      .findOne({ user_id: owner, name }, { _id: 1 })
+      .lean()
+      .exec();
+    if (clash) throw new ConflictException('You already have a subject with this name');
+
+    const source = sourceSubjectId
+      ? await this.subjectModel.findById(sourceSubjectId, { color: 1 }).lean().exec()
+      : null;
+    const created = await this.subjectModel.create({
+      name,
+      color: source?.color,
+      user_id: owner,
+      visibility: 'private',
+    });
+    return created._id as Types.ObjectId;
+  }
+
+  /**
+   * Works out, once for the whole set, which topic of the reader's each card
+   * goes under, and creates the ones that have to exist.
+   *
+   * Returns a lookup rather than doing it card by card: a hundred cards of the
+   * same topic would otherwise be a hundred round trips to find the same one.
+   */
+  private async importTopics(
+    owner: Types.ObjectId,
+    subject_id: Types.ObjectId,
+    sources: SourceCard[],
+    dto: ImportTargetDto,
+  ): Promise<(card: SourceCard) => Types.ObjectId> {
+    if (dto.topicMode === 'single') {
+      const name = dto.topicName?.trim();
+      if (!name) throw new BadRequestException('Name the topic to import into');
+      const single = await this.findOrCreateTopic(owner, subject_id, name);
+      return () => single;
+    }
+
+    // A copy is a card like any other and needs a topic like any other. Cards
+    // made before that was enforced are refused rather than copied without
+    // one: taking them in would put back exactly what this closes.
+    if (sources.some((card) => !card.topic_id)) {
+      throw new BadRequestException('This flashcard is under no topic');
+    }
+
+    // keep: one of theirs per one of the author's, by name
+    const byName = new Map<string, Types.ObjectId>();
+    const mapped = new Map<string, Types.ObjectId>();
+    for (const source of sources) {
+      const topic = source.topic_id;
+      if (!topic?.name || mapped.has(String(topic._id))) continue;
+
+      let target = byName.get(topic.name);
+      if (!target) {
+        const existing = await this.topicModel
+          .findOne({ user_id: owner, subject_id, name: topic.name }, { _id: 1 })
+          .lean()
+          .exec();
+
+        target =
+          existing && dto.onCollision !== 'rename'
+            ? (existing._id as Types.ObjectId)
+            : await this.findOrCreateTopic(
+                owner,
+                subject_id,
+                existing
+                  ? await this.renamedTo(owner, subject_id, topic, dto)
+                  : topic.name,
+                topic.color,
+              );
+        byName.set(topic.name, target);
+      }
+      mapped.set(String(topic._id), target);
+    }
+
+    return (card: SourceCard) =>
+      mapped.get(String(card.topic_id?._id)) as Types.ObjectId;
+  }
+
+  private async findOrCreateTopic(
+    owner: Types.ObjectId,
+    subject_id: Types.ObjectId,
+    name: string,
+    color?: string,
+  ): Promise<Types.ObjectId> {
     const topic = await this.topicModel
       .findOneAndUpdate(
-        { user_id: owner, name, subject_id },
+        { user_id: owner, subject_id, name },
         {
           $setOnInsert: {
             name,
-            color: source.topic_id?.color,
+            color,
             subject_id,
             user_id: owner,
             visibility: 'private',
@@ -678,6 +911,47 @@ export class PostService {
       )
       .exec();
     return topic._id as Types.ObjectId;
+  }
+
+  /**
+   * What a topic whose name is taken is to be called instead: what the reader
+   * typed in the dialog, or a numbered name when they were not asked - a call
+   * that can reach here without one, and a set half imported would be worse
+   * than a topic with a dull name.
+   */
+  private async renamedTo(
+    owner: Types.ObjectId,
+    subject_id: Types.ObjectId,
+    topic: { _id: Types.ObjectId; name?: string },
+    dto: ImportTargetDto,
+  ): Promise<string> {
+    const asked = dto.renames?.find(
+      (rename) => rename.topicId === String(topic._id),
+    )?.name;
+    return (
+      asked?.trim() ||
+      (await this.freeTopicName(owner, subject_id, topic.name ?? ''))
+    );
+  }
+
+  /** "Analisi", "Analisi (2)", "Analisi (3)" - the first one nobody is using. */
+  private async freeTopicName(
+    owner: Types.ObjectId,
+    subject_id: Types.ObjectId,
+    base: string,
+  ): Promise<string> {
+    for (let n = 2; n < 100; n++) {
+      const suffix = ` (${n})`;
+      // Trimmed from the base and not from the suffix, which is what tells the
+      // two apart when a long name is at the limit
+      const name =
+        base.slice(0, nameMaxLength - suffix.length).trimEnd() + suffix;
+      const taken = await this.topicModel
+        .exists({ user_id: owner, subject_id, name })
+        .exec();
+      if (!taken) return name;
+    }
+    throw new ConflictException('Too many topics with this name');
   }
 
   /**

@@ -1,4 +1,12 @@
-import { FeedDateField, FeedPost, FeedSort } from '../models/post.dto';
+import {
+  FeedDateField,
+  FeedPost,
+  FeedSort,
+  ImportPostRequest,
+  ImportResult,
+  ImportTargetRequest,
+  PostContents,
+} from '../models/post.dto';
 
 import { Feedback, PostComment } from '../models/social.dto';
 import { Flashcard } from '../models/flashcard.dto';
@@ -60,6 +68,19 @@ export class CommunityService {
     );
   }
 
+  /** The topics of a post and how much is in each: the import dialog's tree. */
+  getPostContents(postId: string): Promise<PostContents> {
+    return this.restClient.get<PostContents>(`${this.baseUrl}/${postId}/contents`);
+  }
+
+  /** Copies a whole shared set into the reader's own library. */
+  importPost(postId: string, request: ImportPostRequest): Promise<ImportResult> {
+    return this.restClient.post(
+      `${this.baseUrl}/${postId}/import`,
+      request,
+    ) as Promise<ImportResult>;
+  }
+
   /** True likes the post, false takes the like back. */
   setLike(postId: string, liked: boolean): Promise<void> {
     return this.restClient.patch(`${this.baseUrl}/${postId}/like`, { liked });
@@ -67,8 +88,11 @@ export class CommunityService {
 
 
   /** Copies a public flashcard into the caller's own library. */
-  importFlashcard(flashcardId: string): Promise<void> {
-    return this.restClient.post(`${this.baseUrl}/flashcards/${flashcardId}/import`, {});
+  importFlashcard(cardId: string, request: ImportTargetRequest): Promise<void> {
+    return this.restClient.post(
+      `${this.baseUrl}/flashcards/${cardId}/import`,
+      request,
+    ) as Promise<void>;
   }
 
 

@@ -326,6 +326,16 @@
   }
 }
 
+/* Pushed to the far end of the likes row, away from the like itself: these
+   two act on the post, and a button that reports it should not sit where a
+   thumb is about to land. */
+.post-actions {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--spacing-unit) * 0.5);
+  margin-left: auto;
+}
+
 .like-count {
   min-width: 2ch;
   font-weight: 700;

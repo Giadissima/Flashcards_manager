@@ -8,6 +8,7 @@ import { FeedPost } from '../../models/post.dto';
 import { Flashcard } from '../../models/flashcard.dto';
 import { FormsModule } from '@angular/forms';
 import { ModalComponent } from '../../shared/modal/modal.component';
+import { PostImportModalComponent } from '../post-import-modal/post-import-modal.component';
 import { PostComment } from '../../models/social.dto';
 import { KatexRendererPipe } from '../../pipes/katex-renderer.pipe';
 import { ToastService } from '../../shared/toast/toast.service';
@@ -44,6 +45,7 @@ const commentPageSize = 20;
     KatexRendererPipe,
     ModalComponent,
     ContentOverflowDirective,
+    PostImportModalComponent,
   ],
   templateUrl: './post-card.component.html',
   styleUrl: './post-card.component.scss',
@@ -210,28 +212,40 @@ export class PostCardComponent implements OnInit {
 
   /** Cards already taken, so the button does not invite a second useless click. */
   readonly importedIds = new Set<string>();
-  importingId: string | null = null;
 
-  async importCard(card: Flashcard): Promise<void> {
-    if (this.importingId || this.importedIds.has(card._id)) return;
+  // --------------------------------------------------------- the whole set
 
-    this.importingId = card._id;
-    try {
-      await this.communityService.importFlashcard(card._id);
-      this.importedIds.add(card._id);
-      this.toast.show(this.transloco.translate('community.imported'), 'success');
-    } catch (error) {
-      // 409 is the server saying it is already there, which is worth telling
-      // apart from a real failure
-      const already = (error as { status?: number })?.status === 409;
-      this.toast.show(
-        this.transloco.translate(already ? 'community.alreadyImported' : 'community.importError'),
-        already ? 'info' : 'error',
-      );
-      if (already) this.importedIds.add(card._id);
-    } finally {
-      this.importingId = null;
-    }
+  importOpen = false;
+  /** The one card being taken, or null when the whole set is. */
+  importingCard: Flashcard | null = null;
+
+  openImport(): void {
+    this.importingCard = null;
+    this.importOpen = true;
+  }
+
+  /**
+   * A card on its own goes through the same dialog as the set it belongs to.
+   *
+   * It used to be one click and done. What that click could not say is where
+   * the card was going: it made a subject and a topic of the author's names
+   * without asking, and the reader found out afterwards.
+   */
+  openCardImport(card: Flashcard): void {
+    if (this.importedIds.has(card._id)) return;
+
+    this.importingCard = card;
+    this.importOpen = true;
+  }
+
+  /**
+   * Every card of the post is now the reader's, as far as the buttons on them
+   * are concerned: marking them here saves a row of "add" buttons that would
+   * each answer "you already have this one".
+   */
+  onImported(): void {
+    if (this.importingCard) this.importedIds.add(this.importingCard._id);
+    else for (const card of this.cards) this.importedIds.add(card._id);
   }
 
   // ------------------------------------------------------------- comments

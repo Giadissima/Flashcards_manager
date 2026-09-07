@@ -6,6 +6,45 @@ export type FeedSort = (typeof feedSorts)[number];
 export const feedDateFields = ['created', 'updated'] as const;
 export type FeedDateField = (typeof feedDateFields)[number];
 
+/** The tree the import dialog is drawn from. */
+export interface PostContents {
+  subject: { _id: string; name: string; color?: string };
+  topics: { _id: string; name: string; color?: string; cardCount: number }[];
+  total: number;
+  /** How many of them the reader has already taken. */
+  alreadyImported: number;
+}
+
+/** How the topics of a set are laid out on the way in. */
+export type ImportTopicMode = 'keep' | 'single';
+
+/** What to do with a topic name the reader already uses. */
+export type ImportCollision = 'merge' | 'rename';
+
+/** Where copies land: asked the same way of a whole set and of one card. */
+export interface ImportTargetRequest {
+  /** A subject of the reader's own; absent means create the one named below. */
+  subjectId?: string;
+  subjectName?: string;
+  topicMode: ImportTopicMode;
+  topicName?: string;
+  onCollision?: ImportCollision;
+  renames?: { topicId: string; name: string }[];
+}
+
+/** The same, plus which part of the post is being taken. */
+export interface ImportPostRequest extends ImportTargetRequest {
+  topicIds?: string[];
+}
+
+/** What an import did. */
+export interface ImportResult {
+  imported: number;
+  /** Cards left alone because the reader already had them. */
+  skipped: number;
+  subjectId: string;
+}
+
 export interface PostAuthor {
   _id: string;
   username: string;
