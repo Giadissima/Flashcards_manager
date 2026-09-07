@@ -2,6 +2,7 @@ import { Subject, SubjectSchema } from './subject.schema';
 
 import { FileModule } from 'src/file/file.module';
 import { Module } from '@nestjs/common';
+import { PublishingModule } from 'src/common/publishing.module';
 import { Flashcard, FlashcardSchema } from 'src/flashcards/flashcards.schema';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Topic, TopicSchema } from 'src/topic/topic.schema';
@@ -17,6 +18,7 @@ import { SubjectService } from './subject.service';
       { name: Flashcard.name, schema: FlashcardSchema },
     ]),
     FileModule,
+    PublishingModule,
     PostModule,
   ],
   controllers: [SubjectController],

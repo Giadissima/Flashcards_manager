@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../auth/auth.service';
 import { TranslocoModule } from '@jsverse/transloco';
 import { Visibility } from '../../models/visibility.dto';
 
@@ -22,7 +23,7 @@ import { Visibility } from '../../models/visibility.dto';
          is exactly the case that most needs to explain itself. -->
     <span class="visibility-slot" [title]="label | transloco">
       <button type="button" class="btn btn-icon-ghost visibility-button" [class.is-imported]="imported"
-        [disabled]="busy || imported" [attr.aria-label]="label | transloco"
+        [disabled]="busy || imported || !canPublish" [attr.aria-label]="label | transloco"
         (click)="toggled.emit(isPublic ? 'private' : 'public')">
         <span class="material-symbols-outlined" [class.is-marked]="isPublic || imported">{{ icon }}</span>
       </button>
@@ -58,6 +59,16 @@ import { Visibility } from '../../models/visibility.dto';
 })
 export class VisibilityButtonComponent {
   @Input() visibility: Visibility = 'private';
+
+  constructor(private authService: AuthService) {}
+
+  /**
+   * Sharing waits for the profile to say where its author studies; taking
+   * something back never does. See VisibilityToggleComponent for why.
+   */
+  get canPublish(): boolean {
+    return !!this.authService.user?.universityCode || this.isPublic;
+  }
   /** Set while the change is in flight, so it cannot be asked for twice. */
   @Input() busy = false;
   /**
@@ -82,6 +93,7 @@ export class VisibilityButtonComponent {
 
   get label(): string {
     if (this.imported) return 'visibility.imported';
+    if (!this.canPublish) return 'visibility.needUniversity';
     return this.isPublic ? 'visibility.makePrivate' : 'visibility.makePublic';
   }
 }

@@ -438,7 +438,9 @@
     "cascadeTopic": "Its flashcards follow it, both when it is published and when it is taken back.",
     "imported": "Imported card",
     "publicSubjectNoCards": "This subject has no flashcards yet, so it does not show up in the Community.",
-    "publicSubjectAllPrivate": "Every flashcard in this subject is private, so it does not show up in the Community until you share at least one."
+    "publicSubjectAllPrivate": "Every flashcard in this subject is private, so it does not show up in the Community until you share at least one.",
+    "needUniversity": "Say which university you are at before sharing anything: the Community is read one university at a time.",
+    "goToProfile": "Go to the profile"
   },
   "community": {
     "title": "Community",

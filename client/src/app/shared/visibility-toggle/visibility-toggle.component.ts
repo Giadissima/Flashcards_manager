@@ -2,6 +2,8 @@ import { Component, Input } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { AuthService } from '../../auth/auth.service';
 import { TranslocoModule } from '@jsverse/transloco';
 import { Visibility } from '../../models/visibility.dto';
 
@@ -19,12 +21,26 @@ let nextId = 0;
 @Component({
   selector: 'app-visibility-toggle',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, TranslocoModule],
+  imports: [CommonModule, ReactiveFormsModule, TranslocoModule, RouterLink],
   templateUrl: './visibility-toggle.component.html',
   styleUrl: './visibility-toggle.component.scss',
 })
 export class VisibilityToggleComponent {
   @Input({ required: true }) control!: FormControl<Visibility>;
+
+  constructor(private authService: AuthService) {}
+
+  /**
+   * Nothing is shared until the profile says where its author studies: the
+   * feed is read university by university, and a post belonging to none would
+   * be everywhere, which would make filling the field in the losing move.
+   *
+   * Taking something back is always allowed, whatever the profile says - a
+   * subject shared before the rule cannot be left stuck out in the open.
+   */
+  get canPublish(): boolean {
+    return !!this.authService.user?.universityCode || this.isPublic;
+  }
 
   /**
    * What is being published. A subject carries its topics and cards with it,
@@ -47,6 +63,8 @@ export class VisibilityToggleComponent {
   }
 
   toggle(): void {
+    if (!this.canPublish) return;
+
     this.control.setValue(this.isPublic ? 'private' : 'public');
     this.control.markAsDirty();
   }

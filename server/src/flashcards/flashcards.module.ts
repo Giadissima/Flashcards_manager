@@ -7,6 +7,7 @@ import { Topic, TopicSchema } from 'src/topic/topic.schema';
 import { FlashcardsController } from './flashcards.controller';
 import { FlashcardsService } from './flashcards.service';
 import { Module } from '@nestjs/common';
+import { PublishingModule } from 'src/common/publishing.module';
 import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
@@ -19,6 +20,7 @@ import { MongooseModule } from '@nestjs/mongoose';
       { name: Topic.name, schema: TopicSchema },
     ]),
     FileModule,
+    PublishingModule,
     PostModule,
   ],
   exports: [FlashcardsService],

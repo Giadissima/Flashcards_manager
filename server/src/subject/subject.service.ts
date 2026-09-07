@@ -1,3 +1,4 @@
+import { PublishingService } from 'src/common/publishing.service';
 import { Visibility } from 'src/common/visibility';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -26,6 +27,7 @@ export class SubjectService {
     private readonly postService: PostService,
     @InjectModel(Topic.name) private topicModel: Model<Topic>,
     @InjectModel(Flashcard.name) private flashcardModel: Model<Flashcard>,
+    private readonly publishing: PublishingService,
   ) {}
 
   async create(
@@ -33,6 +35,8 @@ export class SubjectService {
     createSubjectDto: ModifySubjectDto,
     icon?: Express.Multer.File,
   ): Promise<void> {
+    await this.publishing.assertMayPublish(userId, createSubjectDto.visibility);
+
     const icon_id = icon
       ? (await this.fileService.create([icon]))._id
       : undefined;
@@ -104,6 +108,8 @@ export class SubjectService {
       throw new NotFoundException(`${ENTITY} with id ${id} not found`);
     }
 
+    await this.publishing.assertMayPublish(userId, updateObj.visibility);
+
     const newIconId = icon
       ? (await this.fileService.create([icon]))._id
       : undefined;
@@ -143,6 +149,7 @@ export class SubjectService {
     id: string,
     visibility: Visibility,
   ): Promise<void> {
+    await this.publishing.assertMayPublish(userId, visibility);
     await updateOwnedOrThrow(
       this.subjectModel,
       id,

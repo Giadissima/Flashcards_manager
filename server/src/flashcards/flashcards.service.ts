@@ -6,6 +6,7 @@ import {
   RandomFlashcardsDTO,
 } from './flashcards.dto';
 import { InjectModel } from '@nestjs/mongoose';
+import { PublishingService } from 'src/common/publishing.service';
 import { Visibility, defaultVisibility } from 'src/common/visibility';
 import {
   BadRequestException,
@@ -41,12 +42,18 @@ export class FlashcardsService {
     @InjectModel(Subject.name) private subjectModel: Model<Subject>,
     @InjectModel(Topic.name) private topicModel: Model<Topic>,
     private readonly postService: PostService,
+    private readonly publishing: PublishingService,
   ) {}
 
   async create(
     userId: string,
     createFlashcardDto: ModifyFlashcardDto,
   ): Promise<void> {
+    await this.publishing.assertMayPublish(
+      userId,
+      createFlashcardDto.visibility,
+    );
+
     const owned = await this.claimImages(userId, createFlashcardDto);
     const created = await new this.flashcardModel({
       ...owned,
@@ -345,6 +352,8 @@ export class FlashcardsService {
     visibility: Visibility,
   ): Promise<void> {
     if (visibility !== 'public') return;
+
+    await this.publishing.assertMayPublish(userId, visibility);
 
     const card = await this.flashcardModel
       .findOne({ _id: cardId, user_id: userId }, { imported: 1 })

@@ -1,3 +1,4 @@
+import { PublishingService } from 'src/common/publishing.service';
 import { Visibility, defaultVisibility } from 'src/common/visibility';
 import { Injectable } from '@nestjs/common';
 import { PostService } from 'src/post/post.service';
@@ -25,9 +26,12 @@ export class TopicService {
     @InjectModel(Subject.name) private subjectModel: Model<Subject>,
     private readonly postService: PostService,
     @InjectModel(Flashcard.name) private flashcardModel: Model<Flashcard>,
+    private readonly publishing: PublishingService,
   ) {}
 
   async create(userId: string, createTopicDto: ModifyTopicDto): Promise<void> {
+    await this.publishing.assertMayPublish(userId, createTopicDto.visibility);
+
     const created = await new this.topicModel({
       ...createTopicDto,
       user_id: userId,
@@ -101,6 +105,7 @@ export class TopicService {
     id: string,
     updateObj: ModifyTopicDto,
   ): Promise<void> {
+    await this.publishing.assertMayPublish(userId, updateObj.visibility);
     await updateOwnedOrThrow(this.topicModel, id, userId, updateObj, ENTITY);
     if (updateObj.visibility) {
       await this.cascadeVisibility(userId, id, updateObj.visibility);
@@ -114,6 +119,7 @@ export class TopicService {
     id: string,
     visibility: Visibility,
   ): Promise<void> {
+    await this.publishing.assertMayPublish(userId, visibility);
     await updateOwnedOrThrow(
       this.topicModel,
       id,

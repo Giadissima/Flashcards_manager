@@ -438,7 +438,9 @@
     "cascadeTopic": "Le sue flashcard lo seguono, sia quando lo pubblichi sia quando lo togli.",
     "imported": "Card importata",
     "publicSubjectNoCards": "Questa materia non ha ancora nessuna flashcard, quindi non compare nella Community.",
-    "publicSubjectAllPrivate": "Le flashcard di questa materia sono tutte private, quindi non compare nella Community finché non ne condividi almeno una."
+    "publicSubjectAllPrivate": "Le flashcard di questa materia sono tutte private, quindi non compare nella Community finché non ne condividi almeno una.",
+    "needUniversity": "Indica la tua università prima di condividere: la Community si legge un ateneo alla volta.",
+    "goToProfile": "Vai al profilo"
   },
   "community": {
     "title": "Community",

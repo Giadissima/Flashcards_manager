@@ -3,7 +3,7 @@
   <div class="d-flex align-items-center gap-2">
     <div class="form-check form-switch mb-0">
       <input class="form-check-input" type="checkbox" role="switch" [id]="inputId" [checked]="isPublic"
-        (change)="toggle()">
+        [disabled]="!canPublish" (change)="toggle()">
     </div>
     <span class="visibility-state">
       <span class="material-symbols-outlined">{{ isPublic ? 'public' : 'lock' }}</span>
@@ -15,5 +15,13 @@
   <div class="form-text">{{ (isPublic ? 'visibility.publicHint' : 'visibility.privateHint') | transloco }}</div>
   @if (cascadeKey) {
   <div class="form-text">{{ cascadeKey | transloco }}</div>
+  }
+  <!-- The way out comes with the refusal: the field it asks for is two clicks
+       away, and without the link this reads as a wall. -->
+  @if (!canPublish) {
+  <div class="form-text text-warning">
+    {{ 'visibility.needUniversity' | transloco }}
+    <a routerLink="/profile">{{ 'visibility.goToProfile' | transloco }}</a>
+  </div>
   }
 </div>
