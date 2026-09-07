@@ -41,11 +41,13 @@ export class ModifyFlashcardDto {
   @Trim()
   answer: string;
 
-  @IsOptional()
+  // Required, like the form that fills it in has always asked: a card under
+  // no topic is one nobody comes across again, since every list and every test
+  // is reached through a subject and a topic.
   @IsMongoId()
   @Length(idLength, idLength)
   @TrimToUndefined()
-  topic_id?: string;
+  topic_id: string;
 
   @IsOptional()
   @IsMongoId()
