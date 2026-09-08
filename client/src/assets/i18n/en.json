@@ -1,5 +1,7 @@
 {
   "navbar": {
+    "flashcards": "Flashcards",
+    "manageFlashcards": "Manage Flashcards",
     "topics": "Topics",
     "createTopic": "Create Topic",
     "manageTopics": "Manage Topics",

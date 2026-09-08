@@ -1,3 +1,9 @@
+$desktop-dim: 1100px;
+$mid-dim: 920px;
+$nav-button-min-display: 620px;
+$logo-resize: 445px;
+$create-btn-remove: 412px;
+
 nav {
   display: flex;
   justify-content: space-between;
@@ -7,7 +13,7 @@ nav {
   border-bottom: 1px solid var(--bs-btn-border-color);
   box-shadow: var(--box-shadow-sm);
   margin-bottom: 1px;
-  position: sticky; // anchors the "create card" button centered below 519px, and pins the navbar at the top on scroll
+  position: sticky; // pins the navbar at the top on scroll
   top: 0;
   z-index: 1050;
 }
@@ -26,9 +32,10 @@ nav {
 
 .project-name {
   display: flex;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
   color: var(--header-color);
+  white-space: nowrap; // always shown now, logo included, so it must not wrap onto a second line
 }
 
 .menu-container {
@@ -38,6 +45,7 @@ nav {
 
 .menu-item {
   color: var(--text-color);
+  font-size: 15px;
   font-weight: 600;
   cursor: pointer;
   position: relative;
@@ -98,7 +106,31 @@ nav {
   gap: calc(var(--spacing-unit) * 2);
 }
 
-.theme-switch-btn {
+.create-card-btn {
+  flex-shrink: 0;
+}
+
+/* The drawer-only stand-in for .create-card-btn: out of the way above the
+   hamburger breakpoint, where the button in actions-container already covers
+   the same two destinations. */
+.mobile-only-item {
+  display: none;
+}
+
+/* The drawer-only stand-in for .profile-group: out of the way above the
+   hamburger breakpoint, where the bell and the avatar in actions-container
+   already cover the same ground. */
+.drawer-account-card {
+  display: none;
+}
+
+/* Hidden above the hamburger breakpoint, where the hamburger button itself
+   already opens and closes the drawer. */
+.drawer-close-btn {
+  display: none;
+}
+
+.settings-btn {
   background: none;
   border: none;
   cursor: pointer;
@@ -110,8 +142,47 @@ nav {
   color: var(--header-color);
 }
 
-.theme-switch-btn:hover {
+.settings-btn:hover {
   background-color: var(--secondary-color);
+}
+
+/* Transparent above the mobile breakpoint: the bell and the avatar keep the
+   spacing/order they would have as plain siblings of actions-container. */
+.profile-group {
+  display: contents;
+}
+
+/* Profilo / Esci / Impostazioni rows in the drawer: an icon beside the label,
+   which the global .dropdown-content a rule (block, text only) doesn't give
+   them on its own. */
+.drawer-icon-link {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--spacing-unit) * 0.5);
+
+  /* Sized down to the label it sits next to, like the icon buttons elsewhere. */
+  .material-symbols-outlined {
+    font-size: 20px;
+  }
+}
+
+/* Hidden above the hamburger breakpoint, where the standalone .settings-btn
+   already covers it. Comes after .drawer-icon-link (same specificity, both
+   single classes) so this "none" wins the tie on the element carrying both.
+   Colour/underline/cursor set explicitly here: unlike the other
+   .drawer-icon-link rows, it sits outside any .dropdown-content, so it
+   doesn't inherit that rule's link styling and falls back to the browser's
+   default blue underline. */
+.drawer-settings-row {
+  display: none;
+  color: var(--text-color);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.drawer-settings-row:hover {
+  color: var(--primary-color);
 }
 
 /* Avatar plus caret as one control. The padding of .menu-item is dropped: it
@@ -195,9 +266,31 @@ nav {
   display: none;
 }
 
+// Between the full desktop layout and the hamburger breakpoint, the menu and
+// the actions are both still laid out side by side: tightening their gaps
+// buys room before falling back to the drawer.
+@media (max-width: $desktop-dim) {
+  .menu-container {
+    gap: calc(var(--spacing-unit) * 2);
+  }
+
+  .actions-container {
+    gap: var(--spacing-unit);
+  }
+
+  /* Shrunk rather than dropped: same variables Bootstrap's .btn-sm sets, kept
+     as a button (not just an icon) as long as the bar is still the desktop
+     layout - it only gives way to the drawer link once the hamburger does. */
+  .create-card-btn {
+    --bs-btn-padding-y: 0.25rem;
+    --bs-btn-padding-x: 0.5rem;
+    --bs-btn-font-size: 0.875rem;
+  }
+}
+
 // Below this width the centre menu collapses into an off-canvas side drawer,
 // opened and closed with the hamburger button, which turns into an X while open.
-@media (max-width: 840px) {
+@media (max-width: $mid-dim) {
   .hamburger-btn {
     width: 36px;
     margin-left: 0;
@@ -205,17 +298,27 @@ nav {
     pointer-events: auto;
   }
 
-@media (max-width: 560px) {
-  .project-name {
-    display: none;
+  // Sits inside the drawer itself, absolutely positioned against it (the
+  // drawer's own top padding already leaves room for it).
+  .drawer-close-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: var(--spacing-unit);
+    right: var(--spacing-unit);
+    width: 36px;
+    height: 36px;
+    background: none;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    color: var(--header-color);
   }
 
-  .create-card-btn {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
+  .drawer-close-btn:hover {
+    background-color: var(--secondary-color);
   }
-}
 
   .menu-container {
     position: fixed;
@@ -280,6 +383,42 @@ nav {
   .menu-container .dropdown-content.show {
     display: block;
   }
+}
+
+@media (max-width: $nav-button-min-display) {
+  // Notifications, profile and settings move into the drawer entirely below
+  // the hamburger breakpoint: nothing of theirs is left in actions-container.
+  .profile-group, .settings-btn {
+    display: none;
+  }
+
+  // Its drawer stand-in: a boxed card at the top holding the profile trigger,
+  // which expands in place to Notifiche/Profilo/Esci - the same static
+  // dropdown-content every other drawer entry already uses.
+  .drawer-account-card {
+    display: block;
+    background-color: var(--inset-background);
+    border-radius: var(--border-radius-md);
+    padding: 0 calc(var(--spacing-unit) * 1.5);
+    margin-bottom: var(--spacing-unit);
+
+    /* The generic .dropdown-content (styles.scss) still carries its own
+       background-color for the desktop flyout case - the mobile override
+       above resets position/border/shadow but not that, so left alone it
+       shows up here as a mismatched box inside the card's own background. */
+    .dropdown-content {
+      background: none;
+    }
+  }
+
+  // Pinned below the nav links rather than folded into the profile card: it
+  // is an app-wide setting, not an account action.
+  .drawer-settings-row {
+    display: flex;
+    margin-top: auto;
+    padding-top: calc(var(--spacing-unit) * 1.5);
+    border-top: 1px solid var(--border-color);
+  }
 
   .mobile-menu-backdrop {
     display: block;
@@ -298,6 +437,27 @@ nav {
   }
 }
 
-@media (max-width: 370px) {
-  .create-card-btn .label { display: none; }
+@media (max-width: $logo-resize) {
+  // Shrunk so the name still fits now that it is always shown, next to a
+  // shorter logo, hamburger and profile group all competing for the same row.
+  .project-name {
+    font-size: 15px;
+  }
+
+  .logo {
+    height: 32px;
+  }
 }
+
+// Below this width the button no longer fits even at btn-sm: it steps aside
+// for the .mobile-only-item link inside the drawer instead.
+@media (max-width: $create-btn-remove) {
+  .create-card-btn {
+    display: none;
+  }
+
+  .mobile-only-item {
+    display: block;
+  }
+}
+

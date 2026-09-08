@@ -11,7 +11,7 @@ import { SettingsModalComponent } from '../settings-modal/settings-modal.compone
 import { ToastService } from '../shared/toast/toast.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 
-type NavbarDropdown = 'topics' | 'subjects' | 'test' | 'account';
+type NavbarDropdown = 'flashcards' | 'topics' | 'subjects' | 'test' | 'account' | 'accountDrawer';
 
 @Component({
   selector: 'app-navbar',
@@ -94,6 +94,13 @@ export class NavbarComponent {
 
   openSettings(): void {
     this.isSettingsOpen = true;
+  }
+
+  // The mobile stand-in for the standalone settings button, folded into the
+  // profile dropdown once the bar has no room for it on its own.
+  openSettingsFromAccount(): void {
+    this.closeMobileMenu(); // also closes the dropdown, being inside the drawer
+    this.openSettings();
   }
 
   onOpenImportExportFromSettings(): void {

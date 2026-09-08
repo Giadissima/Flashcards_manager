@@ -25,6 +25,35 @@
   }
 }
 
+/* The drawer's profile-card variant: a full-width row like "Profilo" and
+   "Esci" beside it, rather than a standalone round icon button. */
+.bell-btn.list-trigger {
+  position: static;
+  width: 100%;
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-unit) calc(var(--spacing-unit) * 1.5);
+  gap: calc(var(--spacing-unit) * 0.5);
+  font-weight: 600;
+  color: var(--text-color);
+
+  .material-symbols-outlined {
+    font-size: 20px;
+  }
+}
+
+.bell-label {
+  flex: 1;
+  text-align: left;
+}
+
+/* Pinned to the icon's corner in the round button, this would sit off to one
+   side of a full-width row instead: pushed to the row's end like a trailing
+   count, the way .tab-count already reads next to its own label. */
+.list-trigger .bell-badge {
+  position: static;
+  margin-left: auto;
+}
+
 /* Sits on the bell rather than beside it, so the bar does not widen as soon as
    something arrives. */
 .bell-badge {

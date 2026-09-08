@@ -1,7 +1,11 @@
 <div class="dropdown notification-dropdown" (appClickOutside)="close()">
-  <button type="button" class="bell-btn" (click)="toggle()" [attr.aria-expanded]="isOpen"
-    [attr.aria-label]="'notifications.title' | transloco" [title]="'notifications.title' | transloco">
+  <button type="button" class="bell-btn" [class.list-trigger]="listStyle" (click)="toggle()"
+    [attr.aria-expanded]="isOpen" [attr.aria-label]="'notifications.title' | transloco"
+    [title]="'notifications.title' | transloco">
     <span class="material-symbols-outlined">notifications</span>
+    @if (listStyle) {
+    <span class="bell-label">{{ 'notifications.title' | transloco }}</span>
+    }
     @if (unread) {
     <span class="bell-badge">{{ unread > 9 ? '9+' : unread }}</span>
     }

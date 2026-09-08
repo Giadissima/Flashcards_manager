@@ -1,5 +1,7 @@
 {
   "navbar": {
+    "flashcards": "Flashcards",
+    "manageFlashcards": "Gestisci Flashcards",
     "topics": "Argomenti",
     "createTopic": "Crea Argomento",
     "manageTopics": "Gestisci Argomenti",

@@ -1,5 +1,5 @@
 import { AppNotification, Feedback, NotificationKind, notificationKinds } from '../models/social.dto';
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 
 import { AuthService } from '../auth/auth.service';
@@ -29,6 +29,11 @@ const maxFeedbackMessages = 3;
   styleUrl: './notification-panel.component.scss',
 })
 export class NotificationPanelComponent implements OnInit {
+  // Rendered as a labelled row (icon + "Notifiche") instead of the plain
+  // round bell button, for the drawer's profile card where it sits alongside
+  // "Profilo" and "Esci" as one of a list rather than a standalone control.
+  @Input() listStyle = false;
+
   isOpen = false;
   loading = false;
   notifications: AppNotification[] = [];
