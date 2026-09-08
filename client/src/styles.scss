@@ -182,14 +182,22 @@ body {
     calendar-date-today-outline-color: var(--primary-color),
   ));
 
-  /* angular material date range input (the field itself, not just the popup calendar) */
+  /* angular material date range input (the field itself, not just the popup
+     calendar): the "outline" appearance rather than the default "fill", so it
+     reads as one more bordered box instead of standing out as a Material
+     control. Colour/shape only - height is handled directly on the field's
+     own internal elements in date-range-filter.component.scss instead of
+     through these theming tokens, which didn't map to a predictable height
+     the way overriding the structure itself does. */
   @include mat.form-field-overrides((
-    filled-container-color: var(--inset-background),
-    filled-input-text-color: var(--text-color),
-    filled-input-text-placeholder-color: var(--muted-color),
-    filled-label-text-color: var(--muted-color),
-    filled-caret-color: var(--primary-color),
-    filled-focus-active-indicator-color: var(--primary-color),
+    outlined-outline-color: var(--border-color),
+    outlined-hover-outline-color: var(--border-color),
+    outlined-focus-outline-color: var(--primary-color),
+    outlined-container-shape: var(--border-radius-md),
+    outlined-input-text-color: var(--text-color),
+    outlined-input-text-placeholder-color: var(--muted-color),
+    outlined-label-text-color: var(--muted-color),
+    outlined-caret-color: var(--primary-color),
   ));
 }
 
@@ -249,6 +257,56 @@ h6 {
 
 .card-header {
   border-bottom: 1.4px solid var(--primary-color);
+}
+
+/* A filter bar's controls, replacing Bootstrap's .row/.col-*-auto there: equal
+   flex-basis on every .filter-col is what a mismatched .col-auto row lacked -
+   without it each control wraps to the next line at its own width, leaving
+   ragged gaps instead of filling the row evenly. */
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 2);
+}
+
+.filter-col {
+  flex: 1 1 160px;
+  min-width: 0; // lets a select/search input ellipsize instead of forcing the row wider
+}
+
+/* For a control that should hug its own content instead - a button group, a
+   segmented filter, a checkbox - rather than stretch into leftover row space. */
+.filter-col--auto {
+  flex: 0 1 auto;
+}
+
+/* Always the row's only occupant: paired with .filter-row on a control (like
+   the community study-fields picker) that needs the full width for itself,
+   never sharing a line with the others. */
+.filter-col--full {
+  flex: 1 1 100%;
+}
+
+/* Paired with .filter-col on a control - the search bar - that wants more
+   room than the shared 160px basis before it starts shrinking. */
+.filter-col--wide {
+  flex-basis: 240px;
+}
+
+/* Wider still, for a placeholder longer than "Search flashcards..." - the
+   community search bar's "Search by user, subject or topic" needs the extra
+   room to read without truncating immediately. */
+.filter-col--xwide {
+  flex-basis: 320px;
+}
+
+/* Bootstrap's default .btn padding is shorter than .form-control's own, which
+   stands out next to it in a filter row - matched here to the same vertical
+   padding so a button-group filter (like home's Name/Date sort) sits at the
+   same height as the selects and inputs beside it. */
+.filter-row .btn-group .btn {
+  padding-block: calc(var(--spacing-unit) * 1.25);
 }
 
 /* ---------------------------------- */

@@ -1,8 +1,8 @@
 <app-load-state errorMessageKey="home.toast.flashcardsLoadError">
 <div class="container mt-4" *transloco="let t">
   <app-filter-bar [activeCount]="activeFilterCount" [caption]="t('common.filters')">
-    <div class="row gy-2 gx-3 align-items-center">
-      <div class="col-12 col-sm-auto">
+    <div class="filter-row">
+      <div class="filter-col">
         <label class="visually-hidden">{{ 'common.subject' | transloco }}</label>
         <app-searchable-select
           [options]="subjectOptions"
@@ -13,7 +13,7 @@
           (valueChange)="onSubjectSelected($event)"
         ></app-searchable-select>
       </div>
-      <div class="col-12 col-sm-auto">
+      <div class="filter-col">
         <label class="visually-hidden">{{ 'common.topic' | transloco }}</label>
         <app-searchable-select
           [options]="topicOptions"
@@ -24,19 +24,11 @@
           (valueChange)="onTopicSelected($event)"
         ></app-searchable-select>
       </div>
-      <div class="col-12 col-sm-auto">
-        <app-date-range-filter [from]="dateFrom" [to]="dateTo" [disabled]="isReloading"
-          (rangeChange)="onDateRangeChange($event)"></app-date-range-filter>
-      </div>
-      <div class="col-12 col-sm-auto">
-        <app-search-input
-          [value]="searchTerm"
-          [placeholder]="t('home.searchPlaceholder')"
-          [disabled]="isReloading"
-          (valueChange)="onSearchTermChange($event)"
-        ></app-search-input>
-      </div>
-      <div class="col-12 col-sm-auto">
+      <!-- Sort sits with the two selects rather than after search/date range:
+           subject, topic and sort are the three that stay compact, so they
+           are what a narrower row keeps together on its own line, wrapping
+           search and date range - the two widest controls - onto the next. -->
+      <div class="filter-col--auto">
         <div class="btn-group" role="group">
           <button type="button" class="btn" (click)="setSortBy('title')"
             [ngClass]="sortBy === 'title' ? 'btn-primary' : 'btn-outline-primary'"
@@ -63,6 +55,18 @@
             }
           </button>
         </div>
+      </div>
+      <div class="filter-col filter-col--wide">
+        <app-search-input
+          [value]="searchTerm"
+          [placeholder]="t('home.searchPlaceholder')"
+          [disabled]="isReloading"
+          (valueChange)="onSearchTermChange($event)"
+        ></app-search-input>
+      </div>
+      <div class="filter-col--auto">
+        <app-date-range-filter [from]="dateFrom" [to]="dateTo" [disabled]="isReloading"
+          (rangeChange)="onDateRangeChange($event)"></app-date-range-filter>
       </div>
     </div>
   </app-filter-bar>

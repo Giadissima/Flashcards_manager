@@ -17,14 +17,13 @@
 .date-range-field {
   width: auto;
   flex-shrink: 0;
-  padding-block: calc(var(--spacing-unit) * 0.9);
 }
 
 /* Wide enough for both ends of the range at once, no wider: it sits in a
    filter bar beside the selects, not on a line of its own. */
 .date-range-field-group {
   width: auto;
-  min-width: 16rem;
+  min-width: 13rem;
   background-color: var(--component-background);
 }
 
@@ -38,4 +37,45 @@
    is already sized for both ends at once. */
 :host ::ng-deep .mat-mdc-form-field-type-mat-date-range-input .mat-mdc-form-field-infix {
   width: 100%;
+}
+
+/* Matched to .form-control/.form-select's own height (styles.scss, 4. Form
+   Elements) directly on the field's internal box rather than through
+   Material's outlined-container-* theming tokens, which turned out not to
+   translate to a predictable pixel height or keep the text centred. The
+   infix is where Material puts its own vertical padding (a fixed value baked
+   into the M3 baseline, taller than .form-control's own) - replaced here with
+   the same padding .form-control uses, and the flex row that holds it
+   recentred now that the box is a different height than Material expects. */
+:host ::ng-deep .date-range-field-group {
+  .mdc-text-field {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .mat-mdc-form-field-flex {
+    align-items: center;
+  }
+
+  .mat-mdc-form-field-infix {
+    padding-top: calc(var(--spacing-unit) * 1.25);
+    padding-bottom: calc(var(--spacing-unit) * 1.25);
+    min-height: 0;
+  }
+
+  /* Material sizes each end to fit its own value via a hidden "mirror" span,
+     falling back to the placeholder's width when empty (getMirrorValue()) -
+     except that mirror comes back empty for both ends here (an OnPush timing
+     quirk, confirmed live: the native input's placeholder attribute is set
+     correctly, but the projected mirror span's text isn't). The end wrapper
+     is unaffected only because Material also gives it its own flex-grow: 1;
+     the start wrapper has no such fallback, so with an empty mirror it
+     collapses to the CSS's 2px floor and clips "From" entirely. Giving both
+     the same flex-grow/flex-basis here makes them split the field evenly
+     regardless of the mirror, sidestepping it rather than fixing it. */
+  .mat-date-range-input-wrapper {
+    flex-grow: 1;
+    flex-basis: 0;
+    min-width: 0;
+  }
 }

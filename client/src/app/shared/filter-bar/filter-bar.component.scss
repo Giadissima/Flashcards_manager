@@ -1,3 +1,5 @@
+$toggle-dim: 650px;
+
 :host {
   display: block;
 }
@@ -66,15 +68,23 @@
   }
 }
 
-@media (min-width: 576px) {
+@media (min-width: $toggle-dim + 0.1px) {
   .filter-caption {
     display: flex;
+  }
+
+  /* Was Bootstrap's d-sm-none on the button itself, fixed at 576px
+     regardless of $toggle-dim: with the panel now collapsing at a different
+     width, that left a gap between the two where the toggle was hidden but
+     the panel was still collapsed, with nothing left to reopen it. */
+  .filter-toggle {
+    display: none;
   }
 }
 
 /* The bar is only taken out of the flow, never restyled: above this width the
    toggle is hidden, so the class must not be able to hide anything. */
-@media (max-width: 575.98px) {
+@media (max-width: $toggle-dim) {
   .filter-bar--collapsed {
     display: none;
   }

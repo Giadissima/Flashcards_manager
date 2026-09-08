@@ -17,7 +17,7 @@
 
   <!-- The far end limits the near one and the other way round, so the calendar
        itself cannot offer a range that runs backwards. -->
-  <mat-form-field class="date-range-field-group" subscriptSizing="dynamic">
+  <mat-form-field class="date-range-field-group" appearance="outline" subscriptSizing="dynamic">
     <mat-date-range-input [formGroup]="range" [rangePicker]="picker" [max]="today">
       <input matStartDate formControlName="start" [placeholder]="'common.dateFrom' | transloco"
         [attr.aria-label]="'common.dateFrom' | transloco">

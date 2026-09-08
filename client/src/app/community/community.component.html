@@ -8,12 +8,12 @@
     [subtitle]="'community.subtitle' | transloco">
     <app-filter-bar [activeCount]="activeFilterCount" appearance="inset"
       [caption]="'common.filters' | transloco">
-      <div class="row gy-3 gx-3">
-        <div class="col-12 col-lg">
+      <div class="filter-row">
+        <div class="filter-col filter-col--xwide">
           <app-search-input [value]="searchTerm" [placeholder]="'community.searchPlaceholder' | transloco"
             inputId="communitySearch" (valueChange)="onSearchTermChange($event)"></app-search-input>
         </div>
-        <div class="col-12 col-lg-auto">
+        <div class="filter-col--auto">
           <!-- The feed has two dates and the filter has to say which one it
                is reading: a post shared in March and last added to in June
                answers "March" or "June" depending on nothing the two date
@@ -27,7 +27,7 @@
         <!-- Set to the reader's own university and course to begin with: the
              feed is worth most where they study, and the whole of it is one
              choice away in the same two dropdowns. -->
-        <div class="col-12">
+        <div class="filter-col--full">
           <app-study-fields variant="filter" [value]="study"
             (valueChange)="onStudyChange($event)"></app-study-fields>
         </div>
