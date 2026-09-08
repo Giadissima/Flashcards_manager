@@ -1,6 +1,13 @@
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Subject as RxSubject, Subscription, debounceTime } from 'rxjs';
-import { FeedDateField, FeedPost, FeedSort } from '../models/post.dto';
+import {
+  FeedDateField,
+  FeedPost,
+  FeedSort,
+  feedDateFields,
+  feedSorts,
+} from '../models/post.dto';
 
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../auth/auth.service';
@@ -72,6 +79,11 @@ export class CommunityComponent implements OnInit, OnDestroy {
   // search is three collections asked at once on the server side.
   private readonly searchChanges = new RxSubject<void>();
   private searchSubscription?: Subscription;
+  private queryParamsSubscription?: Subscription;
+  // true only for the very first queryParamMap emission: that is the one wrapped
+  // in app-load-state. Later ones (filter, sort, page) reload in place - swapping
+  // the whole page for a spinner on every filter click would be bad UX.
+  private isInitialLoad = true;
 
   get activeFilterCount(): number {
     return [
@@ -87,27 +99,97 @@ export class CommunityComponent implements OnInit, OnDestroy {
   constructor(
     private communityService: CommunityService,
     private authService: AuthService,
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
   ) {}
 
   ngOnInit(): void {
-    // Where the reader studies, which is the corner of the Community their own
-    // course is in: the one place worth opening on.
-    const user = this.authService.user;
-    this.study = {
-      universityCode: user?.universityCode ?? null,
-      course: user?.course ?? null,
-      courseKind: user?.courseKind ?? null,
-    };
-
     this.searchSubscription = this.searchChanges
       .pipe(debounceTime(500))
-      .subscribe(() => void this.reload());
+      .subscribe(() => this.onFilterChange());
 
-    this.loadState.run(() => this.loadFeed());
+    // Subscription, not snapshot: navigating to /community while already on
+    // /community makes Angular reuse the existing component and skip ngOnInit,
+    // but this subscription fires anyway and re-reads the filters from the URL,
+    // keeping the state in sync with the route.
+    this.queryParamsSubscription = this.activatedRoute.queryParamMap.subscribe((qp) => {
+      this.sort = this.readOption(qp.get('sort'), feedSorts, 'created');
+      this.dateFrom = qp.get('from') || null;
+      this.dateTo = qp.get('to') || null;
+      this.dateField = this.readOption(qp.get('dateField'), feedDateFields, 'created');
+      this.searchTerm = qp.get('search') || '';
+      this.page = Math.max(0, (Number(qp.get('page')) || 1) - 1);
+      this.study = this.readStudy(qp);
+
+      if (this.isInitialLoad) {
+        this.isInitialLoad = false;
+        this.loadState.run(() => this.loadFeed());
+      } else {
+        void this.loadFeed();
+      }
+    });
   }
 
   ngOnDestroy(): void {
     this.searchSubscription?.unsubscribe();
+    this.queryParamsSubscription?.unsubscribe();
+  }
+
+  /** Anything the address is not allowed to say reads as the default. */
+  private readOption<T extends string>(
+    value: string | null,
+    allowed: readonly T[],
+    fallback: T,
+  ): T {
+    return allowed.includes(value as T) ? (value as T) : fallback;
+  }
+
+  /**
+   * Where the reader studies is the corner of the Community their own course is
+   * in: the one place worth opening on, so an address carrying no filters at all
+   * starts there. Once the filters have been written to the address - and `sort`
+   * always is - an absent university means the reader cleared it, not that they
+   * never chose, and the feed stays as they left it.
+   */
+  private readStudy(qp: ParamMap): StudyFields {
+    const universityCode = qp.get('university');
+    if (!universityCode && !qp.has('sort')) {
+      const user = this.authService.user;
+      return {
+        universityCode: user?.universityCode ?? null,
+        course: user?.course ?? null,
+        courseKind: user?.courseKind ?? null,
+      };
+    }
+    return {
+      universityCode: universityCode || null,
+      course: qp.get('course') || null,
+      courseKind: qp.get('courseKind') || null,
+    };
+  }
+
+  /**
+   * The filters live in the address, and the feed reloads through the
+   * queryParamMap subscription: a read can then be sent to somebody else, or
+   * reopened later exactly as it was left.
+   */
+  private updateQueryParams(): void {
+    this.router.navigate([], {
+      relativeTo: this.activatedRoute,
+      queryParams: {
+        sort: this.sort,
+        from: this.dateFrom,
+        to: this.dateTo,
+        dateField: this.dateField,
+        search: this.searchTerm.trim() || null,
+        university: this.study.universityCode,
+        course: this.study.course,
+        courseKind: this.study.courseKind,
+        page: this.currentPage,
+      },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
   }
 
   onSearchTermChange(term: string): void {
@@ -115,40 +197,41 @@ export class CommunityComponent implements OnInit, OnDestroy {
     this.searchChanges.next();
   }
 
-  async onStudyChange(study: StudyFields): Promise<void> {
+  onStudyChange(study: StudyFields): void {
     this.study = study;
-    await this.reload();
+    this.onFilterChange();
   }
 
   /** Any filter change: back to the first page, since the pages have moved. */
-  private async reload(): Promise<void> {
+  private onFilterChange(): void {
     this.page = 0;
-    await this.loadFeed();
+    this.updateQueryParams();
   }
 
   get totalPages(): number {
     return Math.max(1, Math.ceil(this.total / pageSize));
   }
 
-  async onSortChange(sort: string): Promise<void> {
+  onSortChange(sort: string): void {
     this.sort = sort as FeedSort;
     // Back to the first page: the second page of one order says nothing about
     // the same position in the other
-    this.page = 0;
-    await this.loadFeed();
+    this.onFilterChange();
   }
 
-  async onDateRangeChange(range: DateRange): Promise<void> {
+  onDateRangeChange(range: DateRange): void {
     this.dateFrom = range.from;
     this.dateTo = range.to;
-    await this.reload();
+    this.onFilterChange();
   }
 
-  async onDateFieldChange(field: string): Promise<void> {
+  onDateFieldChange(field: string): void {
     this.dateField = field as FeedDateField;
-    // Only worth a request when there is a range for it to read: with both
-    // ends open, either date matches every post there is.
-    if (this.dateFrom || this.dateTo) await this.reload();
+    // The choice belongs in the address either way, but only a range makes it
+    // change what is shown: with both ends open, either date matches every post
+    // there is, so the feed is left alone and only the URL is written.
+    if (this.dateFrom || this.dateTo) this.onFilterChange();
+    else this.updateQueryParams();
   }
 
   /** app-pagination counts from 1, the feed skips from 0. */
@@ -156,16 +239,16 @@ export class CommunityComponent implements OnInit, OnDestroy {
     return this.page + 1;
   }
 
-  async previousPage(): Promise<void> {
+  previousPage(): void {
     if (this.page === 0) return;
     this.page--;
-    await this.loadFeed();
+    this.updateQueryParams();
   }
 
-  async nextPage(): Promise<void> {
+  nextPage(): void {
     if (this.currentPage >= this.totalPages) return;
     this.page++;
-    await this.loadFeed();
+    this.updateQueryParams();
   }
 
   private async loadFeed(): Promise<void> {
