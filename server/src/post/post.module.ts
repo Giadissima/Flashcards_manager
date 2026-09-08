@@ -12,6 +12,7 @@ import { FileModule } from 'src/file/file.module';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PostController } from './post.controller';
+import { RestrictionsModule } from 'src/common/restrictions.module';
 import { PostService } from './post.service';
 
 @Module({
@@ -28,6 +29,7 @@ import { PostService } from './post.service';
     ]),
     FileModule,
     NotificationModule,
+    RestrictionsModule,
   ],
   controllers: [PostController],
   // The three services that change a visibility keep the feed in step through it

@@ -2,6 +2,7 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
+import { RestrictionsService } from './restrictions.service';
 import { User } from 'src/auth/user.schema';
 import { Visibility } from './visibility';
 
@@ -18,7 +19,10 @@ import { Visibility } from './visibility';
  */
 @Injectable()
 export class PublishingService {
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+  constructor(
+    @InjectModel(User.name) private userModel: Model<User>,
+    private readonly restrictions: RestrictionsService,
+  ) {}
 
   /** Only public asks anything: taking something back is always allowed. */
   async assertMayPublish(
@@ -26,6 +30,10 @@ export class PublishingService {
     visibility?: Visibility,
   ): Promise<void> {
     if (visibility !== 'public') return;
+
+    // A block on publishing is asked about first: somebody who may not share
+    // anything has no reason to be told to go and fill in their university.
+    await this.restrictions.assertMay(userId, 'publish');
 
     const user = await this.userModel
       .findById(userId, { universityCode: 1 })

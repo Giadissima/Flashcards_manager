@@ -2,7 +2,32 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 import { Document } from 'mongoose';
 
+import { Privilege, privileges } from 'src/common/privileges';
+
 export type UserDocument = User & Document;
+
+/**
+ * One thing this account may not do, and until when.
+ *
+ * Stored as a list rather than three flags because that is how it is read:
+ * "what is taken away from you, and when do you get it back" is one question,
+ * and an empty list is the answer everybody else gets.
+ */
+@Schema({ _id: false })
+export class Restriction {
+  @Prop({ required: true, enum: privileges })
+  privilege: Privilege;
+
+  /** Absent means no end: only lifting it by hand gives it back. */
+  @Prop({ required: false })
+  until?: Date;
+
+  /** What it followed from, so the user can be told and the bot can show it. */
+  @Prop({ required: false })
+  reason?: string;
+}
+
+export const RestrictionSchema = SchemaFactory.createForClass(Restriction);
 
 // ? This file contains User MongoDb's schema
 @Schema({
@@ -47,6 +72,27 @@ export class User {
   /** Background colour of the default avatar, as "#rrggbb". */
   @Prop({ required: false })
   avatarColor?: string;
+
+  // ------------------------------------------------------------- moderation
+
+  /**
+   * How many warnings this account has collected, ever.
+   *
+   * Never reset when a block expires: the ladder is the whole point, and an
+   * account that comes back from a week off starts from where it left rather
+   * than from zero.
+   */
+  @Prop({ required: true, default: 0 })
+  strikes: number;
+
+  /** What is taken away right now. Empty for everybody who behaves. */
+  @Prop({ type: [RestrictionSchema], default: [] })
+  restrictions: Restriction[];
+
+  /** Set when the account was banned for good, which is also a restriction. */
+  @Prop({ required: false })
+  bannedAt?: Date;
+
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

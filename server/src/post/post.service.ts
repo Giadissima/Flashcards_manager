@@ -31,6 +31,7 @@ import { BadRequestException } from '@nestjs/common';
 import { Comment } from './comment.schema';
 import { Feedback, maxFeedbackMessages } from './feedback.schema';
 import { NotificationService } from 'src/notification/notification.service';
+import { RestrictionsService } from 'src/common/restrictions.service';
 import { User } from 'src/auth/user.schema';
 import { Vote } from './vote.schema';
 import { escapeRegex } from 'src/common/regex.util';
@@ -50,6 +51,7 @@ export class PostService {
     @InjectModel(Feedback.name) private feedbackModel: Model<Feedback>,
     private readonly fileService: FileService,
     private readonly notificationService: NotificationService,
+    private readonly restrictions: RestrictionsService,
   ) {}
 
   /**
@@ -364,6 +366,7 @@ export class PostService {
   }
 
   async addComment(userId: string, postId: string, text: string): Promise<void> {
+    await this.restrictions.assertMay(userId, 'comment');
     const post = await this.findOneOrThrow(postId);
 
     await this.commentModel.create({
@@ -402,6 +405,8 @@ export class PostService {
     flashcardId: string,
     text: string,
   ): Promise<void> {
+    await this.restrictions.assertMay(userId, 'feedback');
+
     const reporter_id = new Types.ObjectId(userId);
     const card = await this.flashcardModel
       .findOne({ _id: flashcardId, visibility: 'public' }, { user_id: 1 })

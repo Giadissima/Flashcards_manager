@@ -1,5 +1,9 @@
 import { Model, Types } from 'mongoose';
-import { Notification, NotificationKind } from './notification.schema';
+import {
+  ModerationDetails,
+  Notification,
+  NotificationKind,
+} from './notification.schema';
 
 import { BasePaginatedResult } from 'src/common.dto';
 import { NotificationFilterRequest } from './notification.dto';
@@ -9,11 +13,13 @@ import { InjectModel } from '@nestjs/mongoose';
 /** What a notification needs to be recorded. */
 export interface NewNotification {
   userId: string | Types.ObjectId;
-  actorId: string | Types.ObjectId;
+  /** Absent when the site itself is the one with something to say. */
+  actorId?: string | Types.ObjectId;
   kind: NotificationKind;
   postId?: Types.ObjectId;
   feedbackId?: Types.ObjectId;
   preview?: string;
+  moderation?: ModerationDetails;
 }
 
 /** A line of the panel, short enough to read at a glance. */
@@ -32,8 +38,10 @@ export class NotificationService {
    */
   async record(event: NewNotification): Promise<void> {
     const user_id = new Types.ObjectId(String(event.userId));
-    const actor_id = new Types.ObjectId(String(event.actorId));
-    if (user_id.equals(actor_id)) return;
+    const actor_id = event.actorId
+      ? new Types.ObjectId(String(event.actorId))
+      : undefined;
+    if (actor_id && user_id.equals(actor_id)) return;
 
     await this.notificationModel.create({
       user_id,
@@ -42,6 +50,7 @@ export class NotificationService {
       post_id: event.postId,
       feedback_id: event.feedbackId,
       preview: event.preview?.slice(0, previewLength),
+      moderation: event.moderation,
       read: false,
     });
   }
