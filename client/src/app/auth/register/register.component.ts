@@ -1,7 +1,7 @@
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { waitErrorOf } from '../../shared/wait-error';
 import { StudyFields, StudyFieldsComponent, emptyStudyFields } from '../../university/study-fields/study-fields.component';
-import { charMinLength, passwordMaxLength, passwordMinLength, usernameMaxLength } from '../../../config/config';
+import { charMinLength, emailMaxLength, passwordMaxLength, passwordMinLength, usernameMaxLength } from '../../../config/config';
 
 import { AuthService } from '../auth.service';
 import { CommonModule } from '@angular/common';
@@ -42,6 +42,7 @@ export class RegisterComponent {
 
   readonly charMinLength = charMinLength;
   readonly usernameMaxLength = usernameMaxLength;
+  readonly emailMaxLength = emailMaxLength;
   readonly passwordMinLength = passwordMinLength;
   readonly passwordMaxLength = passwordMaxLength;
 
@@ -59,6 +60,9 @@ export class RegisterComponent {
         Validators.maxLength(usernameMaxLength),
         Validators.pattern(usernamePattern),
       ]],
+      // Angular's own address check, which is the loose one on purpose: the
+      // only test that means anything is whether the confirmation mail arrives.
+      email: ['', [Validators.required, Validators.email, Validators.maxLength(emailMaxLength)]],
       password: ['', [Validators.required, Validators.minLength(passwordMinLength), Validators.maxLength(passwordMaxLength)]],
       confirmPassword: ['', Validators.required],
     }, { validators: RegisterComponent.passwordsMatch });
@@ -79,10 +83,10 @@ export class RegisterComponent {
 
     this.submitting = true;
     this.errorKey = null;
-    const { username, password } = this.registerForm.getRawValue();
+    const { username, email, password } = this.registerForm.getRawValue();
     const { universityCode, course, courseKind } = this.studyFields;
 
-    const payload: RegistrationPayload = { username, password };
+    const payload: RegistrationPayload = { username, email: email.trim(), password };
     if (universityCode) payload.universityCode = universityCode;
     if (course && courseKind) {
       payload.course = course;
@@ -91,6 +95,8 @@ export class RegisterComponent {
 
     try {
       await this.authService.register(payload);
+      // The account is ready; the mail is the one thing still outstanding, so
+      // the welcome says where to look for it.
       this.toastService.show(this.transloco.translate('auth.toast.registered'), 'success');
       this.router.navigate(['/home']);
     } catch (error) {
@@ -104,9 +110,16 @@ export class RegisterComponent {
       }
 
       this.errorParams = {};
-      this.errorKey = error instanceof HttpErrorResponse && error.status === 409
-        ? 'auth.error.usernameTaken'
-        : 'auth.error.generic';
+      // A 409 says one of the two unique fields is taken, and which: sending
+      // somebody to change their username when it was the address that clashed
+      // is a loop they cannot get out of.
+      if (error instanceof HttpErrorResponse && error.status === 409) {
+        this.errorKey = error.error?.code === 'emailTaken'
+          ? 'auth.error.emailTaken'
+          : 'auth.error.usernameTaken';
+        return;
+      }
+      this.errorKey = 'auth.error.generic';
     } finally {
       this.submitting = false;
     }

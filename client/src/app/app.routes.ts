@@ -18,6 +18,7 @@ import { ProfileComponent } from './profile/profile.component';
 import { RegisterComponent } from './auth/register/register.component';
 import { Routes } from '@angular/router';
 import { SetupTest } from './test/setup-test/setup-test';
+import { VerifyEmailComponent } from './auth/verify-email/verify-email.component';
 import { TestHistory } from './test/test-history/test-history';
 import { TestResult } from './test/test-result/test-result';
 import { TestRunner } from './test/test-runner/test-runner';
@@ -29,6 +30,9 @@ export const routes: Routes = [
   { path: 'admin/:id', component: AdminComponent },
   { path: 'login', component: LoginComponent, canActivate: [guestGuard] },
   { path: 'register', component: RegisterComponent, canActivate: [guestGuard] },
+  // No guard of any kind: the link is opened from a mail, so the reader can be
+  // logged in, logged out, or in a browser that has never seen this site.
+  { path: 'verify-email', component: VerifyEmailComponent },
   // Every page of the app hangs off this one, so a new route is behind the
   // login by default instead of having to remember its own guard.
   {

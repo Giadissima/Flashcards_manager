@@ -17,6 +17,9 @@
   "auth": {
     "username": "Nome utente",
     "password": "Password",
+    "email": "Email",
+    "emailHint": "Ti mandiamo un link di conferma. Serve per pubblicare in Community: è quello che rende un profilo usa e getta un po’ più scomodo di un click.",
+    "emailError": "Inserisci un indirizzo email valido",
     "usernameRequiredError": "Inserisci il tuo nome utente",
     "usernameLengthError": "Il nome utente deve avere tra {{min}} e {{max}} caratteri",
     "usernamePatternError": "Il nome utente può contenere solo lettere, numeri, punti, trattini e trattini bassi",
@@ -39,9 +42,24 @@
       "haveAccount": "Hai già un account?",
       "loginLink": "Accedi"
     },
+    "verify": {
+      "pending": "Non hai ancora confermato questo indirizzo. Finché non lo fai puoi studiare e importare come sempre, ma non pubblicare, commentare o mandare feedback in Community.",
+      "blocked": "Conferma il tuo indirizzo email prima di pubblicare in Community: trovi il link nella mail che ti abbiamo mandato, e puoi richiederla dal tuo profilo.",
+      "resend": "Rimanda la mail",
+      "resent": "Mail inviata, controlla la posta (anche lo spam)",
+      "resendError": "Non siamo riusciti a rimandare la mail, riprova più tardi",
+      "checkingTitle": "Sto confermando il tuo indirizzo…",
+      "doneTitle": "Indirizzo confermato",
+      "doneSubtitle": "Tutto a posto: ora puoi pubblicare, commentare e mandare feedback in Community.",
+      "failedTitle": "Questo link non vale più",
+      "failedSubtitle": "I link di conferma durano 24 ore. Accedi e chiedine un altro dal tuo profilo.",
+      "goHome": "Vai alla home",
+      "goLogin": "Accedi"
+    },
     "error": {
       "wrongCredentials": "Nome utente o password errati",
       "usernameTaken": "Questo nome utente è già in uso",
+      "emailTaken": "Esiste già un account con questa email",
       "generic": "Qualcosa è andato storto, riprova",
       "tooManyAccounts": "Da questa rete sono stati creati troppi account di recente. Riprova tra {{minutes}} minuti: non è colpa tua, è un limite contro i profili automatici.",
       "tooManyLogins": "Troppi tentativi di accesso da questa rete. Riprova tra {{minutes}} minuti.",
@@ -49,7 +67,7 @@
     },
     "toast": {
       "loggedIn": "Bentornata, {{username}}!",
-      "registered": "Account creato, benvenuta!",
+      "registered": "Account creato! Ti abbiamo mandato una mail per confermare l’indirizzo.",
       "loggedOut": "Hai effettuato il logout"
     }
   },

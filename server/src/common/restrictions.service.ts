@@ -6,6 +6,9 @@ import { NotificationService } from 'src/notification/notification.service';
 import { Privilege } from './privileges';
 import { Restriction, User } from 'src/auth/user.schema';
 
+/** The three fields this service reads, which is all it ever loads. */
+type UserFields = Pick<User, 'restrictions' | 'email' | 'emailVerifiedAt'>;
+
 /**
  * Whether an account may still reach other people.
  *
@@ -14,6 +17,10 @@ import { Restriction, User } from 'src/auth/user.schema';
  * remember. Blocks are dropped the moment they are found to be spent rather
  * than by a job that sweeps the collection: there is no clock here that could
  * be down, and an account gets its week back on the first request it makes.
+ *
+ * The unconfirmed address is asked about in the same breath, and for the same
+ * reason: it stops exactly the three things a block stops, so putting it here
+ * means a new way of reaching people cannot be written that forgets it.
  */
 @Injectable()
 export class RestrictionsService {
@@ -24,19 +31,26 @@ export class RestrictionsService {
 
   /** Throws when this account may not do that right now. */
   async assertMay(userId: string, privilege: Privilege): Promise<void> {
-    const restriction = await this.inForce(userId, privilege);
-    if (!restriction) return;
+    const user = await this.load(userId);
+    const restriction = await this.resolve(userId, user, privilege);
 
-    throw new ForbiddenException({
-      // The client turns these two into the sentence it shows; the message is
-      // for whoever reads the API by hand.
-      code: 'restricted',
-      privilege,
-      until: restriction.until ?? null,
-      message: restriction.until
-        ? `You cannot ${privilege} until ${restriction.until.toISOString()}`
-        : `You cannot ${privilege}`,
-    });
+    if (restriction) {
+      throw new ForbiddenException({
+        // The client turns these two into the sentence it shows; the message is
+        // for whoever reads the API by hand.
+        code: 'restricted',
+        privilege,
+        until: restriction.until ?? null,
+        message: restriction.until
+          ? `You cannot ${privilege} until ${restriction.until.toISOString()}`
+          : `You cannot ${privilege}`,
+      });
+    }
+
+    // Asked second on purpose. An account that was blocked and also never
+    // confirmed would otherwise be told to go and read its mail, which would
+    // be a wrong answer to what it is actually being told.
+    this.assertConfirmed(user);
   }
 
   /** The block on that privilege, or null - lifting it if its day has come. */
@@ -44,11 +58,42 @@ export class RestrictionsService {
     userId: string | Types.ObjectId,
     privilege: Privilege,
   ): Promise<Restriction | null> {
-    const user = await this.userModel
-      .findById(userId, { restrictions: 1 })
-      .lean()
-      .exec();
+    return this.resolve(userId, await this.load(userId), privilege);
+  }
 
+  /**
+   * Throws when the account has an address it never confirmed.
+   *
+   * An account from before addresses existed has none, and passes: taking the
+   * Community away from everybody who registered first would punish them for
+   * the order they arrived in.
+   */
+  private assertConfirmed(user: UserFields | null): void {
+    if (!user?.email || user.emailVerifiedAt) return;
+
+    throw new ForbiddenException({
+      code: 'emailNotVerified',
+      email: user.email,
+      message: 'Confirm your email address before reaching other people',
+    });
+  }
+
+  private async load(
+    userId: string | Types.ObjectId,
+  ): Promise<UserFields | null> {
+    return this.userModel
+      .findById(userId, { restrictions: 1, email: 1, emailVerifiedAt: 1 })
+      .lean<UserFields>()
+      .exec();
+  }
+
+  /** Reads one already-loaded account, so a check that needs both the block
+      and the address does not ask the database twice. */
+  private async resolve(
+    userId: string | Types.ObjectId,
+    user: UserFields | null,
+    privilege: Privilege,
+  ): Promise<Restriction | null> {
     const found = user?.restrictions?.find(
       (restriction) => restriction.privilege === privilege,
     );

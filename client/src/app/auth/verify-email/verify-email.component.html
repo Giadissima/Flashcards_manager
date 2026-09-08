@@ -1,0 +1,39 @@
+<div class="container-md auth-page" *transloco="let t">
+  <!-- The navbar is hidden while logged out, so the page carries the logo itself -->
+  <div class="auth-logo">
+    <img src="assets/favicon.png" alt="Logo">
+    <span>Flashcards Manager</span>
+  </div>
+
+  @switch (state) {
+  @case ('checking') {
+  <app-page-card icon="hourglass_top" [title]="t('auth.verify.checkingTitle')">
+    <div class="text-center py-3">
+      <div class="spinner-border" role="status" aria-hidden="true"></div>
+    </div>
+  </app-page-card>
+  }
+  @case ('done') {
+  <app-page-card icon="mark_email_read" [title]="t('auth.verify.doneTitle')"
+    [subtitle]="t('auth.verify.doneSubtitle')">
+    <div class="form-actions">
+      <a class="btn btn-primary" [routerLink]="target">
+        <span class="material-symbols-outlined">arrow_forward</span>{{ t(targetKey) }}
+      </a>
+    </div>
+  </app-page-card>
+  }
+  @case ('failed') {
+  <app-page-card icon="link_off" [title]="t('auth.verify.failedTitle')" [subtitle]="t('auth.verify.failedSubtitle')">
+    <!-- No "send it again" button here: asking for a new mail needs to know
+         which account is asking, and this page can be open logged out. The
+         profile page has it, behind the login. -->
+    <div class="form-actions">
+      <a class="btn btn-primary" [routerLink]="target">
+        <span class="material-symbols-outlined">arrow_forward</span>{{ t(targetKey) }}
+      </a>
+    </div>
+  </app-page-card>
+  }
+  }
+</div>

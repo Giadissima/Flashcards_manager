@@ -12,6 +12,20 @@ export const passwordMaxLength = 72;
 export const bcryptSaltRounds = 10;
 // The longest course name the ministry publishes is 234 characters
 export const courseMaxLength = 250;
+// What an address is allowed to be, by the standard: 64 for the local part,
+// one @, 255 for the domain - refusing anything longer costs nobody a mailbox
+export const emailMaxLength = 254;
+
+// ---------------------------------------------------------------- addresses
+
+/**
+ * How long a confirmation link stays good for.
+ *
+ * A day: long enough that a mail read the next morning still works, short
+ * enough that a link forwarded, or left in an inbox somebody else later opens,
+ * is spent by the time it is found.
+ */
+export const verificationTokenHours = 24;
 
 // ------------------------------------------------------------- moderation
 
@@ -69,6 +83,12 @@ export const rateLimits = {
   register: { ttl: 60 * 60_000, limit: 30 },
   /** Trying passwords. */
   login: { ttl: 10 * 60_000, limit: 20 },
+  /**
+   * Asking for the confirmation mail again. Low, and per address: every one of
+   * these is a mail somebody's server has to deliver, and a button that can be
+   * held down is how an account ends up in a spam folder for good.
+   */
+  resendVerification: { ttl: 60 * 60_000, limit: 5 },
   /** Anything that puts words in front of other people. */
   write: { ttl: 60_000, limit: 20 },
 } as const;

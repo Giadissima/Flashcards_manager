@@ -1,5 +1,18 @@
-import { AuthUser } from '../../models/auth.dto';
 import { baseUrlAPI } from '../../../config/config';
+
+/**
+ * The two fields an avatar is drawn from, and nothing else.
+ *
+ * Written out rather than taken as AuthUser: the post author in the feed is
+ * shown the same way and is not an AuthUser - it carries no address, no study
+ * fields, nothing the logged reader has - and asking for the whole of one here
+ * would tie the drawing to fields it never looks at.
+ */
+export interface AvatarSource {
+  /** Id of the uploaded picture; absent means the default drawing. */
+  avatar?: string;
+  avatarColor?: string;
+}
 
 export const defaultAvatarColor = '#a294f9';
 
@@ -125,7 +138,7 @@ export function getDefaultAvatarDataUrl(fill: string = defaultAvatarColor): stri
 // resolved through the endpoint serving the file bytes. With nothing uploaded,
 // the default drawing is generated on the fly in the chosen colour, so no file
 // is stored for it.
-export function getAvatarUrl(user: AuthUser | null | undefined): string {
+export function getAvatarUrl(user: AvatarSource | null | undefined): string {
   if (user?.avatar) {
     return `${baseUrlAPI}file/${user.avatar}`;
   }

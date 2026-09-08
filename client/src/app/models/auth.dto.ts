@@ -2,6 +2,12 @@
 export interface AuthUser {
   _id: string;
   username: string;
+  /** Where the account can be reached. Absent on the accounts made before the
+      field existed, which is also why they count as confirmed. */
+  email?: string;
+  /** False only while a confirmation link is still unopened - and only that
+      stands between the account and the Community section. */
+  emailVerified: boolean;
   /** Ministry code of the university, absent when the user skipped it. */
   universityCode?: string;
   course?: string;
@@ -31,5 +37,7 @@ export interface StudyFieldsPayload {
   courseKind?: string;
 }
 
-/** What the registration form sends: the study fields are all optional. */
-export interface RegistrationPayload extends Credentials, StudyFieldsPayload {}
+/** What the registration form sends: only the study fields are optional. */
+export interface RegistrationPayload extends Credentials, StudyFieldsPayload {
+  email: string;
+}

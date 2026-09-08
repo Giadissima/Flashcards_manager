@@ -47,6 +47,16 @@ export class ProfileComponent implements OnInit, OnDestroy {
   /** Translation key of the failure shown above the form, cleared on each save. */
   errorKey: string | null = null;
 
+  /** The address of the account, shown but not editable here: changing it
+      would mean confirming a new one, which is a page of its own. */
+  email: string | null = null;
+  /** False only while the confirmation link is still unopened. */
+  emailVerified = true;
+  /** True while the "send it again" call is out, and after it went through:
+      the mail is on its way, and pressing again would only make a second one. */
+  resending = false;
+  resent = false;
+
   selectedAvatar: File | null = null;
   /**
    * null means nothing is uploaded, so the live drawing is shown and follows the
@@ -104,6 +114,30 @@ export class ProfileComponent implements OnInit, OnDestroy {
       courseKind: user.courseKind ?? null,
     };
     this.previewUrl = user.avatar ? getAvatarUrl(user) : null;
+    this.email = user.email ?? null;
+    this.emailVerified = user.emailVerified;
+  }
+
+  /**
+   * Asks the server for the confirmation mail again.
+   *
+   * The button does not come back: whatever happened, one more mail is either
+   * on its way or was refused for asking too often, and a button that can be
+   * pressed all afternoon is how an address ends up marked as spam.
+   */
+  async resendVerification(): Promise<void> {
+    if (this.resending || this.resent) return;
+    this.resending = true;
+
+    try {
+      await this.authService.resendVerification();
+      this.resent = true;
+      this.toastService.show(this.transloco.translate('auth.verify.resent'), 'success');
+    } catch {
+      this.toastService.show(this.transloco.translate('auth.verify.resendError'), 'error');
+    } finally {
+      this.resending = false;
+    }
   }
 
   // Already cropped by app-icon-preview: what arrives here is the picture as it

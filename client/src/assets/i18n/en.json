@@ -17,6 +17,9 @@
   "auth": {
     "username": "Username",
     "password": "Password",
+    "email": "Email",
+    "emailHint": "We send you a confirmation link. You need it to post in the Community: it is what makes a throwaway profile a little more work than one click.",
+    "emailError": "Enter a valid email address",
     "usernameRequiredError": "Enter your username",
     "usernameLengthError": "The username must be between {{min}} and {{max}} characters",
     "usernamePatternError": "The username can only contain letters, digits, dots, dashes and underscores",
@@ -39,8 +42,23 @@
       "haveAccount": "Already have an account?",
       "loginLink": "Sign in"
     },
+    "verify": {
+      "pending": "You have not confirmed this address yet. Until you do you can study and import as always, but not post, comment or send feedback in the Community.",
+      "blocked": "Confirm your email address before posting in the Community: the link is in the mail we sent you, and you can ask for another one from your profile.",
+      "resend": "Send the mail again",
+      "resent": "Mail sent, have a look in your inbox (and in the spam folder)",
+      "resendError": "We could not send the mail again, try later",
+      "checkingTitle": "Confirming your address…",
+      "doneTitle": "Address confirmed",
+      "doneSubtitle": "All set: you can now post, comment and send feedback in the Community.",
+      "failedTitle": "This link is no longer valid",
+      "failedSubtitle": "Confirmation links last 24 hours. Log in and ask for another one from your profile.",
+      "goHome": "Go to the home page",
+      "goLogin": "Log in"
+    },
     "error": {
       "wrongCredentials": "Wrong username or password",
+      "emailTaken": "An account with this email already exists",
       "usernameTaken": "This username is already taken",
       "generic": "Something went wrong, please try again",
       "tooManyAccounts": "Too many accounts have been created from this network lately. Try again in {{minutes}} minutes: nothing you did, it is a limit against automated sign-ups.",
@@ -49,7 +67,7 @@
     },
     "toast": {
       "loggedIn": "Welcome back, {{username}}!",
-      "registered": "Account created, welcome!",
+      "registered": "Account created! We sent you a mail to confirm your address.",
       "loggedOut": "You have been logged out"
     }
   },

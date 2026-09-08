@@ -1,7 +1,15 @@
-import { IsBoolean, IsOptional, IsString, Length, Matches } from 'class-validator';
+import {
+  IsBoolean,
+  IsEmail,
+  IsOptional,
+  IsString,
+  Length,
+  Matches,
+} from 'class-validator';
 import {
   charMinLength,
   courseMaxLength,
+  emailMaxLength,
   nameMaxLength,
   passwordMaxLength,
   passwordMinLength,
@@ -85,6 +93,32 @@ export class RegisterDto extends IntersectionType(LoginDto, StudyFieldsDto) {
   })
   declare username: string;
 
+  /**
+   * Required here and nowhere else. The accounts made before this field
+   * existed have no address and keep working without one; from now on every
+   * new account has a way of being reached, which is what the Community
+   * section leans on to make a throwaway profile cost something.
+   */
+  @IsEmail({}, { message: 'email must be a valid address' })
+  @Length(charMinLength, emailMaxLength)
+  @ApiProperty({
+    description: 'Address the confirmation link is sent to',
+    example: 'giada@example.com',
+  })
+  @Trim()
+  email: string;
+}
+
+/** The token out of the confirmation link, as the page sends it back. */
+export class VerifyEmailDto {
+  @IsString()
+  @Length(16, 200)
+  @ApiProperty({
+    description: 'Token from the ?token= of the confirmation link',
+    example: '9f1c…',
+  })
+  @Trim()
+  token: string;
 }
 
 /**
@@ -139,6 +173,12 @@ export interface AuthResponse {
 export interface PublicUser {
   _id: string;
   username: string;
+  /** Absent on the accounts that predate the field; never shown to anybody
+      but the owner - PublicUser only ever describes the caller. */
+  email?: string;
+  /** Whether the address was confirmed. True for an account without one, so
+      that nothing the old accounts could do is taken away from them. */
+  emailVerified: boolean;
   universityCode?: string;
   course?: string;
   courseKind?: string;

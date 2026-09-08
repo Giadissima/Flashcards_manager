@@ -5,6 +5,7 @@ import {
   PublicUser,
   RegisterDto,
   UpdateProfileDto,
+  VerifyEmailDto,
 } from './auth.dto';
 import {
   Body,
@@ -26,10 +27,14 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthService } from './auth.service';
 import { CurrentUser } from './current-user.decorator';
 import { Public } from './public.decorator';
+import { VerificationService } from './verification.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly verification: VerificationService,
+  ) {}
 
   @ApiOperation({ description: 'create a new user and return its access token' })
   @Public()
@@ -52,6 +57,33 @@ export class AuthController {
   @HttpCode(HttpStatus.OK) // a login creates nothing, so 201 would be misleading
   login(@Body() loginDto: LoginDto): Promise<AuthResponse> {
     return this.authService.login(loginDto);
+  }
+
+  @ApiOperation({
+    description: 'spend the token out of a confirmation mail',
+  })
+  // Public because it is opened from a mail: whoever clicks the link may be in
+  // a browser that has never seen this site, and the token is what proves it.
+  @Public()
+  @Throttle({ all: rateLimits.login })
+  @Post('verify-email')
+  @HttpCode(HttpStatus.OK)
+  async verifyEmail(@Body() dto: VerifyEmailDto): Promise<{ verified: true }> {
+    await this.verification.confirm(dto.token);
+    return { verified: true };
+  }
+
+  @ApiOperation({
+    description: 'send the confirmation mail again to the logged user',
+  })
+  @Throttle({ all: rateLimits.resendVerification })
+  @Post('verify-email/resend')
+  @HttpCode(HttpStatus.ACCEPTED)
+  async resendVerification(
+    @CurrentUser() user: JwtPayload,
+  ): Promise<{ sent: true }> {
+    await this.authService.resendVerification(user);
+    return { sent: true };
   }
 
   @ApiOperation({

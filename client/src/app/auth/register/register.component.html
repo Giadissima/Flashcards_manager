@@ -26,6 +26,19 @@
       </div>
 
       <div class="form-group">
+        <label for="email" class="form-label">{{ 'auth.email' | transloco }}</label>
+        <input type="email" id="email" formControlName="email" class="form-control" autocomplete="email"
+          inputmode="email">
+        <!-- Said before the field is filled in and not after: it explains why
+             the field is there at all, which is the question somebody asked
+             for an address on a study site is actually asking. -->
+        <div class="form-text">{{ 'auth.emailHint' | transloco }}</div>
+        @if (registerForm.get('email')?.touched && registerForm.get('email')?.invalid) {
+        <div class="invalid-feedback d-block">{{ 'auth.emailError' | transloco }}</div>
+        }
+      </div>
+
+      <div class="form-group">
         <label for="password" class="form-label">{{ 'auth.password' | transloco }}</label>
         <input type="password" id="password" formControlName="password" class="form-control"
           autocomplete="new-password">

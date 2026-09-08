@@ -6,9 +6,11 @@ import { AuthService } from './auth.service';
 import { JwtModule, JwtSignOptions } from '@nestjs/jwt';
 import { Module } from '@nestjs/common';
 import { FileModule } from 'src/file/file.module';
+import { MailModule } from 'src/mail/mail.module';
 import { ModerationModule } from 'src/moderation/moderation.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UniversityModule } from 'src/university/university.module';
+import { VerificationService } from './verification.service';
 
 @Module({
   imports: [
@@ -16,6 +18,7 @@ import { UniversityModule } from 'src/university/university.module';
     UniversityModule,
     FileModule,
     ModerationModule,
+    MailModule,
     JwtModule.registerAsync({
       global: true, // the guard registered in AppModule needs JwtService too
       imports: [ConfigModule],
@@ -31,6 +34,6 @@ import { UniversityModule } from 'src/university/university.module';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, VerificationService],
 })
 export class AuthModule {}

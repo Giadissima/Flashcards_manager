@@ -45,6 +45,36 @@ export class User {
   password: string;
 
   /**
+   * Where the account can be reached, lowercased and unique.
+   *
+   * Required of everybody who registers from now on - the DTO asks for it -
+   * but not by the schema, and the index is sparse: the accounts that existed
+   * before this field did have none, and a required field would have made
+   * every one of them unsaveable. They keep working; only an account that has
+   * an address has to confirm it.
+   */
+  @Prop({ required: false, unique: true, sparse: true, lowercase: true, trim: true })
+  email?: string;
+
+  /** When the address was confirmed. Absent means the link is still unopened. */
+  @Prop({ required: false })
+  emailVerifiedAt?: Date;
+
+  /**
+   * sha-256 of the confirmation token, never the token itself.
+   *
+   * The token goes out in a mail and comes back in a URL, so it is a password
+   * that opens this account's confirmation - and a database that leaks would
+   * otherwise hand over every pending one. Cleared once it has been used.
+   */
+  @Prop({ required: false })
+  emailTokenHash?: string;
+
+  /** When that token stops working, so an old mail cannot confirm anything. */
+  @Prop({ required: false })
+  emailTokenExpiresAt?: Date;
+
+  /**
    * Ministry code of the university the user belongs to, e.g. "00101". Both
    * study fields are optional: they describe the user, they do not gate
    * anything, and the registration form lets them be skipped.

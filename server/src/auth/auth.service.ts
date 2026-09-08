@@ -22,6 +22,7 @@ import { Model } from 'mongoose';
 import { FileService } from 'src/file/file.service';
 import { ModerationService } from 'src/moderation/moderation.service';
 import { UniversityService } from 'src/university/university.service';
+import { VerificationService } from './verification.service';
 import bcrypt from 'bcryptjs';
 import { bcryptSaltRounds } from 'src/config';
 
@@ -33,12 +34,14 @@ export class AuthService {
     private readonly universityService: UniversityService,
     private readonly fileService: FileService,
     private readonly moderation: ModerationService,
+    private readonly verification: VerificationService,
   ) {}
 
   async register(dto: RegisterDto, ip?: string): Promise<AuthResponse> {
-    // Nothing else costs anything here: no mail, no invitation, no payment.
-    // The one price of a ban is that the address it came from waits a day
-    // before it can open the next account.
+    // Neither an invitation nor a payment: an account still costs a minute.
+    // What it does cost is one address that answers, which is what stands
+    // between a ban and the same person back an hour later - and the address
+    // the ban came from waits a day before it can open the next account.
     if (await this.moderation.signupBlocked(ip)) {
       throw new ForbiddenException(
         'Too many accounts from here lately. Try again tomorrow.',
@@ -52,6 +55,17 @@ export class AuthService {
       throw new ConflictException('Username already taken');
     }
 
+    const email = dto.email.toLowerCase();
+    if (await this.userModel.exists({ email })) {
+      // Told apart from a taken username on purpose: the two are fixed in
+      // different places, and one message for both would send half the people
+      // who meet it to change the wrong field.
+      throw new ConflictException({
+        code: 'emailTaken',
+        message: 'Email already registered',
+      });
+    }
+
     const password = await bcrypt.hash(dto.password, bcryptSaltRounds);
     // A unique index still decides it: two registrations of the same name can
     // both pass the check above, and only one of them can reach the database.
@@ -59,6 +73,7 @@ export class AuthService {
     try {
       user = await this.userModel.create({
         username,
+        email,
         password,
         universityCode: dto.universityCode,
         course: dto.course,
@@ -66,13 +81,32 @@ export class AuthService {
         signupIp: ip,
       });
     } catch (error) {
+      // A unique index still decides both, and it says which one it was.
       if ((error as { code?: number }).code === 11000) {
+        const key = (error as { keyPattern?: Record<string, unknown> })
+          .keyPattern;
+        if (key && 'email' in key) {
+          throw new ConflictException({
+            code: 'emailTaken',
+            message: 'Email already registered',
+          });
+        }
         throw new ConflictException('Username already taken');
       }
       throw error;
     }
 
+    // After the account exists, and never in its way: a mail that does not go
+    // out leaves somebody logged in with a button to ask for it again, while a
+    // failure here would leave them with nothing.
+    await this.verification.send(user);
+
     return this.buildResponse(user);
+  }
+
+  /** Asks for the confirmation mail again, for the account that is asking. */
+  async resendVerification(payload: JwtPayload): Promise<void> {
+    await this.verification.resend(payload.sub);
   }
 
   async login(dto: LoginDto): Promise<AuthResponse> {
@@ -204,6 +238,11 @@ export class AuthService {
       courseKind: user.courseKind,
       avatar: user.avatar,
       avatarColor: user.avatarColor,
+      email: user.email,
+      // An account from before the field existed has nothing to confirm, so it
+      // counts as confirmed: the alternative is locking out everybody who
+      // registered first.
+      emailVerified: !user.email || !!user.emailVerifiedAt,
     };
   }
 }

@@ -37,6 +37,15 @@ services:
       # rate limits count is the reader's. 0 = none; 1 = one reverse proxy;
       # 2 = Cloudflare and then it. Never guess high: see main.ts.
       - TRUSTED_PROXIES=${TRUSTED_PROXIES:-0}
+      # Who carries the confirmation mails - any SMTP server, set in .env and
+      # described in .env.example. Nothing about the provider lives in the
+      # code. Empty host, user or password = feature off: whoever registers is
+      # taken at their word and the site works exactly as before.
+      - MAIL_HOST=${MAIL_HOST:-}
+      - MAIL_PORT=${MAIL_PORT:-}
+      - MAIL_USER=${MAIL_USER:-}
+      - MAIL_PASSWORD=${MAIL_PASSWORD:-}
+      - MAIL_FROM=${MAIL_FROM:-}
       # The moderation page: a password of the server's own, not an account.
       # Empty means the page turns everybody away, bot included.
       - ADMIN_PASSWORD=${ADMIN_PASSWORD:-}

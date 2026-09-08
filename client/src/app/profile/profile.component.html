@@ -30,6 +30,24 @@
           }
         </div>
 
+        <!-- Read only: a new address would have to be confirmed before it
+             replaced this one, and half a change is worse than none. -->
+        @if (email) {
+        <div class="form-group">
+          <label class="form-label">{{ t('auth.email') }}</label>
+          <input type="email" class="form-control" [value]="email" readonly disabled>
+          @if (!emailVerified) {
+          <div class="alert alert-warning mt-2 mb-0" role="alert">
+            <div>{{ t('auth.verify.pending') }}</div>
+            <button type="button" class="btn btn-outline-primary btn-sm mt-2" [disabled]="resending || resent"
+              (click)="resendVerification()">
+              <span class="material-symbols-outlined">forward_to_inbox</span>{{ t('auth.verify.resend') }}
+            </button>
+          </div>
+          }
+        </div>
+        }
+
         <app-study-fields [value]="studyFields" (valueChange)="studyFields = $event"></app-study-fields>
 
         <!-- Saving is what the page is for, so it sits on the right, where the

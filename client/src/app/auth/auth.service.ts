@@ -56,6 +56,24 @@ export class AuthService {
   }
 
   /**
+   * Spends the token out of a confirmation mail.
+   *
+   * Reachable logged out, because the link is opened from an inbox and that
+   * may well be a browser this site has never seen. When somebody is logged in
+   * the stored copy of the user is refreshed straight after, so the notice
+   * about the unconfirmed address goes away without a reload.
+   */
+  async verifyEmail(token: string): Promise<void> {
+    await this.restClient.post(this.baseUrl + '/verify-email', { token });
+    if (this.isLoggedIn) await this.fetchMe();
+  }
+
+  /** Asks for the confirmation mail again, for whoever is logged in. */
+  async resendVerification(): Promise<void> {
+    await this.restClient.post(this.baseUrl + '/verify-email/resend', {});
+  }
+
+  /**
    * The user as the server has them now. The copy in storage is only there to
    * show a name without waiting for a round trip, so a page that edits the
    * profile asks for the real thing.
