@@ -85,6 +85,26 @@ export class Post {
    */
   @Prop({ required: true, default: 0, index: true })
   score: number;
+
+  /**
+   * When the post was taken out of the Community, and why.
+   *
+   * Taken out, not deleted: a post hidden while its reports are looked at may
+   * well go back up, and one taken down for good is still the record of what
+   * was there. Both are the same field because every reader's question is the
+   * same - is this in the feed or not.
+   */
+  @Prop({ required: false, index: true })
+  hiddenAt?: Date;
+
+  /**
+   * 'reports' is waiting to be looked at, 'admin' was taken down on its own,
+   * 'ban' went down with its author - which is the one that has to be told
+   * apart, so that lifting the ban puts back what the ban took and nothing
+   * else.
+   */
+  @Prop({ required: false, enum: ['reports', 'admin', 'ban'] })
+  hiddenReason?: 'reports' | 'admin' | 'ban';
 }
 
 export const PostSchema = SchemaFactory.createForClass(Post);

@@ -10,6 +10,7 @@ import { TopicModule } from './topic/topic.module';
 import { ImportExportModule } from './import-export/import-export.module';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { Module } from '@nestjs/common';
+import { ModerationModule } from './moderation/moderation.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { NotificationModule } from './notification/notification.module';
 import { PostModule } from './post/post.module';
@@ -39,6 +40,7 @@ import { UniversityModule } from './university/university.module';
     UniversityModule,
     PostModule,
     NotificationModule,
+    ModerationModule,
   ],
   controllers: [AppController],
   providers: [

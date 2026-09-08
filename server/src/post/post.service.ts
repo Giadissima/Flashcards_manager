@@ -168,7 +168,11 @@ export class PostService {
     // The empty ones are left out here rather than deleted when they run dry:
     // a subject taken back by mistake would otherwise cost its author every
     // like and comment the post had earned, with no way back.
-    const query: FilterQuery<Post> = { cardCount: { $gt: 0 } };
+    const query: FilterQuery<Post> = {
+      cardCount: { $gt: 0 },
+      // Reported and waiting, or taken down: out of the feed either way
+      hiddenAt: { $exists: false },
+    };
 
     // Which date the range reads is the caller's to say, and independent of
     // the order: when the post went up is a fact that stays put, while when it
@@ -988,8 +992,16 @@ export class PostService {
     };
   }
 
+  /**
+   * Not found rather than forbidden for a hidden post, and for everybody
+   * including its author: every way into a post goes through here - the
+   * carousel, the likes, the comments, the import - and a post that is out of
+   * the Community has to be out of all of them at once.
+   */
   private async findOneOrThrow(postId: string): Promise<PostDocument> {
-    const post = await this.postModel.findById(postId).exec();
+    const post = await this.postModel
+      .findOne({ _id: postId, hiddenAt: { $exists: false } })
+      .exec();
     if (!post) {
       throw new NotFoundException(`${ENTITY} with id ${postId} not found`);
     }
