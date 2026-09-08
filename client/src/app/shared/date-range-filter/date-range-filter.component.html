@@ -1,12 +1,11 @@
 <div class="date-range">
-  <span class="material-symbols-outlined date-range-icon">date_range</span>
 
   <!-- In front of the two ends and not above them: read left to right it makes
-       one sentence, "publication, from this day to that one". -->
+  one sentence, "publication, from this day to that one". -->
   @if (fields.length) {
-  <select class="form-select date-range-field" [disabled]="disabled"
-    [title]="'common.dateFieldLabel' | transloco" [attr.aria-label]="'common.dateFieldLabel' | transloco"
-    (change)="onField($any($event.target).value)">
+  <span class="material-symbols-outlined date-range-icon">date_range</span>
+  <select class="form-select date-range-field" [disabled]="disabled" [title]="'common.dateFieldLabel' | transloco"
+    [attr.aria-label]="'common.dateFieldLabel' | transloco" (change)="onField($any($event.target).value)">
     <!-- Marked on the option and not bound on the select: the value of a
          select is set before its options exist, and would find nothing to
          match on the first draw. -->
@@ -18,15 +17,16 @@
 
   <!-- The far end limits the near one and the other way round, so the calendar
        itself cannot offer a range that runs backwards. -->
-  <input type="date" class="form-control date-range-input" [value]="from ?? ''" [attr.max]="to || null"
-    [disabled]="disabled" [title]="'common.dateFrom' | transloco" [attr.aria-label]="'common.dateFrom' | transloco"
-    (change)="onFrom($any($event.target).value)">
-
-  <span class="date-range-dash" aria-hidden="true">–</span>
-
-  <input type="date" class="form-control date-range-input" [value]="to ?? ''" [attr.min]="from || null"
-    [disabled]="disabled" [title]="'common.dateTo' | transloco" [attr.aria-label]="'common.dateTo' | transloco"
-    (change)="onTo($any($event.target).value)">
+  <mat-form-field class="date-range-field-group" subscriptSizing="dynamic">
+    <mat-date-range-input [formGroup]="range" [rangePicker]="picker" [max]="today">
+      <input matStartDate formControlName="start" [placeholder]="'common.dateFrom' | transloco"
+        [attr.aria-label]="'common.dateFrom' | transloco">
+      <input matEndDate formControlName="end" [placeholder]="'common.dateTo' | transloco"
+        [attr.aria-label]="'common.dateTo' | transloco">
+    </mat-date-range-input>
+    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-date-range-picker #picker></mat-date-range-picker>
+  </mat-form-field>
 
   @if (from || to) {
   <button type="button" class="btn btn-icon-ghost date-range-clear" [disabled]="disabled" (click)="clear()"

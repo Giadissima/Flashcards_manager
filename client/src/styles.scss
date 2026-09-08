@@ -1,3 +1,41 @@
+
+// Include theming for Angular Material with `mat.theme()`.
+// This Sass mixin will define CSS variables that are used for styling Angular Material
+// components according to the Material 3 design spec.
+// Learn more about theming and how to use it for your application's
+// custom components at https://material.angular.dev/guide/theming
+@use '@angular/material' as mat;
+
+html {
+  @include mat.theme((
+    color: (
+      primary: mat.$magenta-palette,
+      tertiary: mat.$violet-palette,
+    ),
+    // Matches the app's own font (--font-family below) instead of Material's
+    // default Roboto, so its components (datepicker included) read the same
+    // as everything else.
+    typography: Nunito,
+    density: 0,
+  ));
+}
+
+body {
+  // Default the application to a light color theme. This can be changed to
+  // `dark` to enable the dark color theme, or to `light dark` to defer to the
+  // user's system settings.
+  color-scheme: light;
+
+  // Set a default background, font and text colors for the application using
+  // Angular Material's system-level CSS variables. Learn more about these
+  // variables at https://material.angular.dev/guide/system-variables
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+
+  // Reset the user agent margin.
+  margin: 0;
+}
 /* ---------------------------------- */
 /* 1. Design System                   */
 /* ---------------------------------- */
@@ -104,6 +142,55 @@
   --bs-body-bg: var(--background-color);
   --bs-body-color: var(--text-color);
 
+  /* Angular Material reads its own "primary" through these two system-level
+     tokens (--mat-sys-primary/-on-primary), which every component falls back
+     to unless it defines a more specific token of its own - the same role
+     --bs-primary plays for Bootstrap above. mat.theme() above sets them from
+     a fixed magenta palette; overridden here, after it, so every Material
+     component (buttons, toggles, the datepicker's selected day, ...) follows
+     the app's own palette instead. --header-color rather than a fixed white:
+     it is what .btn already puts on every button's own colored background
+     (see 4. Form Elements), so Material buttons read the same way. */
+  --mat-sys-primary: var(--primary-color);
+  --mat-sys-on-primary: var(--header-color);
+
+  /* mat.theme() derives every "neutral" system token (surface, on-surface,
+     on-surface-variant, outline...) from the same magenta palette used for
+     primary, tinting them with its hue - so text and borders keep a
+     brownish-pink cast even where nothing asks for the primary colour
+     specifically (the date range input's value text, the calendar's
+     weekday row). Restated here in the app's own greys, the same way
+     --mat-sys-primary is restated above. */
+  --mat-sys-surface: var(--component-background);
+  --mat-sys-on-surface: var(--text-color);
+  --mat-sys-surface-variant: var(--inset-background);
+  --mat-sys-on-surface-variant: var(--text-color);
+  --mat-sys-outline: var(--border-color);
+  --mat-sys-outline-variant: var(--border-color);
+
+  /* angular material datepicker */
+  @include mat.datepicker-overrides((
+    calendar-body-label-text-color: var(--text-color),
+    calendar-container-background-color: var(--inset-background),
+    calendar-date-text-color: var(--text-color),
+    /* The fill behind the days between the two selected ends: falls back to
+       primary-container (the magenta palette's pale pink) unless named here,
+       which the --mat-sys-primary override above never touches. */
+    calendar-date-in-range-state-background-color: color-mix(in srgb, var(--primary-color) 60%, #000),
+    calendar-date-selected-state-background-color: var(--primary-color),
+    calendar-date-selected-state-text-color: var(--header-color),
+    calendar-date-today-outline-color: var(--primary-color),
+  ));
+
+  /* angular material date range input (the field itself, not just the popup calendar) */
+  @include mat.form-field-overrides((
+    filled-container-color: var(--inset-background),
+    filled-input-text-color: var(--text-color),
+    filled-input-text-placeholder-color: var(--muted-color),
+    filled-label-text-color: var(--muted-color),
+    filled-caret-color: var(--primary-color),
+    filled-focus-active-indicator-color: var(--primary-color),
+  ));
 }
 
 /* ---------------------------------- */
@@ -1111,8 +1198,6 @@ $image-modal-height: calc(
   border: 1px solid var(--border-color);
 }
 
-/* DROPDOWN*/
-
 .dropdown {
   position: relative;
 }
@@ -1263,3 +1348,5 @@ $image-modal-height: calc(
 .search-clear-btn .material-symbols-outlined {
   font-size: 18px;
 }
+
+html, body { height: 100%; }
