@@ -26,10 +26,19 @@ services:
       # already handed out stops working - TODO
       - JWT_SECRET=${JWT_SECRET:-change-me-in-production}
       - JWT_EXPIRES_IN=7d
+      # The chat reports are announced in. Empty token = feature off, site
+      # unchanged. The bot only sends; it listens to nothing.
+      # The real values live in .env, which git ignores: a bot token in the
+      # repository is a bot anybody can drive.
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID:-}
+      - TELEGRAM_API_URL=${TELEGRAM_API_URL:-https://api.telegram.org}
       # How many proxies really sit in front of the server, so the address the
       # rate limits count is the reader's. 0 = none; 1 = one reverse proxy;
       # 2 = Cloudflare and then it. Never guess high: see main.ts.
       - TRUSTED_PROXIES=${TRUSTED_PROXIES:-0}
+      # Where the site answers from, for the link the bot sends
+      - PUBLIC_URL=${PUBLIC_URL:-http://localhost:4200}
     depends_on:
       - mongodb
 

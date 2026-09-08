@@ -8,6 +8,7 @@ import { Post, PostSchema } from 'src/post/post.schema';
 import { Report, ReportSchema } from './report.schema';
 import { Sanction, SanctionSchema } from './sanction.schema';
 import { SignupBlock, SignupBlockSchema } from './signup-block.schema';
+import { TelegramService } from './telegram.service';
 import { User, UserSchema } from 'src/auth/user.schema';
 
 @Module({
@@ -22,7 +23,7 @@ import { User, UserSchema } from 'src/auth/user.schema';
     NotificationModule,
   ],
   controllers: [ModerationController],
-  providers: [ModerationService],
+  providers: [ModerationService, TelegramService],
   // AuthModule asks it whether an address may open an account
   exports: [ModerationService],
 })

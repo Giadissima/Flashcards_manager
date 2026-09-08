@@ -7,6 +7,7 @@ import { CurrentUser } from 'src/auth/current-user.decorator';
 import { JwtPayload } from 'src/auth/auth.dto';
 import { ModerationService } from './moderation.service';
 import { ReportPostDto, ReportResult } from './moderation.dto';
+import { TelegramService } from './telegram.service';
 
 /**
  * Reporting lives under the post it is about, which is where a reader looks
@@ -15,7 +16,10 @@ import { ReportPostDto, ReportResult } from './moderation.dto';
  */
 @Controller('post')
 export class ModerationController {
-  constructor(private readonly moderation: ModerationService) {}
+  constructor(
+    private readonly moderation: ModerationService,
+    private readonly telegram: TelegramService,
+  ) {}
 
   @ApiOperation({
     description: 'report a post; enough reports take it out of the feed',
@@ -33,6 +37,12 @@ export class ModerationController {
       dto.reason,
       dto.note,
     );
+
+    // Sent from here rather than from the service, so that the domain does not
+    // depend on a chat app being reachable: a report is filed whether or not
+    // anybody is listening on the other side.
+    const summary = await this.moderation.summarise(filed.reportId);
+    if (summary) await this.telegram.announce(summary);
 
     return { reports: filed.reports };
   }
