@@ -6,7 +6,7 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -18,6 +18,27 @@ async function bootstrap() {
   app.set('query parser', 'extended');
 
   app.use(morgan('dev'));
+
+  /**
+   * How many proxies sit in front of us, so req.ip is the reader's address and
+   * not the proxy's - everything that counts per address depends on it.
+   *
+   * Left at nothing by default, and that is the safe side: trusting a header
+   * nobody is setting would let anybody claim any address they like and walk
+   * through every limit here. Set TRUSTED_PROXIES to the number of hops
+   * (1 for a single reverse proxy, 2 with Cloudflare in front of it) only when
+   * those hops really exist.
+   */
+  const hops = Number(configService.get<string>('TRUSTED_PROXIES') ?? 0);
+  if (hops > 0) {
+    app.set('trust proxy', hops);
+  } else {
+    Logger.warn(
+      'TRUSTED_PROXIES is 0: if anything sits in front of this server, every ' +
+        'reader looks like it and the rate limits count them as one person.',
+      'Bootstrap',
+    );
+  }
 
   /* configuration and Swagger activation*/
   if (configService.getOrThrow<boolean>('enableSwagger')) {

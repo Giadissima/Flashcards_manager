@@ -1,6 +1,8 @@
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { FriendlyThrottlerGuard } from './common/throttle.guard';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -17,6 +19,7 @@ import { PostModule } from './post/post.module';
 import { SubjectModule } from './subject/subject.module';
 import { TestModule } from './test/test.module';
 import { UniversityModule } from './university/university.module';
+import { rateLimits } from './config';
 
 @Module({
   imports: [
@@ -24,6 +27,9 @@ import { UniversityModule } from './university/university.module';
       isGlobal: true,
       envFilePath: '.env',
     }),
+    // Counted per address, in this process's memory: a restart forgets, which
+    // is the right trade for something whose whole job is to blunt a burst.
+    ThrottlerModule.forRoot([{ name: 'all', ...rateLimits.all }]),
     MongooseModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
@@ -48,6 +54,9 @@ import { UniversityModule } from './university/university.module';
     // Closed by default: every endpoint needs a token unless it is marked
     // @Public(), so a new controller cannot forget to protect itself.
     { provide: APP_GUARD, useClass: JwtAuthGuard },
+    // And nothing, token or not, gets to ask as fast as it likes - said in a
+    // way somebody who is not a script can act on
+    { provide: APP_GUARD, useClass: FriendlyThrottlerGuard },
   ],
 })
 export class AppModule {}

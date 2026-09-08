@@ -42,7 +42,10 @@
     "error": {
       "wrongCredentials": "Nome utente o password errati",
       "usernameTaken": "Questo nome utente è già in uso",
-      "generic": "Qualcosa è andato storto, riprova"
+      "generic": "Qualcosa è andato storto, riprova",
+      "tooManyAccounts": "Da questa rete sono stati creati troppi account di recente. Riprova tra {{minutes}} minuti: non è colpa tua, è un limite contro i profili automatici.",
+      "tooManyLogins": "Troppi tentativi di accesso da questa rete. Riprova tra {{minutes}} minuti.",
+      "tooFast": "Troppe richieste da questa rete. Riprova tra {{minutes}} minuti."
     },
     "toast": {
       "loggedIn": "Bentornata, {{username}}!",

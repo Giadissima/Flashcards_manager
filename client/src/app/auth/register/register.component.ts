@@ -1,4 +1,5 @@
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import { waitErrorOf } from '../../shared/wait-error';
 import { StudyFields, StudyFieldsComponent, emptyStudyFields } from '../../university/study-fields/study-fields.component';
 import { charMinLength, passwordMaxLength, passwordMinLength, usernameMaxLength } from '../../../config/config';
 
@@ -34,6 +35,8 @@ export class RegisterComponent {
   submitting = false;
   /** Translation key of the failure shown above the form, cleared on each try. */
   errorKey: string | null = null;
+  /** What the message needs, when it needs anything: the wait, in minutes. */
+  errorParams: Record<string, unknown> = {};
 
   studyFields: StudyFields = emptyStudyFields();
 
@@ -91,6 +94,16 @@ export class RegisterComponent {
       this.toastService.show(this.transloco.translate('auth.toast.registered'), 'success');
       this.router.navigate(['/home']);
     } catch (error) {
+      // An address that has asked too often is told how long to wait, not that
+      // something went wrong: waiting is the whole of what it has to do.
+      const wait = waitErrorOf(error);
+      if (wait) {
+        this.errorKey = wait.key;
+        this.errorParams = wait.params;
+        return;
+      }
+
+      this.errorParams = {};
       this.errorKey = error instanceof HttpErrorResponse && error.status === 409
         ? 'auth.error.usernameTaken'
         : 'auth.error.generic';

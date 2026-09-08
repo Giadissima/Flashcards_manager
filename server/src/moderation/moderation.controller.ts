@@ -1,5 +1,7 @@
 import { Body, Controller, Param, Post } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
+import { rateLimits } from 'src/config';
 
 import { CurrentUser } from 'src/auth/current-user.decorator';
 import { JwtPayload } from 'src/auth/auth.dto';
@@ -18,6 +20,7 @@ export class ModerationController {
   @ApiOperation({
     description: 'report a post; enough reports take it out of the feed',
   })
+  @Throttle({ all: rateLimits.write })
   @Post(':id/report')
   async report(
     @CurrentUser() user: JwtPayload,

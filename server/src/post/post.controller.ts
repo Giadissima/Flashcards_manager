@@ -20,6 +20,8 @@ import {
 } from './post.dto';
 
 import { ApiOperation } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
+import { rateLimits } from 'src/config';
 import { BasePaginatedResult } from 'src/common.dto';
 import { BasicFilterRequest } from 'src/common.dto';
 import { Comment } from './comment.schema';
@@ -125,6 +127,7 @@ export class PostController {
   }
 
   @ApiOperation({ description: 'comment publicly on a post' })
+  @Throttle({ all: rateLimits.write })
   @Post(':id/comments')
   addComment(
     @CurrentUser() user: JwtPayload,
@@ -148,6 +151,7 @@ export class PostController {
   @ApiOperation({
     description: 'report privately to the author of a flashcard',
   })
+  @Throttle({ all: rateLimits.write })
   @Post('flashcards/:id/feedback')
   createFeedback(
     @CurrentUser() user: JwtPayload,
@@ -195,6 +199,7 @@ export class PostController {
   @ApiOperation({
     description: 'add your one reply to an exchange, when it is your turn',
   })
+  @Throttle({ all: rateLimits.write })
   @Post('feedback/:id/reply')
   replyToFeedback(
     @CurrentUser() user: JwtPayload,

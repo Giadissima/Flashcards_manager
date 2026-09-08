@@ -12,6 +12,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Ip,
   Patch,
   Post,
   UploadedFile,
@@ -19,6 +20,8 @@ import {
 } from '@nestjs/common';
 
 import { ApiBody, ApiConsumes, ApiOperation } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
+import { rateLimits } from 'src/config';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthService } from './auth.service';
 import { CurrentUser } from './current-user.decorator';
@@ -30,13 +33,21 @@ export class AuthController {
 
   @ApiOperation({ description: 'create a new user and return its access token' })
   @Public()
+  @Throttle({ all: rateLimits.register })
   @Post('register')
-  register(@Body() registerDto: RegisterDto): Promise<AuthResponse> {
-    return this.authService.register(registerDto);
+  register(
+    @Body() registerDto: RegisterDto,
+    @Ip() ip: string,
+  ): Promise<AuthResponse> {
+    // The address comes from Express, which reads it through however many
+    // proxies are trusted (see main.ts): behind a reverse proxy the socket
+    // always says the proxy, and blocking that would block everybody.
+    return this.authService.register(registerDto, ip);
   }
 
   @ApiOperation({ description: 'exchange username and password for an access token' })
   @Public()
+  @Throttle({ all: rateLimits.login })
   @Post('login')
   @HttpCode(HttpStatus.OK) // a login creates nothing, so 201 would be misleading
   login(@Body() loginDto: LoginDto): Promise<AuthResponse> {

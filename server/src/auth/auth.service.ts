@@ -10,6 +10,7 @@ import {
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -19,6 +20,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { Model } from 'mongoose';
 import { FileService } from 'src/file/file.service';
+import { ModerationService } from 'src/moderation/moderation.service';
 import { UniversityService } from 'src/university/university.service';
 import bcrypt from 'bcryptjs';
 import { bcryptSaltRounds } from 'src/config';
@@ -30,9 +32,19 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly universityService: UniversityService,
     private readonly fileService: FileService,
+    private readonly moderation: ModerationService,
   ) {}
 
-  async register(dto: RegisterDto): Promise<AuthResponse> {
+  async register(dto: RegisterDto, ip?: string): Promise<AuthResponse> {
+    // Nothing else costs anything here: no mail, no invitation, no payment.
+    // The one price of a ban is that the address it came from waits a day
+    // before it can open the next account.
+    if (await this.moderation.signupBlocked(ip)) {
+      throw new ForbiddenException(
+        'Too many accounts from here lately. Try again tomorrow.',
+      );
+    }
+
     this.assertStudyFieldsExist(dto);
 
     const username = dto.username.toLowerCase();
@@ -51,6 +63,7 @@ export class AuthService {
         universityCode: dto.universityCode,
         course: dto.course,
         courseKind: dto.courseKind,
+        signupIp: ip,
       });
     } catch (error) {
       if ((error as { code?: number }).code === 11000) {

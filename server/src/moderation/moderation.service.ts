@@ -13,8 +13,14 @@ import { Post } from 'src/post/post.schema';
 import { blockUntil, blocksAt, privileges } from 'src/common/privileges';
 import { Report, ReportReason } from './report.schema';
 import { Sanction } from './sanction.schema';
+import { SignupBlock } from './signup-block.schema';
 import { User } from 'src/auth/user.schema';
-import { autoHideReports } from 'src/config';
+import { isSharedAddress } from 'src/common/address.util';
+import {
+  autoHideReports,
+  signupBlockAfterBans,
+  signupBlockHours,
+} from 'src/config';
 
 /** A report with everything the person deciding on it needs to see. */
 export interface ReportSummary {
@@ -44,6 +50,8 @@ export class ModerationService {
   constructor(
     @InjectModel(Report.name) private readonly reportModel: Model<Report>,
     @InjectModel(Sanction.name) private readonly sanctionModel: Model<Sanction>,
+    @InjectModel(SignupBlock.name)
+    private readonly signupBlockModel: Model<SignupBlock>,
     @InjectModel(Post.name) private readonly postModel: Model<Post>,
     @InjectModel(User.name) private readonly userModel: Model<User>,
     private readonly notificationService: NotificationService,
@@ -295,6 +303,27 @@ export class ModerationService {
       )
       .exec();
 
+    // Never an address that stands for more than one person: behind a proxy
+    // whose forwarded header is not trusted, everybody looks like the proxy,
+    // and blocking it would shut the door on the whole site.
+    //
+    // And not on the first ban either. A university's wifi is one address for
+    // a whole faculty, so the door is only held shut once several accounts
+    // from there have been banned - a pattern, rather than one person.
+    if (user.signupIp && !isSharedAddress(user.signupIp)) {
+      const banned = await this.userModel
+        .countDocuments({ signupIp: user.signupIp, bannedAt: { $exists: true } })
+        .exec();
+
+      if (banned >= signupBlockAfterBans) {
+        await this.signupBlockModel.create({
+          ip: user.signupIp,
+          until: new Date(Date.now() + signupBlockHours * 60 * 60 * 1000),
+          because: user.username,
+        });
+      }
+    }
+
     // Everything reported about them is settled by this, since none of it is
     // in the feed any more
     const theirs = await this.postModel
@@ -389,6 +418,17 @@ export class ModerationService {
       .exec();
     await this.closeReports(postId, 'kept');
     return { done: 'Post rimesso nel feed', postId };
+  }
+
+  // ------------------------------------------------------------ registration
+
+  /** True when this address may not open an account right now. */
+  async signupBlocked(ip?: string): Promise<boolean> {
+    if (isSharedAddress(ip)) return false;
+    const block = await this.signupBlockModel
+      .exists({ ip, until: { $gt: new Date() } })
+      .exec();
+    return !!block;
   }
 
   /**

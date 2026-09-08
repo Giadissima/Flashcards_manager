@@ -93,6 +93,15 @@ export class User {
   @Prop({ required: false })
   bannedAt?: Date;
 
+  /**
+   * The address the account was made from.
+   *
+   * Kept for one thing only: a ban blocks that address from registering again
+   * for a few hours, which is what stands between one ban and eight hundred
+   * new accounts. Not shown anywhere, not used to recognise anybody.
+   */
+  @Prop({ required: false })
+  signupIp?: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

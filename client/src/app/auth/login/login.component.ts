@@ -1,4 +1,5 @@
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { waitErrorOf } from '../../shared/wait-error';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { charMinLength, passwordMaxLength, passwordMinLength, usernameMaxLength } from '../../../config/config';
 
@@ -22,6 +23,8 @@ export class LoginComponent {
   submitting = false;
   /** Translation key of the failure shown above the form, cleared on each try. */
   errorKey: string | null = null;
+  /** What the message needs, when it needs anything: the wait, in minutes. */
+  errorParams: Record<string, unknown> = {};
 
   readonly charMinLength = charMinLength;
   readonly usernameMaxLength = usernameMaxLength;
@@ -60,6 +63,16 @@ export class LoginComponent {
       const redirectTo = this.route.snapshot.queryParamMap.get('redirectTo');
       this.router.navigateByUrl(redirectTo || '/home');
     } catch (error) {
+      // An address that has asked too often is told how long to wait, not that
+      // something went wrong: waiting is the whole of what it has to do.
+      const wait = waitErrorOf(error);
+      if (wait) {
+        this.errorKey = wait.key;
+        this.errorParams = wait.params;
+        return;
+      }
+
+      this.errorParams = {};
       this.errorKey = error instanceof HttpErrorResponse && error.status === 401
         ? 'auth.error.wrongCredentials'
         : 'auth.error.generic';

@@ -42,7 +42,10 @@
     "error": {
       "wrongCredentials": "Wrong username or password",
       "usernameTaken": "This username is already taken",
-      "generic": "Something went wrong, please try again"
+      "generic": "Something went wrong, please try again",
+      "tooManyAccounts": "Too many accounts have been created from this network lately. Try again in {{minutes}} minutes: nothing you did, it is a limit against automated sign-ups.",
+      "tooManyLogins": "Too many sign-in attempts from this network. Try again in {{minutes}} minutes.",
+      "tooFast": "Too many requests from this network. Try again in {{minutes}} minutes."
     },
     "toast": {
       "loggedIn": "Welcome back, {{username}}!",
