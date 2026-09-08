@@ -75,6 +75,12 @@ export class Test {
     default: undefined,
   })
   topic_id?: Types.ObjectId[];
+
+  // The test this one was built from, e.g. by "repeat the wrong ones": set
+  // once at creation and never changed, it is what lets the history show a
+  // test as a continuation of another instead of an unrelated attempt.
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Test', required: false })
+  parent_test_id?: Types.ObjectId;
 }
 
 export const TestSchema = SchemaFactory.createForClass(Test);

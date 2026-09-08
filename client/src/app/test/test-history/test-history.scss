@@ -18,6 +18,119 @@
   gap: calc(var(--spacing-unit) * 2);
 }
 
+/* Offered above a root whose own parent exists but wasn't fetched - the
+   automatic load stopped at its cap, or the lookup failed. Styled as a quiet
+   text link rather than a button of its own weight: it extends a tree
+   already on screen, it doesn't start a new action. */
+.btn-load-more-ancestors {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--spacing-unit) * 0.5);
+  align-self: flex-start;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary-color);
+  cursor: pointer;
+
+  &:disabled {
+    color: var(--text-color);
+    cursor: default;
+  }
+
+  .material-symbols-outlined {
+    font-size: 18px;
+  }
+}
+
+/* One test plus, indented below it, every test repeated from it. Just a
+   flex column: the card and the (optional) .test-children that follows it
+   are the only two things in it, so no positioning of its own is needed. */
+.test-node {
+  display: flex;
+  flex-direction: column;
+}
+
+/* The indented group of one test's children, file-explorer style. Padding
+   sets the indent; the line itself is drawn by the two rules below, per
+   child, so it stops exactly at the last one instead of a single border
+   trailing past it into whatever sits below the whole group. */
+.test-children {
+  margin-top: calc(var(--spacing-unit) * 2);
+  padding-left: calc(var(--spacing-unit) * 2.5);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--spacing-unit) * 2);
+}
+
+.test-children > .test-node {
+  position: relative;
+}
+
+/* Carries the line past this child's own box - card and, if it has any,
+   its own repeats underneath - down to the next child's elbow. Only every
+   child but the last needs one: nothing follows the last, so the line has
+   nowhere left to reach and stops at its own elbow instead. */
+.test-children > .test-node:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: calc(var(--spacing-unit) * -2.5);
+  top: 0;
+  bottom: 0;
+  border-left: 2px solid var(--secondary-color);
+}
+
+.test-children > .test-node > .test-card {
+  position: relative;
+}
+
+/* The elbow: reaches up past this card's own top, closing the gap back to
+   whatever line ends there (the group's line, or the parent card right
+   above the first child), then curls into the card at its middle. Sized to
+   the card alone, so a child that itself holds further repeats doesn't push
+   its own elbow down to make room for them. */
+.test-children > .test-node > .test-card::before {
+  content: '';
+  position: absolute;
+  left: calc(var(--spacing-unit) * -2.5);
+  top: calc(var(--spacing-unit) * -2);
+  height: calc(50% + var(--spacing-unit) * 2);
+  width: calc(var(--spacing-unit) * 2.5);
+  border-left: 2px solid var(--secondary-color);
+  border-bottom: 2px solid var(--secondary-color);
+  border-bottom-left-radius: 8px;
+}
+
+/* Past maxIndentDepth: no further indent and no connector, so a chain of
+   "repeat the wrong ones" long enough to reach this depth stacks its cards
+   flush instead of marching them off the edge of the screen. "Repeated from"
+   above each card is still what says it belongs to the test above it. */
+.test-children.test-children--flat {
+  padding-left: 0;
+
+  > .test-node:not(:last-child)::after,
+  > .test-node > .test-card::before {
+    display: none;
+  }
+}
+
+/* "Repeated from" line above the subject: the same caption weight as the
+   date below the score, so it reads as a note about the test and not as a
+   second title competing with the subject under it. */
+.test-repeat-of {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--spacing-unit) * 0.5);
+  font-size: 12px;
+  color: var(--text-color-muted, var(--text-color));
+
+  .material-symbols-outlined {
+    font-size: 16px;
+  }
+}
+
 .test-card {
   display: flex;
   /* Bootstrap sets flex-direction: column on .card, so the row this layout is
@@ -152,6 +265,21 @@
   color: var(--header-color);
 }
 
+/* Marks a card pulled in only to complete the tree - an ancestor old enough
+   to have fallen off this page - so its actions (no delete, review only)
+   read as belonging elsewhere rather than as a row of this page gone quiet. */
+.badge-context {
+  display: inline-block;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 1px 8px;
+  border-radius: var(--border-radius-sm);
+  background-color: transparent;
+  border: 1px dashed var(--secondary-color);
+  color: var(--text-color);
+}
+
 /* Phone layout. The page is built for a row of filters and cards split between
    text on the left and buttons on the right; below this width there is room
    for neither, so the filters and the cards both become single columns and the
@@ -163,6 +291,18 @@
 
   .stat-value {
     font-size: 22px;
+  }
+
+  /* A narrower indent: the full 2.5 spacing units per level would push a
+     deep chain off the edge of a phone screen well before the card itself
+     does. */
+  .test-children {
+    padding-left: var(--spacing-unit);
+  }
+
+  .test-children > .test-node > .test-card::before {
+    left: calc(var(--spacing-unit) * -1);
+    width: var(--spacing-unit);
   }
 
   .test-card {

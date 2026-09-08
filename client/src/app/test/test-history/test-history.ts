@@ -77,6 +77,33 @@ export class TestHistory extends PaginatedList implements OnInit, OnDestroy {
   override pageSize = 20;
   stats: TestStats | null = null;
 
+  /* Parent tests pulled in only to complete the tree: a test on this page may
+     be a "repeat the wrong ones" of a test that fell off an earlier page (or
+     was taken well before it), and that ancestor is fetched on its own so the
+     tree still shows where the test on screen came from, rather than only
+     linking tests that happen to land on the same page. Keyed by id, and
+     rebuilt every time the page loads. */
+  ancestorTests = new Map<string, Test>();
+
+  /* How many tests the tree shows at once, this page's own rows included.
+     Without it, a long enough chain of "repeat the wrong ones" - or, worse, a
+     wide one, a test with several - would walk back through every test that
+     ever fed into today's page, one request per generation, for a tree most
+     of which scrolled out of view long ago. */
+  private static readonly MAX_TREE_SIZE = 20;
+
+  /* How many more are pulled in by the "load more" button on one click - a
+     fixed step past MAX_TREE_SIZE, since that button is the reader asking for
+     more themselves rather than the automatic load reaching its own cap. */
+  private static readonly ANCESTORS_PER_LOAD_MORE = 20;
+
+  /* How many levels of "repeat the wrong ones" keep growing the indent before
+     it stops: a chain long enough (each repeat born from the last) would
+     otherwise push itself further right forever and run off a narrow screen
+     regardless of how few tests are actually on show. Read by the template,
+     which cannot see a private static of the class directly. */
+  readonly maxIndentDepth = 4;
+
   /* The same stats without the status filter: they are what the three status
      choices are labelled with, so picking one must not empty the other two. */
   statusStats: TestStats | null = null;
@@ -249,16 +276,173 @@ export class TestHistory extends PaginatedList implements OnInit, OnDestroy {
         limit: this.pageSize,
         ...this.activeFilters,
       })
-      .then((data) => {
+      .then(async (data) => {
         this.tests = data.data.filter(
           (t) => !t._id || !this.pendingDeletions.has(t._id),
         );
         this.totalCount = data.count;
+        await this.loadMissingAncestors();
       });
   }
 
   protected override onPageChange(): void {
     this.loadTests();
+  }
+
+  /**
+   * Fetches, one generation at a time, every parent test referenced by a test
+   * on this page (and by whatever is fetched after it) that isn't already
+   * known - on this page or already fetched. This is what lets the tree link
+   * a test back to the one it repeats even when that one is old enough to
+   * have fallen off the current page entirely.
+   *
+   * Stops once the tree reaches MAX_TREE_SIZE tests in total - this page's own
+   * rows counted in - even mid-generation: a chain (or a wide spread of
+   * repeats) can otherwise keep growing it one request after another, for a
+   * tree most of which scrolled out of view long ago.
+   */
+  private async loadMissingAncestors(): Promise<void> {
+    this.ancestorTests = new Map();
+    const known = new Set(
+      this.tests.map((t) => t._id).filter((id): id is string => !!id),
+    );
+    const budget = TestHistory.MAX_TREE_SIZE - this.tests.length;
+    if (budget <= 0) return;
+
+    await this.fetchAncestorGenerations(
+      this.missingParentIds(this.tests, known),
+      known,
+      budget,
+    );
+  }
+
+  /* Ids of a root currently fetching more of its own chain, so its button can
+     show a spinner and not be clicked a second time while it's mid-request. */
+  private loadingMoreAncestors = new Set<string>();
+
+  /**
+   * Fetches one more batch of ancestors above a root whose own chain was cut
+   * short by MAX_TREE_SIZE - the button on screen only offers this when
+   * {@link hasHiddenAncestor} says there is more to find.
+   */
+  async loadMoreAncestors(test: Test): Promise<void> {
+    const parentId = test.parent_test_id;
+    if (!parentId || !test._id || this.loadingMoreAncestors.has(test._id)) return;
+
+    this.loadingMoreAncestors.add(test._id);
+    try {
+      const known = new Set(this.testPool.keys());
+      await this.fetchAncestorGenerations(
+        new Set([parentId]),
+        known,
+        TestHistory.ANCESTORS_PER_LOAD_MORE,
+      );
+    } finally {
+      this.loadingMoreAncestors.delete(test._id);
+    }
+  }
+
+  isLoadingMoreAncestors(test: Test): boolean {
+    return !!test._id && this.loadingMoreAncestors.has(test._id);
+  }
+
+  /**
+   * True on the root of a tree whose own parent exists but wasn't fetched -
+   * either the automatic load stopped at MAX_TREE_SIZE, or a lookup failed.
+   * Either way, there is more chain above this card than is shown.
+   */
+  hasHiddenAncestor(test: Test): boolean {
+    return !!test.parent_test_id && !this.testPool.has(test.parent_test_id);
+  }
+
+  /**
+   * Fetches ancestors generation by generation starting from `seedIds`,
+   * stopping once `budget` new ones have been added to ancestorTests (which
+   * it only ever adds to - resetting it, when wanted, is the caller's job).
+   * Shared by the automatic load on page load and the manual "load more".
+   */
+  private async fetchAncestorGenerations(
+    seedIds: Set<string>,
+    known: Set<string>,
+    budget: number,
+  ): Promise<void> {
+    let toFetch = new Set([...seedIds].filter((id) => !known.has(id)));
+    let remaining = budget;
+
+    while (toFetch.size > 0 && remaining > 0) {
+      const batch = [...toFetch].slice(0, remaining);
+      const fetched = await Promise.all(
+        batch.map((id) => this.testService.getById(id).catch(() => null)),
+      );
+      const newlyKnown: Test[] = [];
+      for (const ancestor of fetched) {
+        if (!ancestor?._id || known.has(ancestor._id)) continue;
+        known.add(ancestor._id);
+        this.ancestorTests.set(ancestor._id, ancestor);
+        newlyKnown.push(ancestor);
+        remaining--;
+      }
+      toFetch = this.missingParentIds(newlyKnown, known);
+    }
+  }
+
+  /** Every parent_test_id referenced by the given tests that isn't in `known` yet. */
+  private missingParentIds(tests: Test[], known: Set<string>): Set<string> {
+    const ids = new Set<string>();
+    for (const test of tests) {
+      if (test.parent_test_id && !known.has(test.parent_test_id)) {
+        ids.add(test.parent_test_id);
+      }
+    }
+    return ids;
+  }
+
+  /** This page's tests plus whatever ancestor was fetched in to complete their tree. */
+  private get testPool(): Map<string, Test> {
+    const pool = new Map(this.ancestorTests);
+    for (const test of this.tests) if (test._id) pool.set(test._id, test);
+    return pool;
+  }
+
+  /**
+   * The top of each tree shown on this page: for every test on the page, the
+   * furthest-back ancestor reachable through parent_test_id (itself, if it has
+   * none, or its parent wasn't found). Listed once each, in the order their
+   * first descendant appears on the page, so the tree lands roughly where its
+   * newest test would have sorted to on its own.
+   */
+  get rootTests(): Test[] {
+    const pool = this.testPool;
+    const roots: Test[] = [];
+    const seenRootIds = new Set<string>();
+
+    for (const test of this.tests) {
+      let node = test;
+      while (node.parent_test_id) {
+        const parent = pool.get(node.parent_test_id);
+        if (!parent) break;
+        node = parent;
+      }
+      if (node._id && !seenRootIds.has(node._id)) {
+        seenRootIds.add(node._id);
+        roots.push(node);
+      }
+    }
+
+    return roots;
+  }
+
+  /** The tests directly repeated from the given one, among this page's tree. */
+  childrenOf(test: Test): Test[] {
+    if (!test._id) return [];
+    return [...this.testPool.values()].filter(
+      (t) => t.parent_test_id === test._id,
+    );
+  }
+
+  /** Fetched in only to complete the tree: not one of this page's own rows. */
+  isAncestor(test: Test): boolean {
+    return !!test._id && this.ancestorTests.has(test._id);
   }
 
   getCorrectCount(test: Test): number {

@@ -22,6 +22,10 @@ export class TestCreateRequest {
   @ValidateNested({ each: true }) // validates every element of the array
   @Type(() => QuestionDto) // turns every element into a QuestionDto
   questions: QuestionDto[];
+
+  @IsOptional()
+  @IsMongoId()
+  parent_test_id?: string;
 }
 
 // Filters shared between the test list (TestFilterDto) and the aggregate stats

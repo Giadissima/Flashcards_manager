@@ -66,67 +66,113 @@
     <p>{{ 'test.history.noTests' | transloco }}</p>
     } @else {
     <div class="test-list">
-      @for (test of tests; track test._id) {
-      <div class="card test-card">
-        <div class="test-card-main">
-          @if (getSubjectLabel(test); as subjectLabel) {
-          <div class="test-subject">{{ subjectLabel }}</div>
-          }
-          <div class="test-score">
-            {{ getCorrectCount(test) }} / {{ test.questions.length }} {{ 'test.history.correctSuffix' | transloco }}
-            @if (getWrongCount(test) > 0) {
-            <span class="wrong-count">({{ getWrongCount(test) }} {{ 'test.history.wrongSuffix' | transloco }})</span>
-            }
-          </div>
-          <app-score-bar [correct]="getCorrectCount(test)" [wrong]="getWrongCount(test)"
-            [total]="test.questions.length" size="sm"></app-score-bar>
-          <div class="test-card-meta">
-            <span class="test-date">
-              {{ (test.completedAt ?? test.updatedAt ?? test.createdAt) | date:'medium' }}
-            </span>
-            <!-- Bare digits next to a date read as anything: the icon says which
-                 of the two numbers is a length of time, and the title spells it
-                 out for a pointer and for a screen reader. -->
-            <span class="test-duration" [title]="t('test.history.durationLabel')"
-              [attr.aria-label]="t('test.history.durationLabel')">
-              <span class="material-symbols-outlined">timer</span>
-              {{ test.elapsed_time | duration }}
-            </span>
-            @if (!test.completedAt) {
-            <span class="badge-in-progress">{{ 'test.history.inProgress' | transloco }}</span>
-            }
-          </div>
-        </div>
-        <div class="test-card-actions">
-          @if (test.completedAt) {
-          <button type="button" class="btn btn-outline-primary" (click)="openTest(test)">
-            <span class="material-symbols-outlined">visibility</span>
-            {{ 'test.history.review' | transloco }}
-          </button>
-          <!-- Only on a test that is over: one still in progress is not
-               finished with, and the action next to it there is the one that
-               ends it. -->
-          <button type="button" class="btn btn-outline-danger test-card-delete" (click)="deleteTest(test)"
-            [attr.aria-label]="t('common.delete')" [title]="t('common.delete')">
-            <span class="material-symbols-outlined">delete</span>
-          </button>
-          } @else {
-          <button type="button" class="btn btn-primary" (click)="resumeTest(test)">
-            <span class="material-symbols-outlined">play_arrow</span>
-            {{ 'test.history.resume' | transloco }}
-          </button>
-          <button type="button" class="btn btn-outline-danger" (click)="stopTest(test)">
-            <span class="material-symbols-outlined">flag</span>
-            {{ 'test.history.terminate' | transloco }}
-          </button>
-          }
-        </div>
-      </div>
+      @for (root of rootTests; track root._id) {
+      @if (hasHiddenAncestor(root)) {
+      <button type="button" class="btn-load-more-ancestors" [disabled]="isLoadingMoreAncestors(root)"
+        (click)="loadMoreAncestors(root)">
+        <span class="material-symbols-outlined">expand_less</span>
+        {{ (isLoadingMoreAncestors(root) ? 'test.history.loadingMoreAncestors' :
+        'test.history.loadMoreAncestors') | transloco }}
+      </button>
+      }
+      <ng-container
+        *ngTemplateOutlet="testNode; context: { $implicit: root, isChild: false, depth: 0 }"></ng-container>
       }
     </div>
 
     <app-pagination [currentPage]="currentPage" [totalPages]="totalPages"
       (previous)="previousPage()" (next)="nextPage()"></app-pagination>
     }
+
+    <!-- Recursive node of the tree: the card for one test, then - indented
+         under a continuous guide line, file-explorer style - the same node
+         for each test repeated from it. Kept as a template rather than a
+         separate component so the row markup below is written once and
+         still shares this component's methods and translations directly. -->
+    <ng-template #testNode let-test let-isChild="isChild" let-depth="depth">
+      <div class="test-node">
+        <div class="card test-card">
+          <div class="test-card-main">
+            @if (isChild) {
+            <div class="test-repeat-of">
+              <span class="material-symbols-outlined">subdirectory_arrow_right</span>
+              {{ 'test.history.repeatOf' | transloco }}
+            </div>
+            }
+            @if (getSubjectLabel(test); as subjectLabel) {
+            <div class="test-subject">{{ subjectLabel }}</div>
+            }
+            <div class="test-score">
+              {{ getCorrectCount(test) }} / {{ test.questions.length }} {{ 'test.history.correctSuffix' | transloco }}
+              @if (getWrongCount(test) > 0) {
+              <span class="wrong-count">({{ getWrongCount(test) }} {{ 'test.history.wrongSuffix' | transloco }})</span>
+              }
+            </div>
+            <app-score-bar [correct]="getCorrectCount(test)" [wrong]="getWrongCount(test)"
+              [total]="test.questions.length" size="sm"></app-score-bar>
+            <div class="test-card-meta">
+              <span class="test-date">
+                {{ (test.completedAt ?? test.updatedAt ?? test.createdAt) | date:'medium' }}
+              </span>
+              <!-- Bare digits next to a date read as anything: the icon says which
+                   of the two numbers is a length of time, and the title spells it
+                   out for a pointer and for a screen reader. -->
+              <span class="test-duration" [title]="t('test.history.durationLabel')"
+                [attr.aria-label]="t('test.history.durationLabel')">
+                <span class="material-symbols-outlined">timer</span>
+                {{ test.elapsed_time | duration }}
+              </span>
+              @if (!test.completedAt) {
+              <span class="badge-in-progress">{{ 'test.history.inProgress' | transloco }}</span>
+              }
+              @if (isAncestor(test)) {
+              <span class="badge-context" [title]="t('test.history.contextHint')">{{
+                'test.history.contextBadge' | transloco }}</span>
+              }
+            </div>
+          </div>
+          <div class="test-card-actions">
+            @if (test.completedAt) {
+            <button type="button" class="btn btn-outline-primary" (click)="openTest(test)">
+              <span class="material-symbols-outlined">visibility</span>
+              {{ 'test.history.review' | transloco }}
+            </button>
+            <!-- Only on a test that is over: one still in progress is not
+                 finished with, and the action next to it there is the one that
+                 ends it. Also only on a row of this page: a test fetched purely
+                 to complete the tree is deleted from wherever its own page is,
+                 not from here. -->
+            @if (!isAncestor(test)) {
+            <button type="button" class="btn btn-outline-danger test-card-delete" (click)="deleteTest(test)"
+              [attr.aria-label]="t('common.delete')" [title]="t('common.delete')">
+              <span class="material-symbols-outlined">delete</span>
+            </button>
+            }
+            } @else {
+            <button type="button" class="btn btn-primary" (click)="resumeTest(test)">
+              <span class="material-symbols-outlined">play_arrow</span>
+              {{ 'test.history.resume' | transloco }}
+            </button>
+            @if (!isAncestor(test)) {
+            <button type="button" class="btn btn-outline-danger" (click)="stopTest(test)">
+              <span class="material-symbols-outlined">flag</span>
+              {{ 'test.history.terminate' | transloco }}
+            </button>
+            }
+            }
+          </div>
+        </div>
+
+        @let children = childrenOf(test);
+        @if (children.length) {
+        <div class="test-children" [class.test-children--flat]="depth + 1 >= maxIndentDepth">
+          @for (child of children; track child._id) {
+          <ng-container
+            *ngTemplateOutlet="testNode; context: { $implicit: child, isChild: true, depth: depth + 1 }"></ng-container>
+          }
+        </div>
+        }
+      </div>
+    </ng-template>
   </app-page-card>
 </div>

@@ -12,6 +12,9 @@ export interface Test {
   // test. topic_names holds one name per topic the test touches.
   subject_name?: string;
   topic_names?: string[];
+
+  // The test this one was built from (e.g. "repeat the wrong ones"), if any.
+  parent_test_id?: string;
 }
 
 /**
@@ -22,6 +25,7 @@ export interface Test {
  */
 export interface TestCreateRequest {
   questions: Question[];
+  parent_test_id?: string;
 }
 
 export type Question = {

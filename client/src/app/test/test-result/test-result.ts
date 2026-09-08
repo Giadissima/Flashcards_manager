@@ -336,6 +336,7 @@ export class TestResult extends PaginatedList {
           flashcard_id,
           topic_id,
         })),
+        parent_test_id: this.test?._id,
       });
       this.router.navigate(['/test', test._id]);
     } catch (err) {
