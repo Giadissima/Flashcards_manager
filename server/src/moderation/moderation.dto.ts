@@ -27,3 +27,55 @@ export class ReportResult {
   reports: number;
 }
 
+// ------------------------------------------------------- the moderation page
+
+export class AdminLoginDto {
+  @IsString()
+  @Length(charMinLength, 200)
+  @ApiProperty({ description: 'The moderation password of this server' })
+  password: string;
+}
+
+/** What can be decided about a report, from the page or from the chat. */
+export const moderationActions = [
+  'keep',
+  'remove',
+  'warn',
+  'ban',
+  'restore',
+] as const;
+export type ModerationAction = (typeof moderationActions)[number];
+
+export class AdminAction {
+  @IsString()
+  @IsIn(moderationActions)
+  @ApiProperty({ enum: moderationActions })
+  action: ModerationAction;
+}
+
+/** A card of the reported post, as it is, so the page can show it. */
+export interface AdminCard {
+  _id: string;
+  title: string;
+  question: string;
+  answer: string;
+  topic?: string;
+}
+
+/** One report with everything needed to decide on it. */
+export interface AdminReport {
+  reportId: string;
+  postId: string;
+  authorId: string;
+  author: string;
+  subject: string;
+  reason: ReportReason;
+  note?: string;
+  reports: number;
+  strikes: number;
+  hidden: boolean;
+  banned: boolean;
+  state: string;
+  createdAt: Date;
+  cards: AdminCard[];
+}

@@ -993,6 +993,28 @@ export class PostService {
   }
 
   /**
+   * The cards a post shows, for somebody who has to decide about the post.
+   *
+   * Deliberately not going through findOneOrThrow: by the time a report is
+   * looked at the post is often already out of the feed, and the whole point
+   * is to see what it was that everybody reported.
+   */
+  async cardsForReview(
+    postId: string,
+    limit: number,
+  ): Promise<FlashcardDocument[]> {
+    const post = await this.postModel.findById(postId).lean().exec();
+    if (!post) return [];
+
+    return this.flashcardModel
+      .find(this.visibleCardsQuery(post))
+      .sort({ _id: -1 })
+      .limit(limit)
+      .lean()
+      .exec() as unknown as Promise<FlashcardDocument[]>;
+  }
+
+  /**
    * Not found rather than forbidden for a hidden post, and for everybody
    * including its author: every way into a post goes through here - the
    * carousel, the likes, the comments, the import - and a post that is out of

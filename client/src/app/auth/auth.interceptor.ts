@@ -10,6 +10,13 @@ const isCredentialsRequest = (url: string): boolean =>
   url.includes('/auth/login') || url.includes('/auth/register');
 
 /**
+ * The moderation page signs its own calls, with a token that is not anybody's
+ * account. Left alone here on both counts: it must not be given the reader's
+ * token, and its own expiring must not log the reader out of the app.
+ */
+const isModerationRequest = (url: string): boolean => url.includes('/admin/');
+
+/**
  * Signs every call with the token and ends the session on the first 401, so an
  * expired token cannot leave the app showing pages it can no longer load.
  */
@@ -17,7 +24,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(AuthService);
   const token = auth.token;
 
-  const request = token && !isCredentialsRequest(req.url)
+  const request = token && !isCredentialsRequest(req.url) && !isModerationRequest(req.url)
     ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
     : req;
 
@@ -25,7 +32,12 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     catchError((error: HttpErrorResponse) => {
       // A 401 on the login is a wrong password, which the page reports itself:
       // only a rejected token means the session is over.
-      if (error.status === 401 && !isCredentialsRequest(req.url) && auth.isLoggedIn) {
+      if (
+        error.status === 401 &&
+        !isCredentialsRequest(req.url) &&
+        !isModerationRequest(req.url) &&
+        auth.isLoggedIn
+      ) {
         auth.logout();
       }
       return throwError(() => error);

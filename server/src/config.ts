@@ -39,6 +39,18 @@ export const signupBlockHours = 24;
 export const signupBlockAfterBans = 3;
 
 /**
+ * How many cards of a reported post the moderation page shows.
+ *
+ * All of them that the carousel would: the page exists to be looked at before
+ * deciding, and a set whose fortieth card is the problem is exactly the set
+ * somebody would report.
+ */
+export const allCards = 200;
+
+/** How long a session on the moderation page lasts before asking again. */
+export const adminSessionHours = 8;
+
+/**
  * How much one address may ask for, per minute.
  *
  * Nothing here is per account on purpose: an account is free, so a limit on

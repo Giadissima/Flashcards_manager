@@ -8,9 +8,14 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 
+import { FileService } from 'src/file/file.service';
 import { NotificationService } from 'src/notification/notification.service';
+import { PostService } from 'src/post/post.service';
+import { extractImageFileIds } from 'src/common/html.util';
+import { allCards } from 'src/config';
 import { Post } from 'src/post/post.schema';
 import { blockUntil, blocksAt, privileges } from 'src/common/privileges';
+import { AdminReport, ModerationAction } from './moderation.dto';
 import { Report, ReportReason } from './report.schema';
 import { Sanction } from './sanction.schema';
 import { SignupBlock } from './signup-block.schema';
@@ -55,6 +60,8 @@ export class ModerationService {
     @InjectModel(Post.name) private readonly postModel: Model<Post>,
     @InjectModel(User.name) private readonly userModel: Model<User>,
     private readonly notificationService: NotificationService,
+    private readonly postService: PostService,
+    private readonly fileService: FileService,
   ) {}
 
   // --------------------------------------------------------- what readers do
@@ -149,6 +156,106 @@ export class ModerationService {
       hidden: !!post.hiddenAt,
       createdAt: report.createdAt as unknown as Date,
     };
+  }
+
+  // ---------------------------------------------------- the moderation page
+
+  /**
+   * Every report there has ever been, the undecided ones first.
+   *
+   * All of them, and not only what is waiting: what was decided last time is
+   * half of what decides this time - the same post reported again, an author
+   * whose two previous reports were nonsense.
+   */
+  async reviews(limit = 100): Promise<AdminReport[]> {
+    await this.forgetOrphans();
+
+    const reports = await this.reportModel
+      .find({}, { _id: 1, state: 1 })
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .lean()
+      .exec();
+
+    const reviews = await Promise.all(
+      reports.map((report) => this.review(String(report._id))),
+    );
+    const found = reviews.filter((review): review is AdminReport => !!review);
+
+    return found.sort((first, second) => {
+      if (first.state !== second.state) return first.state === 'open' ? -1 : 1;
+      return second.createdAt.getTime() - first.createdAt.getTime();
+    });
+  }
+
+  /**
+   * Throws away the reports whose post is not there any more.
+   *
+   * A post goes when its subject does, and the report about it outlives it as
+   * a row nobody can open, act on, or clear - it would sit in the queue for
+   * ever. Done here, on the way to reading the list, so there is no job to
+   * schedule and nothing to remember.
+   */
+  private async forgetOrphans(): Promise<void> {
+    const posts = await this.reportModel.distinct('post_id').exec();
+    if (!posts.length) return;
+
+    const alive = await this.postModel
+      .find({ _id: { $in: posts } }, { _id: 1 })
+      .lean()
+      .exec();
+    const living = new Set(alive.map((post) => String(post._id)));
+    const gone = posts.filter((id) => !living.has(String(id)));
+    if (!gone.length) return;
+
+    const dropped = await this.reportModel
+      .deleteMany({ post_id: { $in: gone } })
+      .exec();
+    this.logger.log(`${dropped.deletedCount} reports about deleted posts dropped`);
+  }
+
+  /** One report, with the post as its readers see it. */
+  async review(reportId: string): Promise<AdminReport | null> {
+    const summary = await this.summarise(reportId);
+    if (!summary) return null;
+
+    const [report, author, cards] = await Promise.all([
+      this.reportModel.findById(reportId, { state: 1 }).lean().exec(),
+      this.userModel
+        .findById(summary.authorId, { bannedAt: 1 })
+        .lean()
+        .exec(),
+      this.postService.cardsForReview(summary.postId, allCards),
+    ]);
+
+    return {
+      ...summary,
+      state: report?.state ?? 'open',
+      banned: !!author?.bannedAt,
+      // Whole, pictures and all: the page shows the post the way the people
+      // who reported it saw it, which is the only fair way to decide about it.
+      cards: await Promise.all(
+        cards.map(async (card) => ({
+          _id: String(card._id),
+          title: card.title,
+          question: await this.withImages(card.question),
+          answer: await this.withImages(card.answer),
+          topic: (card.topic_id as unknown as { name?: string })?.name,
+        })),
+      ),
+    };
+  }
+
+  /** What a button on the page, or in the chat, comes down to. */
+  async act(reportId: string, action: ModerationAction): Promise<Verdict> {
+    const summary = await this.summarise(reportId);
+    if (!summary) throw new NotFoundException('Report not found');
+
+    if (action === 'keep') return this.keep(summary.postId);
+    if (action === 'remove') return this.removePost(summary.postId);
+    if (action === 'restore') return this.restore(summary.postId);
+    if (action === 'warn') return this.warn(summary.authorId, summary.postId);
+    return this.ban(summary.authorId);
   }
 
   // ------------------------------------------------------ what the admin does
@@ -429,6 +536,46 @@ export class ModerationService {
       .exists({ ip, until: { $gt: new Date() } })
       .exec();
     return !!block;
+  }
+
+  /**
+   * The same HTML, with its pictures carried inside it.
+   *
+   * The page is opened with a password and not with an account, so it cannot
+   * ask for /file/:id the way the app does - and opening those files to
+   * everybody, to save this, would put every private flashcard's images one
+   * guessed id away from being public. So they travel in the answer.
+   */
+  private async withImages(html?: string): Promise<string> {
+    if (!html) return '';
+
+    let done = html;
+    for (const fileId of extractImageFileIds(html)) {
+      const file = await this.image(fileId);
+      if (!file) continue;
+
+      const inline = `data:${file.mimetype};base64,${Buffer.from(file.content).toString('base64')}`;
+      done = done.replace(
+        new RegExp(`src="[^"]*${fileId}[^"]*"`, 'gi'),
+        `src="${inline}"`,
+      );
+    }
+    return done;
+  }
+
+  /** One picture out of a reported card. */
+  async image(
+    fileId: string,
+  ): Promise<{ content: Uint8Array; mimetype: string } | null> {
+    const file = await this.fileService.findOne(fileId);
+    if (!file) return null;
+
+    // What comes back is a Buffer or the driver's Binary wrapper, and the two
+    // meet as bytes, which is all the sending needs.
+    return {
+      content: this.fileService.convertBuffer(file.content) as Uint8Array,
+      mimetype: file.mimetype,
+    };
   }
 
   /**

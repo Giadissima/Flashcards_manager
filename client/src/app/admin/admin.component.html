@@ -1,0 +1,135 @@
+@if (!isIn) {
+<!-- Nothing of the site shows through here: whoever opens this address without
+     the password sees a password box and no hint that there is anything to
+     moderate. -->
+<div class="admin-gate">
+  <form class="admin-gate-box" (ngSubmit)="login()">
+    <h1 class="admin-title">Moderazione</h1>
+    <input type="password" class="form-control" [(ngModel)]="password" name="password"
+      placeholder="Password" autocomplete="current-password" autofocus>
+    @if (loginError) {
+    <p class="admin-error">{{ loginError }}</p>
+    }
+    <button type="submit" class="btn btn-primary" [disabled]="loggingIn || password.length < 2">Entra</button>
+  </form>
+</div>
+} @else {
+<div class="admin-page">
+  <aside class="admin-list">
+    <div class="admin-list-head">
+      <strong>Segnalazioni</strong>
+      <button type="button" class="btn btn-sm btn-outline-primary" (click)="logout()">Esci</button>
+    </div>
+
+    @if (loading) {
+    <p class="admin-empty">Un attimo…</p>
+    } @else {
+    @for (report of reports; track report.reportId) {
+    <button type="button" class="admin-row" [class.is-chosen]="report.reportId === chosen?.reportId"
+      [class.is-open]="report.state === 'open'" (click)="choose(report)">
+      <span class="admin-row-top">
+        <strong>{{ report.author }}</strong>
+        <span class="admin-badge" [class.is-open]="report.state === 'open'">{{ stateOf(report) }}</span>
+      </span>
+      <span class="admin-row-sub">{{ report.subject }}</span>
+      <span class="admin-row-sub">{{ reasonOf(report) }} · {{ when(report.createdAt) }}</span>
+    </button>
+    } @empty {
+    <p class="admin-empty">Nessuna segnalazione.</p>
+    }
+    }
+  </aside>
+
+  <main class="admin-detail">
+    @if (chosen) {
+    <header class="admin-head">
+      <h2>{{ chosen.author }} — {{ chosen.subject }}</h2>
+      <p class="admin-meta">
+        motivo: {{ reasonOf(chosen) }}<br>
+        @if (chosen.note) { messaggio utente: {{ chosen.note }}<br> }
+        segnalazioni aperte: {{ chosen.reports }} ·
+        ammonizioni dell'autore: {{ chosen.strikes }} ·
+        stato: {{ stateOf(chosen) }}
+        @if (chosen.hidden) { · <span class="admin-flag">fuori dal feed</span> }
+        @if (chosen.banned) { · <span class="admin-flag">autore bannato</span> }
+      </p>
+
+      <!-- Each one greyed out once it has nothing left to do, so a button that
+           can be pressed is a button that changes something. -->
+      <div class="admin-actions">
+        <button type="button" class="btn btn-outline-primary" [disabled]="!can('keep')" (click)="act('keep')">
+          Va bene
+        </button>
+        <button type="button" class="btn btn-outline-danger" [disabled]="!can('remove')" (click)="act('remove')">
+          Togli il post
+        </button>
+        <button type="button" class="btn btn-outline-primary" [disabled]="!can('restore')" (click)="act('restore')">
+          Rimetti il post
+        </button>
+        <button type="button" class="btn btn-outline-danger" [disabled]="!can('warn')" (click)="act('warn')">
+          Ammonisci
+        </button>
+        <button type="button" class="btn btn-danger" [disabled]="!can('ban')" (click)="confirming = true">
+          Banna
+        </button>
+        @if (chosen.banned || chosen.strikes) {
+        <button type="button" class="btn btn-outline-primary" [disabled]="working" (click)="pardon()">
+          Ridagli tutto
+        </button>
+        }
+      </div>
+
+      <!-- Said twice, and in full: what a ban does is not obvious from the
+           word, and it is the one thing here with no button to undo it. -->
+      @if (confirming) {
+      <div class="admin-confirm">
+        <p>
+          Bannare <strong>{{ chosen.author }}</strong>? Tutti i suoi post escono dal feed
+          e non potrà più pubblicare, commentare o mandare feedback.
+        </p>
+        <div class="admin-actions">
+          <button type="button" class="btn btn-danger" [disabled]="working" (click)="ban()">
+            Sì, banna
+          </button>
+          <button type="button" class="btn btn-outline-primary" (click)="confirming = false">
+            Annulla
+          </button>
+        </div>
+      </div>
+      }
+
+      @if (message) {
+      <p class="admin-message">{{ message }}</p>
+      }
+    </header>
+
+    <!-- The post as its readers see it, whole: what has to be decided here
+         cannot be decided on an excerpt. -->
+    <section class="admin-cards">
+      <!-- The size the cards have everywhere else, but never cut: elsewhere a
+           clipped card is a card you can open, and here it would be evidence
+           kept out of sight of the person deciding on it. -->
+      @for (card of chosen.cards; track card._id) {
+      <article class="admin-card">
+        <h3>{{ card.title }}</h3>
+        @if (card.topic) { <p class="admin-card-topic">{{ card.topic }}</p> }
+        <!-- Capped inside the card so a set stays scannable, and opened full
+             size in the lightbox when one of them is the thing being judged. -->
+        <div class="admin-card-text" [innerHTML]="card.question | katexRenderer"
+          (zoomableImages)="lightbox.open($event)"></div>
+        <p class="admin-card-label">Risposta</p>
+        <div class="admin-card-text" [innerHTML]="card.answer | katexRenderer"
+          (zoomableImages)="lightbox.open($event)"></div>
+      </article>
+      } @empty {
+      <p class="admin-empty">Questo post non mostra più nessuna carta.</p>
+      }
+    </section>
+    } @else {
+    <p class="admin-empty">Scegli una segnalazione.</p>
+    }
+  </main>
+</div>
+
+<app-image-lightbox #lightbox></app-image-lightbox>
+}

@@ -1,0 +1,249 @@
+/* Its own page, not a section of the app: no navbar, no theme switch, nothing
+   to click but the decision at hand. */
+.admin-gate {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: calc(var(--spacing-unit) * 2);
+}
+
+.admin-gate-box {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-unit);
+  width: min(360px, 100%);
+  padding: calc(var(--spacing-unit) * 3);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius, 8px);
+  background: var(--component-background);
+}
+
+.admin-title {
+  margin: 0 0 var(--spacing-unit);
+  font-size: 1.25rem;
+  color: var(--header-color);
+}
+
+.admin-error {
+  color: var(--danger-color);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.admin-page {
+  display: flex;
+  align-items: stretch;
+  min-height: 100vh;
+}
+
+.admin-list {
+  flex: 0 0 320px;
+  border-right: 1px solid var(--border-color);
+  overflow-y: auto;
+  max-height: 100vh;
+}
+
+.admin-list-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-unit);
+  padding: calc(var(--spacing-unit) * 1.5);
+  border-bottom: 1px solid var(--border-color);
+  color: var(--header-color);
+}
+
+.admin-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  text-align: left;
+  padding: calc(var(--spacing-unit) * 1.5);
+  border: 0;
+  border-bottom: 1px solid var(--border-color);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+
+  &:hover {
+    background: color-mix(in srgb, var(--primary-color) 8%, transparent);
+  }
+}
+
+/* The one being looked at, and the ones still waiting: two different questions,
+   so two different marks. */
+.admin-row.is-chosen {
+  background: color-mix(in srgb, var(--primary-color) 14%, transparent);
+}
+
+.admin-row-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-unit);
+}
+
+.admin-row-sub {
+  color: var(--muted-color);
+  font-size: 0.85rem;
+}
+
+.admin-badge {
+  font-size: 0.75rem;
+  padding: 1px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  color: var(--muted-color);
+  flex-shrink: 0;
+}
+
+.admin-badge.is-open {
+  color: var(--warning-color);
+  border-color: var(--warning-color);
+}
+
+.admin-detail {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: calc(var(--spacing-unit) * 2);
+  overflow-y: auto;
+  max-height: 100vh;
+}
+
+/* The decision stays in reach while the post is read: a set of forty cards
+   would otherwise leave the buttons a scroll away from what they are about. */
+.admin-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 2) var(--spacing-unit);
+  margin: calc(var(--spacing-unit) * -2) calc(var(--spacing-unit) * -2) 0;
+  background: var(--background-color, var(--component-background));
+  border-bottom: 1px solid var(--border-color);
+}
+
+.admin-head h2 {
+  margin: 0 0 var(--spacing-unit);
+  font-size: 1.15rem;
+  color: var(--header-color);
+}
+
+.admin-meta {
+  color: var(--muted-color);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.admin-flag {
+  color: var(--danger-color);
+}
+
+.admin-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-unit);
+  margin: calc(var(--spacing-unit) * 1.5) 0;
+}
+
+.admin-message {
+  margin: 0 0 var(--spacing-unit);
+  padding: var(--spacing-unit) calc(var(--spacing-unit) * 1.5);
+  border-radius: var(--border-radius, 8px);
+  background: color-mix(in srgb, var(--primary-color) 10%, transparent);
+}
+
+/* The grid the cards have everywhere else in the app, with the same numbers:
+   whoever moderates reads them the way their readers do, and a set of forty is
+   scanned rather than scrolled through one card per screen. */
+.admin-cards {
+  padding-top: calc(var(--spacing-unit) * 1.5);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
+  gap: calc(var(--spacing-unit) * 3);
+  align-items: start;
+}
+
+.admin-card {
+  min-height: 240px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg, 12px);
+  padding: calc(var(--spacing-unit) * 2);
+  background: var(--component-background);
+
+  h3 {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--header-color);
+  }
+}
+
+.admin-card-topic {
+  color: var(--muted-color);
+  font-size: 0.8rem;
+  margin: 2px 0 var(--spacing-unit);
+}
+
+.admin-card-label {
+  color: var(--muted-color);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: var(--spacing-unit) 0 4px;
+}
+
+/* Whatever the card holds, it stays inside its box: a wide table or a big
+   picture must not push the page sideways. */
+.admin-card-text {
+  overflow-x: auto;
+
+  /* Through ::ng-deep because this content arrives by [innerHTML] and so
+     carries none of this component's style attributes - a scoped "img" rule
+     never reaches it, which is how a 1838px screenshot came out at 1838px.
+     Height capped as well as width: a tall narrow picture stays inside its
+     width and can still be a screen and a half long. */
+  ::ng-deep img {
+    /* Says what clicking does, since the cap means what is on screen is not
+       the whole picture. */
+    cursor: zoom-in;
+    max-width: 100%;
+    max-height: 320px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+  }
+}
+
+
+
+.admin-empty {
+  color: var(--muted-color);
+  padding: calc(var(--spacing-unit) * 2);
+}
+
+@media (max-width: 840px) {
+  .admin-page {
+    flex-direction: column;
+  }
+
+  .admin-list {
+    flex: 0 0 auto;
+    max-height: 40vh;
+    border-right: 0;
+    border-bottom: 1px solid var(--border-color);
+  }
+}
+
+/* The one question the page asks back, in the colour of what it is about. */
+.admin-confirm {
+  margin-bottom: calc(var(--spacing-unit) * 1.5);
+  padding: var(--spacing-unit) calc(var(--spacing-unit) * 1.5);
+  border: 1px solid var(--danger-color);
+  border-radius: var(--border-radius, 8px);
+  background: var(--danger-tint);
+
+  p {
+    margin: 0;
+  }
+}

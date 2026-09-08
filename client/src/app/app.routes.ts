@@ -1,5 +1,7 @@
 import { authGuard, guestGuard } from './auth/auth.guard';
 
+import { AdminComponent } from './admin/admin.component';
+
 import { CommunityComponent } from './community/community.component';
 import { CreateFlashcard } from './flashcard/create-flashcard/create-flashcard';
 import { CreateSubjectComponent } from './subject/create-subject/create-subject.component';
@@ -21,6 +23,10 @@ import { TestResult } from './test/test-result/test-result';
 import { TestRunner } from './test/test-runner/test-runner';
 
 export const routes: Routes = [
+  // Outside the app's own login, and with no link pointing at it: this one is
+  // opened from the address in the chat, with the server's own password.
+  { path: 'admin', component: AdminComponent },
+  { path: 'admin/:id', component: AdminComponent },
   { path: 'login', component: LoginComponent, canActivate: [guestGuard] },
   { path: 'register', component: RegisterComponent, canActivate: [guestGuard] },
   // Every page of the app hangs off this one, so a new route is behind the
