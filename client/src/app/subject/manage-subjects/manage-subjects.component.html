@@ -24,12 +24,12 @@
       </thead>
       <tbody>
         @for (subject of subjects; track subject._id) {
-        <tr>
+        <tr class="clickable-row" (click)="filterBySubject(subject._id)" [attr.title]="t('subject.manage.filterByTitle')">
           <td class="subject-icon-cell"><img [src]="getIconUrl(subject)" alt="icon" class="subject-icon"></td>
           <td class="cell-title">{{ subject.name }}</td>
           <td class="cell-meta">
             @if (hasDescription(subject)) {
-            <button type="button" class="btn btn-sm btn-outline-secondary" (click)="toggleDescription(subject._id)">
+            <button type="button" class="btn btn-sm btn-outline-secondary" (click)="$event.stopPropagation(); toggleDescription(subject._id)">
               <span class="material-symbols-outlined">
                 {{ isDescriptionExpanded(subject._id) ? 'expand_less' : 'expand_more' }}
               </span>
@@ -39,7 +39,7 @@
             <span class="text-body-secondary fst-italic">{{ 'subject.manage.noDescription' | transloco }}</span>
             }
           </td>
-          <td class="cell-actions">
+          <td class="cell-actions" (click)="$event.stopPropagation()">
             <app-visibility-button [visibility]="subject.visibility ?? 'private'"
               [busy]="visibilityBusyId === subject._id" (toggled)="onVisibilityToggled(subject, $event)"></app-visibility-button>
             <button class="btn btn-icon-ghost" (click)="editSubject(subject._id)" [attr.aria-label]="t('common.edit')">

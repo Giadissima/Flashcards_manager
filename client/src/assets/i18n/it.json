@@ -251,7 +251,8 @@
       "subtitle": "Organizza gli argomenti delle materie",
       "newTopicButton": "Nuovo argomento",
       "searchPlaceholder": "Cerca argomenti...",
-      "deleteConfirm": "Sei sicuro di voler eliminare questo argomento?"
+      "deleteConfirm": "Sei sicuro di voler eliminare questo argomento?",
+      "filterByTitle": "Vedi le flashcard di questo argomento"
     },
     "toast": {
       "created": "argomento creato con successo",
@@ -292,7 +293,8 @@
       "searchPlaceholder": "Cerca materie...",
       "tableDescription": "Descrizione",
       "noDescription": "Nessuna descrizione",
-      "deleteConfirm": "Sei sicuro di voler eliminare questa materia?"
+      "deleteConfirm": "Sei sicuro di voler eliminare questa materia?",
+      "filterByTitle": "Vedi gli argomenti di questa materia"
     },
     "toast": {
       "created": "materia creata con successo",

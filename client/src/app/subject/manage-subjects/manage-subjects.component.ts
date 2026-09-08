@@ -110,6 +110,12 @@ export class ManageSubjectsComponent extends PaginatedList implements OnInit {
     }
   }
 
+  /** Clicking a subject row jumps to "manage topics" pre-filtered to that subject. */
+  filterBySubject(id?: string): void {
+    if (!id) return;
+    this.router.navigate(['/manage-topics'], { queryParams: { subject_id: id } });
+  }
+
   /** Which subject the confirmation dialog is currently asking about. */
   private pendingDeleteId: string | null = null;
   showDeleteConfirm = false;

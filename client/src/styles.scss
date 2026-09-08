@@ -515,6 +515,17 @@ input:-webkit-autofill:active {
   margin-left: calc(var(--spacing-unit) * 0.5);
 }
 
+/* A row that navigates elsewhere on click (e.g. filtering another list by
+   the clicked item), as opposed to the buttons in .cell-actions, which stop
+   the click from reaching the row. */
+.clickable-row {
+  cursor: pointer;
+}
+
+.clickable-row:hover {
+  background-color: var(--background-color);
+}
+
 /* Stacked table: on phones a .table-stacked stops being a grid and every row
    becomes a card, so cells with an incompressible width (icons, action
    buttons) no longer push the table into a horizontal overflow. The column

@@ -38,14 +38,14 @@
       </thead>
       <tbody>
         @for (topic of topics; track topic._id) {
-        <tr>
+        <tr class="clickable-row" (click)="filterByTopic(topic._id)" [attr.title]="t('topic.manage.filterByTitle')">
           <td class="cell-title">{{ topic.name }}</td>
           <td class="topic-color">
             <span [style.backgroundColor]="topic.color" class="color-preview"></span>
             <span class="color-hex">{{ topic.color }}</span>
           </td>
           <td class="cell-meta">{{ getSubjectName(topic.subject_id) }}</td>
-          <td class="cell-actions">
+          <td class="cell-actions" (click)="$event.stopPropagation()">
             <app-visibility-button [visibility]="topic.visibility ?? 'private'"
               [busy]="visibilityBusyId === topic._id" (toggled)="onVisibilityToggled(topic, $event)"></app-visibility-button>
             <button type="button" class="btn btn-icon-ghost" (click)="editTopic(topic._id)" [attr.aria-label]="t('common.edit')">

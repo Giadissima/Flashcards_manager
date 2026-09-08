@@ -251,7 +251,8 @@
       "subtitle": "Organize the topics of your subjects",
       "newTopicButton": "New Topic",
       "searchPlaceholder": "Search topics...",
-      "deleteConfirm": "Are you sure you want to delete this topic?"
+      "deleteConfirm": "Are you sure you want to delete this topic?",
+      "filterByTitle": "View flashcards for this topic"
     },
     "toast": {
       "created": "Topic created successfully",
@@ -292,7 +293,8 @@
       "searchPlaceholder": "Search subjects...",
       "tableDescription": "Description",
       "noDescription": "No description",
-      "deleteConfirm": "Are you sure you want to delete this subject?"
+      "deleteConfirm": "Are you sure you want to delete this subject?",
+      "filterByTitle": "View topics for this subject"
     },
     "toast": {
       "created": "Subject created successfully",

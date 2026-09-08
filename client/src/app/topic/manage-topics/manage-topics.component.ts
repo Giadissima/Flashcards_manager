@@ -9,7 +9,7 @@ import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dial
 import { PageCardComponent } from '../../shared/page-card/page-card.component';
 import { PaginatedList } from '../../shared/paginated-list';
 import { toSubjectOptions } from '../../shared/select-options.util';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SearchInputComponent } from '../../shared/search-input/search-input.component';
 import { SearchableSelectComponent, SelectOption } from '../../shared/searchable-select/searchable-select.component';
 import { Subject } from '../../models/subject.dto';
@@ -38,6 +38,7 @@ export class ManageTopicsComponent extends PaginatedList implements OnInit {
   constructor(
     private topicService: TopicService,
     private router: Router,
+    private activatedRoute: ActivatedRoute,
     private toastService: ToastService,
     private subjectService: SubjectService,
     private transloco: TranslocoService
@@ -46,6 +47,9 @@ export class ManageTopicsComponent extends PaginatedList implements OnInit {
   }
 
   ngOnInit(): void {
+    // Arriving from "manage subjects" with a subject clicked lands here with
+    // its id in the query string, pre-filtering the list to that subject.
+    this.selectedSubjectId = this.activatedRoute.snapshot.queryParamMap.get('subject_id') || null;
     this.loadTopics();
     this.loadSubjects();
   }
@@ -108,6 +112,12 @@ export class ManageTopicsComponent extends PaginatedList implements OnInit {
 
   editTopic(id?: string): void {
     this.router.navigate(['/edit-topic', id]);
+  }
+
+  /** Clicking a topic row jumps to the home feed pre-filtered to that topic. */
+  filterByTopic(id?: string): void {
+    if (!id) return;
+    this.router.navigate(['/home'], { queryParams: { topic_id: id } });
   }
 
   /** Which topic the confirmation dialog is currently asking about. */
