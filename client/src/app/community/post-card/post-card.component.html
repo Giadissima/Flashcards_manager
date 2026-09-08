@@ -129,7 +129,9 @@
          where the per-card buttons on the cards themselves are not. -->
     @if (!isMine) {
     <div class="post-actions">
-      <button type="button" class="btn btn-icon-ghost" [title]="'community.reportPost' | transloco"
+      <button type="button" class="btn btn-icon-ghost" [class.is-reported]="reported" [disabled]="reported"
+        (click)="reportOpen = true"
+        [title]="(reported ? 'community.report.already' : 'community.reportPost') | transloco"
         [attr.aria-label]="'community.reportPost' | transloco">
         <span class="material-symbols-outlined">flag</span>
       </button>
@@ -200,6 +202,9 @@
      where they land in a library that is already somebody's own. -->
 <app-post-import-modal [post]="post" [card]="importingCard" [isOpen]="importOpen"
   (closed)="importOpen = false" (done)="onImported()"></app-post-import-modal>
+
+<app-post-report-modal [post]="post" [isOpen]="reportOpen" (closed)="reportOpen = false"
+  (done)="reported = true"></app-post-report-modal>
 
 <!-- Private, and addressed to the author alone: correcting a stranger in the
      open is awkward enough that most people simply would not. -->

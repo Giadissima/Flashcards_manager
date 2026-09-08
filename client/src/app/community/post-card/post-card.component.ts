@@ -9,6 +9,7 @@ import { Flashcard } from '../../models/flashcard.dto';
 import { FormsModule } from '@angular/forms';
 import { ModalComponent } from '../../shared/modal/modal.component';
 import { PostImportModalComponent } from '../post-import-modal/post-import-modal.component';
+import { PostReportModalComponent } from '../post-report-modal/post-report-modal.component';
 import { PostComment } from '../../models/social.dto';
 import { KatexRendererPipe } from '../../pipes/katex-renderer.pipe';
 import { ToastService } from '../../shared/toast/toast.service';
@@ -46,6 +47,7 @@ const commentPageSize = 20;
     ModalComponent,
     ContentOverflowDirective,
     PostImportModalComponent,
+    PostReportModalComponent,
   ],
   templateUrl: './post-card.component.html',
   styleUrl: './post-card.component.scss',
@@ -216,6 +218,9 @@ export class PostCardComponent implements OnInit {
   // --------------------------------------------------------- the whole set
 
   importOpen = false;
+  reportOpen = false;
+  /** Set once this reader has reported it, so the flag says it has been. */
+  reported = false;
   /** The one card being taken, or null when the whole set is. */
   importingCard: Flashcard | null = null;
 

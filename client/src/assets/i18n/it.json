@@ -520,6 +520,22 @@
       "topicKeepOne": "Mantieni l'argomento dell'autore",
       "topicSingleOne": "Mettila in un argomento mio",
       "confirmOne": "Aggiungila"
+    },
+    "report": {
+      "title": "Segnala questo post",
+      "intro": "La segnalazione arriva a chi amministra il sito. {{author}} non saprà che sei stato tu.",
+      "reason": {
+        "explicit": "Contenuto esplicito o volgare",
+        "offensive": "Offensivo o discriminatorio",
+        "spam": "Spam o pubblicità",
+        "other": "Altro"
+      },
+      "notePlaceholder": "Vuoi aggiungere qualcosa? (facoltativo)",
+      "privacy": "Chi amministra vede il motivo, la nota e di che post si tratta. Il tuo nome non viene mostrato all'autore.",
+      "send": "Segnala",
+      "done": "Segnalazione inviata, ci pensiamo noi.",
+      "already": "L'hai già segnalato",
+      "error": "Non è stato possibile inviare la segnalazione"
     }
   },
   "notifications": {

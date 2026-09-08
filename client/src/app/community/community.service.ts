@@ -6,6 +6,8 @@ import {
   ImportResult,
   ImportTargetRequest,
   PostContents,
+  ReportRequest,
+  ReportResult,
 } from '../models/post.dto';
 
 import { Feedback, PostComment } from '../models/social.dto';
@@ -79,6 +81,14 @@ export class CommunityService {
       `${this.baseUrl}/${postId}/import`,
       request,
     ) as Promise<ImportResult>;
+  }
+
+  /** Says a post should not be in the Community, and why. */
+  reportPost(postId: string, request: ReportRequest): Promise<ReportResult> {
+    return this.restClient.post(
+      `${this.baseUrl}/${postId}/report`,
+      request,
+    ) as Promise<ReportResult>;
   }
 
   /** True likes the post, false takes the like back. */

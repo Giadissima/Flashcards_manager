@@ -520,6 +520,22 @@
       "topicKeepOne": "Keep the author's topic",
       "topicSingleOne": "Put it under a topic of mine",
       "confirmOne": "Add it"
+    },
+    "report": {
+      "title": "Report this post",
+      "intro": "The report goes to whoever administers the site. {{author}} will not know it was you.",
+      "reason": {
+        "explicit": "Explicit or vulgar content",
+        "offensive": "Offensive or discriminatory",
+        "spam": "Spam or advertising",
+        "other": "Something else"
+      },
+      "notePlaceholder": "Anything to add? (optional)",
+      "privacy": "The administrator sees the reason, the note and which post it is. Your name is never shown to the author.",
+      "send": "Report",
+      "done": "Reported. We will look at it.",
+      "already": "You already reported it",
+      "error": "The report could not be sent"
     }
   },
   "notifications": {

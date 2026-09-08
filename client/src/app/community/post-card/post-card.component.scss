@@ -422,3 +422,10 @@
 .feedback-intro {
   color: var(--text-color);
 }
+
+/* Already reported: the flag stays where it was, marked rather than gone, so
+   the answer to "did that go through" is the button itself. */
+.post-actions .btn.is-reported {
+  color: var(--danger-color);
+  opacity: 1;
+}

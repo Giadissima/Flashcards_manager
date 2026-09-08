@@ -1,0 +1,29 @@
+<app-modal [isOpen]="isOpen" [title]="'community.report.title' | transloco" [showFooter]="true"
+  (closed)="close()">
+  <p class="report-intro">{{ 'community.report.intro' | transloco:{ author: post.author.username } }}</p>
+
+  @for (option of reasons; track option) {
+  <label class="report-choice">
+    <input type="radio" class="form-check-input" name="reason" [checked]="reason === option"
+      (change)="reason = option">
+    <span>{{ ('community.report.reason.' + option) | transloco }}</span>
+  </label>
+  }
+
+  <textarea class="form-control report-note" rows="3" maxlength="1000" [(ngModel)]="note"
+    [placeholder]="'community.report.notePlaceholder' | transloco"></textarea>
+
+  <!-- Said plainly, because the fear that stops people reporting is of being
+       seen doing it, and the fear that makes them do it too often is that
+       nothing will happen. -->
+  <p class="report-note-hint">{{ 'community.report.privacy' | transloco }}</p>
+
+  <ng-container modal-footer>
+    <button type="button" class="btn btn-outline-primary" (click)="close()">
+      <span class="material-symbols-outlined">close</span>{{ 'common.cancel' | transloco }}
+    </button>
+    <button type="button" class="btn btn-danger" [disabled]="!canSend" (click)="confirm()">
+      <span class="material-symbols-outlined">flag</span>{{ 'community.report.send' | transloco }}
+    </button>
+  </ng-container>
+</app-modal>

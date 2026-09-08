@@ -1,0 +1,22 @@
+.report-intro {
+  margin-bottom: calc(var(--spacing-unit) * 1.5);
+}
+
+.report-choice {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-unit);
+  padding: calc(var(--spacing-unit) * 0.5) 0;
+  cursor: pointer;
+}
+
+.report-note {
+  margin-top: calc(var(--spacing-unit) * 1.5);
+  resize: vertical;
+}
+
+.report-note-hint {
+  color: var(--muted-color);
+  font-size: 0.85rem;
+  margin: var(--spacing-unit) 0 0;
+}

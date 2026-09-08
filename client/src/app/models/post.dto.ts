@@ -45,6 +45,27 @@ export interface ImportResult {
   subjectId: string;
 }
 
+/** Why a post is being reported. Matches the server's own list. */
+export const reportReasons = [
+  'explicit',
+  'offensive',
+  'spam',
+  'wrong',
+  'copyright',
+  'other',
+] as const;
+export type ReportReason = (typeof reportReasons)[number];
+
+export interface ReportRequest {
+  reason: ReportReason;
+  note?: string;
+}
+
+export interface ReportResult {
+  /** Open reports on that post, this one included. */
+  reports: number;
+}
+
 export interface PostAuthor {
   _id: string;
   username: string;
