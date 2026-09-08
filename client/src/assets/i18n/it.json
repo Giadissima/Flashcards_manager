@@ -550,7 +550,8 @@
       "upvote": "ha messo mi piace al tuo post",
       "comment": "ha commentato il tuo post",
       "feedback": "ti ha scritto su una flashcard",
-      "resolved": "ha preso nota della tua segnalazione"
+      "resolved": "ha preso nota della tua segnalazione",
+      "moderation": "moderazione"
     },
     "markResolved": "Segna come risolta",
     "resolved": "Chi l'ha segnalata è stato avvisato",
@@ -568,6 +569,26 @@
       "comment": "Commenti",
       "feedback": "Segnalazioni",
       "resolved": "Risolte"
+    },
+    "fromSite": "Moderazione",
+    "moderation": {
+      "warned": "ti ha ammonito: rispetta le regole della community.",
+      "blocked": "ha limitato il tuo account fino al {{until}}.",
+      "blockedForever": "ha limitato il tuo account.",
+      "lifted": "ti ha ridato i permessi: puoi tornare a pubblicare, commentare e mandare feedback.",
+      "removed": "ha tolto un tuo post dalla community."
+    }
+  },
+  "moderation": {
+    "blocked": {
+      "publish": "Non puoi pubblicare fino al {{until}}.",
+      "comment": "Non puoi commentare fino al {{until}}.",
+      "feedback": "Non puoi mandare feedback fino al {{until}}."
+    },
+    "blockedForever": {
+      "publish": "Il tuo account non può più pubblicare.",
+      "comment": "Il tuo account non può più commentare.",
+      "feedback": "Il tuo account non può più mandare feedback."
     }
   }
 }

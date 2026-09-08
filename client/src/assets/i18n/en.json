@@ -550,7 +550,8 @@
       "upvote": "liked your post",
       "comment": "commented on your post",
       "feedback": "wrote about a flashcard",
-      "resolved": "took note of your report"
+      "resolved": "took note of your report",
+      "moderation": "moderation"
     },
     "markResolved": "Mark as sorted",
     "resolved": "The reporter has been told",
@@ -568,6 +569,26 @@
       "comment": "Comments",
       "feedback": "Reports",
       "resolved": "Sorted"
+    },
+    "fromSite": "Moderation",
+    "moderation": {
+      "warned": "warned you: please keep to the community rules.",
+      "blocked": "has limited your account until {{until}}.",
+      "blockedForever": "has limited your account.",
+      "lifted": "gave your account back: you can publish, comment and send feedback again.",
+      "removed": "took one of your posts out of the community."
+    }
+  },
+  "moderation": {
+    "blocked": {
+      "publish": "You cannot publish until {{until}}.",
+      "comment": "You cannot comment until {{until}}.",
+      "feedback": "You cannot send feedback until {{until}}."
+    },
+    "blockedForever": {
+      "publish": "Your account can no longer publish.",
+      "comment": "Your account can no longer comment.",
+      "feedback": "Your account can no longer send feedback."
     }
   }
 }

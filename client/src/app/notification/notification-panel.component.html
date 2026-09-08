@@ -73,8 +73,15 @@
       <span class="material-symbols-outlined notification-icon">{{ iconOf(n) }}</span>
       <span class="notification-body">
         <span class="notification-line">
-          <strong>{{ n.actor_id.username }}</strong>
+          <!-- Nobody's name on this one: it comes from the site itself, and a
+               username here would name somebody who had nothing to do with it. -->
+          @if (n.moderation) {
+          <strong>{{ 'notifications.fromSite' | transloco }}</strong>
+          {{ moderationText(n) }}
+          } @else {
+          <strong>{{ n.actor_id?.username }}</strong>
           {{ ('notifications.kind.' + n.kind) | transloco }}
+          }
         </span>
         @if (n.preview) {
         <span class="notification-preview">{{ n.preview }}</span>

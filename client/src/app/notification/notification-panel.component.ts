@@ -125,7 +125,34 @@ export class NotificationPanelComponent implements OnInit {
     // thing it is about, and two symbols for one thing read as two things.
     if (notification.kind === 'upvote') return 'thumb_up';
     if (notification.kind === 'comment') return 'chat_bubble';
+    if (notification.kind === 'moderation') return 'gavel';
     return notification.kind === 'resolved' ? 'task_alt' : 'feedback';
+  }
+
+  /**
+   * What a moderation notice says, in one line.
+   *
+   * Built here rather than sent ready-made by the server: the date belongs in
+   * the reader's own format, and the sentence in the language they picked.
+   */
+  moderationText(notification: AppNotification): string {
+    const notice = notification.moderation;
+    if (!notice) return '';
+
+    const until = notice.until
+      ? new Date(notice.until).toLocaleDateString(undefined, {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+        })
+      : '';
+
+    const key =
+      notice.event === 'blocked' && !notice.until
+        ? 'notifications.moderation.blockedForever'
+        : `notifications.moderation.${notice.event}`;
+
+    return this.transloco.translate(key, { until });
   }
 
   /** Only the author closes a report, and only once. */

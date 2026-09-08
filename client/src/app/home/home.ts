@@ -1,4 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { restrictionOf } from '../shared/restriction';
 import { Subject as RxSubject, Subscription, debounceTime } from 'rxjs';
 import { SearchableSelectComponent, SelectOption } from '../shared/searchable-select/searchable-select.component';
 import { SearchInputComponent } from '../shared/search-input/search-input.component';
@@ -464,8 +465,16 @@ export class Home extends PaginatedList implements OnInit, OnDestroy {
         ),
         'success',
       );
-    } catch {
-      this.toast.show(this.transloco.translate('visibility.toastError'), 'error');
+    } catch (error) {
+      // A block on publishing is not a failure to explain away: it has a
+      // reason and a date, and both belong in the message.
+      const blocked = restrictionOf(error);
+      this.toast.show(
+        blocked
+          ? this.transloco.translate(blocked.key, blocked.params)
+          : this.transloco.translate('visibility.toastError'),
+        'error',
+      );
     } finally {
       this.visibilityBusyId = undefined;
     }

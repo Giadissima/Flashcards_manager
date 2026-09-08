@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { restrictionOf } from '../../shared/restriction';
 import { PaginationComponent } from '../../shared/pagination/pagination.component';
 
 import { CommonModule } from '@angular/common';
@@ -161,8 +162,16 @@ export class ManageSubjectsComponent extends PaginatedList implements OnInit {
         ),
         'success',
       );
-    } catch {
-      this.toastService.show(this.transloco.translate('visibility.toastError'), 'error');
+    } catch (error) {
+      // A block on publishing is not a failure to explain away: it has a
+      // reason and a date, and both belong in the message.
+      const blocked = restrictionOf(error);
+      this.toastService.show(
+        blocked
+          ? this.transloco.translate(blocked.key, blocked.params)
+          : this.transloco.translate('visibility.toastError'),
+        'error',
+      );
     } finally {
       this.visibilityBusyId = undefined;
     }

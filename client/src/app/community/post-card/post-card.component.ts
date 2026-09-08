@@ -10,6 +10,7 @@ import { FormsModule } from '@angular/forms';
 import { ModalComponent } from '../../shared/modal/modal.component';
 import { PostImportModalComponent } from '../post-import-modal/post-import-modal.component';
 import { PostReportModalComponent } from '../post-report-modal/post-report-modal.component';
+import { restrictionOf } from '../../shared/restriction';
 import { PostComment } from '../../models/social.dto';
 import { KatexRendererPipe } from '../../pipes/katex-renderer.pipe';
 import { ToastService } from '../../shared/toast/toast.service';
@@ -285,8 +286,15 @@ export class PostCardComponent implements OnInit {
       );
       this.comments = [...[...page.data].reverse(), ...this.comments];
       this.commentCount = page.count;
-    } catch {
-      this.toast.show(this.transloco.translate('community.commentError'), 'error');
+    } catch (error) {
+      // A block on commenting says so in its own words, with the date it ends
+      const blocked = restrictionOf(error);
+      this.toast.show(
+        blocked
+          ? this.transloco.translate(blocked.key, blocked.params)
+          : this.transloco.translate('community.commentError'),
+        'error',
+      );
     } finally {
       this.loadingOlderComments = false;
     }
@@ -368,8 +376,13 @@ export class PostCardComponent implements OnInit {
     } catch (error) {
       // 409 is "you already reported this one", which is not a failure
       const already = (error as { status?: number })?.status === 409;
+      const blocked = restrictionOf(error);
       this.toast.show(
-        this.transloco.translate(already ? 'community.feedbackAlready' : 'community.feedbackError'),
+        blocked
+          ? this.transloco.translate(blocked.key, blocked.params)
+          : this.transloco.translate(
+              already ? 'community.feedbackAlready' : 'community.feedbackError',
+            ),
         already ? 'info' : 'error',
       );
       if (already) this.closeFeedback();
