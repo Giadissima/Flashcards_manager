@@ -57,6 +57,11 @@
     @if (isNewSubject) {
     <input type="text" class="form-control mt-2" [(ngModel)]="subjectName" maxlength="30"
       [placeholder]="'community.importSet.newSubjectName' | transloco">
+    <!-- Said here rather than after the button: the server turns this name
+         down, and finding that out is not worth a round trip. -->
+    @if (subjectNameTaken) {
+    <p class="import-note is-error">{{ 'community.importSet.subjectTaken' | transloco }}</p>
+    }
     }
   </section>
 
@@ -86,8 +91,30 @@
       <span>{{ (isCard ? 'community.importSet.topicSingleOne' : 'community.importSet.topicSingle') | transloco }}</span>
     </label>
     @if (topicMode === 'single') {
-    <input type="text" class="form-control import-indent" [(ngModel)]="topicName" maxlength="30"
-      [placeholder]="'community.importSet.topicNamePlaceholder' | transloco">
+    <div class="import-indent">
+      <!-- A subject of one's own already has topics, and one of them may well
+           be where these belong; a new subject has none, so there the only
+           answer is a name. -->
+      @if (topics.length) {
+      <select class="form-select" (change)="singleTopic = $any($event.target).value">
+        <option [value]="newTopic" [selected]="isNewTopic">{{ 'community.importSet.newTopic' | transloco }}</option>
+        @for (topic of topics; track topic._id) {
+        <option [value]="topic._id" [selected]="topic._id === singleTopic">{{ topic.name }}</option>
+        }
+      </select>
+      }
+
+      @if (isNewTopic) {
+      <input type="text" class="form-control" [class.mt-2]="topics.length" [(ngModel)]="topicName" maxlength="30"
+        [placeholder]="'community.importSet.topicNamePlaceholder' | transloco">
+      <!-- Not a refusal: this is the select's own answer, reached by typing -->
+      @if (topicNameTaken) {
+      <p class="import-note is-warning">{{ 'community.importSet.topicNameTaken' | transloco }}</p>
+      }
+      } @else {
+      <p class="import-note">{{ 'community.importSet.topicExistingHint' | transloco:{ name: singleTopicName } }}</p>
+      }
+    </div>
     }
 
   </section>
@@ -121,6 +148,11 @@
           [attr.aria-label]="'community.importSet.collisionRename' | transloco"
           (input)="onRename(topic._id, $any($event.target).value)">
       </div>
+      <!-- Another name in use is the same trap under a different name: these
+           cards were to be kept apart, and there they would not be. -->
+      @if (renameTaken(topic)) {
+      <p class="import-note is-error">{{ 'community.importSet.renameTaken' | transloco }}</p>
+      }
       }
     </div>
     }

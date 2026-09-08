@@ -106,3 +106,13 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* A name that will do something other than what was asked, and one that will
+   not be taken at all: the second is worth the louder colour. */
+.import-note.is-warning {
+  color: var(--warning-color);
+}
+
+.import-note.is-error {
+  color: var(--danger-color);
+}

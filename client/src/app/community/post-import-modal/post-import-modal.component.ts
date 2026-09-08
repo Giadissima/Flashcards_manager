@@ -17,6 +17,20 @@ import { TopicService } from '../../topic/topic.service';
 /** The value of the destination select that stands for "make me a new one". */
 const newSubject = 'new';
 
+/** The same, for the topic everything goes under. */
+const newTopic = 'new';
+
+/**
+ * How two names are told apart, which is how the server tells them apart.
+ *
+ * Subjects and topics are read there under an Italian collation that looks
+ * past case and accents, so "Perche" typed here lands the cards in "Perche"
+ * of one's own. Comparing any more strictly would mean promising one thing
+ * and doing another.
+ */
+const names = new Intl.Collator('it', { sensitivity: 'base' });
+const sameName = (a: string, b: string): boolean => names.compare(a.trim(), b.trim()) === 0;
+
 /**
  * Where a whole shared set is taken in.
  *
@@ -50,6 +64,7 @@ export class PostImportModalComponent implements OnChanges {
   @Output() done = new EventEmitter<number>();
 
   readonly newSubject = newSubject;
+  readonly newTopic = newTopic;
 
   contents: PostContents | null = null;
   loading = false;
@@ -66,13 +81,18 @@ export class PostImportModalComponent implements OnChanges {
 
   // ----------------------------------------------------------- and how it lands
   topicMode: ImportTopicMode = 'keep';
+  /** A topic of the chosen subject to pour everything into, or a new one. */
+  singleTopic: string = newTopic;
   topicName = '';
   onCollision: ImportCollision = 'merge';
   /** The name each colliding topic is to take, keyed by the author's topic id. */
   renames: Record<string, string> = {};
 
-  /** The names already in use in the chosen subject, folded for comparison. */
-  private takenNames = new Set<string>();
+  /** The topics of the chosen subject, when it is one the reader already has. */
+  topics: Topic[] = [];
+
+  /** The names already in use in the chosen subject. */
+  private takenNames: string[] = [];
 
   constructor(
     private communityService: CommunityService,
@@ -127,7 +147,7 @@ export class PostImportModalComponent implements OnChanges {
       // A subject of their own by the same name is where these cards would go
       // if they took them one by one, so it is where the dialog opens
       const same = subjects.find(
-        (subject) => subject.name.toLowerCase() === contents.subject.name.toLowerCase(),
+        (subject) => sameName(subject.name, contents.subject.name),
       );
       this.target = same?._id ?? newSubject;
       this.subjectName = contents.subject.name;
@@ -206,11 +226,55 @@ export class PostImportModalComponent implements OnChanges {
    * never put.
    */
   private async readTakenNames(): Promise<void> {
-    this.takenNames = new Set();
+    this.takenNames = [];
+    this.topics = [];
+    this.singleTopic = newTopic;
     if (this.isNewSubject) return;
 
-    const topics = await this.topicService.getSelectableTopics(this.target);
-    this.takenNames = new Set(topics.map((topic) => topic.name.toLowerCase()));
+    this.topics = await this.topicService.getSelectableTopics(this.target);
+    this.takenNames = this.topics.map((topic) => topic.name);
+  }
+
+  /**
+   * True when a subject of the reader's is already called what they typed.
+   *
+   * The server refuses such a name outright, so this is the refusal said
+   * before the button is pressed rather than after.
+   */
+  get subjectNameTaken(): boolean {
+    const name = this.subjectName.trim();
+    return !!name && this.subjects.some((subject) => sameName(subject.name, name));
+  }
+
+  /**
+   * True when the typed topic name is one the chosen subject already carries.
+   *
+   * Not a refusal, this one: the cards join that topic, which is the same
+   * thing the select above offers. It is only worth saying so first.
+   */
+  get topicNameTaken(): boolean {
+    const name = this.topicName.trim();
+    return !!name && this.isNewTopic && this.isTaken(name);
+  }
+
+  /** True when a topic being kept apart was given a name already in use. */
+  renameTaken(topic: { _id: string; name: string }): boolean {
+    return this.isTaken(this.renameOf(topic));
+  }
+
+  /** True when a topic of the chosen subject already goes by this name. */
+  private isTaken(name: string): boolean {
+    return this.takenNames.some((taken) => sameName(taken, name));
+  }
+
+  /** True when the one topic is to be made, rather than one that is there. */
+  get isNewTopic(): boolean {
+    return this.singleTopic === newTopic || !this.topics.length;
+  }
+
+  /** The topic the cards would join, for the sentence that says as much. */
+  get singleTopicName(): string {
+    return this.topics.find((topic) => topic._id === this.singleTopic)?.name ?? '';
   }
 
   /** The topics being taken whose name is already on a topic of the reader's. */
@@ -218,7 +282,7 @@ export class PostImportModalComponent implements OnChanges {
     if (!this.contents || this.topicMode !== 'keep') return [];
 
     return this.contents.topics.filter(
-      (topic) => this.chosen.has(topic._id) && this.takenNames.has(topic.name.toLowerCase()),
+      (topic) => this.chosen.has(topic._id) && this.isTaken(topic.name),
     );
   }
 
@@ -232,12 +296,29 @@ export class PostImportModalComponent implements OnChanges {
 
   // ------------------------------------------------------------- and go
 
+  /**
+   * The name the one topic is asked for by, chosen or typed.
+   *
+   * The server takes a name either way and puts the cards in the topic of the
+   * subject that already bears it, making one only when none does - which is
+   * the same thing the select above says in words.
+   */
+  private get singleName(): string {
+    return this.isNewTopic ? this.topicName.trim() : this.singleTopicName;
+  }
+
   get canImport(): boolean {
     if (this.importing || !this.selectedCount) return false;
-    if (this.isNewSubject && this.subjectName.trim().length < 2) return false;
-    if (this.topicMode === 'single' && this.topicName.trim().length < 2) return false;
+    if (this.isNewSubject && (this.subjectName.trim().length < 2 || this.subjectNameTaken)) {
+      return false;
+    }
+    if (this.topicMode === 'single' && this.singleName.length < 2) return false;
+    // A name already in use would land these cards in that very topic, which
+    // is the opposite of what keeping them apart was asked for.
     if (this.onCollision === 'rename') {
-      return this.collisions.every((topic) => this.renameOf(topic).trim().length >= 2);
+      return this.collisions.every(
+        (topic) => this.renameOf(topic).trim().length >= 2 && !this.renameTaken(topic),
+      );
     }
     return true;
   }
@@ -252,7 +333,7 @@ export class PostImportModalComponent implements OnChanges {
           ? { subjectName: this.subjectName.trim() }
           : { subjectId: this.target }),
         topicMode: this.topicMode,
-        ...(this.topicMode === 'single' ? { topicName: this.topicName.trim() } : {}),
+        ...(this.topicMode === 'single' ? { topicName: this.singleName } : {}),
         ...(this.topicMode === 'keep'
           ? {
               onCollision: this.onCollision,
