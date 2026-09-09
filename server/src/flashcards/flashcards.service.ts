@@ -68,6 +68,10 @@ export class FlashcardsService {
       // the form said otherwise: the topic or subject was made public exactly
       // to carry what goes in it.
       visibility: owned.visibility ?? (await this.inheritedVisibility(userId, owned)),
+      // Same idea for spaced repetition: a card added to a topic already
+      // turned on for it starts on, instead of waiting for the topic's
+      // toggle to be flipped off and on again to catch it.
+      in_spaced_repetition: await this.inheritedSpacedRepetition(userId, owned),
     }).save();
 
     if (created.subject_id) {
@@ -95,6 +99,19 @@ export class FlashcardsService {
       if (subject?.visibility === 'public') return 'public';
     }
     return defaultVisibility;
+  }
+
+  /** Whether the topic the card is added to is itself in spaced repetition - only topics carry the flag, not subjects. */
+  private async inheritedSpacedRepetition(
+    userId: string,
+    dto: ModifyFlashcardDto,
+  ): Promise<boolean> {
+    if (!dto.topic_id) return false;
+    const topic = await this.topicModel
+      .findOne({ _id: dto.topic_id, user_id: userId }, { in_spaced_repetition: 1 })
+      .lean()
+      .exec();
+    return topic?.in_spaced_repetition ?? false;
   }
 
   findOne(userId: string, id: string): Promise<FlashcardDocument> {
