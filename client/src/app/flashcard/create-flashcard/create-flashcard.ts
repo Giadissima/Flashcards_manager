@@ -9,6 +9,8 @@ import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { answerMaxLength, charMinLength, questionMaxLength, titleMaxLength } from '../../../config/config';
 
 import { CommonModule } from '@angular/common';
+import { ModalComponent } from '../../shared/modal/modal.component';
+import { Router } from '@angular/router';
 import { VisibilityToggleComponent } from '../../shared/visibility-toggle/visibility-toggle.component';
 import { Visibility, defaultVisibility } from '../../models/visibility.dto';
 import { Editor } from '@tiptap/core';
@@ -22,6 +24,7 @@ import { SubjectService } from '../../subject/subject.service';
 import { ToastService } from '../../shared/toast/toast.service';
 import { Topic } from '../../models/topic.dto';
 import { TopicService } from '../../topic/topic.service';
+import { TutorialService } from '../../shared/tutorial/tutorial.service';
 import { toSubjectOptions, toTopicOptions } from '../../shared/select-options.util';
 
 @Component({
@@ -36,6 +39,7 @@ import { toSubjectOptions, toTopicOptions } from '../../shared/select-options.ut
     SearchableSelectComponent,
     PageCardComponent,
     VisibilityToggleComponent,
+    ModalComponent,
   ],
   templateUrl: './create-flashcard.html',
 })
@@ -52,6 +56,11 @@ export class CreateFlashcard implements OnInit, OnDestroy {
   showImport = false;
   importText = '';
 
+  // Which prerequisite is missing so the user can't create a flashcard yet:
+  // no subject at all, or subjects exist but no topic exists in any of them.
+  emptyState: 'subjects' | 'topics' | null = null;
+  showEmptyStateModal = false;
+
   get visibilityControl(): FormControl<Visibility> {
     return this.cardForm.get('visibility') as FormControl<Visibility>;
   }
@@ -62,7 +71,9 @@ export class CreateFlashcard implements OnInit, OnDestroy {
     private toastService: ToastService,
     private topicService: TopicService,
     private subjectService: SubjectService,
-    private transloco: TranslocoService
+    private transloco: TranslocoService,
+    private router: Router,
+    private tutorialService: TutorialService
   ) {
     this.questionEditor = createRichTextEditor({
       placeholder: () => this.transloco.translate('flashcard.create.questionPlaceholder'),
@@ -86,8 +97,36 @@ export class CreateFlashcard implements OnInit, OnDestroy {
       subject_id: ['']
     });
 
-    this.loadSubjects();
-    this.loadTopicsBySubject(undefined);
+    Promise.all([this.loadSubjects(), this.loadTopicsBySubject(undefined)]).then(() =>
+      this.updateEmptyState()
+    );
+  }
+
+  // Called after subjects/topics load: no subject at all takes priority over
+  // "has subjects but no topic yet", since creating the subject comes first.
+  private updateEmptyState(): void {
+    if (this.subjects.length === 0) {
+      this.emptyState = 'subjects';
+    } else if (this.topics.length === 0) {
+      this.emptyState = 'topics';
+    } else {
+      this.emptyState = null;
+    }
+    this.showEmptyStateModal = this.emptyState !== null;
+  }
+
+  closeEmptyStateModal(): void {
+    this.showEmptyStateModal = false;
+  }
+
+  goToCreatePrerequisite(): void {
+    this.showEmptyStateModal = false;
+    this.router.navigate([this.emptyState === 'subjects' ? '/create-subject' : '/create-topic']);
+  }
+
+  reviewTutorial(): void {
+    this.showEmptyStateModal = false;
+    this.tutorialService.open();
   }
 
   ngOnDestroy(): void {

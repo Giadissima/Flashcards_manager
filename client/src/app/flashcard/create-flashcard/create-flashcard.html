@@ -94,4 +94,23 @@
       </div>
     </form>
   </app-page-card>
+
+  @if (emptyState) {
+  <app-modal [isOpen]="showEmptyStateModal"
+    [title]="(emptyState === 'subjects' ? 'flashcard.create.noSubjectsTitle' : 'flashcard.create.noTopicsTitle') | transloco"
+    [showFooter]="true" (closed)="closeEmptyStateModal()">
+    <p class="mb-0">{{ (emptyState === 'subjects' ? 'flashcard.create.noSubjectsMessage' :
+      'flashcard.create.noTopicsMessage') | transloco }}</p>
+
+    <ng-container modal-footer>
+      <button type="button" class="btn btn-outline-secondary" (click)="reviewTutorial()">
+        <span class="material-symbols-outlined">school</span>{{ 'flashcard.create.reviewTutorialButton' | transloco }}
+      </button>
+      <button type="button" class="btn btn-primary" (click)="goToCreatePrerequisite()">
+        <span class="material-symbols-outlined">add</span>{{ (emptyState === 'subjects' ?
+        'flashcard.create.createSubjectButton' : 'flashcard.create.createTopicButton') | transloco }}
+      </button>
+    </ng-container>
+  </app-modal>
+  }
 </div>

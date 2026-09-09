@@ -251,7 +251,14 @@
       "importLabel": "Incolla il testo copiato con \"Copia card\"",
       "importPlaceholder": "Titolo\nQuestion: ...\nAnswer: ...",
       "importApply": "Importa",
-      "importParseError": "Il testo non è nel formato atteso (Titolo / Question / Answer)."
+      "importParseError": "Il testo non è nel formato atteso (Titolo / Question / Answer).",
+      "noSubjectsTitle": "Non hai ancora creato nessuna materia",
+      "noSubjectsMessage": "Crea una materia per poter creare la tua prima flashcard.",
+      "createSubjectButton": "Crea materia",
+      "noTopicsTitle": "Non hai ancora creato nessun argomento",
+      "noTopicsMessage": "Crea un argomento per poter creare la tua prima flashcard.",
+      "createTopicButton": "Crea argomento",
+      "reviewTutorialButton": "Rivedi il tutorial"
     },
     "edit": {
       "title": "Modifica Flashcard",
@@ -279,7 +286,11 @@
       "nameMinError": "Il nome deve avere almeno 2 caratteri.",
       "nameMaxError": "Numero massimo di caratteri per il nome raggiunto.",
       "colorTitle": "Scegli il tuo colore",
-      "createButton": "Crea argomento"
+      "createButton": "Crea argomento",
+      "noSubjectsTitle": "Non hai ancora creato nessuna materia",
+      "noSubjectsMessage": "Crea una materia per poter creare il tuo primo argomento.",
+      "createSubjectButton": "Crea materia",
+      "reviewTutorialButton": "Rivedi il tutorial"
     },
     "edit": {
       "title": "Modifica argomento",

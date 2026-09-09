@@ -251,7 +251,14 @@
       "importLabel": "Paste the text copied with \"Copy card\"",
       "importPlaceholder": "Title\nQuestion: ...\nAnswer: ...",
       "importApply": "Import",
-      "importParseError": "The text isn't in the expected format (Title / Question / Answer)."
+      "importParseError": "The text isn't in the expected format (Title / Question / Answer).",
+      "noSubjectsTitle": "You haven't created any subject yet",
+      "noSubjectsMessage": "Create a subject to be able to create your first flashcard.",
+      "createSubjectButton": "Create subject",
+      "noTopicsTitle": "You haven't created any topic yet",
+      "noTopicsMessage": "Create a topic to be able to create your first flashcard.",
+      "createTopicButton": "Create topic",
+      "reviewTutorialButton": "Review tutorial"
     },
     "edit": {
       "title": "Edit Flashcard",
@@ -279,7 +286,11 @@
       "nameMinError": "Name should have min 2 characters.",
       "nameMaxError": "Name's max characters reached.",
       "colorTitle": "Choose your color",
-      "createButton": "Create Topic"
+      "createButton": "Create Topic",
+      "noSubjectsTitle": "You haven't created any subject yet",
+      "noSubjectsMessage": "Create a subject to be able to create your first topic.",
+      "createSubjectButton": "Create subject",
+      "reviewTutorialButton": "Review tutorial"
     },
     "edit": {
       "title": "Edit Topic",

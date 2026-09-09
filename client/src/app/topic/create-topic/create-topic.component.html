@@ -37,4 +37,18 @@
       </div>
     </form>
   </app-page-card>
+
+  <app-modal [isOpen]="showEmptyStateModal" [title]="'topic.create.noSubjectsTitle' | transloco"
+    [showFooter]="true" (closed)="closeEmptyStateModal()">
+    <p class="mb-0">{{ 'topic.create.noSubjectsMessage' | transloco }}</p>
+
+    <ng-container modal-footer>
+      <button type="button" class="btn btn-outline-secondary" (click)="reviewTutorial()">
+        <span class="material-symbols-outlined">school</span>{{ 'topic.create.reviewTutorialButton' | transloco }}
+      </button>
+      <button type="button" class="btn btn-primary" (click)="goToCreateSubject()">
+        <span class="material-symbols-outlined">add</span>{{ 'topic.create.createSubjectButton' | transloco }}
+      </button>
+    </ng-container>
+  </app-modal>
 </div>

@@ -8,6 +8,7 @@ import {
 } from '@angular/forms';
 
 import { CommonModule } from '@angular/common';
+import { ModalComponent } from '../../shared/modal/modal.component';
 import { VisibilityToggleComponent } from '../../shared/visibility-toggle/visibility-toggle.component';
 import { Visibility, defaultVisibility } from '../../models/visibility.dto';
 import { NgxColorsComponent, NgxColorsTriggerDirective } from 'ngx-colors';
@@ -18,6 +19,7 @@ import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
 import { ToastService } from '../../shared/toast/toast.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
+import { TutorialService } from '../../shared/tutorial/tutorial.service';
 import {
   SearchableSelectComponent,
   SelectOption,
@@ -38,12 +40,17 @@ import { toSubjectOptions } from '../../shared/select-options.util';
     NgxColorsTriggerDirective,
     PageCardComponent,
     VisibilityToggleComponent,
+    ModalComponent,
   ],
   templateUrl: './create-topic.component.html',
 })
 export class CreateTopicComponent implements OnInit {
   topicForm!: FormGroup;
   subjects: Subject[] = [];
+
+  // A topic needs a subject to belong to, so without any subject yet the
+  // form is blocked behind a modal pointing at "create subject" instead.
+  showEmptyStateModal = false;
 
   get subjectOptions(): SelectOption[] {
     return toSubjectOptions(this.subjects);
@@ -60,6 +67,7 @@ export class CreateTopicComponent implements OnInit {
     private toastService: ToastService,
     private subjectService: SubjectService,
     private transloco: TranslocoService,
+    private tutorialService: TutorialService,
     protected themeService: ThemeService,
   ) {}
 
@@ -78,6 +86,20 @@ export class CreateTopicComponent implements OnInit {
       subject_id: [null], // Assuming subject_id is required
     });
     this.loadSubjects();
+  }
+
+  closeEmptyStateModal(): void {
+    this.showEmptyStateModal = false;
+  }
+
+  goToCreateSubject(): void {
+    this.showEmptyStateModal = false;
+    this.router.navigate(['/create-subject']);
+  }
+
+  reviewTutorial(): void {
+    this.showEmptyStateModal = false;
+    this.tutorialService.open();
   }
 
   async createTopic(): Promise<void> {
@@ -104,6 +126,7 @@ export class CreateTopicComponent implements OnInit {
   async loadSubjects() {
     try {
       this.subjects = await this.subjectService.getSelectableSubjects();
+      this.showEmptyStateModal = this.subjects.length === 0;
     } catch (err) {
       console.error('Error loading subjects', err);
       this.toastService.show(
