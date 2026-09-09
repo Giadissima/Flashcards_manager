@@ -31,15 +31,15 @@
           <app-study-fields variant="filter" [value]="study"
             (valueChange)="onStudyChange($event)"></app-study-fields>
         </div>
+        <app-segmented-filter [options]="[
+            { value: 'created', label: ('community.sortCreated' | transloco) },
+            { value: 'updated', label: ('community.sortUpdated' | transloco) },
+            { value: 'popular', label: ('community.sortPopular' | transloco) }
+          ]" [value]="sort" [label]="'community.sortLabel' | transloco" (valueChange)="onSortChange($event)">
+        </app-segmented-filter>
       </div>
     </app-filter-bar>
 
-    <app-segmented-filter [options]="[
-        { value: 'created', label: ('community.sortCreated' | transloco) },
-        { value: 'updated', label: ('community.sortUpdated' | transloco) },
-        { value: 'popular', label: ('community.sortPopular' | transloco) }
-      ]" [value]="sort" [label]="'community.sortLabel' | transloco" (valueChange)="onSortChange($event)">
-    </app-segmented-filter>
 
     <app-load-state errorMessageKey="community.loadError">
       @for (post of posts; track post._id) {
