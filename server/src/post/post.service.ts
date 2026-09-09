@@ -225,7 +225,12 @@ export class PostService {
       _id: Types.ObjectId;
       count: number;
     }>([
-      { $match: { post_id: { $in: posts.map((post) => post._id) } } },
+      {
+        $match: {
+          post_id: { $in: posts.map((post) => post._id) },
+          hiddenAt: { $exists: false },
+        },
+      },
       { $group: { _id: '$post_id', count: { $sum: 1 } } },
     ]);
     const commentsByPost = new Map(
