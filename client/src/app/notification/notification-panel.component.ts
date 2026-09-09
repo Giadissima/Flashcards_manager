@@ -8,6 +8,7 @@ import { CommonModule } from '@angular/common';
 import { CommunityService } from '../community/community.service';
 import { FormsModule } from '@angular/forms';
 import { NotificationService } from './notification.service';
+import { SearchableSelectComponent, SelectOption } from '../shared/searchable-select/searchable-select.component';
 import { ToastService } from '../shared/toast/toast.service';
 
 /** How many messages an exchange holds before it is closed. */
@@ -24,7 +25,7 @@ const maxFeedbackMessages = 3;
 @Component({
   selector: 'app-notification-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslocoModule, ClickOutsideDirective],
+  imports: [CommonModule, FormsModule, TranslocoModule, ClickOutsideDirective, SearchableSelectComponent],
   templateUrl: './notification-panel.component.html',
   styleUrl: './notification-panel.component.scss',
 })
@@ -109,8 +110,20 @@ export class NotificationPanelComponent implements OnInit {
 
   readonly kinds = notificationKinds;
 
+  get kindOptions(): SelectOption[] {
+    return this.kinds.map((kind) => ({
+      value: kind,
+      label: this.transloco.translate('notifications.kindName.' + kind),
+    }));
+  }
+
   async onFilterChange(): Promise<void> {
     await this.load();
+  }
+
+  async onKindFilterChange(value: string | null | undefined): Promise<void> {
+    this.kindFilter = (value as NotificationKind) || '';
+    await this.onFilterChange();
   }
 
   /** Fetches again on demand: the panel has no way of hearing about new ones. */

@@ -47,12 +47,7 @@
   <section class="import-section">
     <h6 class="import-heading">{{ 'community.importSet.where' | transloco }}</h6>
 
-    <select class="form-select" [value]="target" (change)="onTargetChange($any($event.target).value)">
-      <option [value]="newSubject" [selected]="isNewSubject">{{ 'community.importSet.newSubject' | transloco }}</option>
-      @for (subject of subjects; track subject._id) {
-      <option [value]="subject._id" [selected]="subject._id === target">{{ subject.name }}</option>
-      }
-    </select>
+    <app-searchable-select [options]="subjectOptions" [value]="target" (valueChange)="onTargetChange($event)"></app-searchable-select>
 
     @if (isNewSubject) {
     <input type="text" class="form-control mt-2" [(ngModel)]="subjectName" maxlength="30"
@@ -96,12 +91,7 @@
            be where these belong; a new subject has none, so there the only
            answer is a name. -->
       @if (topics.length) {
-      <select class="form-select" (change)="singleTopic = $any($event.target).value">
-        <option [value]="newTopic" [selected]="isNewTopic">{{ 'community.importSet.newTopic' | transloco }}</option>
-        @for (topic of topics; track topic._id) {
-        <option [value]="topic._id" [selected]="topic._id === singleTopic">{{ topic.name }}</option>
-        }
-      </select>
+      <app-searchable-select [options]="topicOptions" [value]="singleTopic" (valueChange)="onSingleTopicChange($event)"></app-searchable-select>
       }
 
       @if (isNewTopic) {

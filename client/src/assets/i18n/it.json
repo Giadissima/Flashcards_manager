@@ -550,6 +550,7 @@
     "sortCreated": "Più recenti",
     "sortUpdated": "Aggiornati di recente",
     "empty": "Non è ancora stato condiviso nulla.",
+    "emptyNoUniversity": "Indica la tua università per leggere la Community del tuo ateneo.",
     "loadError": "Non è stato possibile caricare il feed",
     "noFlashcards": "Nessuna flashcard da mostrare",
     "cardCount": "{{count}} flashcard",
@@ -667,7 +668,8 @@
       "upvote": "Mi piace",
       "comment": "Commenti",
       "feedback": "Segnalazioni",
-      "resolved": "Risolte"
+      "resolved": "Risolte",
+      "moderation": "Moderazione"
     },
     "fromSite": "Moderazione",
     "moderation": {

@@ -550,6 +550,7 @@
     "sortCreated": "Newest",
     "sortUpdated": "Recently updated",
     "empty": "Nothing has been shared yet.",
+    "emptyNoUniversity": "Say which university you are at to read your own Community.",
     "loadError": "The feed could not be loaded",
     "noFlashcards": "No flashcards to show",
     "cardCount": "{{count}} flashcards",
@@ -667,7 +668,8 @@
       "upvote": "Likes",
       "comment": "Comments",
       "feedback": "Reports",
-      "resolved": "Sorted"
+      "resolved": "Sorted",
+      "moderation": "Moderation"
     },
     "fromSite": "Moderation",
     "moderation": {

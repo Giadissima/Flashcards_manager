@@ -9,6 +9,31 @@
   white-space: normal;
 }
 
+/* In the drawer's list-trigger variant, navbar.component.scss turns every
+   .dropdown-content under .menu-container static so it lays out as a plain
+   row instead of a floating panel - but that rule is scoped to navbar's own
+   template and can't reach an element rendered by this component, so this
+   panel kept floating absolutely (still 340px wide) inside the narrow
+   drawer and got clipped by it. Mirrors that same override here, gated to
+   $nav-button-min-display (620px), the width at which the drawer's account
+   card takes over. */
+@media (max-width: 620px) {
+  .notification-dropdown:has(.list-trigger) .dropdown-content {
+    position: static;
+    display: none;
+    width: auto;
+    max-width: none;
+    transform: none;
+    box-shadow: none;
+    border: none;
+    max-height: none;
+  }
+
+  .notification-dropdown:has(.list-trigger) .dropdown-content.show {
+    display: block;
+  }
+}
+
 .bell-btn {
   position: relative;
   background: none;
@@ -142,11 +167,12 @@
 .panel-filters {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: var(--spacing-unit);
   padding: var(--spacing-unit) calc(var(--spacing-unit) * 1.5);
   border-bottom: 1px solid var(--border-color);
 
-  .form-select {
+  app-searchable-select {
     flex: 1;
     min-width: 0;
   }
@@ -159,6 +185,17 @@
   white-space: nowrap;
   color: var(--text-color);
   margin: 0;
+}
+
+/* The dropdown itself stays a fixed 340px (90vw on tiny phones), which leaves
+   the select too little room once "Non lette" sits beside it on the same
+   row. Below the phone breakpoint "Non lette" drops to a row of its own so
+   the select gets the full width instead. */
+@media (max-width: 575.98px) {
+  .unread-only {
+    flex-basis: 100%;
+    justify-content: flex-end;
+  }
 }
 
 .panel-empty {

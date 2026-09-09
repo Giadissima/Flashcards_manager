@@ -8,6 +8,8 @@ import { CommunityService } from '../community.service';
 import { FeedPost, ImportCollision, ImportTopicMode, PostContents } from '../../models/post.dto';
 import { Flashcard } from '../../models/flashcard.dto';
 import { ModalComponent } from '../../shared/modal/modal.component';
+import { SearchableSelectComponent, SelectOption } from '../../shared/searchable-select/searchable-select.component';
+import { toSubjectOptions, toTopicOptions } from '../../shared/select-options.util';
 import { Topic } from '../../models/topic.dto';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
@@ -43,7 +45,7 @@ const sameName = (a: string, b: string): boolean => names.compare(a.trim(), b.tr
 @Component({
   selector: 'app-post-import-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslocoModule, ModalComponent],
+  imports: [CommonModule, FormsModule, TranslocoModule, ModalComponent, SearchableSelectComponent],
   templateUrl: './post-import-modal.component.html',
   styleUrl: './post-import-modal.component.scss',
 })
@@ -62,9 +64,6 @@ export class PostImportModalComponent implements OnChanges {
   @Output() closed = new EventEmitter<void>();
   /** How many cards landed, so the post can say so and count them in. */
   @Output() done = new EventEmitter<number>();
-
-  readonly newSubject = newSubject;
-  readonly newTopic = newTopic;
 
   contents: PostContents | null = null;
   loading = false;
@@ -210,9 +209,27 @@ export class PostImportModalComponent implements OnChanges {
     return this.target === newSubject;
   }
 
-  async onTargetChange(value: string): Promise<void> {
-    this.target = value;
+  get subjectOptions(): SelectOption[] {
+    return [
+      { value: newSubject, label: this.transloco.translate('community.importSet.newSubject') },
+      ...toSubjectOptions(this.subjects),
+    ];
+  }
+
+  get topicOptions(): SelectOption[] {
+    return [
+      { value: newTopic, label: this.transloco.translate('community.importSet.newTopic') },
+      ...toTopicOptions(this.topics),
+    ];
+  }
+
+  async onTargetChange(value: string | null | undefined): Promise<void> {
+    this.target = value || newSubject;
     await this.readTakenNames();
+  }
+
+  onSingleTopicChange(value: string | null | undefined): void {
+    this.singleTopic = value || newTopic;
   }
 
   onTopicModeChange(mode: ImportTopicMode): void {

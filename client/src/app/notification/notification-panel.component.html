@@ -42,13 +42,8 @@
 
     @if (tab === 'all') {
     <div class="panel-filters">
-      <select class="form-select form-select-sm" [(ngModel)]="kindFilter" (ngModelChange)="onFilterChange()"
-        [attr.aria-label]="'notifications.filterKind' | transloco">
-        <option value="">{{ 'notifications.filterAll' | transloco }}</option>
-        @for (kind of kinds; track kind) {
-        <option [value]="kind">{{ ('notifications.kindName.' + kind) | transloco }}</option>
-        }
-      </select>
+      <app-searchable-select [options]="kindOptions" [value]="kindFilter" [allOptionLabel]="'notifications.filterAll' | transloco"
+        [placeholder]="'notifications.filterKind' | transloco" (valueChange)="onKindFilterChange($event)"></app-searchable-select>
       <label class="unread-only">
         <input type="checkbox" class="form-check-input" [(ngModel)]="unreadOnly" (ngModelChange)="onFilterChange()">
         {{ 'notifications.onlyUnread' | transloco }}
