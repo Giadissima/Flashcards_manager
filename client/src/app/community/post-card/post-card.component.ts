@@ -91,6 +91,8 @@ export class PostCardComponent implements OnInit, AfterViewInit, OnDestroy {
   pageSize = 3;
   private resizeObserver?: ResizeObserver;
   private resizeTimeout?: ReturnType<typeof setTimeout>;
+  /** Whether the track's width has been measured yet - see onTrackResize. */
+  private measured = false;
 
   /**
    * The topics actually behind this post's cards, whole-subject shares
@@ -204,15 +206,19 @@ export class PostCardComponent implements OnInit, AfterViewInit, OnDestroy {
     // opening them replaces it with what was actually fetched
     this.commentCount = this.post.commentCount;
     this.filteredCount = this.post.flashcardCount;
-    // The first page waits for ngAfterViewInit: it is measured off the
-    // track's real width, which is not there to measure yet.
+    // The first page waits for the resize observer's own first callback in
+    // ngAfterViewInit: it is measured off the track's real width, which is
+    // not reliably there to measure yet at this point.
     void this.loadTopicOptions();
   }
 
   ngAfterViewInit(): void {
-    this.pageSize = this.measurePageSize();
-    void this.loadPage(0);
-
+    // No measurement here: on a device already at a narrow width, the track
+    // can still report a width of 0 this early, before the browser's first
+    // layout pass has settled - that used to leave pageSize at its default
+    // of 3 until an actual resize came along to correct it. The observer's
+    // own first callback fires once the track has a real, laid-out width, so
+    // the first measurement and page load happen there instead.
     this.resizeObserver = new ResizeObserver(() => this.onTrackResize());
     this.resizeObserver.observe(this.trackRef.nativeElement);
   }
@@ -233,8 +239,20 @@ export class PostCardComponent implements OnInit, AfterViewInit, OnDestroy {
    * Debounced: a window drag fires this many times a second, and each one
    * would otherwise be its own request for a page nobody stayed on long
    * enough to see.
+   *
+   * Not debounced the first time: that call is the observer reporting the
+   * track's real width for the first time, which is also what the first
+   * page load has been waiting on - delaying it would just be a blank
+   * carousel for no reason.
    */
   private onTrackResize(): void {
+    if (!this.measured) {
+      this.measured = true;
+      this.pageSize = this.measurePageSize();
+      void this.loadPage(0);
+      return;
+    }
+
     clearTimeout(this.resizeTimeout);
     this.resizeTimeout = setTimeout(() => {
       const measured = this.measurePageSize();
