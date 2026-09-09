@@ -42,6 +42,13 @@
 
 
     <app-load-state errorMessageKey="community.loadError">
+      @if (needsUniversity) {
+      <div class="alert alert-info" role="alert">
+        {{ 'community.noUniversityHint' | transloco }}
+        <a routerLink="/profile" class="link-action">{{ 'visibility.goToProfile' | transloco }}</a>
+      </div>
+      }
+
       @for (post of posts; track post._id) {
       <app-post-card [post]="post"></app-post-card>
       } @empty {
