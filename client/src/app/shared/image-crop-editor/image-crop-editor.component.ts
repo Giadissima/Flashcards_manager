@@ -52,9 +52,19 @@ export class ImageCropEditorComponent {
   // on a size, the buttons for getting there in a couple of clicks.
   readonly scaleStep = ZOOM_STEP / 5;
 
+  // translateUnit defaults to '%' in the library, which is what made dragging
+  // feel off: the same pointer movement pans the image by a different amount
+  // depending on how far it is already zoomed in, instead of tracking the
+  // cursor 1:1. 'px' is what the library itself recommends with
+  // allowMoveImage.
+  private static readonly INITIAL_TRANSFORM: ImageTransform = {
+    scale: 1,
+    translateUnit: 'px',
+  };
+
   isOpen = false;
   imageFile: File | null = null;
-  transform: ImageTransform = { scale: 1 };
+  transform: ImageTransform = { ...ImageCropEditorComponent.INITIAL_TRANSFORM };
   loadFailed = false;
 
   private lastCrop: ImageCroppedEvent | null = null;
@@ -64,7 +74,7 @@ export class ImageCropEditorComponent {
   /** Opens the editor on a freshly picked file. */
   open(file: File): void {
     this.imageFile = file;
-    this.transform = { scale: 1 };
+    this.transform = { ...ImageCropEditorComponent.INITIAL_TRANSFORM };
     this.lastCrop = null;
     this.loadFailed = false;
     this.confirming = false;
@@ -115,7 +125,7 @@ export class ImageCropEditorComponent {
 
   /** Back to the whole image, centred, as it was when the editor opened. */
   resetZoom(): void {
-    this.transform = { scale: 1 };
+    this.transform = { ...ImageCropEditorComponent.INITIAL_TRANSFORM };
     this.cropper?.resetCropperPosition();
   }
 

@@ -96,10 +96,17 @@
 /* Same language the review page uses for an answered question (see
    .question-card in test-result.scss): a coloured left edge and a tint, so a
    card that has already been answered is recognised while scrolling and not
-   only by looking at its two buttons. */
+   only by looking at its two buttons.
+
+   Painted with an inset box-shadow rather than a border: a border-left takes
+   its 5px out of the content box the moment a card is answered, which on a
+   phone - already tight around the "see answer" button and the two round
+   check/cross ones - was just enough to push the last one, the cross, onto a
+   row of its own. A shadow paints over the existing edge instead of resizing
+   anything, so answering a card never reflows what is inside it. */
 .flashcard.card--correct,
 .flashcard.card--incorrect {
-  border-left: 5px solid;
+  box-shadow: inset 5px 0 0 0 var(--edge-color);
 }
 
 /* Edge only, no tint on the card: the answer is already stated by the filled
@@ -107,11 +114,11 @@
    colour the user picked - which is the one thing on the card that identifies
    what is being studied. */
 .flashcard.card--correct {
-  border-left-color: var(--success-color);
+  --edge-color: var(--success-color);
 }
 
 .flashcard.card--incorrect {
-  border-left-color: var(--danger-color);
+  --edge-color: var(--danger-color);
 }
 
 .icon-wrapper {

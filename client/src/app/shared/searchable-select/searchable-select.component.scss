@@ -13,7 +13,10 @@
 .form-select {
   display: flex;
   align-items: center;
-  gap: calc(var(--spacing-unit) * 0.75);
+  /* Matches the gap-2 the dropdown's own rows use (searchable-select.component.html):
+     the closed button was the one place a subject's colour dot sat noticeably
+     closer to its name than everywhere else the same dot appears. */
+  gap: var(--spacing-unit);
   width: 100%;
   text-align: left;
 

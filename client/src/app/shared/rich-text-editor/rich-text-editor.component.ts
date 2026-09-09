@@ -151,6 +151,13 @@ export class RichTextEditorComponent implements OnInit, OnDestroy {
 
   /** Puts an empty formula where the cursor is and opens the bar on it. */
   insertMath(isBlock: boolean): void {
+    // A formula already being edited is closed first - empty, it is dropped,
+    // same as clicking away - so the new insertion never leaves the bar's own
+    // bookkeeping (mathPos, editingMath) pointing at a node that insertContent
+    // is about to replace out from under it, which is what made the field
+    // vanish when inline was picked and then, before finishing it, block was.
+    if (this.editingMath) this.closeMathBar();
+
     this.editor
       .chain()
       .focus()

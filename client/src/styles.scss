@@ -327,6 +327,21 @@ h6 {
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
+/* Left to the browser, a disabled field (the filters, while a page they
+   narrow is reloading) gets its own default dimming - opacity in some
+   browsers, a hard-coded grey in others - layered on top of the colours
+   above rather than replacing them, which is what read as "the wrong colour"
+   rather than as a field that is just temporarily off limits. Stated
+   explicitly instead, with the same muted tone every disabled button on the
+   site already uses. */
+.form-control:disabled,
+.form-select:disabled {
+  opacity: 1;
+  color: var(--muted-color);
+  background-color: var(--component-background);
+  cursor: not-allowed;
+}
+
 /* A value or a placeholder longer than the field it is in is cut short with an
    ellipsis rather than at whatever letter the edge falls on. Only single line
    fields: a textarea wraps its text and has nothing to cut. */
@@ -708,6 +723,24 @@ input:-webkit-autofill:active {
   --bs-btn-hover-border-color: color-mix(in srgb, var(--primary-color) var(--hover-percent), #000);
   --bs-btn-active-bg: color-mix(in srgb, var(--primary-color) var(--active-percent), #000);
   --bs-btn-active-border-color: color-mix(in srgb, var(--primary-color) var(--active-percent), #000);
+
+  /* The base .btn rule above sets --bs-btn-color to --header-color, meant for
+     the ghost/outline buttons whose background stays the page's own. On a
+     solid primary background that same variable is --header-color's *dark*
+     light-theme value, e.g. "See answer" on the home cards, so it is put back
+     to white here - what Bootstrap's own default already was before .btn's
+     rule quietly overrode it for every button, this one included. */
+  --bs-btn-color: var(--white-color);
+  --bs-btn-hover-color: var(--white-color);
+  --bs-btn-active-color: var(--white-color);
+}
+
+/* Solid, like .btn-primary above: the same --header-color-from-.btn issue
+   showed up here too ("Max" in setup-test), so it gets the same white text. */
+.btn-secondary {
+  --bs-btn-color: var(--white-color);
+  --bs-btn-hover-color: var(--white-color);
+  --bs-btn-active-color: var(--white-color);
 }
 
 .btn-outline-secondary {
