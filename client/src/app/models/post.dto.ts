@@ -50,8 +50,6 @@ export const reportReasons = [
   'explicit',
   'offensive',
   'spam',
-  'wrong',
-  'copyright',
   'other',
 ] as const;
 export type ReportReason = (typeof reportReasons)[number];

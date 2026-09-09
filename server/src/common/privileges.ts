@@ -1,11 +1,14 @@
 /**
  * What a user can be stopped from doing.
  *
- * Only the three ways of reaching other people: studying, importing and
- * writing one's own cards are nobody else's business, and taking them away
- * would punish somebody by deleting their notes.
+ * Studying, importing and writing one's own cards are nobody else's
+ * business, and taking them away would punish somebody by deleting their
+ * notes. Reporting reaches other people too, just the other way round from
+ * the other three: a report is aimed at whoever gets read next by whoever
+ * moderates, and an account that spends it on people at random is worth
+ * stopping the same way as one that spends comments that way.
  */
-export const privileges = ['publish', 'comment', 'feedback'] as const;
+export const privileges = ['publish', 'comment', 'feedback', 'report'] as const;
 export type Privilege = (typeof privileges)[number];
 
 /**

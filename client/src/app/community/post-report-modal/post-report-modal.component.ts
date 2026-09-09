@@ -5,17 +5,26 @@ import { FormsModule } from '@angular/forms';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 
 import { CommunityService } from '../community.service';
-import { FeedPost, ReportReason, reportReasons } from '../../models/post.dto';
+import { ReportReason, reportReasons } from '../../models/post.dto';
 import { ModalComponent } from '../../shared/modal/modal.component';
+import { restrictionOf } from '../../shared/restriction';
 import { ToastService } from '../../shared/toast/toast.service';
 
+/** What this report is filed against. */
+export type ReportKind = 'post' | 'comment';
+
 /**
- * What is wrong with a post, in the reporter's words.
+ * What is wrong with a post, or a comment under one, in the reporter's words.
  *
  * A reason has to be picked and the note is optional, which is the way round
  * that makes a report worth reading: whoever looks at these does it on a phone
  * between two other things, and a list of six words sorts them in a glance
  * where six paragraphs would not.
+ *
+ * Shared between the two kinds rather than one modal each: a post and a
+ * comment are reported the same way, over the same reasons, to the same
+ * queue - only which endpoint is called, and whose name is in the intro,
+ * actually differ.
  */
 @Component({
   selector: 'app-post-report-modal',
@@ -25,7 +34,9 @@ import { ToastService } from '../../shared/toast/toast.service';
   styleUrl: './post-report-modal.component.scss',
 })
 export class PostReportModalComponent implements OnChanges {
-  @Input({ required: true }) post!: FeedPost;
+  @Input() kind: ReportKind = 'post';
+  @Input({ required: true }) targetId!: string;
+  @Input({ required: true }) authorUsername!: string;
   @Input() isOpen = false;
 
   @Output() closed = new EventEmitter<void>();
@@ -45,7 +56,7 @@ export class PostReportModalComponent implements OnChanges {
   ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
-    // Opened again means another post, or another mind: nothing is carried over
+    // Opened again means another target, or another mind: nothing carries over
     if (changes['isOpen'] && this.isOpen) {
       this.reason = null;
       this.note = '';
@@ -61,20 +72,29 @@ export class PostReportModalComponent implements OnChanges {
 
     this.sending = true;
     try {
-      await this.communityService.reportPost(this.post._id, {
-        reason: this.reason,
-        note: this.note.trim() || undefined,
-      });
+      const request = { reason: this.reason, note: this.note.trim() || undefined };
+      if (this.kind === 'comment') {
+        await this.communityService.reportComment(this.targetId, request);
+      } else {
+        await this.communityService.reportPost(this.targetId, request);
+      }
       this.toast.show(this.transloco.translate('community.report.done'), 'success');
       this.done.emit();
       this.close();
     } catch (error) {
-      // Already reported is not a failure: it is the answer, and the post is
+      // Already reported is not a failure: it is the answer, and the target is
       // in the pile either way.
       const already = (error as { status?: number })?.status === 409;
+      // A block on reporting, or the flood limit, says so in its own words
+      const blocked = restrictionOf(error);
       this.toast.show(
         this.transloco.translate(
-          already ? 'community.report.already' : 'community.report.error',
+          already
+            ? 'community.report.already'
+            : blocked
+              ? blocked.key
+              : 'community.report.error',
+          blocked?.params,
         ),
         already ? 'info' : 'error',
       );

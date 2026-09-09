@@ -90,7 +90,7 @@ export class AdminController {
     @Param('id') id: string,
     @Body() dto: AdminAction,
   ): Promise<Verdict> {
-    return this.moderation.act(id, dto.action as ModerationAction);
+    return this.moderation.act(id, dto.action as ModerationAction, dto.against);
   }
 
   @ApiOperation({ description: 'give an account everything back' })

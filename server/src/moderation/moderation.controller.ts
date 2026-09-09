@@ -46,4 +46,27 @@ export class ModerationController {
 
     return { reports: filed.reports };
   }
+
+  @ApiOperation({
+    description: 'report a comment; enough reports take it out of the thread',
+  })
+  @Throttle({ all: rateLimits.write })
+  @Post('comments/:id/report')
+  async reportComment(
+    @CurrentUser() user: JwtPayload,
+    @Param('id') id: string,
+    @Body() dto: ReportPostDto,
+  ): Promise<ReportResult> {
+    const filed = await this.moderation.reportComment(
+      user.sub,
+      id,
+      dto.reason,
+      dto.note,
+    );
+
+    const summary = await this.moderation.summarise(filed.reportId);
+    if (summary) await this.telegram.announce(summary);
+
+    return { reports: filed.reports };
+  }
 }

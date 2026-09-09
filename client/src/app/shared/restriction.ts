@@ -25,6 +25,14 @@ interface HttpErrorLike {
  */
 export function restrictionOf(error: unknown): RestrictionError | null {
   const failure = error as HttpErrorLike;
+
+  // Too many, too fast, rather than not allowed at all: no date to wait for
+  // either, since the window it is counted over is a few minutes, not worth
+  // spelling out.
+  if (failure?.status === 429 && failure.error?.code === 'flooding') {
+    return { key: 'community.flooding', params: { until: '' } };
+  }
+
   if (failure?.status !== 403) return null;
 
   // No date on this one, and nothing to wait for: it ends when the reader

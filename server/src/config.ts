@@ -38,6 +38,25 @@ export const verificationTokenHours = 24;
  */
 export const autoHideReports = 3;
 
+/** Same idea, for one comment instead of a whole post - cheap enough to take
+ * down on the same three-strangers rule rather than a blunter one. */
+export const autoHideCommentReports = 3;
+
+/**
+ * How many comments the same person may leave under the same post inside the
+ * window below before a cool-down kicks in.
+ *
+ * Checked in the service itself and not only through the generic write limit
+ * further down: that budget is shared with every other write the account
+ * makes, so a script pointed only at this one endpoint would otherwise still
+ * be free to bury a single post in messages nobody but its author will ever
+ * read.
+ */
+export const commentFloodLimit = { windowMinutes: 10, max: 5 };
+
+/** Same idea, for feedback threads opened against the same author. */
+export const feedbackFloodLimit = { windowMinutes: 10, max: 5 };
+
 /** How long the address of a banned account cannot open a new one. */
 export const signupBlockHours = 24;
 

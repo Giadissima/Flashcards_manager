@@ -128,6 +128,14 @@ export class CommunityService {
     return this.restClient.delete(`${this.baseUrl}/comments/${commentId}`);
   }
 
+  /** Says a comment should not be there, and why. */
+  reportComment(commentId: string, request: ReportRequest): Promise<ReportResult> {
+    return this.restClient.post(
+      `${this.baseUrl}/comments/${commentId}/report`,
+      request,
+    ) as Promise<ReportResult>;
+  }
+
   // ------------------------------------------------------------- feedback
 
   /** Opens a private thread with the author of a flashcard. */

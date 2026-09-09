@@ -256,7 +256,7 @@
       "subtitle": "Organizza gli argomenti delle materie",
       "newTopicButton": "Nuovo argomento",
       "searchPlaceholder": "Cerca argomenti...",
-      "deleteConfirm": "Sei sicuro di voler eliminare questo argomento?",
+      "deleteConfirm": "Eliminando questo argomento eliminerai anche tutte le sue flashcard. L'azione non può essere annullata dopo pochi secondi.",
       "filterByTitle": "Vedi le flashcard di questo argomento"
     },
     "toast": {
@@ -264,8 +264,10 @@
       "createError": "Errore nella creazione dell'argomento",
       "updated": "argomento aggiornato con successo",
       "updateError": "Errore nell'aggiornamento dell'argomento",
-      "deleted": "argomento eliminato con successo",
+      "deleted": "argomento e flashcard eliminati",
       "deleteError": "Errore nell'eliminazione dell'argomento",
+      "deleteUndo": "Annulla",
+      "deleteUndone": "Eliminazione annullata",
       "loadError": "Impossibile caricare i dati dell'argomento",
       "subjectsLoadError": "Impossibile caricare le materie",
       "topicsLoadError": "Impossibile caricare gli argomenti"
@@ -298,7 +300,7 @@
       "searchPlaceholder": "Cerca materie...",
       "tableDescription": "Descrizione",
       "noDescription": "Nessuna descrizione",
-      "deleteConfirm": "Sei sicuro di voler eliminare questa materia?",
+      "deleteConfirm": "Eliminando questa materia eliminerai anche tutti i suoi argomenti e tutte le sue flashcard. L'azione non può essere annullata dopo pochi secondi.",
       "filterByTitle": "Vedi gli argomenti di questa materia"
     },
     "toast": {
@@ -306,8 +308,10 @@
       "createError": "Errore nella creazione della materia",
       "updated": "materia aggiornata con successo",
       "updateError": "Errore nell'aggiornamento della materia",
-      "deleted": "materia eliminata con successo",
+      "deleted": "materia, argomenti e flashcard eliminati",
       "deleteError": "Errore nell'eliminazione della materia",
+      "deleteUndo": "Annulla",
+      "deleteUndone": "Eliminazione annullata",
       "loadError": "Impossibile caricare le materie",
       "loadOneError": "Impossibile caricare i dati della materia"
     }
@@ -514,6 +518,8 @@
     "noComments": "Ancora nessun commento",
     "commentPlaceholder": "Scrivi un commento",
     "commentError": "Non è stato possibile inviare il commento",
+    "reportComment": "Segnala il commento",
+    "flooding": "Stai scrivendo troppo velocemente. Aspetta un momento e riprova.",
     "feedback": "Feedback all'autore",
     "feedbackTitle": "Segnala all'autore",
     "feedbackHint": "Un messaggio privato a chi ha scritto “{{title}}”. Lo vedrà solo lui.",
@@ -569,6 +575,7 @@
     },
     "report": {
       "title": "Segnala questo post",
+      "titleComment": "Segnala questo commento",
       "intro": "La segnalazione arriva a chi amministra il sito. {{author}} non saprà che sei stato tu.",
       "reason": {
         "explicit": "Contenuto esplicito o volgare",
@@ -629,12 +636,14 @@
     "blocked": {
       "publish": "Non puoi pubblicare fino al {{until}}.",
       "comment": "Non puoi commentare fino al {{until}}.",
-      "feedback": "Non puoi mandare feedback fino al {{until}}."
+      "feedback": "Non puoi mandare feedback fino al {{until}}.",
+      "report": "Non puoi segnalare fino al {{until}}."
     },
     "blockedForever": {
       "publish": "Il tuo account non può più pubblicare.",
       "comment": "Il tuo account non può più commentare.",
-      "feedback": "Il tuo account non può più mandare feedback."
+      "feedback": "Il tuo account non può più mandare feedback.",
+      "report": "Il tuo account non può più segnalare."
     }
   }
 }

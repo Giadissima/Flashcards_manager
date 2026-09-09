@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { AdminReport, AdminService, ModerationAction } from './admin.service';
+import { AdminReport, AdminService, ModerationAction, ModerationSubject } from './admin.service';
 import { ImageLightboxComponent } from '../shared/image-lightbox/image-lightbox.component';
 import { KatexRendererPipe } from '../pipes/katex-renderer.pipe';
 import { ZoomableImagesDirective } from '../shared/zoomable-images.directive';
@@ -43,8 +43,9 @@ export class AdminComponent implements OnInit {
   loading = false;
   working = false;
   message = '';
-  /** Set while a ban is waiting to be said twice. */
-  confirming = false;
+  /** Which ban is waiting to be said twice - the author's, the reporter's, or
+      neither. */
+  confirming: ModerationSubject | null = null;
 
   constructor(
     private admin: AdminService,
@@ -134,7 +135,7 @@ export class AdminComponent implements OnInit {
   choose(report: AdminReport): void {
     this.chosen = report;
     this.message = '';
-    this.confirming = false;
+    this.confirming = null;
     // The address follows what is being looked at, so the page can be sent to
     // somebody - or reloaded - and come back to the same report.
     void this.router.navigate(['/admin', report.reportId], {
@@ -142,13 +143,13 @@ export class AdminComponent implements OnInit {
     });
   }
 
-  async act(action: ModerationAction): Promise<void> {
+  async act(action: ModerationAction, against: ModerationSubject = 'author'): Promise<void> {
     if (!this.chosen || this.working) return;
 
-    this.confirming = false;
+    this.confirming = null;
     this.working = true;
     try {
-      const verdict = await this.admin.act(this.chosen.reportId, action);
+      const verdict = await this.admin.act(this.chosen.reportId, action, against);
       this.message = verdict.done;
 
       // Read back rather than patched here: what a decision changes - the
@@ -163,12 +164,13 @@ export class AdminComponent implements OnInit {
     }
   }
 
-  async pardon(): Promise<void> {
+  async pardon(who: ModerationSubject = 'author'): Promise<void> {
     if (!this.chosen || this.working) return;
 
+    const username = who === 'reporter' ? this.chosen.reporter : this.chosen.author;
     this.working = true;
     try {
-      const verdict = await this.admin.pardon(this.chosen.author);
+      const verdict = await this.admin.pardon(username);
       this.message = verdict.done;
       await this.refresh();
     } catch {
@@ -185,9 +187,17 @@ export class AdminComponent implements OnInit {
    * greyed out: the first is read as the page being broken, the second says
    * plainly that this has already been dealt with.
    */
-  can(action: ModerationAction): boolean {
+  can(action: ModerationAction, against: ModerationSubject = 'author'): boolean {
     const report = this.chosen;
     if (!report || this.working) return false;
+
+    // The reporter is a person, not a piece of content: nothing here to keep,
+    // remove or put back, only their own account to warn or ban.
+    if (against === 'reporter') {
+      if (action === 'warn') return true;
+      if (action === 'ban') return !report.reporterBanned;
+      return false;
+    }
 
     if (action === 'keep') return report.state === 'open' || report.hidden;
     if (action === 'remove') return !report.hidden;
@@ -207,11 +217,11 @@ export class AdminComponent implements OnInit {
    * be enough to do it. Asked inside the page rather than with the browser's
    * own box, which on a phone is a grey slab that says the site's address.
    */
-  async ban(): Promise<void> {
-    if (!this.chosen || !this.can('ban')) return;
+  async ban(against: ModerationSubject = 'author'): Promise<void> {
+    if (!this.chosen || !this.can('ban', against)) return;
 
-    this.confirming = false;
-    await this.act('ban');
+    this.confirming = null;
+    await this.act('ban', against);
   }
 
   reasonOf(report: AdminReport): string {

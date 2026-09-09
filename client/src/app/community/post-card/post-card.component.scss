@@ -463,8 +463,16 @@ app-pagination {
   flex-shrink: 0;
 }
 
-.comment-delete {
+.comment-delete,
+.comment-report {
   padding: 0;
+}
+
+/* Same idea as .post-actions .btn.is-reported, one comment at a time. */
+.comment-report.is-reported {
+  color: var(--danger-color);
+  opacity: 1;
+  --bs-btn-disabled-border-color: transparent !important;
 }
 
 .comment-empty {
@@ -486,4 +494,9 @@ app-pagination {
 .post-actions .btn.is-reported {
   color: var(--danger-color);
   opacity: 1;
+
+  /* .btn:disabled in styles.scss wins over .btn-icon-ghost's own transparent
+     border on specificity, so the disabled flag is left with a visible
+     border here where it stays disabled once reported. */
+  --bs-btn-disabled-border-color: transparent !important;
 }

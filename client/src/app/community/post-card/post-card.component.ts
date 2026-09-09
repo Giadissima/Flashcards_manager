@@ -9,7 +9,7 @@ import { Flashcard } from '../../models/flashcard.dto';
 import { FormsModule } from '@angular/forms';
 import { ModalComponent } from '../../shared/modal/modal.component';
 import { PostImportModalComponent } from '../post-import-modal/post-import-modal.component';
-import { PostReportModalComponent } from '../post-report-modal/post-report-modal.component';
+import { PostReportModalComponent, ReportKind } from '../post-report-modal/post-report-modal.component';
 import { restrictionOf } from '../../shared/restriction';
 import { PostComment } from '../../models/social.dto';
 import { SearchableSelectComponent, SelectOption } from '../../shared/searchable-select/searchable-select.component';
@@ -332,11 +332,42 @@ export class PostCardComponent implements OnInit, AfterViewInit, OnDestroy {
   // --------------------------------------------------------- the whole set
 
   importOpen = false;
-  reportOpen = false;
-  /** Set once this reader has reported it, so the flag says it has been. */
-  reported = false;
   /** The one card being taken, or null when the whole set is. */
   importingCard: Flashcard | null = null;
+
+  // --------------------------------------------------------------- reporting
+
+  reportOpen = false;
+  reportKind: ReportKind = 'post';
+  reportTargetId = '';
+  reportAuthorUsername = '';
+  /** Set once this reader has reported it, so the flag says it has been. */
+  reported = false;
+  /** Same idea, one entry per comment already reported. */
+  private readonly reportedCommentIds = new Set<string>();
+
+  openReport(): void {
+    this.reportKind = 'post';
+    this.reportTargetId = this.post._id;
+    this.reportAuthorUsername = this.post.author.username;
+    this.reportOpen = true;
+  }
+
+  openCommentReport(comment: PostComment): void {
+    this.reportKind = 'comment';
+    this.reportTargetId = comment._id;
+    this.reportAuthorUsername = comment.user_id.username;
+    this.reportOpen = true;
+  }
+
+  onReported(): void {
+    if (this.reportKind === 'comment') this.reportedCommentIds.add(this.reportTargetId);
+    else this.reported = true;
+  }
+
+  isCommentReported(comment: PostComment): boolean {
+    return this.reportedCommentIds.has(comment._id);
+  }
 
   openImport(): void {
     this.importingCard = null;
@@ -429,8 +460,15 @@ export class PostCardComponent implements OnInit, AfterViewInit, OnDestroy {
       await this.communityService.addComment(this.post._id, text);
       this.commentDraft = '';
       await this.loadComments();
-    } catch {
-      this.toast.show(this.transloco.translate('community.commentError'), 'error');
+    } catch (error) {
+      // A block on commenting, or the flood limit, says so in its own words
+      const blocked = restrictionOf(error);
+      this.toast.show(
+        blocked
+          ? this.transloco.translate(blocked.key, blocked.params)
+          : this.transloco.translate('community.commentError'),
+        'error',
+      );
     } finally {
       this.sendingComment = false;
     }

@@ -1,6 +1,7 @@
-<app-modal [isOpen]="isOpen" [title]="'community.report.title' | transloco" [showFooter]="true"
-  (closed)="close()">
-  <p class="report-intro">{{ 'community.report.intro' | transloco:{ author: post.author.username } }}</p>
+<app-modal [isOpen]="isOpen"
+  [title]="(kind === 'comment' ? 'community.report.titleComment' : 'community.report.title') | transloco"
+  [showFooter]="true" (closed)="close()">
+  <p class="report-intro">{{ 'community.report.intro' | transloco:{ author: authorUsername } }}</p>
 
   @for (option of reasons; track option) {
   <label class="report-choice">

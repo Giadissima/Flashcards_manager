@@ -15,9 +15,17 @@ export interface AdminCard {
 
 export interface AdminReport {
   reportId: string;
+  target: 'post' | 'comment';
   postId: string;
+  /** Set only when target is 'comment'. */
+  commentId?: string;
+  commentText?: string;
   authorId: string;
   author: string;
+  reporterId: string;
+  reporter: string;
+  reporterStrikes: number;
+  reporterBanned: boolean;
   subject: string;
   reason: string;
   note?: string;
@@ -31,6 +39,8 @@ export interface AdminReport {
 }
 
 export type ModerationAction = 'keep' | 'remove' | 'warn' | 'ban' | 'restore';
+/** Who an action is aimed at: the author of the content, or whoever reported it. */
+export type ModerationSubject = 'author' | 'reporter';
 
 /** Where the token is kept: this tab, this session, and nowhere else. */
 const tokenKey = 'moderation-token';
@@ -96,11 +106,15 @@ export class AdminService {
     );
   }
 
-  act(reportId: string, action: ModerationAction): Promise<{ done: string }> {
+  act(
+    reportId: string,
+    action: ModerationAction,
+    against: ModerationSubject = 'author',
+  ): Promise<{ done: string }> {
     return firstValueFrom(
       this.http.post<{ done: string }>(
         `${this.baseUrl}/reports/${reportId}/act`,
-        { action },
+        { action, against },
         this.signed(),
       ),
     );

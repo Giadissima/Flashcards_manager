@@ -35,6 +35,19 @@ export class Comment {
 
   @Prop({ required: true })
   text: string;
+
+  /**
+   * When the comment was taken out of the thread, and why.
+   *
+   * Same idea as a post's own hiddenAt: kept rather than deleted, since a
+   * comment auto-hidden by reports may go back up once somebody has looked at
+   * it, and the report about it still needs something to point at.
+   */
+  @Prop({ required: false, index: true })
+  hiddenAt?: Date;
+
+  @Prop({ required: false, enum: ['reports', 'admin'] })
+  hiddenReason?: 'reports' | 'admin';
 }
 
 export const CommentSchema = SchemaFactory.createForClass(Comment);

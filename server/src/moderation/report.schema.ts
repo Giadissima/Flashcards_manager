@@ -25,12 +25,24 @@ export type ReportReason = (typeof reportReasons)[number];
 export const reportStates = ['open', 'kept', 'removed'] as const;
 export type ReportState = (typeof reportStates)[number];
 
-/** Somebody saying a post should not be there. */
+/** What a report is about - a whole post, or one comment under it. */
+export const reportTargets = ['post', 'comment'] as const;
+export type ReportTarget = (typeof reportTargets)[number];
+
+/** Somebody saying a post, or a comment under it, should not be there. */
 @Schema({
   collection: 'report',
   timestamps: { createdAt: true, updatedAt: false },
 })
 export class Report {
+  @Prop({ required: true, enum: reportTargets, default: 'post', index: true })
+  target: ReportTarget;
+
+  /**
+   * The post, in both cases: it is what a post report is about, and what a
+   * comment report's comment lives under - kept here too so the post a
+   * reported comment belongs to never needs a second lookup.
+   */
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Post',
@@ -38,6 +50,15 @@ export class Report {
     index: true,
   })
   post_id: mongoose.Types.ObjectId;
+
+  /** Set only when target is 'comment'. */
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Comment',
+    required: false,
+    index: true,
+  })
+  comment_id?: mongoose.Types.ObjectId;
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
@@ -66,6 +87,18 @@ export class Report {
 
 export const ReportSchema = SchemaFactory.createForClass(Report);
 
-// One report per post and person: reporting twice is not agreeing twice, and
-// counting it as two would let one account hide any post it likes.
-ReportSchema.index({ post_id: 1, reporter_id: 1 }, { unique: true });
+// One report per post (or per comment) and person: reporting twice is not
+// agreeing twice, and counting it as two would let one account hide anything
+// it likes on its own. Split in two partial indexes rather than one compound
+// one, because a comment report also carries the post_id of the post it
+// lives under - a plain index on (post_id, reporter_id) would refuse a second
+// comment reported under the same post by the same person, even a different
+// comment entirely.
+ReportSchema.index(
+  { post_id: 1, reporter_id: 1 },
+  { unique: true, partialFilterExpression: { target: 'post' } },
+);
+ReportSchema.index(
+  { comment_id: 1, reporter_id: 1 },
+  { unique: true, partialFilterExpression: { target: 'comment' } },
+);

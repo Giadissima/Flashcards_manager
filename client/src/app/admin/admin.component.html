@@ -31,7 +31,8 @@
         <strong>{{ report.author }}</strong>
         <span class="admin-badge" [class.is-open]="report.state === 'open'">{{ stateOf(report) }}</span>
       </span>
-      <span class="admin-row-sub">{{ report.subject }}</span>
+      <span class="admin-row-sub">{{ report.subject }}{{ report.target === 'comment' ? ' · commento' : '' }}</span>
+      <span class="admin-row-sub">segnalato da {{ report.reporter }}</span>
       <span class="admin-row-sub">{{ reasonOf(report) }} · {{ when(report.createdAt) }}</span>
     </button>
     } @empty {
@@ -43,37 +44,60 @@
   <main class="admin-detail">
     @if (chosen) {
     <header class="admin-head">
-      <h2>{{ chosen.author }} — {{ chosen.subject }}</h2>
+      <h2>{{ chosen.author }} — {{ chosen.subject }}{{ chosen.target === 'comment' ? ' (commento)' : '' }}</h2>
       <p class="admin-meta">
         motivo: {{ reasonOf(chosen) }}<br>
         @if (chosen.note) { messaggio utente: {{ chosen.note }}<br> }
+        segnalato da: <strong>{{ chosen.reporter }}</strong>
+        (ammonizioni: {{ chosen.reporterStrikes }}{{ chosen.reporterBanned ? ' · bannato' : '' }})<br>
         segnalazioni aperte: {{ chosen.reports }} ·
         ammonizioni dell'autore: {{ chosen.strikes }} ·
         stato: {{ stateOf(chosen) }}
-        @if (chosen.hidden) { · <span class="admin-flag">fuori dal feed</span> }
+        @if (chosen.hidden) { · <span class="admin-flag">{{ chosen.target === 'comment' ? 'fuori dal thread' : 'fuori dal feed' }}</span> }
         @if (chosen.banned) { · <span class="admin-flag">autore bannato</span> }
       </p>
 
-      <!-- Each one greyed out once it has nothing left to do, so a button that
-           can be pressed is a button that changes something. -->
+      <!-- What is decided about the content: keep it, take it down, put it
+           back. Each greyed out once it has nothing left to do. -->
       <div class="admin-actions">
         <button type="button" class="btn btn-outline-primary" [disabled]="!can('keep')" (click)="act('keep')">
           Va bene
         </button>
         <button type="button" class="btn btn-outline-danger" [disabled]="!can('remove')" (click)="act('remove')">
-          Togli il post
+          {{ chosen.target === 'comment' ? 'Togli il commento' : 'Togli il post' }}
         </button>
         <button type="button" class="btn btn-outline-primary" [disabled]="!can('restore')" (click)="act('restore')">
-          Rimetti il post
+          {{ chosen.target === 'comment' ? 'Rimetti il commento' : 'Rimetti il post' }}
         </button>
+      </div>
+
+      <!-- What is decided about the two accounts involved: whoever wrote it,
+           and whoever reported it - a report can be exactly as much of a
+           problem as the thing it is about. -->
+      <div class="admin-actions">
         <button type="button" class="btn btn-outline-danger" [disabled]="!can('warn')" (click)="act('warn')">
-          Ammonisci
+          Ammonisci l'autore
         </button>
-        <button type="button" class="btn btn-danger" [disabled]="!can('ban')" (click)="confirming = true">
-          Banna
+        <button type="button" class="btn btn-danger" [disabled]="!can('ban')" (click)="confirming = 'author'">
+          Banna l'autore
         </button>
         @if (chosen.banned || chosen.strikes) {
-        <button type="button" class="btn btn-outline-primary" [disabled]="working" (click)="pardon()">
+        <button type="button" class="btn btn-outline-primary" [disabled]="working" (click)="pardon('author')">
+          Ridagli tutto
+        </button>
+        }
+      </div>
+      <div class="admin-actions">
+        <button type="button" class="btn btn-outline-danger" [disabled]="!can('warn', 'reporter')"
+          (click)="act('warn', 'reporter')">
+          Ammonisci chi ha segnalato
+        </button>
+        <button type="button" class="btn btn-danger" [disabled]="!can('ban', 'reporter')"
+          (click)="confirming = 'reporter'">
+          Banna chi ha segnalato
+        </button>
+        @if (chosen.reporterBanned || chosen.reporterStrikes) {
+        <button type="button" class="btn btn-outline-primary" [disabled]="working" (click)="pardon('reporter')">
           Ridagli tutto
         </button>
         }
@@ -84,14 +108,14 @@
       @if (confirming) {
       <div class="admin-confirm">
         <p>
-          Bannare <strong>{{ chosen.author }}</strong>? Tutti i suoi post escono dal feed
-          e non potrà più pubblicare, commentare o mandare feedback.
+          Bannare <strong>{{ confirming === 'reporter' ? chosen.reporter : chosen.author }}</strong>?
+          Tutti i suoi post escono dal feed e non potrà più pubblicare, commentare, mandare feedback o segnalare.
         </p>
         <div class="admin-actions">
-          <button type="button" class="btn btn-danger" [disabled]="working" (click)="ban()">
+          <button type="button" class="btn btn-danger" [disabled]="working" (click)="ban(confirming)">
             Sì, banna
           </button>
-          <button type="button" class="btn btn-outline-primary" (click)="confirming = false">
+          <button type="button" class="btn btn-outline-primary" (click)="confirming = null">
             Annulla
           </button>
         </div>
@@ -103,6 +127,16 @@
       }
     </header>
 
+    @if (chosen.target === 'comment') {
+    <!-- Just the one comment: it, and not the post it happens to sit under,
+         is what is being decided on. -->
+    <section class="admin-cards">
+      <article class="admin-card">
+        <p class="admin-card-label">Commento</p>
+        <div class="admin-card-text">{{ chosen.commentText }}</div>
+      </article>
+    </section>
+    } @else {
     <!-- The post as its readers see it, whole: what has to be decided here
          cannot be decided on an excerpt. -->
     <section class="admin-cards">
@@ -125,6 +159,7 @@
       <p class="admin-empty">Questo post non mostra più nessuna carta.</p>
       }
     </section>
+    }
     } @else {
     <p class="admin-empty">Scegli una segnalazione.</p>
     }

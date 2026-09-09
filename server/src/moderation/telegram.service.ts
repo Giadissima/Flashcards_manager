@@ -54,14 +54,20 @@ export class TelegramService {
     return !!this.token && !!this.chatId;
   }
 
-  /** Says a post was reported, and where to go and look at it. */
+  /** Says a post, or a comment under one, was reported - and where to go and look at it. */
   async announce(summary: ReportSummary): Promise<void> {
     if (!this.enabled) return;
 
     const lines = [
-      `<b>${escape(summary.author)}</b> — ${escape(summary.subject)}`,
+      `<b>${escape(summary.author)}</b> — ${escape(summary.subject)}` +
+        (summary.target === 'comment' ? ' (commento)' : ''),
+      `segnalato da: ${escape(summary.reporter)}`,
       `motivo: ${reasons[summary.reason] ?? summary.reason}`,
     ];
+
+    if (summary.target === 'comment' && summary.commentText) {
+      lines.push(`commento: ${escape(summary.commentText)}`);
+    }
 
     if (summary.note) {
       lines.push(`messaggio utente: ${escape(summary.note)}`);
@@ -74,7 +80,7 @@ export class TelegramService {
     );
 
     const text = lines.join('\n');
-    const button = this.button(summary.reportId);
+    const button = this.button();
 
     try {
       await this.send(text, button);
@@ -85,13 +91,13 @@ export class TelegramService {
       if (!button) throw error;
 
       this.logger.warn(`button refused (${String(error)}), sending the link`);
-      await this.send(`${text}\n\n${this.link(summary.reportId)}`);
+      await this.send(`${text}\n\n${this.link()}`);
     }
   }
 
-  /** The one thing the message can do: open the report where it is decided. */
-  private button(reportId: string): unknown {
-    const link = this.link(reportId);
+  /** The one thing the message can do: open the moderation page. */
+  private button(): unknown {
+    const link = this.link();
     if (!link) return undefined;
 
     return {
@@ -99,8 +105,8 @@ export class TelegramService {
     };
   }
 
-  private link(reportId: string): string {
-    return this.site ? `${this.site}/admin/${reportId}` : '';
+  private link(): string {
+    return this.site ? `${this.site}/admin/` : '';
   }
 
   private async send(text: string, replyMarkup?: unknown): Promise<void> {

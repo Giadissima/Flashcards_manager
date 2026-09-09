@@ -14,14 +14,17 @@ import { PostService } from 'src/post/post.service';
 import { extractImageFileIds } from 'src/common/html.util';
 import { allCards } from 'src/config';
 import { Post } from 'src/post/post.schema';
+import { Comment } from 'src/post/comment.schema';
 import { blockUntil, blocksAt, privileges } from 'src/common/privileges';
-import { AdminReport, ModerationAction } from './moderation.dto';
-import { Report, ReportReason } from './report.schema';
+import { AdminReport, ModerationAction, ModerationSubject } from './moderation.dto';
+import { Report, ReportReason, ReportTarget } from './report.schema';
 import { Sanction } from './sanction.schema';
 import { SignupBlock } from './signup-block.schema';
 import { User } from 'src/auth/user.schema';
 import { isSharedAddress } from 'src/common/address.util';
+import { RestrictionsService } from 'src/common/restrictions.service';
 import {
+  autoHideCommentReports,
   autoHideReports,
   signupBlockAfterBans,
   signupBlockHours,
@@ -30,9 +33,18 @@ import {
 /** A report with everything the person deciding on it needs to see. */
 export interface ReportSummary {
   reportId: string;
+  target: ReportTarget;
   postId: string;
+  /** Set only when target is 'comment'. */
+  commentId?: string;
+  commentText?: string;
   authorId: string;
   author: string;
+  /** Whoever filed this particular report. */
+  reporterId: string;
+  reporter: string;
+  /** How many warnings the reporter's own account has behind it. */
+  reporterStrikes: number;
   subject: string;
   reason: ReportReason;
   note?: string;
@@ -58,10 +70,12 @@ export class ModerationService {
     @InjectModel(SignupBlock.name)
     private readonly signupBlockModel: Model<SignupBlock>,
     @InjectModel(Post.name) private readonly postModel: Model<Post>,
+    @InjectModel(Comment.name) private readonly commentModel: Model<Comment>,
     @InjectModel(User.name) private readonly userModel: Model<User>,
     private readonly notificationService: NotificationService,
     private readonly postService: PostService,
     private readonly fileService: FileService,
+    private readonly restrictions: RestrictionsService,
   ) {}
 
   // --------------------------------------------------------- what readers do
@@ -81,6 +95,7 @@ export class ModerationService {
     reason: ReportReason,
     note?: string,
   ): Promise<{ reportId: string; reports: number; hidden: boolean }> {
+    await this.restrictions.assertMay(userId, 'report');
     const post = await this.postModel.findById(postId).lean().exec();
     if (!post) throw new NotFoundException(`Post with id ${postId} not found`);
     if (String(post.user_id) === userId) {
@@ -90,6 +105,7 @@ export class ModerationService {
     let reportId = '';
     try {
       const report = await this.reportModel.create({
+        target: 'post',
         post_id: post._id,
         reporter_id: new Types.ObjectId(userId),
         reason,
@@ -105,7 +121,7 @@ export class ModerationService {
     }
 
     const reports = await this.reportModel
-      .countDocuments({ post_id: post._id, state: 'open' })
+      .countDocuments({ post_id: post._id, target: 'post', state: 'open' })
       .exec();
 
     const hidden = reports >= autoHideReports && !post.hiddenAt;
@@ -121,10 +137,68 @@ export class ModerationService {
     return { reportId, reports, hidden };
   }
 
+  /**
+   * Same idea, for one comment: files a report and, once enough different
+   * people have filed one, takes just that comment out of the thread rather
+   * than the whole post it lives under.
+   */
+  async reportComment(
+    userId: string,
+    commentId: string,
+    reason: ReportReason,
+    note?: string,
+  ): Promise<{ reportId: string; reports: number; hidden: boolean }> {
+    await this.restrictions.assertMay(userId, 'report');
+    const comment = await this.commentModel.findById(commentId).lean().exec();
+    if (!comment) {
+      throw new NotFoundException(`Comment with id ${commentId} not found`);
+    }
+    if (String(comment.user_id) === userId) {
+      throw new BadRequestException('This comment is yours');
+    }
+
+    let reportId = '';
+    try {
+      const report = await this.reportModel.create({
+        target: 'comment',
+        post_id: comment.post_id,
+        comment_id: comment._id,
+        reporter_id: new Types.ObjectId(userId),
+        reason,
+        note,
+        state: 'open',
+      });
+      reportId = String(report._id);
+    } catch (error) {
+      if ((error as { code?: number }).code === 11000) {
+        throw new ConflictException('You already reported this comment');
+      }
+      throw error;
+    }
+
+    const reports = await this.reportModel
+      .countDocuments({ comment_id: comment._id, state: 'open' })
+      .exec();
+
+    const hidden = reports >= autoHideCommentReports && !comment.hiddenAt;
+    if (hidden) {
+      await this.commentModel
+        .updateOne(
+          { _id: comment._id },
+          { $set: { hiddenAt: new Date(), hiddenReason: 'reports' } },
+        )
+        .exec();
+    }
+
+    return { reportId, reports, hidden };
+  }
+
   /** Everything one report is about, for the message that asks about it. */
   async summarise(reportId: string): Promise<ReportSummary | null> {
     const report = await this.reportModel.findById(reportId).lean().exec();
     if (!report) return null;
+
+    if (report.target === 'comment') return this.summariseComment(report);
 
     const post = await this.postModel
       .findById(report.post_id)
@@ -133,27 +207,82 @@ export class ModerationService {
       .exec();
     if (!post) return null;
 
-    const [author, reports] = await Promise.all([
+    const [author, reporter, reports] = await Promise.all([
       this.userModel
         .findById(post.user_id, { username: 1, strikes: 1 })
         .lean()
         .exec(),
+      this.userModel
+        .findById(report.reporter_id, { username: 1, strikes: 1 })
+        .lean()
+        .exec(),
       this.reportModel
-        .countDocuments({ post_id: post._id, state: 'open' })
+        .countDocuments({ post_id: post._id, target: 'post', state: 'open' })
         .exec(),
     ]);
 
     return {
       reportId: String(report._id),
+      target: 'post',
       postId: String(post._id),
       authorId: String(post.user_id),
       author: author?.username ?? '?',
+      reporterId: String(report.reporter_id),
+      reporter: reporter?.username ?? '?',
+      reporterStrikes: reporter?.strikes ?? 0,
       subject: (post.subject_id as unknown as { name?: string })?.name ?? '?',
       reason: report.reason,
       note: report.note,
       reports,
       strikes: author?.strikes ?? 0,
       hidden: !!post.hiddenAt,
+      createdAt: report.createdAt as unknown as Date,
+    };
+  }
+
+  /** summarise(), for a report whose target is a comment. */
+  private async summariseComment(
+    report: Report & { _id: Types.ObjectId; createdAt?: Date },
+  ): Promise<ReportSummary | null> {
+    const comment = await this.commentModel.findById(report.comment_id).lean().exec();
+    if (!comment) return null;
+
+    const [post, author, reporter, reports] = await Promise.all([
+      this.postModel
+        .findById(comment.post_id)
+        .populate('subject_id', 'name')
+        .lean()
+        .exec(),
+      this.userModel
+        .findById(comment.user_id, { username: 1, strikes: 1 })
+        .lean()
+        .exec(),
+      this.userModel
+        .findById(report.reporter_id, { username: 1, strikes: 1 })
+        .lean()
+        .exec(),
+      this.reportModel
+        .countDocuments({ comment_id: comment._id, state: 'open' })
+        .exec(),
+    ]);
+
+    return {
+      reportId: String(report._id),
+      target: 'comment',
+      postId: String(comment.post_id),
+      commentId: String(comment._id),
+      commentText: comment.text,
+      authorId: String(comment.user_id),
+      author: author?.username ?? '?',
+      reporterId: String(report.reporter_id),
+      reporter: reporter?.username ?? '?',
+      reporterStrikes: reporter?.strikes ?? 0,
+      subject: (post?.subject_id as unknown as { name?: string })?.name ?? '?',
+      reason: report.reason,
+      note: report.note,
+      reports,
+      strikes: author?.strikes ?? 0,
+      hidden: !!comment.hiddenAt,
       createdAt: report.createdAt as unknown as Date,
     };
   }
@@ -189,49 +318,86 @@ export class ModerationService {
   }
 
   /**
-   * Throws away the reports whose post is not there any more.
+   * Throws away the reports whose post, or whose comment, is not there any
+   * more.
    *
-   * A post goes when its subject does, and the report about it outlives it as
-   * a row nobody can open, act on, or clear - it would sit in the queue for
-   * ever. Done here, on the way to reading the list, so there is no job to
-   * schedule and nothing to remember.
+   * A post goes when its subject does, a comment when its own author deletes
+   * it, and the report about either outlives it as a row nobody can open, act
+   * on, or clear - it would sit in the queue for ever. Done here, on the way
+   * to reading the list, so there is no job to schedule and nothing to
+   * remember.
    */
   private async forgetOrphans(): Promise<void> {
-    const posts = await this.reportModel.distinct('post_id').exec();
-    if (!posts.length) return;
+    const posts = await this.reportModel.distinct('post_id', { target: 'post' }).exec();
+    if (posts.length) {
+      const alive = await this.postModel.find({ _id: { $in: posts } }, { _id: 1 }).lean().exec();
+      await this.forgetGone(posts, alive, 'post_id', 'posts');
+    }
 
-    const alive = await this.postModel
-      .find({ _id: { $in: posts } }, { _id: 1 })
-      .lean()
+    const comments = await this.reportModel
+      .distinct('comment_id', { target: 'comment' })
       .exec();
-    const living = new Set(alive.map((post) => String(post._id)));
-    const gone = posts.filter((id) => !living.has(String(id)));
-    if (!gone.length) return;
-
-    const dropped = await this.reportModel
-      .deleteMany({ post_id: { $in: gone } })
-      .exec();
-    this.logger.log(`${dropped.deletedCount} reports about deleted posts dropped`);
+    if (comments.length) {
+      const alive = await this.commentModel
+        .find({ _id: { $in: comments } }, { _id: 1 })
+        .lean()
+        .exec();
+      await this.forgetGone(comments, alive, 'comment_id', 'comments');
+    }
   }
 
-  /** One report, with the post as its readers see it. */
+  /** Deletes the reports pointing at whichever of `ids` are not in `alive`. */
+  private async forgetGone(
+    ids: Types.ObjectId[],
+    alive: { _id: Types.ObjectId }[],
+    field: 'post_id' | 'comment_id',
+    noun: string,
+  ): Promise<void> {
+    const living = new Set(alive.map((doc) => String(doc._id)));
+    const gone = ids.filter((id) => !living.has(String(id)));
+    if (!gone.length) return;
+
+    const dropped = await this.reportModel.deleteMany({ [field]: { $in: gone } }).exec();
+    this.logger.log(`${dropped.deletedCount} reports about deleted ${noun} dropped`);
+  }
+
+  /** One report, with the post - or the comment - as its readers see it. */
   async review(reportId: string): Promise<AdminReport | null> {
     const summary = await this.summarise(reportId);
     if (!summary) return null;
 
-    const [report, author, cards] = await Promise.all([
+    const [report, author, reporter] = await Promise.all([
       this.reportModel.findById(reportId, { state: 1 }).lean().exec(),
       this.userModel
         .findById(summary.authorId, { bannedAt: 1 })
         .lean()
         .exec(),
-      this.postService.cardsForReview(summary.postId, allCards),
+      this.userModel
+        .findById(summary.reporterId, { bannedAt: 1 })
+        .lean()
+        .exec(),
     ]);
+    const reporterBanned = !!reporter?.bannedAt;
+
+    if (summary.target === 'comment') {
+      // No cards to draw here: the whole point being decided on is the one
+      // comment already carried in the summary.
+      return {
+        ...summary,
+        state: report?.state ?? 'open',
+        banned: !!author?.bannedAt,
+        reporterBanned,
+        cards: [],
+      };
+    }
+
+    const cards = await this.postService.cardsForReview(summary.postId, allCards);
 
     return {
       ...summary,
       state: report?.state ?? 'open',
       banned: !!author?.bannedAt,
+      reporterBanned,
       // Whole, pictures and all: the page shows the post the way the people
       // who reported it saw it, which is the only fair way to decide about it.
       cards: await Promise.all(
@@ -246,16 +412,65 @@ export class ModerationService {
     };
   }
 
-  /** What a button on the page, or in the chat, comes down to. */
-  async act(reportId: string, action: ModerationAction): Promise<Verdict> {
+  /**
+   * What a button on the page, or in the chat, comes down to.
+   *
+   * Whoever it was about goes on the front of the answer, and not only in the
+   * report it came from: an admin acting on one warning after another only
+   * has this sentence in front of them by the third or fourth, and "still no
+   * block" says nothing on its own about whether it is the same account each
+   * time.
+   */
+  async act(
+    reportId: string,
+    action: ModerationAction,
+    against: ModerationSubject = 'author',
+  ): Promise<Verdict> {
     const summary = await this.summarise(reportId);
     if (!summary) throw new NotFoundException('Report not found');
+
+    if (against === 'reporter') {
+      const verdict = await this.actOnReporter(summary, action);
+      return { ...verdict, done: `${summary.reporter}: ${verdict.done}` };
+    }
+
+    const verdict = await this.actOn(summary, action);
+    return { ...verdict, done: `${summary.author}: ${verdict.done}` };
+  }
+
+  private async actOn(summary: ReportSummary, action: ModerationAction): Promise<Verdict> {
+    if (summary.target === 'comment') {
+      const commentId = summary.commentId as string;
+      if (action === 'keep' || action === 'restore') return this.keepComment(commentId);
+      if (action === 'remove') return this.removeComment(commentId);
+      if (action === 'warn') return this.warn(summary.authorId, summary.postId);
+      return this.ban(summary.authorId);
+    }
 
     if (action === 'keep') return this.keep(summary.postId);
     if (action === 'remove') return this.removePost(summary.postId);
     if (action === 'restore') return this.restore(summary.postId);
     if (action === 'warn') return this.warn(summary.authorId, summary.postId);
     return this.ban(summary.authorId);
+  }
+
+  /**
+   * The same buttons, aimed at whoever filed the report instead of whoever it
+   * is about.
+   *
+   * Only warn and ban make sense here: keep, remove and restore are decisions
+   * about a piece of content, and the reporter did not write it. Left alone
+   * rather than blocked: a bad choice of button on a report about the reporter
+   * is a wrong click, but the account behind it is still real and still
+   * whoever it always was.
+   */
+  private async actOnReporter(
+    summary: ReportSummary,
+    action: ModerationAction,
+  ): Promise<Verdict> {
+    if (action === 'warn') return this.warn(summary.reporterId);
+    if (action === 'ban') return this.ban(summary.reporterId);
+    throw new BadRequestException(`Cannot ${action} a reporter`);
   }
 
   // ------------------------------------------------------ what the admin does
@@ -288,6 +503,54 @@ export class ModerationService {
           : 'Segnalazione chiusa, il post era già nel feed',
       postId,
     };
+  }
+
+  /** Same idea as keep(), for one comment: it goes back into the thread. */
+  async keepComment(commentId: string): Promise<Verdict> {
+    await this.closeCommentReports(commentId, 'kept');
+    const back = await this.commentModel
+      .updateOne(
+        { _id: commentId, hiddenReason: 'reports' },
+        { $unset: { hiddenAt: '', hiddenReason: '' } },
+      )
+      .exec();
+
+    return {
+      done: back.modifiedCount
+        ? 'Segnalazione chiusa, il commento torna visibile'
+        : 'Segnalazione chiusa, il commento era già visibile',
+    };
+  }
+
+  /** The comment goes, and its author is told which post it was under and why. */
+  async removeComment(commentId: string): Promise<Verdict> {
+    const comment = await this.commentModel.findById(commentId).lean().exec();
+    if (!comment) throw new NotFoundException('Comment not found');
+
+    await this.commentModel
+      .updateOne(
+        { _id: comment._id },
+        { $set: { hiddenAt: new Date(), hiddenReason: 'admin' } },
+      )
+      .exec();
+    await this.closeCommentReports(commentId, 'removed');
+
+    await this.notificationService.record({
+      userId: comment.user_id,
+      kind: 'moderation',
+      postId: comment.post_id,
+      moderation: { event: 'removed', privileges: [] },
+    });
+
+    await this.sanctionModel.create({
+      user_id: comment.user_id,
+      kind: 'warning',
+      post_id: comment.post_id,
+      privileges: [],
+      note: 'comment removed',
+    });
+
+    return { done: "Commento tolto, l'autore è stato avvisato" };
   }
 
   /** The post goes, and its author is told which one and why. */
@@ -592,11 +855,28 @@ export class ModerationService {
   ): Promise<void> {
     await this.reportModel
       .updateMany(
-        { post_id: new Types.ObjectId(postId), state: { $ne: state } },
+        // Scoped to target: 'post', or deciding on the post would also close
+        // out the still-open reports on its comments, which nobody has looked
+        // at yet.
+        { post_id: new Types.ObjectId(postId), target: 'post', state: { $ne: state } },
         { $set: { state, handledAt: new Date() } },
       )
       .exec();
-    this.logger.log(`reports on ${postId} closed as ${state}`);
+    this.logger.log(`reports on post ${postId} closed as ${state}`);
+  }
+
+  /** Same idea as closeReports(), for the reports on one comment. */
+  private async closeCommentReports(
+    commentId: string,
+    state: 'kept' | 'removed',
+  ): Promise<void> {
+    await this.reportModel
+      .updateMany(
+        { comment_id: new Types.ObjectId(commentId), state: { $ne: state } },
+        { $set: { state, handledAt: new Date() } },
+      )
+      .exec();
+    this.logger.log(`reports on comment ${commentId} closed as ${state}`);
   }
 }
 

@@ -46,11 +46,26 @@ export const moderationActions = [
 ] as const;
 export type ModerationAction = (typeof moderationActions)[number];
 
+/** Who an action is aimed at: the post/comment's author, or whoever reported it. */
+export const moderationSubjects = ['author', 'reporter'] as const;
+export type ModerationSubject = (typeof moderationSubjects)[number];
+
 export class AdminAction {
   @IsString()
   @IsIn(moderationActions)
   @ApiProperty({ enum: moderationActions })
   action: ModerationAction;
+
+  @IsOptional()
+  @IsString()
+  @IsIn(moderationSubjects)
+  @ApiProperty({
+    enum: moderationSubjects,
+    default: 'author',
+    required: false,
+    description: 'Warn or ban the reporter instead of the author',
+  })
+  against?: ModerationSubject;
 }
 
 /** A card of the reported post, as it is, so the page can show it. */
@@ -65,9 +80,17 @@ export interface AdminCard {
 /** One report with everything needed to decide on it. */
 export interface AdminReport {
   reportId: string;
+  target: 'post' | 'comment';
   postId: string;
+  /** Set only when target is 'comment'. */
+  commentId?: string;
+  commentText?: string;
   authorId: string;
   author: string;
+  reporterId: string;
+  reporter: string;
+  reporterStrikes: number;
+  reporterBanned: boolean;
   subject: string;
   reason: ReportReason;
   note?: string;

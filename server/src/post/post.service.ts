@@ -27,7 +27,7 @@ import {
   replaceImageFileIds,
 } from 'src/common/html.util';
 import { Topic } from 'src/topic/topic.schema';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus } from '@nestjs/common';
 import { Comment } from './comment.schema';
 import { Feedback, maxFeedbackMessages } from './feedback.schema';
 import { NotificationService } from 'src/notification/notification.service';
@@ -35,6 +35,7 @@ import { RestrictionsService } from 'src/common/restrictions.service';
 import { User } from 'src/auth/user.schema';
 import { Vote } from './vote.schema';
 import { escapeRegex } from 'src/common/regex.util';
+import { commentFloodLimit, feedbackFloodLimit } from 'src/config';
 
 const ENTITY = 'Post';
 
@@ -353,18 +354,20 @@ export class PostService {
     postId: string,
     filter: { skip: number; limit: number },
   ): Promise<BasePaginatedResult<Comment>> {
-    const post_id = new Types.ObjectId(postId);
+    // Hidden the moment it is out of the thread: an admin's "tolto" and a
+    // still-visible comment would tell the reader two different things.
+    const query = { post_id: new Types.ObjectId(postId), hiddenAt: { $exists: false } };
 
     const [data, count] = await Promise.all([
       this.commentModel
-        .find({ post_id })
+        .find(query)
         .sort({ createdAt: -1, _id: -1 })
         .skip(filter.skip)
         .limit(filter.limit)
         .populate('user_id', 'username avatar avatarColor')
         .lean()
         .exec(),
-      this.commentModel.countDocuments({ post_id }),
+      this.commentModel.countDocuments(query),
     ]);
     return { data: data as unknown as Comment[], count };
   }
@@ -372,6 +375,7 @@ export class PostService {
   async addComment(userId: string, postId: string, text: string): Promise<void> {
     await this.restrictions.assertMay(userId, 'comment');
     const post = await this.findOneOrThrow(postId);
+    await this.assertNotFloodingComments(userId, post._id as Types.ObjectId);
 
     await this.commentModel.create({
       post_id: post._id,
@@ -386,6 +390,32 @@ export class PostService {
       postId: post._id as Types.ObjectId,
       preview: text,
     });
+  }
+
+  /**
+   * Refuses one more comment when this account has already left several on
+   * this same post inside the window - see commentFloodLimit for why this
+   * cannot be left to the generic write limit alone.
+   */
+  private async assertNotFloodingComments(
+    userId: string,
+    postId: Types.ObjectId,
+  ): Promise<void> {
+    const since = new Date(Date.now() - commentFloodLimit.windowMinutes * 60_000);
+    const recent = await this.commentModel
+      .countDocuments({
+        user_id: new Types.ObjectId(userId),
+        post_id: postId,
+        createdAt: { $gte: since },
+      })
+      .exec();
+
+    if (recent >= commentFloodLimit.max) {
+      throw new HttpException(
+        { code: 'flooding', message: 'You are commenting too fast on this post' },
+        HttpStatus.TOO_MANY_REQUESTS,
+      );
+    }
   }
 
   /** Only by whoever wrote it. */
@@ -429,6 +459,7 @@ export class PostService {
     if (existing) {
       throw new ConflictException('You already reported this flashcard');
     }
+    await this.assertNotFloodingFeedback(reporter_id, card.user_id);
 
     const feedback = await this.feedbackModel.create({
       flashcard_id: card._id,
@@ -444,6 +475,36 @@ export class PostService {
       feedbackId: feedback._id as Types.ObjectId,
       preview: text,
     });
+  }
+
+  /**
+   * Refuses one more thread when this account has already opened several
+   * against the same author inside the window.
+   *
+   * The unique index on (reporter_id, flashcard_id) already stops the same
+   * flashcard being reported twice, but says nothing about a dozen different
+   * ones of the same author's opened in a minute - which reaches them exactly
+   * as a flood of comments would.
+   */
+  private async assertNotFloodingFeedback(
+    reporterId: Types.ObjectId,
+    authorId: Types.ObjectId,
+  ): Promise<void> {
+    const since = new Date(Date.now() - feedbackFloodLimit.windowMinutes * 60_000);
+    const recent = await this.feedbackModel
+      .countDocuments({
+        reporter_id: reporterId,
+        author_id: authorId,
+        createdAt: { $gte: since },
+      })
+      .exec();
+
+    if (recent >= feedbackFloodLimit.max) {
+      throw new HttpException(
+        { code: 'flooding', message: 'You are sending feedback too fast to this author' },
+        HttpStatus.TOO_MANY_REQUESTS,
+      );
+    }
   }
 
   /**
