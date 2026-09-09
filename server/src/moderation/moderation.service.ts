@@ -522,17 +522,20 @@ export class ModerationService {
     };
   }
 
-  /** The comment goes, and its author is told which post it was under and why. */
+  /**
+   * The comment is gone for good, and its author is told which post it was
+   * under and why.
+   *
+   * Unlike a post, kept around hidden so a decision can be undone, a comment
+   * this small is not worth a permanent row once the decision is final -
+   * there is nothing left to restore it to that keepComment() would not
+   * already have handled while the report was still open.
+   */
   async removeComment(commentId: string): Promise<Verdict> {
     const comment = await this.commentModel.findById(commentId).lean().exec();
     if (!comment) throw new NotFoundException('Comment not found');
 
-    await this.commentModel
-      .updateOne(
-        { _id: comment._id },
-        { $set: { hiddenAt: new Date(), hiddenReason: 'admin' } },
-      )
-      .exec();
+    await this.commentModel.deleteOne({ _id: comment._id }).exec();
     await this.closeCommentReports(commentId, 'removed');
 
     await this.notificationService.record({

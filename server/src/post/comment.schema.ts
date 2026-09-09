@@ -37,17 +37,20 @@ export class Comment {
   text: string;
 
   /**
-   * When the comment was taken out of the thread, and why.
+   * When the comment was taken out of the thread pending a decision.
    *
-   * Same idea as a post's own hiddenAt: kept rather than deleted, since a
-   * comment auto-hidden by reports may go back up once somebody has looked at
-   * it, and the report about it still needs something to point at.
+   * Only a holding state, unlike a post's own hiddenAt: a comment auto-hidden
+   * by reports may go back up once somebody has looked at it, and the report
+   * about it still needs something to point at until then. Once an admin
+   * decides to remove it for good, the row itself is deleted rather than kept
+   * hidden forever - a comment is small enough that there is nothing worth
+   * keeping around for.
    */
   @Prop({ required: false, index: true })
   hiddenAt?: Date;
 
-  @Prop({ required: false, enum: ['reports', 'admin'] })
-  hiddenReason?: 'reports' | 'admin';
+  @Prop({ required: false, enum: ['reports'] })
+  hiddenReason?: 'reports';
 }
 
 export const CommentSchema = SchemaFactory.createForClass(Comment);
