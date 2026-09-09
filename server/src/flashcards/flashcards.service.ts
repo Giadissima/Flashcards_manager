@@ -326,6 +326,28 @@ export class FlashcardsService {
     }
   }
 
+  /**
+   * Deletes every flashcard matching the filter, images included. Used by the
+   * topic and subject cascades: a flashcard can never be left pointing at a
+   * topic or a subject that no longer exists, so removing one always takes
+   * its cards down with it, the same as removing a single card does.
+   */
+  async deleteMany(
+    userId: string,
+    filter: FilterQuery<Flashcard>,
+  ): Promise<void> {
+    const query: FilterQuery<Flashcard> = { ...filter, user_id: userId };
+
+    const cards = await this.flashcardModel
+      .find(query, { question: 1, answer: 1 })
+      .lean()
+      .exec();
+    if (!cards.length) return;
+
+    await Promise.all(cards.map((c) => this.deleteImagesOf(c.question, c.answer)));
+    await this.flashcardModel.deleteMany(query).exec();
+  }
+
   async update(
     userId: string,
     id: string,

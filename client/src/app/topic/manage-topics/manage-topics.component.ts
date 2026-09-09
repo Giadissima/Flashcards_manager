@@ -134,6 +134,12 @@ export class ManageTopicsComponent extends PaginatedList implements OnInit {
   private pendingDeleteId: string | null = null;
   showDeleteConfirm = false;
 
+  // How long the undo toast (and the row's actual removal) waits before the
+  // delete - which cascades to every flashcard of the topic, see
+  // TopicService.delete server side - is actually sent to the server.
+  private static readonly deleteUndoDelayMs = 6000;
+  private deleteUndoTimer: ReturnType<typeof setTimeout> | null = null;
+
   askDeleteTopic(id?: string): void {
     if (!id) return;
     this.pendingDeleteId = id;
@@ -145,24 +151,65 @@ export class ManageTopicsComponent extends PaginatedList implements OnInit {
     this.pendingDeleteId = null;
   }
 
-  async confirmDelete(): Promise<void> {
+  /**
+   * The row leaves the list right away, but nothing reaches the server until
+   * the undo toast times out unanswered: pressing undo before then cancels
+   * the pending call outright, rather than undoing a cascade already done.
+   */
+  confirmDelete(): void {
     const id = this.pendingDeleteId;
     this.cancelDelete();
     if (!id) return;
 
+    this.topics = this.topics.filter((t) => t._id !== id);
+
+    if (this.deleteUndoTimer) clearTimeout(this.deleteUndoTimer);
+    this.deleteUndoTimer = setTimeout(() => {
+      this.deleteUndoTimer = null;
+      this.performDelete(id);
+    }, ManageTopicsComponent.deleteUndoDelayMs);
+
+    this.toastService.show(this.transloco.translate('topic.toast.deleted'), 'success', {
+      actionLabel: this.transloco.translate('topic.toast.deleteUndo'),
+      onAction: () => this.undoDelete(),
+      // Closing the toast by hand is not the same as ignoring it: the undo
+      // offer was only good while it was on screen, so dismissing it settles
+      // the delete right away instead of leaving it ticking unseen.
+      onDismiss: () => this.finalizeDelete(id),
+      duration: ManageTopicsComponent.deleteUndoDelayMs,
+    });
+  }
+
+  private finalizeDelete(id: string): void {
+    if (this.deleteUndoTimer) {
+      clearTimeout(this.deleteUndoTimer);
+      this.deleteUndoTimer = null;
+    }
+    this.performDelete(id);
+  }
+
+  private undoDelete(): void {
+    if (this.deleteUndoTimer) {
+      clearTimeout(this.deleteUndoTimer);
+      this.deleteUndoTimer = null;
+    }
+    this.toastService.show(this.transloco.translate('topic.toast.deleteUndone'), 'success');
+    // The row never actually left the server, so the list only has to be
+    // read again to bring it back - skip/limit stay resolved server side.
+    this.reloadTopics();
+  }
+
+  private async performDelete(id: string): Promise<void> {
     try {
       await this.topicService.deleteTopic(id);
-      this.toastService.show(this.transloco.translate('topic.toast.deleted'), 'success');
     } catch (error) {
       console.error('Error deleting topic', error);
       this.toastService.show(this.transloco.translate('topic.toast.deleteError'), 'error');
-      return;
+      // The row was already taken off screen on confirmDelete(); if the
+      // delete it was standing in for failed, the list has to be read again
+      // to put it back.
+      this.reloadTopics();
     }
-
-    // Reload instead of filtering locally: skip/limit are resolved by the
-    // server, so the page would otherwise show one item less than it should.
-    // Its own failure gets its own (topicsLoadError) toast, not deleteError's.
-    this.reloadTopics();
   }
 
   /** The row whose visibility is being changed, so it cannot be clicked twice. */
