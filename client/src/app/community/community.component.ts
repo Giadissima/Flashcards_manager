@@ -1,4 +1,4 @@
-import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router, RouterLink } from '@angular/router';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Subject as RxSubject, Subscription, debounceTime } from 'rxjs';
 import {
@@ -54,6 +54,7 @@ const pageSize = 5;
     FilterBarComponent,
     SearchInputComponent,
     StudyFieldsComponent,
+    RouterLink,
   ],
   templateUrl: './community.component.html',
   styleUrl: './community.component.scss',
@@ -95,6 +96,16 @@ export class CommunityComponent implements OnInit, OnDestroy {
     ].filter(Boolean).length;
   }
   readonly pageSize = pageSize;
+
+  /**
+   * False only until the reader's university scope is settled - by their own
+   * profile having one, or by an explicit filter choice (including choosing
+   * "all universities" on purpose). Until then the feed asks for nothing:
+   * showing everyone's posts to someone who never chose to see them would mean
+   * a brand-new account with no university sees random Engineering, Nursing
+   * and Computer Science posts mixed together on the very first visit.
+   */
+  scopeChosen = false;
 
   constructor(
     private communityService: CommunityService,
@@ -155,12 +166,16 @@ export class CommunityComponent implements OnInit, OnDestroy {
     const universityCode = qp.get('university');
     if (!universityCode && !qp.has('sort')) {
       const user = this.authService.user;
+      // No filter has ever been touched: a university on the profile settles
+      // the scope, but its absence does not - that is not yet a choice.
+      this.scopeChosen = !!user?.universityCode;
       return {
         universityCode: user?.universityCode ?? null,
         course: user?.course ?? null,
         courseKind: user?.courseKind ?? null,
       };
     }
+    this.scopeChosen = true;
     return {
       universityCode: universityCode || null,
       course: qp.get('course') || null,
@@ -252,6 +267,12 @@ export class CommunityComponent implements OnInit, OnDestroy {
   }
 
   private async loadFeed(): Promise<void> {
+    if (!this.scopeChosen) {
+      this.posts = [];
+      this.total = 0;
+      return;
+    }
+
     const feed = await this.communityService.getFeed(
       this.page * pageSize,
       pageSize,

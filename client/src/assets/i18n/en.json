@@ -550,7 +550,7 @@
     "sortCreated": "Newest",
     "sortUpdated": "Recently updated",
     "empty": "Nothing has been shared yet.",
-    "emptyNoUniversity": "Say which university you are at to read your own Community.",
+    "noUniversityHint": "Pick a university in the filters to see posts, or set yours on your profile to start there.",
     "loadError": "The feed could not be loaded",
     "noFlashcards": "No flashcards to show",
     "cardCount": "{{count}} flashcards",

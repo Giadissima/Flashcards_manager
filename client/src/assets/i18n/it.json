@@ -550,7 +550,7 @@
     "sortCreated": "Più recenti",
     "sortUpdated": "Aggiornati di recente",
     "empty": "Non è ancora stato condiviso nulla.",
-    "emptyNoUniversity": "Indica la tua università per leggere la Community del tuo ateneo.",
+    "noUniversityHint": "Scegli un'università nei filtri per vedere i post, o indica la tua nel profilo per partire da lì.",
     "loadError": "Non è stato possibile caricare il feed",
     "noFlashcards": "Nessuna flashcard da mostrare",
     "cardCount": "{{count}} flashcard",
