@@ -80,10 +80,45 @@
     "darkModeDesc": "Turn dark theme on or off",
     "importExport": "Import / Export",
     "importExportButton": "Import / Export Flashcards",
+    "tutorial": "Tutorial",
+    "tutorialButton": "Show tutorial",
     "feedback": "Feedback",
     "feedbackButton": "Send feedback",
     "cancel": "Cancel",
     "save": "Save Changes"
+  },
+  "tutorial": {
+    "title": "Quick tour",
+    "skip": "Skip",
+    "finish": "Got it",
+    "step": "Step {{number}}",
+    "steps": {
+      "welcome": {
+        "title": "Welcome to Flashcards Manager!",
+        "text": "A quick tour of the main features. You can revisit it anytime from the settings."
+      },
+      "subject": {
+        "title": "Create your first subject"
+      },
+      "topic": {
+        "title": "Break it down into topics"
+      },
+      "flashcards": {
+        "title": "Fill it with flashcards"
+      },
+      "test": {
+        "title": "Put yourself to the test",
+        "text": "Start a test on the subjects or topics you want to review and check your results."
+      },
+      "community": {
+        "title": "Community",
+        "text": "Discover and share flashcard decks with other users in the Community section."
+      },
+      "settings": {
+        "title": "Settings",
+        "text": "Language, dark mode and other preferences live in the settings, where you can also revisit this tutorial anytime."
+      }
+    }
   },
   "common": {
     "delete": "Delete",
@@ -629,7 +664,8 @@
       "blocked": "has limited your account until {{until}}.",
       "blockedForever": "has limited your account.",
       "lifted": "gave your account back: you can publish, comment and send feedback again.",
-      "removed": "took one of your posts out of the community."
+      "removed": "took one of your posts out of the community.",
+      "commentRemoved": "took one of your comments out of the community."
     }
   },
   "moderation": {

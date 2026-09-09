@@ -10,13 +10,14 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { SettingsModalComponent } from '../settings-modal/settings-modal.component';
 import { ToastService } from '../shared/toast/toast.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
+import { TutorialModalComponent } from '../shared/tutorial/tutorial-modal.component';
 
 type NavbarDropdown = 'flashcards' | 'topics' | 'subjects' | 'test' | 'account' | 'accountDrawer';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, CommonModule, ImportExportModalComponent, SettingsModalComponent, ClickOutsideDirective, TranslocoModule, NotificationPanelComponent],
+  imports: [RouterLink, RouterLinkActive, CommonModule, ImportExportModalComponent, SettingsModalComponent, ClickOutsideDirective, TranslocoModule, NotificationPanelComponent, TutorialModalComponent],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss']
 })

@@ -6,6 +6,7 @@ import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { CommonModule } from '@angular/common';
 import { ModalComponent } from '../shared/modal/modal.component';
 import { ThemeService } from '../shared/theme/theme.service';
+import { TutorialService } from '../shared/tutorial/tutorial.service';
 
 @Component({
   selector: 'app-settings-modal',
@@ -48,6 +49,17 @@ import { ThemeService } from '../shared/theme/theme.service';
         <button class="btn btn-outline-primary w-100" (click)="openImportExport.emit()">
           <span class="material-symbols-outlined">upload_file</span>
           {{ 'settings.importExportButton' | transloco }}
+        </button>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">
+          <span class="material-symbols-outlined">help</span>
+          {{ 'settings.tutorial' | transloco }}
+        </div>
+        <button class="btn btn-outline-primary w-100" (click)="showTutorial()">
+          <span class="material-symbols-outlined">school</span>
+          {{ 'settings.tutorialButton' | transloco }}
         </button>
       </div>
 
@@ -110,7 +122,11 @@ export class SettingsModalComponent implements OnInit, OnChanges {
   private originalDarkMode = false;
   private originalLanguage: AppLanguage = 'it';
 
-  constructor(private transloco: TranslocoService, private themeService: ThemeService) {}
+  constructor(
+    private transloco: TranslocoService,
+    private themeService: ThemeService,
+    private tutorialService: TutorialService,
+  ) {}
 
   ngOnInit(): void {
     this.isDarkMode = this.themeService.theme === 'dark';
@@ -144,6 +160,12 @@ export class SettingsModalComponent implements OnInit, OnChanges {
   toggleTheme(): void {
     this.isDarkMode = !this.isDarkMode;
     this.themeService.setTheme(this.isDarkMode ? 'dark' : 'light');
+  }
+
+  // Closes settings first so the tutorial modal is not stacked behind it
+  showTutorial(): void {
+    this.closeModal();
+    this.tutorialService.open();
   }
 
   setLanguage(value: string | null | undefined): void {

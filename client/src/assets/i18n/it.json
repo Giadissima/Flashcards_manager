@@ -80,10 +80,45 @@
     "darkModeDesc": "Attiva o disattiva il tema scuro",
     "importExport": "Import / Export",
     "importExportButton": "Importa / Esporta Flashcard",
+    "tutorial": "Tutorial",
+    "tutorialButton": "Mostra tutorial",
     "feedback": "Feedback",
     "feedbackButton": "Lascia un feedback",
     "cancel": "Annulla",
     "save": "Salva Modifiche"
+  },
+  "tutorial": {
+    "title": "Guida rapida",
+    "skip": "Salta",
+    "finish": "Ho capito",
+    "step": "Passo {{number}}",
+    "steps": {
+      "welcome": {
+        "title": "Benvenuta/o su Flashcards Manager!",
+        "text": "Una breve guida per orientarti tra le funzioni principali. Puoi rivederla in qualsiasi momento dalle impostazioni."
+      },
+      "subject": {
+        "title": "Crea la tua prima materia"
+      },
+      "topic": {
+        "title": "Suddividila in argomenti"
+      },
+      "flashcards": {
+        "title": "Riempila di flashcard"
+      },
+      "test": {
+        "title": "Mettiti alla prova",
+        "text": "Avvia un test sulle materie o argomenti che vuoi ripassare e controlla i tuoi risultati."
+      },
+      "community": {
+        "title": "Community",
+        "text": "Scopri e condividi mazzi di flashcard con altri utenti nella sezione Community."
+      },
+      "settings": {
+        "title": "Impostazioni",
+        "text": "Lingua, tema scuro e altre preferenze si trovano nelle impostazioni, dove puoi anche rivedere questo tutorial in qualsiasi momento."
+      }
+    }
   },
   "common": {
     "delete": "Elimina",
@@ -629,7 +664,8 @@
       "blocked": "ha limitato il tuo account fino al {{until}}.",
       "blockedForever": "ha limitato il tuo account.",
       "lifted": "ti ha ridato i permessi: puoi tornare a pubblicare, commentare e mandare feedback.",
-      "removed": "ha tolto un tuo post dalla community."
+      "removed": "ha tolto un tuo post dalla community.",
+      "commentRemoved": "ha tolto un tuo commento dalla community."
     }
   },
   "moderation": {

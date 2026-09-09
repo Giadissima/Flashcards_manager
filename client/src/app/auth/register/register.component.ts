@@ -12,6 +12,7 @@ import { RegistrationPayload } from '../../models/auth.dto';
 import { Router, RouterLink } from '@angular/router';
 import { ToastService } from '../../shared/toast/toast.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
+import { TutorialService } from '../../shared/tutorial/tutorial.service';
 
 /** Same rule as the server DTO: what is refused there is caught here first. */
 const usernamePattern = /^[A-Za-z0-9._-]+$/;
@@ -52,6 +53,7 @@ export class RegisterComponent {
     private authService: AuthService,
     private toastService: ToastService,
     private transloco: TranslocoService,
+    private tutorialService: TutorialService,
   ) {
     this.registerForm = this.fb.group({
       username: ['', [
@@ -99,6 +101,8 @@ export class RegisterComponent {
       // the welcome says where to look for it.
       this.toastService.show(this.transloco.translate('auth.toast.registered'), 'success');
       this.router.navigate(['/home']);
+      // First thing a brand new account sees on /home: a quick tour of the app.
+      this.tutorialService.open();
     } catch (error) {
       // An address that has asked too often is told how long to wait, not that
       // something went wrong: waiting is the whole of what it has to do.
