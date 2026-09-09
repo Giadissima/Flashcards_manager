@@ -1,3 +1,4 @@
+<app-load-state errorMessageKey="subject.toast.loadError">
 <div class="container md" *transloco="let t">
   <app-page-card icon="book_2" [title]="'subject.manage.title' | transloco" [subtitle]="'subject.manage.subtitle' | transloco"
     [actions]="[{ label: t('subject.manage.newSubjectButton') }]" (action)="createSubject()">
@@ -68,6 +69,8 @@
     <app-pagination [currentPage]="currentPage" [totalPages]="totalPages"
       (previous)="previousPage()" (next)="nextPage()"></app-pagination>
   </app-page-card>
+</div>
+</app-load-state>
 <app-image-lightbox #lightbox></app-image-lightbox>
 <ng-container *transloco="let t">
   <app-confirm-dialog [isOpen]="showDeleteConfirm" [title]="t('common.confirmDelete')"

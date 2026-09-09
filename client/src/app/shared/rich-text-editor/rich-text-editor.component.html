@@ -94,18 +94,10 @@
       </label>
     </div>
     <div class="btn-group" role="group">
-      <button type="button" class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"
+      <button type="button" class="btn" (click)="insertMath(false)"
         [ngClass]="editingMath ? 'btn-secondary' : 'btn-outline-secondary'" [title]="t('editor.latexGroupTitle')">
         <span class="material-symbols-outlined">function</span>
       </button>
-      <ul class="dropdown-menu">
-        <li><button (click)="insertMath(false)" class="dropdown-item" type="button">
-            <ng-container *ngTemplateOutlet="inlineFormulaIcon; context: { spaced: true }"></ng-container>{{
-            t('editor.latexInline') }}</button></li>
-        <li><button (click)="insertMath(true)" class="dropdown-item" type="button">
-            <ng-container *ngTemplateOutlet="blockFormulaIcon; context: { spaced: true }"></ng-container>{{
-            t('editor.latexBlock') }}</button></li>
-      </ul>
     </div>
   </div>
 

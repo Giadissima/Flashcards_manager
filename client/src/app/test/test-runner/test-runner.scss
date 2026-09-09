@@ -172,10 +172,13 @@
            calc(var(--spacing-unit) * 0.5) calc(var(--spacing-unit) * 1.5);
 
   /* Orange is what this app already uses for elapsed time (the "time" stat of
-     the result page): the token, not the literal it was written with. */
-  background: var(--warning-color);
-  color: var(--white-color);
-  border: solid 2px var(--white-color);
+     the result page) - --test-timer-background/-color instead of the shared
+     --warning-color/--white-color directly, since light mode wants a softer,
+     pastel version of it (see :root in styles.scss for why the per-theme
+     values live there and not in this file). */
+  background: var(--test-timer-background);
+  color: var(--test-timer-color);
+  border: solid 2px var(--test-timer-border);
   border-radius: 999px;
   box-shadow: var(--box-shadow-md);
 }
@@ -217,6 +220,10 @@
    green - it is the one control of the pill either way. */
 .test-timer--paused {
   background: var(--muted-color);
+  /* Overrides --test-timer-color/-border: muted-color is dark enough in both
+     themes for white, which the light-mode running state no longer is. */
+  color: var(--white-color);
+  border-color: var(--white-color);
 }
 
 /* On a phone the pill sits over the card header: the icon is the part the

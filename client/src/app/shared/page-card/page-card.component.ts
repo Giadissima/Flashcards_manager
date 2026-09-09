@@ -51,6 +51,9 @@ export class PageCardComponent {
   @Input({ required: true }) title = '';
   @Input() subtitle = '';
 
+  /** Overrides icon with an image (e.g. a subject icon), when the header stands for a specific subject rather than the page itself. */
+  @Input() iconUrl = '';
+
   /** Extra classes for the body, e.g. "p-4" for the pages that want a roomier padding. */
   @Input() bodyClass = '';
 

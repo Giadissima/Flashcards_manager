@@ -56,6 +56,22 @@ body {
   /* Neutral grey for a control that is switched off - a stopped timer, and
      anything else that has to read as "not running". */
   --muted-color: #667085;
+
+  /* --warning-color (below) is kept the same across themes on purpose, so the
+     softer look the test-runner timer wants in light mode is mixed in here
+     instead of touching that shared token. Mixed mostly with white rather
+     than solid orange - a pale peach, the same soft-surface-plus-coloured-
+     border language as --primary-tint-soft - with the border carrying the
+     colour the fill gave up and the text going dark for contrast against it.
+     Paused is untouched - it runs on --muted-color, dark enough for white
+     already. This lives here rather than in test-runner.scss because
+     Angular's emulated encapsulation adds its scoping attribute to every
+     element the component-level stylesheet needs to match, including
+     ancestors - and html, carrying data-theme, never has it, so the rule
+     would never match there. */
+  --test-timer-background: color-mix(in srgb, #FF9500 18%, white);
+  --test-timer-color: var(--header-color);
+  --test-timer-border: var(--warning-color);
 }
 
 [data-theme='dark'] {
@@ -80,6 +96,12 @@ body {
   --on-accent-color: #f8f9fa;
   /* See the light theme: a grey that stays visible against #121212. */
   --muted-color: #818da0;
+
+  /* See the light theme for why this pair lives here: full-strength orange
+     with white text and a white border, same as before this pair existed. */
+  --test-timer-background: var(--warning-color);
+  --test-timer-color: var(--white-color);
+  --test-timer-border: var(--white-color);
 }
 
 :root {
@@ -743,6 +765,22 @@ input:-webkit-autofill:active {
   --bs-btn-active-color: var(--white-color);
 }
 
+/* Same --header-color-from-.btn issue as .btn-primary/.btn-secondary above:
+   the true/false buttons in test-runner turn solid green/red on answer, and
+   without this their icon stayed dark instead of the white Bootstrap gives
+   every solid button by default. */
+.btn-success {
+  --bs-btn-color: var(--white-color);
+  --bs-btn-hover-color: var(--white-color);
+  --bs-btn-active-color: var(--white-color);
+}
+
+.btn-danger {
+  --bs-btn-color: var(--white-color);
+  --bs-btn-hover-color: var(--white-color);
+  --bs-btn-active-color: var(--white-color);
+}
+
 .btn-outline-secondary {
   --bs-btn-active-bg: var(--muted-color);
   --bs-btn-active-border-color: var(--muted-color);
@@ -1298,6 +1336,13 @@ $image-modal-height: calc(
   justify-content: center;
   border-radius: 50%;
   border: 1px solid var(--border-color);
+}
+
+.header-icon-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
 }
 
 .dropdown {

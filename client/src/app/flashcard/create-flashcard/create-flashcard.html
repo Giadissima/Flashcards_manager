@@ -1,6 +1,20 @@
 <div class="container-md" *transloco="let t">
   <app-page-card icon="add_box" [title]="'flashcard.create.title' | transloco"
-    [subtitle]="'flashcard.create.subtitle' | transloco">
+    [subtitle]="'flashcard.create.subtitle' | transloco"
+    [actions]="[{ label: t('flashcard.create.importButton'), icon: 'content_paste', variant: 'outline' }]"
+    (action)="toggleImport()">
+    @if (showImport) {
+    <div class="form-group">
+      <label for="import-text" class="form-label">{{ 'flashcard.create.importLabel' | transloco }}</label>
+      <textarea id="import-text" class="form-control" rows="4" [(ngModel)]="importText"
+        [ngModelOptions]="{ standalone: true }"
+        [placeholder]="t('flashcard.create.importPlaceholder')"></textarea>
+      <div class="form-actions">
+        <button type="button" class="btn btn-outline-secondary" (click)="toggleImport()">{{ 'common.cancel' | transloco }}</button>
+        <button type="button" class="btn btn-primary" [disabled]="!importText.trim()" (click)="applyImport()">{{ 'flashcard.create.importApply' | transloco }}</button>
+      </div>
+    </div>
+    }
     <form [formGroup]="cardForm" (ngSubmit)="addCard()" novalidate>
 
       <div class="form-group">

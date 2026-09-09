@@ -1,3 +1,4 @@
+<app-load-state errorMessageKey="topic.toast.topicsLoadError">
 <div class="container md" *transloco="let t">
   <app-page-card icon="cards_stack" [title]="'topic.manage.title' | transloco" [subtitle]="'topic.manage.subtitle' | transloco"
     [actions]="[{ label: t('topic.manage.newTopicButton') }]" (action)="createTopic()">
@@ -64,6 +65,7 @@
       (previous)="previousPage()" (next)="nextPage()"></app-pagination>
   </app-page-card>
 </div>
+</app-load-state>
 <ng-container *transloco="let t">
   <app-confirm-dialog [isOpen]="showDeleteConfirm" [title]="t('common.confirmDelete')"
     [message]="t('topic.manage.deleteConfirm')" [confirmLabel]="t('common.yes')" [cancelLabel]="t('common.cancel')"

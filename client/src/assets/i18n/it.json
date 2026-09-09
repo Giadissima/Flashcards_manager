@@ -178,8 +178,6 @@
     "link": "Link",
     "linkPrompt": "Inserisci l'URL del link",
     "latexGroupTitle": "Formule matematiche (LaTeX)",
-    "latexInline": "Formula in linea",
-    "latexBlock": "Formula in blocco",
     "latexSource": "Formula LaTeX",
     "latexPlaceholder": "Scrivi la formula, es. \frac{a}{b}",
     "latexToInline": "Riportala nella riga",
@@ -211,7 +209,12 @@
       "subjectRequiredError": "Scegli una materia.",
       "topicLabel": "Argomento",
       "topicRequiredError": "Seleziona un argomento: aiuta a ritrovare la flashcard più facilmente.",
-      "addButton": "Aggiungi nuova Flashcard"
+      "addButton": "Aggiungi nuova Flashcard",
+      "importButton": "Importa da testo",
+      "importLabel": "Incolla il testo copiato con \"Copia card\"",
+      "importPlaceholder": "Titolo\nQuestion: ...\nAnswer: ...",
+      "importApply": "Importa",
+      "importParseError": "Il testo non è nel formato atteso (Titolo / Question / Answer)."
     },
     "edit": {
       "title": "Modifica Flashcard",

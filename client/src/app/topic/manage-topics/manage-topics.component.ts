@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { restrictionOf } from '../../shared/restriction';
 import { PaginationComponent } from '../../shared/pagination/pagination.component';
 
@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { VisibilityButtonComponent } from '../../shared/visibility-toggle/visibility-button.component';
 import { Visibility } from '../../models/visibility.dto';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
+import { LoadStateComponent } from '../../shared/load-state/load-state.component';
 import { PageCardComponent } from '../../shared/page-card/page-card.component';
 import { PaginatedList } from '../../shared/paginated-list';
 import { toSubjectOptions } from '../../shared/select-options.util';
@@ -22,11 +23,13 @@ import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 @Component({
   selector: 'app-manage-topics',
   standalone: true,
-  imports: [CommonModule, SearchInputComponent, SearchableSelectComponent, TranslocoModule, ConfirmDialogComponent, PageCardComponent, PaginationComponent, VisibilityButtonComponent],
+  imports: [CommonModule, SearchInputComponent, SearchableSelectComponent, TranslocoModule, ConfirmDialogComponent, LoadStateComponent, PageCardComponent, PaginationComponent, VisibilityButtonComponent],
   templateUrl: './manage-topics.component.html',
   styleUrls: ['./manage-topics.component.scss']
 })
 export class ManageTopicsComponent extends PaginatedList implements OnInit {
+  @ViewChild(LoadStateComponent, { static: true }) loadState!: LoadStateComponent;
+
   topics: Topic[] = [];
   subjects: Subject[] = [];
   selectedSubjectId: string | null = null;
@@ -50,7 +53,7 @@ export class ManageTopicsComponent extends PaginatedList implements OnInit {
     // Arriving from "manage subjects" with a subject clicked lands here with
     // its id in the query string, pre-filtering the list to that subject.
     this.selectedSubjectId = this.activatedRoute.snapshot.queryParamMap.get('subject_id') || null;
-    this.loadTopics();
+    this.loadState.run(() => this.loadTopics());
     this.loadSubjects();
   }
 
@@ -65,7 +68,7 @@ export class ManageTopicsComponent extends PaginatedList implements OnInit {
 
   onFilterChange() {
     this.currentPage = 1;
-    this.loadTopics();
+    this.reloadTopics();
   }
 
   onSearchTermChange(term: string): void {
@@ -78,25 +81,31 @@ export class ManageTopicsComponent extends PaginatedList implements OnInit {
     this.onFilterChange();
   }
 
+  // Left to throw: see the same note on loadSubjects in manage-subjects, its
+  // twin - the initial call goes through app-load-state (ngOnInit), a filter/
+  // page change/reload after delete already has a list on screen and catches
+  // it itself via reloadTopics(), falling back to a toast.
   async loadTopics(): Promise<void> {
-    try {
-      const response = await this.topicService.getAllTopics({
-        limit: this.pageSize,
-        skip: this.pageSkip,
-        sortDirection: 'asc',
-        sortField: 'name',
-        subject_id: this.selectedSubjectId || undefined,
-        title: this.searchTerm.trim() || undefined
-      });
-      this.topics = response.data;
-      this.totalCount = response.count;
-    } catch (error) {
+    const response = await this.topicService.getAllTopics({
+      limit: this.pageSize,
+      skip: this.pageSkip,
+      sortDirection: 'asc',
+      sortField: 'name',
+      subject_id: this.selectedSubjectId || undefined,
+      title: this.searchTerm.trim() || undefined
+    });
+    this.topics = response.data;
+    this.totalCount = response.count;
+  }
+
+  private reloadTopics(): void {
+    this.loadTopics().catch(() => {
       this.toastService.show(this.transloco.translate('topic.toast.topicsLoadError'), 'error');
-    }
+    });
   }
 
   protected override onPageChange(): void {
-    this.loadTopics();
+    this.reloadTopics();
   }
 
   getSubjectName(subjectId: any): string {
@@ -142,14 +151,17 @@ export class ManageTopicsComponent extends PaginatedList implements OnInit {
 
     try {
       await this.topicService.deleteTopic(id);
-      // Reload instead of filtering locally: skip/limit are resolved by the
-      // server, so the page would otherwise show one item less than it should
-      await this.loadTopics();
       this.toastService.show(this.transloco.translate('topic.toast.deleted'), 'success');
     } catch (error) {
       console.error('Error deleting topic', error);
       this.toastService.show(this.transloco.translate('topic.toast.deleteError'), 'error');
+      return;
     }
+
+    // Reload instead of filtering locally: skip/limit are resolved by the
+    // server, so the page would otherwise show one item less than it should.
+    // Its own failure gets its own (topicsLoadError) toast, not deleteError's.
+    this.reloadTopics();
   }
 
   /** The row whose visibility is being changed, so it cannot be clicked twice. */

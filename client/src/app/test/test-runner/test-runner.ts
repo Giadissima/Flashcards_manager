@@ -51,6 +51,7 @@ export class TestRunner extends PaginatedList implements OnInit {
   showFinishConfirm = false;
 
   subjectName = '';
+  subjectIconUrl = '';
   testStartDate?: Date;
   answeredCount = 0;
 
@@ -135,6 +136,7 @@ export class TestRunner extends PaginatedList implements OnInit {
     await this.loadPage();
     if (this.pageFlashcards.length > 0) {
       this.subjectName = this.getCardSubjectName(this.pageFlashcards[0]);
+      this.subjectIconUrl = this.getCardSubjectIconUrl(this.pageFlashcards[0]);
     }
 
     // timer starts only now: the test data is actually available

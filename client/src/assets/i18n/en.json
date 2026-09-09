@@ -178,8 +178,6 @@
     "link": "Link",
     "linkPrompt": "Enter the link URL",
     "latexGroupTitle": "Math formulas (LaTeX)",
-    "latexInline": "Inline formula",
-    "latexBlock": "Block formula",
     "latexSource": "LaTeX formula",
     "latexPlaceholder": "Write the formula, e.g. \frac{a}{b}",
     "latexToInline": "Put it back in the line",
@@ -211,7 +209,12 @@
       "subjectRequiredError": "Please choose a subject.",
       "topicLabel": "Topic",
       "topicRequiredError": "Select a topic: it helps you find the flashcard again later.",
-      "addButton": "Add New Card"
+      "addButton": "Add New Card",
+      "importButton": "Import from text",
+      "importLabel": "Paste the text copied with \"Copy card\"",
+      "importPlaceholder": "Title\nQuestion: ...\nAnswer: ...",
+      "importApply": "Import",
+      "importParseError": "The text isn't in the expected format (Title / Question / Answer)."
     },
     "edit": {
       "title": "Edit Flashcard",

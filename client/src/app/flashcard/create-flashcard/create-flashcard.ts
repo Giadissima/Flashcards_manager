@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder,
-  FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+  FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
   SearchableSelectComponent,
   SelectOption,
@@ -15,6 +15,7 @@ import { Editor } from '@tiptap/core';
 import { createRichTextEditor } from '../../shared/rich-text-editor/editor.factory';
 import { FlashcardService } from '../flashcard.service';
 import { PageCardComponent } from '../../shared/page-card/page-card.component';
+import { parseFlashcardText } from '../../shared/flashcard-import.util';
 import { RichTextEditorComponent } from '../../shared/rich-text-editor/rich-text-editor.component';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
@@ -28,6 +29,7 @@ import { toSubjectOptions, toTopicOptions } from '../../shared/select-options.ut
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     ReactiveFormsModule,
     RichTextEditorComponent,
     TranslocoModule,
@@ -46,6 +48,9 @@ export class CreateFlashcard implements OnInit, OnDestroy {
 
   questionEditor: Editor;
   answerEditor: Editor;
+
+  showImport = false;
+  importText = '';
 
   get visibilityControl(): FormControl<Visibility> {
     return this.cardForm.get('visibility') as FormControl<Visibility>;
@@ -142,6 +147,28 @@ export class CreateFlashcard implements OnInit, OnDestroy {
       console.error(err);
       this.toastService.show(this.transloco.translate('flashcard.toast.addError'), 'error')
     }
+  }
+
+  toggleImport(): void {
+    this.showImport = !this.showImport;
+    if (!this.showImport) this.importText = '';
+  }
+
+  // Fills the form from the text "copia card" produces, so a card copied from
+  // another page can be recreated here instead of retyped by hand.
+  applyImport(): void {
+    const parsed = parseFlashcardText(this.importText);
+    if (!parsed) {
+      this.toastService.show(this.transloco.translate('flashcard.create.importParseError'), 'error');
+      return;
+    }
+
+    this.cardForm.get('title')?.setValue(parsed.title);
+    this.questionEditor.commands.setContent(parsed.question);
+    this.answerEditor.commands.setContent(parsed.answer);
+
+    this.showImport = false;
+    this.importText = '';
   }
 
   onSubjectSelected(id: string | null | undefined): void {

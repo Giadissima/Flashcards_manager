@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { restrictionOf } from '../../shared/restriction';
 import { PaginationComponent } from '../../shared/pagination/pagination.component';
 
@@ -7,6 +7,7 @@ import { VisibilityButtonComponent } from '../../shared/visibility-toggle/visibi
 import { Visibility } from '../../models/visibility.dto';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
 import { ImageLightboxComponent } from '../../shared/image-lightbox/image-lightbox.component';
+import { LoadStateComponent } from '../../shared/load-state/load-state.component';
 import { PageCardComponent } from '../../shared/page-card/page-card.component';
 import { PaginatedList } from '../../shared/paginated-list';
 import { ZoomableImagesDirective } from '../../shared/zoomable-images.directive';
@@ -22,11 +23,13 @@ import { hasHtmlContent } from '../../shared/html.util';
 @Component({
   selector: 'app-manage-subjects',
   standalone: true,
-  imports: [CommonModule, SearchInputComponent, TranslocoModule, ImageLightboxComponent, ZoomableImagesDirective, ConfirmDialogComponent, PageCardComponent, PaginationComponent, VisibilityButtonComponent],
+  imports: [CommonModule, SearchInputComponent, TranslocoModule, ImageLightboxComponent, ZoomableImagesDirective, ConfirmDialogComponent, LoadStateComponent, PageCardComponent, PaginationComponent, VisibilityButtonComponent],
   templateUrl: './manage-subjects.component.html',
   styleUrls: ['./manage-subjects.component.scss']
 })
 export class ManageSubjectsComponent extends PaginatedList implements OnInit {
+  @ViewChild(LoadStateComponent, { static: true }) loadState!: LoadStateComponent;
+
   subjects: Subject[] = [];
   private expandedSubjectIds = new Set<string>();
   searchTerm = '';
@@ -41,28 +44,35 @@ export class ManageSubjectsComponent extends PaginatedList implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadSubjects();
+    this.loadState.run(() => this.loadSubjects());
   }
 
+  // Left to throw: the initial call goes through app-load-state (see
+  // ngOnInit), which needs the rejection to tell an unreachable server apart
+  // from an empty page. A filter, a page change or a reload after delete
+  // already has a list on screen, so those catch it themselves and fall back
+  // to a toast instead of replacing the list with the error block.
   async loadSubjects(): Promise<void> {
-    try {
-      const response = await this.subjectService.getAllSubjects({
-        skip: this.pageSkip,
-        limit: this.pageSize,
-        sortField: 'name',
-        sortDirection: 'asc',
-        title: this.searchTerm.trim() || undefined
-      });
-      this.subjects = response.data;
-      this.totalCount = response.count;
-    } catch (error) {
+    const response = await this.subjectService.getAllSubjects({
+      skip: this.pageSkip,
+      limit: this.pageSize,
+      sortField: 'name',
+      sortDirection: 'asc',
+      title: this.searchTerm.trim() || undefined
+    });
+    this.subjects = response.data;
+    this.totalCount = response.count;
+  }
+
+  private reloadSubjects(): void {
+    this.loadSubjects().catch(() => {
       this.toastService.show(this.transloco.translate('subject.toast.loadError'), 'error');
-    }
+    });
   }
 
   onFilterChange(): void {
     this.currentPage = 1;
-    this.loadSubjects();
+    this.reloadSubjects();
   }
 
   onSearchTermChange(term: string): void {
@@ -71,7 +81,7 @@ export class ManageSubjectsComponent extends PaginatedList implements OnInit {
   }
 
   protected override onPageChange(): void {
-    this.loadSubjects();
+    this.reloadSubjects();
   }
 
   getIconUrl(subject: Subject): string {
@@ -138,14 +148,17 @@ export class ManageSubjectsComponent extends PaginatedList implements OnInit {
 
     try {
       await this.subjectService.deleteSubject(id);
-      // Reload instead of filtering locally: skip/limit are resolved by the
-      // server, so the page would otherwise show one item less than it should
-      await this.loadSubjects();
       this.toastService.show(this.transloco.translate('subject.toast.deleted'), 'success');
     } catch (error) {
       console.error('Error deleting subject', error);
       this.toastService.show(this.transloco.translate('subject.toast.deleteError'), 'error');
+      return;
     }
+
+    // Reload instead of filtering locally: skip/limit are resolved by the
+    // server, so the page would otherwise show one item less than it should.
+    // Its own failure gets its own (loadError) toast, not deleteError's.
+    this.reloadSubjects();
   }
 
   /** The row whose visibility is being changed, so it cannot be clicked twice. */

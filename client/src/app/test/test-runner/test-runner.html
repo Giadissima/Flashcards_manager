@@ -15,7 +15,7 @@
     </div>
   </div>
 
-  <app-page-card icon="quiz" [title]="subjectName"
+  <app-page-card icon="quiz" [iconUrl]="subjectIconUrl" [title]="subjectName"
     [subtitle]="testStartDate ? t('test.runner.startedOn') + ' ' + (testStartDate | date:'dd/MM/yyyy HH:mm') : ''"
     bodyClass="p-4">
     <!-- The number checked most often during a run, so it is the first thing in
