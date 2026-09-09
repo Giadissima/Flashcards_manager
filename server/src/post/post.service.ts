@@ -576,14 +576,16 @@ export class PostService {
   }
 
 
-  /** One page of the carousel. */
+  /** One page of the carousel, optionally narrowed to a single topic of the post. */
   async findFlashcards(
     postId: string,
     skip: number,
     limit: number,
+    topicId?: string,
   ): Promise<BasePaginatedResult<FlashcardDocument>> {
     const post = await this.findOneOrThrow(postId);
     const query = this.visibleCardsQuery(post);
+    if (topicId) query.topic_id = new Types.ObjectId(topicId);
 
     const [data, count] = await Promise.all([
       this.flashcardModel

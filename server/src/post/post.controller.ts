@@ -52,17 +52,19 @@ export class PostController {
     return this.postService.findFeed(user.sub, filters);
   }
 
-  @ApiOperation({ description: 'one page of the flashcards of a post' })
+  @ApiOperation({ description: 'one page of the flashcards of a post, optionally narrowed to a topic' })
   @Get(':id/flashcards')
   findFlashcards(
     @Param('id') id: string,
     @Query('skip') skip: string,
     @Query('limit') limit: string,
+    @Query('topicId') topicId?: string,
   ): Promise<BasePaginatedResult<FlashcardDocument>> {
     return this.postService.findFlashcards(
       id,
       Number(skip) || 0,
       Number(limit) || 5,
+      topicId,
     );
   }
 

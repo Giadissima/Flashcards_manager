@@ -62,11 +62,16 @@ export class CommunityService {
     });
   }
 
-  /** One page of a post's carousel. */
-  getFlashcards(postId: string, skip: number, limit: number): Promise<PaginatedResponse<Flashcard>> {
+  /** One page of a post's carousel, optionally narrowed to a single topic of the post. */
+  getFlashcards(
+    postId: string,
+    skip: number,
+    limit: number,
+    topicId?: string,
+  ): Promise<PaginatedResponse<Flashcard>> {
     return this.restClient.get<PaginatedResponse<Flashcard>>(
       `${this.baseUrl}/${postId}/flashcards`,
-      { skip, limit },
+      { skip, limit, ...(topicId ? { topicId } : {}) },
     );
   }
 

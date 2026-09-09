@@ -53,6 +53,11 @@
   object-fit: cover;
 }
 
+.post-topic-filter {
+  max-width: 260px;
+  margin-bottom: calc(var(--spacing-unit) * 1.5);
+}
+
 .post-carousel {
   /* Holds the loading veil, which covers the arrows along with the cards:
      while a page is on its way there is nothing to page to. */
@@ -74,6 +79,54 @@
   &:disabled {
     opacity: 0.35;
     cursor: default;
+  }
+}
+
+/* The desktop's own paging: arrows beside a track wide enough for three cards
+   at once. Below app-pagination sits ready but hidden - a phone's is the only
+   screen narrow enough that squeezing a card's width down for the arrows is
+   worse than putting the control somewhere else entirely. */
+app-pagination {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  /* Same idea already applied to the arrows: the icon and the subject/topic
+     name are the least useful thing to spend width on next to who shared it.
+     Both images shrink to the same size, and not only the subject icon, so
+     the author's row lines up with it instead of setting a taller row that
+     leaves the shrunk icon looking off-centre. */
+  .post-subject-icon,
+  .post-avatar {
+    width: 36px;
+    height: 36px;
+  }
+
+  .post-heading {
+    font-size: 0.9rem;
+  }
+
+  /* Traded for app-pagination below the track: two arrows and a card's width
+     between them do not fit a phone screen whichever one gives way, so the
+     track gets the row to itself and paging moves under it instead. */
+  .carousel-arrow {
+    display: none;
+  }
+
+  app-pagination {
+    display: block;
+
+    /* The default margin is sized for a whole feed's worth of cards above it;
+       here it only has one carousel to sit under. */
+    ::ng-deep .pagination-bar {
+      margin-top: calc(var(--spacing-unit) * 1.5);
+    }
+  }
+
+  .post-flashcard,
+  .carousel-filler,
+  .carousel-track {
+    min-height: 200px;
   }
 }
 
@@ -108,7 +161,12 @@
    Only what belongs to a carousel is set here: how wide a card is in the row,
    and the floor under its height, which is the home grid's own. */
 .post-flashcard {
-  flex: 1 0 300px;
+  /* Shrinkable, unlike before: the page is now sized in TypeScript to the
+     number of 300px cards the track actually measures room for, but that
+     count is still a whole-pixel floor division - shrink is only there to
+     absorb the rounding, not to make room for one more than fits. */
+  flex: 1 1 300px;
+  min-width: 0;
   min-height: 240px;
 
   /* The one departure from the home card: the post around it is already a

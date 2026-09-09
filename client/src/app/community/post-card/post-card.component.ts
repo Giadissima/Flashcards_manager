@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { ContentOverflowDirective } from '../../shared/content-overflow.directive';
@@ -12,6 +12,8 @@ import { PostImportModalComponent } from '../post-import-modal/post-import-modal
 import { PostReportModalComponent } from '../post-report-modal/post-report-modal.component';
 import { restrictionOf } from '../../shared/restriction';
 import { PostComment } from '../../models/social.dto';
+import { SearchableSelectComponent, SelectOption } from '../../shared/searchable-select/searchable-select.component';
+import { PaginationComponent } from '../../shared/pagination/pagination.component';
 import { KatexRendererPipe } from '../../pipes/katex-renderer.pipe';
 import { ToastService } from '../../shared/toast/toast.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
@@ -20,8 +22,19 @@ import { getAvatarUrl } from '../../shared/avatar/avatar.util';
 import { getDefaultSubjectIconDataUrl } from '../../subject/subject-icon.util';
 import { baseUrlAPI } from '../../../config/config';
 
-/** How many cards the carousel holds at a time. */
-const pageSize = 3;
+/**
+ * Width of one carousel card and the gap between two, in step with
+ * .post-flashcard's flex-basis and .carousel-track's gap in the stylesheet.
+ * Used only to work out how many fit; the layout itself is still CSS's.
+ */
+const cardWidthPx = 300;
+const cardGapPx = 16;
+
+/** Before the first measurement, and the floor a card is never asked below. */
+const minCardsPerPage = 1;
+
+/** How long to let a resize settle before refetching to the new count. */
+const resizeDebounceMs = 200;
 
 /** The beat between one card of a page coming in and the next one. */
 const cardStaggerMs = 80;
@@ -49,12 +62,15 @@ const commentPageSize = 20;
     ContentOverflowDirective,
     PostImportModalComponent,
     PostReportModalComponent,
+    SearchableSelectComponent,
+    PaginationComponent,
   ],
   templateUrl: './post-card.component.html',
   styleUrl: './post-card.component.scss',
 })
-export class PostCardComponent implements OnInit {
+export class PostCardComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input({ required: true }) post!: FeedPost;
+  @ViewChild('track') private trackRef!: ElementRef<HTMLDivElement>;
 
   cards: Flashcard[] = [];
   /** Set while a like is in flight, so a double click cannot send two. */
@@ -64,6 +80,29 @@ export class PostCardComponent implements OnInit {
   skip = 0;
   /** Which way the last page was asked for, which is the way it comes in. */
   pageDirection: 'forward' | 'back' = 'forward';
+
+  /**
+   * How many cards a page holds - measured from the track's own width rather
+   * than fixed, so a page is always exactly as many as fit whole. Without
+   * this a page sized for a wide screen just spills off a narrower one,
+   * cards cut at the edge or hidden behind a scroll nothing on screen hints
+   * is there.
+   */
+  pageSize = 3;
+  private resizeObserver?: ResizeObserver;
+  private resizeTimeout?: ReturnType<typeof setTimeout>;
+
+  /**
+   * The topics actually behind this post's cards, whole-subject shares
+   * included - the header's own topics list is empty for those, but a reader
+   * still wants to narrow the carousel down to one of the eight the subject
+   * happens to hold.
+   */
+  topicOptions: { _id: string; name: string; color?: string; cardCount: number }[] = [];
+  /** Null narrows to nothing - the whole carousel, as it is without a filter. */
+  selectedTopicId: string | null = null;
+  /** How many cards the current topic filter matches, for the pagination bar. */
+  filteredCount = 0;
 
   // Both keyed by flashcard id: which answers the reader has opened out, and
   // which ones are long enough to be worth offering it on.
@@ -136,7 +175,7 @@ export class PostCardComponent implements OnInit {
    */
   get emptySlots(): number[] {
     if (this.loading || !this.cards.length) return [];
-    return Array.from({ length: Math.max(0, pageSize - this.cards.length) });
+    return Array.from({ length: Math.max(0, this.pageSize - this.cards.length) });
   }
 
   /**
@@ -164,6 +203,80 @@ export class PostCardComponent implements OnInit {
     // Comes with the feed, so the button carries the number from the start;
     // opening them replaces it with what was actually fetched
     this.commentCount = this.post.commentCount;
+    this.filteredCount = this.post.flashcardCount;
+    // The first page waits for ngAfterViewInit: it is measured off the
+    // track's real width, which is not there to measure yet.
+    void this.loadTopicOptions();
+  }
+
+  ngAfterViewInit(): void {
+    this.pageSize = this.measurePageSize();
+    void this.loadPage(0);
+
+    this.resizeObserver = new ResizeObserver(() => this.onTrackResize());
+    this.resizeObserver.observe(this.trackRef.nativeElement);
+  }
+
+  ngOnDestroy(): void {
+    this.resizeObserver?.disconnect();
+    clearTimeout(this.resizeTimeout);
+  }
+
+  /** How many whole cards the track's current width has room for. */
+  private measurePageSize(): number {
+    const width = this.trackRef?.nativeElement.clientWidth;
+    if (!width) return this.pageSize;
+    return Math.max(minCardsPerPage, Math.floor((width + cardGapPx) / (cardWidthPx + cardGapPx)));
+  }
+
+  /**
+   * Debounced: a window drag fires this many times a second, and each one
+   * would otherwise be its own request for a page nobody stayed on long
+   * enough to see.
+   */
+  private onTrackResize(): void {
+    clearTimeout(this.resizeTimeout);
+    this.resizeTimeout = setTimeout(() => {
+      const measured = this.measurePageSize();
+      if (measured === this.pageSize) return;
+
+      this.pageSize = measured;
+      // The old skip is meaningless against a different page size - back to
+      // the start rather than working out which of the new pages it falls in.
+      void this.loadPage(0);
+    }, resizeDebounceMs);
+  }
+
+  /**
+   * Only worth a control past one topic: a post narrowed to a single one
+   * already shows nothing else, and a whole subject shared as one topic is no
+   * different from the reader's point of view.
+   */
+  get topicSelectOptions(): SelectOption[] {
+    return this.topicOptions.map((topic) => ({
+      value: topic._id,
+      label: `${topic.name} (${topic.cardCount})`,
+      color: topic.color,
+    }));
+  }
+
+  get hasTopicFilter(): boolean {
+    return this.topicOptions.length > 1;
+  }
+
+  private async loadTopicOptions(): Promise<void> {
+    try {
+      const contents = await this.communityService.getPostContents(this.post._id);
+      this.topicOptions = contents.topics;
+    } catch {
+      // Nothing worth failing the whole card over: the carousel still works
+      // without the filter, just unable to narrow itself down.
+    }
+  }
+
+  onTopicFilterChange(topicId: string | null | undefined): void {
+    this.selectedTopicId = topicId ?? null;
+    this.pageDirection = 'forward';
     void this.loadPage(0);
   }
 
@@ -396,32 +509,48 @@ export class PostCardComponent implements OnInit {
   }
 
   get canGoForward(): boolean {
-    return this.skip + pageSize < this.post.flashcardCount;
+    return this.skip + this.pageSize < this.filteredCount;
+  }
+
+  /** app-pagination counts from 1, the carousel skips from 0. */
+  get currentPage(): number {
+    return Math.floor(this.skip / this.pageSize) + 1;
+  }
+
+  get totalPages(): number {
+    return Math.max(1, Math.ceil(this.filteredCount / this.pageSize));
   }
 
   previous(): void {
     if (!this.canGoBack) return;
 
     this.pageDirection = 'back';
-    void this.loadPage(Math.max(0, this.skip - pageSize));
+    void this.loadPage(Math.max(0, this.skip - this.pageSize));
   }
 
   next(): void {
     if (!this.canGoForward) return;
 
     this.pageDirection = 'forward';
-    void this.loadPage(this.skip + pageSize);
+    void this.loadPage(this.skip + this.pageSize);
   }
 
   private async loadPage(skip: number): Promise<void> {
     this.loading = true;
     try {
-      const page = await this.communityService.getFlashcards(this.post._id, skip, pageSize);
+      const page = await this.communityService.getFlashcards(
+        this.post._id,
+        skip,
+        this.pageSize,
+        this.selectedTopicId ?? undefined,
+      );
       this.cards = page.data;
       this.skip = skip;
-      // The count travels with every page, so a card withdrawn since the feed
-      // was drawn does not leave the arrows pointing at nothing
-      this.post.flashcardCount = page.count;
+      this.filteredCount = page.count;
+      // The post's own total travels with the unfiltered page only: the
+      // footer says how big the whole set is, which a topic filter narrows
+      // the carousel around without shrinking.
+      if (!this.selectedTopicId) this.post.flashcardCount = page.count;
     } catch {
       this.cards = [];
     } finally {

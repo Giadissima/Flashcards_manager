@@ -502,8 +502,6 @@
     "empty": "Nothing has been shared yet.",
     "loadError": "The feed could not be loaded",
     "noFlashcards": "No flashcards to show",
-    "previous": "Previous flashcards",
-    "next": "More flashcards",
     "cardCount": "{{count}} flashcards",
     "updatedAt": "Updated {{date}}",
     "sortPopular": "Most rated",
