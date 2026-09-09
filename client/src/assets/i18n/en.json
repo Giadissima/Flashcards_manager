@@ -80,6 +80,8 @@
     "darkModeDesc": "Turn dark theme on or off",
     "importExport": "Import / Export",
     "importExportButton": "Import / Export Flashcards",
+    "feedback": "Feedback",
+    "feedbackButton": "Send feedback",
     "cancel": "Cancel",
     "save": "Save Changes"
   },
@@ -314,6 +316,13 @@
     "setup": {
       "title": "New Test",
       "subtitle": "Choose subject, topic and number of questions",
+      "modeBasicTitle": "Manual test",
+      "modeBasicDesc": "Pick a subject and topic, draw at random",
+      "modeWrongTitle": "Weak cards",
+      "modeWrongDesc": "Review the questions you're currently getting wrong",
+      "modeDailyTitle": "Daily review",
+      "modeDailyDesc": "Cards due today, among the ones you've turned on",
+      "noneToReviewError": "There's nothing to review right now.",
       "subjectLabel": "Subject",
       "selectSubject": "Select subject",
       "topicLabel": "Topic",
@@ -455,6 +464,15 @@
       "saved": "Profile updated",
       "saveError": "The profile could not be saved"
     }
+  },
+  "spacedRepetition": {
+    "turnOn": "Turn on spaced repetition",
+    "turnOff": "Turn off spaced repetition",
+    "toastOn": "Spaced repetition turned on",
+    "toastOff": "Spaced repetition turned off",
+    "toastOnSubject": "Turned on for every topic of the subject",
+    "toastOffSubject": "Turned off for every topic of the subject",
+    "toastError": "Couldn't change the setting"
   },
   "visibility": {
     "label": "Visibility",

@@ -5,7 +5,7 @@ import { PostService } from 'src/post/post.service';
 import { Subject } from 'src/subject/subject.schema';
 import { Flashcard } from 'src/flashcards/flashcards.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model } from 'mongoose';
+import { FilterQuery, Model, Types } from 'mongoose';
 import { Topic, TopicDocument } from './topic.schema';
 import { ModifyTopicDto } from './topic.dto';
 import { BasePaginatedResult, ListFilterRequest } from 'src/common.dto';
@@ -129,6 +129,66 @@ export class TopicService {
     );
     await this.cascadeVisibility(userId, id, visibility);
     await this.refreshPostOf(userId, id);
+  }
+
+  /**
+   * Only the spaced-repetition flag, for the quick toggle in the lists.
+   * Cascades to the topic's own flashcards the same way visibility does (see
+   * cascadeVisibility), so the daily-test query can filter flashcards
+   * directly without joining back to this collection.
+   */
+  async setSpacedRepetition(
+    userId: string,
+    id: string,
+    enabled: boolean,
+  ): Promise<void> {
+    await updateOwnedOrThrow(
+      this.topicModel,
+      id,
+      userId,
+      { in_spaced_repetition: enabled },
+      ENTITY,
+    );
+    await this.flashcardModel
+      .updateMany({ user_id: userId, topic_id: id }, { in_spaced_repetition: enabled })
+      .exec();
+  }
+
+  /**
+   * For each given subject, whether every one of its topics currently has
+   * spaced repetition on - what the bulk toggle on a subject's own row shows
+   * and flips. A subject with no topics, or a mix of on/off ones, reports
+   * false: only "all on" reads as on.
+   */
+  async spacedRepetitionStatus(
+    userId: string,
+    subjectIds: string[],
+  ): Promise<Record<string, boolean>> {
+    const rows = await this.topicModel.aggregate<{
+      _id: Types.ObjectId;
+      total: number;
+      enabled: number;
+    }>([
+      {
+        $match: {
+          user_id: new Types.ObjectId(userId),
+          subject_id: { $in: subjectIds.map((id) => new Types.ObjectId(id)) },
+        },
+      },
+      {
+        $group: {
+          _id: '$subject_id',
+          total: { $sum: 1 },
+          enabled: { $sum: { $cond: ['$in_spaced_repetition', 1, 0] } },
+        },
+      },
+    ]);
+
+    const result: Record<string, boolean> = {};
+    for (const row of rows) {
+      result[row._id.toString()] = row.total > 0 && row.total === row.enabled;
+    }
+    return result;
   }
 
   /**

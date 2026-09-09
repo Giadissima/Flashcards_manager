@@ -20,6 +20,7 @@ import { ApiBody, ApiConsumes, ApiOperation } from '@nestjs/swagger';
 import {
   BasePaginatedResult,
   ListFilterRequest,
+  SetSpacedRepetitionDto,
   SetVisibilityDto,
 } from 'src/common.dto';
 import { SubjectDocument } from './subject.schema';
@@ -121,6 +122,19 @@ export class SubjectController {
     @Body() dto: SetVisibilityDto,
   ): Promise<void> {
     return this.subjectService.setVisibility(user.sub, id, dto.visibility);
+  }
+
+  @ApiOperation({
+    description:
+      'turn spaced repetition on or off for every topic of this subject at once, for the quick toggle in the lists',
+  })
+  @Patch(':id/spaced-repetition')
+  setSpacedRepetition(
+    @CurrentUser() user: JwtPayload,
+    @Param('id') id: string,
+    @Body() dto: SetSpacedRepetitionDto,
+  ): Promise<void> {
+    return this.subjectService.setSpacedRepetition(user.sub, id, dto.enabled);
   }
 
 }

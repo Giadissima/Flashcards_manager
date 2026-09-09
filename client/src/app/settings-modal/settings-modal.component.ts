@@ -51,6 +51,17 @@ import { ThemeService } from '../shared/theme/theme.service';
         </button>
       </div>
 
+      <div class="settings-section">
+        <div class="settings-section-title">
+          <span class="material-symbols-outlined">feedback</span>
+          {{ 'settings.feedback' | transloco }}
+        </div>
+        <a class="btn btn-outline-secondary w-100" [href]="feedbackUrl" target="_blank" rel="noopener noreferrer">
+          <span class="material-symbols-outlined">send</span>
+          {{ 'settings.feedbackButton' | transloco }}
+        </a>
+      </div>
+
       <ng-container modal-footer>
         <button type="button" class="btn btn-outline-secondary" (click)="cancel()"><span class="material-symbols-outlined">close</span>{{ 'settings.cancel' | transloco }}</button>
         <button type="button" class="btn btn-primary" (click)="save()"><span class="material-symbols-outlined">save</span>{{ 'settings.save' | transloco }}</button>
@@ -88,6 +99,8 @@ export class SettingsModalComponent implements OnInit, OnChanges {
 
   isDarkMode = false;
   language: AppLanguage = 'it';
+
+  readonly feedbackUrl = 'https://t.me/giadissima1234';
 
   readonly languageOptions: SelectOption[] = [
     { value: 'it', label: 'Italiano' },

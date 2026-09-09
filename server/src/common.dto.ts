@@ -1,5 +1,6 @@
 import { Filters, nameMaxLength } from './config';
 import {
+  IsBoolean,
   IsDateString,
   IsIn,
   IsMongoId,
@@ -130,4 +131,11 @@ export class SetVisibilityDto {
   @IsIn(visibilities)
   @ApiProperty({ enum: visibilities, example: 'public' })
   visibility: Visibility;
+}
+
+/** The whole body of the spaced-repetition quick toggle, on a topic or on every topic of a subject at once. */
+export class SetSpacedRepetitionDto {
+  @IsBoolean()
+  @ApiProperty({ example: true })
+  enabled: boolean;
 }

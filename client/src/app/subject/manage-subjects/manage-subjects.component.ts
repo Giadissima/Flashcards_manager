@@ -13,9 +13,11 @@ import { PaginatedList } from '../../shared/paginated-list';
 import { ZoomableImagesDirective } from '../../shared/zoomable-images.directive';
 import { Router } from '@angular/router';
 import { SearchInputComponent } from '../../shared/search-input/search-input.component';
+import { SrToggleButtonComponent } from '../../shared/sr-toggle-button/sr-toggle-button.component';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from './../subject.service';
 import { ToastService } from '../../shared/toast/toast.service';
+import { TopicService } from '../../topic/topic.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { getSubjectIconUrl } from '../subject-icon.util';
 import { hasHtmlContent } from '../../shared/html.util';
@@ -23,7 +25,7 @@ import { hasHtmlContent } from '../../shared/html.util';
 @Component({
   selector: 'app-manage-subjects',
   standalone: true,
-  imports: [CommonModule, SearchInputComponent, TranslocoModule, ImageLightboxComponent, ZoomableImagesDirective, ConfirmDialogComponent, LoadStateComponent, PageCardComponent, PaginationComponent, VisibilityButtonComponent],
+  imports: [CommonModule, SearchInputComponent, TranslocoModule, ImageLightboxComponent, ZoomableImagesDirective, ConfirmDialogComponent, LoadStateComponent, PageCardComponent, PaginationComponent, VisibilityButtonComponent, SrToggleButtonComponent],
   templateUrl: './manage-subjects.component.html',
   styleUrls: ['./manage-subjects.component.scss']
 })
@@ -34,8 +36,18 @@ export class ManageSubjectsComponent extends PaginatedList implements OnInit {
   private expandedSubjectIds = new Set<string>();
   searchTerm = '';
 
+  /**
+   * Whether every topic of a subject is currently in spaced repetition - what
+   * the bulk toggle on its row shows. Computed by the server (see
+   * TopicService.spacedRepetitionStatus), not stored on the subject itself:
+   * a subject with no topics, or a mix of on/off ones, is missing here and
+   * reads as off.
+   */
+  srStatus: Record<string, boolean> = {};
+
   constructor(
     private subjectService: SubjectService,
+    private topicService: TopicService,
     private router: Router,
     private toastService: ToastService,
     private transloco: TranslocoService
@@ -62,6 +74,14 @@ export class ManageSubjectsComponent extends PaginatedList implements OnInit {
     });
     this.subjects = response.data;
     this.totalCount = response.count;
+
+    // Best-effort, and after subjects are already on screen: the row's
+    // toggle just starts out reading "off" if this fails, same as a subject
+    // with no topics - it is not worth failing the whole page load over.
+    const ids = this.subjects.map((s) => s._id).filter((id): id is string => !!id);
+    this.topicService.getSpacedRepetitionStatus(ids)
+      .then((status) => this.srStatus = status)
+      .catch(() => {});
   }
 
   private reloadSubjects(): void {
@@ -193,6 +213,34 @@ export class ManageSubjectsComponent extends PaginatedList implements OnInit {
       );
     } finally {
       this.visibilityBusyId = undefined;
+    }
+  }
+
+  /** The row whose spaced-repetition flag is being changed. */
+  srBusyId: string | undefined;
+
+  /**
+   * Sets every topic of the subject to the same value at once (see
+   * SubjectService.setSpacedRepetition): a click here never reads a mixed
+   * on/off state back, it just flips what the row currently shows.
+   */
+  async onSrToggled(item: Subject, enabled: boolean): Promise<void> {
+    if (!item._id || this.srBusyId) return;
+
+    this.srBusyId = item._id;
+    try {
+      await this.subjectService.setSpacedRepetition(item._id, enabled);
+      this.srStatus[item._id] = enabled;
+      this.toastService.show(
+        this.transloco.translate(
+          enabled ? 'spacedRepetition.toastOnSubject' : 'spacedRepetition.toastOffSubject',
+        ),
+        'success',
+      );
+    } catch (error) {
+      this.toastService.show(this.transloco.translate('spacedRepetition.toastError'), 'error');
+    } finally {
+      this.srBusyId = undefined;
     }
   }
 

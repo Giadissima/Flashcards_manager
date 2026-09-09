@@ -80,6 +80,8 @@
     "darkModeDesc": "Attiva o disattiva il tema scuro",
     "importExport": "Import / Export",
     "importExportButton": "Importa / Esporta Flashcard",
+    "feedback": "Feedback",
+    "feedbackButton": "Lascia un feedback",
     "cancel": "Annulla",
     "save": "Salva Modifiche"
   },
@@ -314,6 +316,13 @@
     "setup": {
       "title": "Nuovo Test",
       "subtitle": "Scegli materia, argomento e numero di domande",
+      "modeBasicTitle": "Test manuale",
+      "modeBasicDesc": "Scegli materia e argomento, pesca a caso",
+      "modeWrongTitle": "Carte deboli",
+      "modeWrongDesc": "Ripassa le domande che stai sbagliando",
+      "modeDailyTitle": "Ripasso del giorno",
+      "modeDailyDesc": "Le carte in scadenza oggi, tra quelle attivate",
+      "noneToReviewError": "Non c'è nulla da ripassare al momento.",
       "subjectLabel": "Materia",
       "selectSubject": "Seleziona materia",
       "topicLabel": "Argomento",
@@ -455,6 +464,15 @@
       "saved": "Profilo aggiornato",
       "saveError": "Non è stato possibile salvare il profilo"
     }
+  },
+  "spacedRepetition": {
+    "turnOn": "Attiva la ripetizione dilazionata",
+    "turnOff": "Disattiva la ripetizione dilazionata",
+    "toastOn": "Ripetizione dilazionata attivata",
+    "toastOff": "Ripetizione dilazionata disattivata",
+    "toastOnSubject": "Attivata per tutti gli argomenti della materia",
+    "toastOffSubject": "Disattivata per tutti gli argomenti della materia",
+    "toastError": "Non è stato possibile cambiare l'impostazione"
   },
   "visibility": {
     "label": "Visibilità",

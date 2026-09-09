@@ -72,6 +72,34 @@ export class Flashcard {
     required: false,
   })
   imported_from?: mongoose.Types.ObjectId;
+
+  /**
+   * Cascaded down from the topic's own flag (see TopicService.
+   * setSpacedRepetition): kept here, denormalised, so the query behind the
+   * daily test can filter flashcards directly instead of joining to topic on
+   * every draw.
+   */
+  @Prop({ required: true, default: false })
+  in_spaced_repetition: boolean;
+
+  /**
+   * The Leitner box the card is in - how well it is currently known - and the
+   * date it next becomes due. Every review (see FlashcardsService.
+   * recordReview) either advances the box and pushes the date out, or drops
+   * the box back to 0 and the date back to now.
+   */
+  @Prop({ required: true, default: 0 })
+  sr_box: number;
+
+  @Prop({ required: true, default: Date.now })
+  sr_due_at: Date;
+
+  /**
+   * Unset until the first review. What tells "never studied" (also box 0)
+   * apart from "studied and still wrong" - the pair the weak-cards test reads.
+   */
+  @Prop({ required: false })
+  sr_last_reviewed_at?: Date;
 }
 // ! known gap: by editing the request by hand a client can create a flashcard
 // whose topic and subject are not related to each other, since nothing checks

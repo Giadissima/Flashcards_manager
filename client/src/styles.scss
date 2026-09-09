@@ -546,10 +546,23 @@ input:-webkit-autofill:active {
   --bs-table-border-color: var(--border-color);
 }
 
-/* The buttons of an actions cell are spaced by the cell, so the same spacing
-   holds once the row becomes a card. */
-.cell-actions .btn+.btn {
-  margin-left: calc(var(--spacing-unit) * 0.5);
+/* Some of the buttons in an actions cell (visibility, spaced repetition) sit
+   inside an extra wrapping <span> that carries their tooltip; the rest are
+   plain <button> elements. Two different inline elements do not share a
+   baseline the way two of the same tag do, which is what was throwing the
+   row out of line - centring the cell as a flex row keeps every button on
+   the same line regardless of what wraps it. Below the .table-stacked
+   breakpoint this is superseded by the flex .table-stacked td already sets. */
+.cell-actions {
+  display: flex;
+  align-items: center;
+  /* Some of the buttons here (edit, delete) are direct siblings and used to
+     be spaced by the .btn+.btn margin below; others sit inside their own
+     wrapping <span> (visibility, spaced repetition) and relied on the
+     whitespace between inline elements instead, which flexbox does not fall
+     back to. A gap on the flex container spaces every button the same way
+     regardless of what wraps it, so the margin rule is no longer needed. */
+  gap: calc(var(--spacing-unit) * 0.5);
 }
 
 /* A row that navigates elsewhere on click (e.g. filtering another list by

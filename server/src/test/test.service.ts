@@ -162,7 +162,7 @@ export class TestService {
     return deleteOwnedOrThrow(this.testModel, id, userId, ENTITY);
   }
 
-  updateAnswer(
+  async updateAnswer(
     userId: string,
     test_id: string,
     question_id: string,
@@ -174,11 +174,21 @@ export class TestService {
       is_correct === undefined
         ? { $unset: { 'questions.$.is_correct': '' } }
         : { $set: { 'questions.$.is_correct': is_correct } };
-    return this.testModel.findOneAndUpdate(
+    const result = await this.testModel.findOneAndUpdate(
       { _id: test_id, user_id: userId, 'questions.flashcard_id': question_id },
       update,
       { new: true },
     );
+
+    // Only on an actual answer, not on the undo that clears one: a card is
+    // reviewed by being judged right or wrong, and there is no sound way to
+    // roll a Leitner box back to what it was before an answer that is now
+    // being taken away.
+    if (is_correct !== undefined) {
+      await this.flashcardService.recordReview(userId, question_id, is_correct);
+    }
+
+    return result;
   }
 
   /**

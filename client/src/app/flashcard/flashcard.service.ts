@@ -36,6 +36,22 @@ export class FlashcardService {
     }
 
 
+  // The flashcards currently due for spaced repetition, most overdue first.
+  getDue(filter: RandomCardFIlter): Promise<RandomFlashcard[]> {
+    return this.restClient.get<RandomFlashcard[]>(
+      this.baseUrl + '/due',
+      filter
+    );
+  }
+
+  // Random flashcards currently at Leitner box 0 - the ones being gotten wrong.
+  getWeak(filter: RandomCardFIlter): Promise<RandomFlashcard[]> {
+    return this.restClient.get<RandomFlashcard[]>(
+      this.baseUrl + '/weak',
+      filter
+    );
+  }
+
   // Counts the flashcards matching the filters
   count(filter: CountCardFilter): Promise<number> {
     return this.restClient.get<number>(

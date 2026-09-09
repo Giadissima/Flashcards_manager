@@ -1,4 +1,4 @@
-import { IsIn, IsMongoId, IsOptional, IsString, Length } from 'class-validator';
+import { IsArray, IsIn, IsMongoId, IsOptional, IsString, Length } from 'class-validator';
 import { charMinLength, idLength, nameMaxLength } from 'src/config';
 
 import { ApiProperty } from '@nestjs/swagger';
@@ -43,4 +43,19 @@ export class ModifyTopicDto {
   })
   visibility?: Visibility;
 
+}
+
+/**
+ * Which subjects, of the ones on screen, have every one of their topics in
+ * spaced repetition - what the toggle on a subject's own row reads to know
+ * whether it currently shows as on or off.
+ */
+export class SpacedRepetitionStatusFilter {
+  @IsArray()
+  @IsMongoId({ each: true })
+  @ApiProperty({
+    description: 'Subject IDs to report the spaced-repetition status of',
+    type: [String],
+  })
+  subject_ids: string[];
 }

@@ -13,6 +13,7 @@ import { toSubjectOptions } from '../../shared/select-options.util';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SearchInputComponent } from '../../shared/search-input/search-input.component';
 import { SearchableSelectComponent, SelectOption } from '../../shared/searchable-select/searchable-select.component';
+import { SrToggleButtonComponent } from '../../shared/sr-toggle-button/sr-toggle-button.component';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
 import { ToastService } from '../../shared/toast/toast.service';
@@ -23,7 +24,7 @@ import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 @Component({
   selector: 'app-manage-topics',
   standalone: true,
-  imports: [CommonModule, SearchInputComponent, SearchableSelectComponent, TranslocoModule, ConfirmDialogComponent, LoadStateComponent, PageCardComponent, PaginationComponent, VisibilityButtonComponent],
+  imports: [CommonModule, SearchInputComponent, SearchableSelectComponent, TranslocoModule, ConfirmDialogComponent, LoadStateComponent, PageCardComponent, PaginationComponent, VisibilityButtonComponent, SrToggleButtonComponent],
   templateUrl: './manage-topics.component.html',
   styleUrls: ['./manage-topics.component.scss']
 })
@@ -196,6 +197,29 @@ export class ManageTopicsComponent extends PaginatedList implements OnInit {
       );
     } finally {
       this.visibilityBusyId = undefined;
+    }
+  }
+
+  /** The row whose spaced-repetition flag is being changed. */
+  srBusyId: string | undefined;
+
+  async onSrToggled(item: Topic, enabled: boolean): Promise<void> {
+    if (!item._id || this.srBusyId) return;
+
+    this.srBusyId = item._id;
+    try {
+      await this.topicService.setSpacedRepetition(item._id, enabled);
+      item.in_spaced_repetition = enabled;
+      this.toastService.show(
+        this.transloco.translate(
+          enabled ? 'spacedRepetition.toastOn' : 'spacedRepetition.toastOff',
+        ),
+        'success',
+      );
+    } catch (error) {
+      this.toastService.show(this.transloco.translate('spacedRepetition.toastError'), 'error');
+    } finally {
+      this.srBusyId = undefined;
     }
   }
 

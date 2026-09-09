@@ -162,6 +162,31 @@ export class SubjectService {
   }
 
   /**
+   * Sets the spaced-repetition flag on every topic of the subject at once -
+   * and, through the same cascade each topic's own toggle uses, on every
+   * flashcard under them. It is a bulk write, not a flag of its own kept on
+   * the subject: a subject with 15 topics is one click instead of 15, but
+   * turning a single topic back off afterwards is still possible, and does
+   * not "remember" as a mixed state here - the next click on this same
+   * toggle simply sets every topic to the same value again.
+   */
+  async setSpacedRepetition(
+    userId: string,
+    id: string,
+    enabled: boolean,
+  ): Promise<void> {
+    await findOwnedOrThrow<SubjectDocument>(this.subjectModel, id, userId, ENTITY);
+    await Promise.all([
+      this.topicModel
+        .updateMany({ user_id: userId, subject_id: id }, { in_spaced_repetition: enabled })
+        .exec(),
+      this.flashcardModel
+        .updateMany({ user_id: userId, subject_id: id }, { in_spaced_repetition: enabled })
+        .exec(),
+    ]);
+  }
+
+  /**
    * Carries the choice down to everything under the subject.
    *
    * Both ways round, and the second is the one that matters: a subject shared

@@ -69,6 +69,30 @@ export class FlashcardsController {
     return this.flashcardsService.count(user.sub, filters);
   }
 
+  @ApiOperation({
+    description:
+      'get the flashcards currently due for spaced repetition, most overdue first',
+  })
+  @Get('due')
+  getDue(
+    @CurrentUser() user: JwtPayload,
+    @Query() filters: RandomFlashcardsDTO,
+  ): Promise<RandomFlashcard[]> {
+    return this.flashcardsService.getDue(user.sub, filters);
+  }
+
+  @ApiOperation({
+    description:
+      'get random flashcards currently at Leitner box 0 (being gotten wrong)',
+  })
+  @Get('weak')
+  getWeak(
+    @CurrentUser() user: JwtPayload,
+    @Query() filters: RandomFlashcardsDTO,
+  ): Promise<RandomFlashcard[]> {
+    return this.flashcardsService.getWeak(user.sub, filters);
+  }
+
   @ApiOperation({ description: 'get a specific Flashcard from db' })
   @Get(':id')
   findOne(@CurrentUser() user: JwtPayload, @Param('id') id: string) {

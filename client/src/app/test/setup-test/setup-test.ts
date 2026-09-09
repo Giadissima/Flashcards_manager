@@ -6,6 +6,7 @@ import { Question } from '../../models/test.dto';
 import { CommonModule } from '@angular/common';
 import { FlashcardService } from '../../flashcard/flashcard.service';
 import { RandomCardFIlter } from '../../models/http.dto';
+import { RandomFlashcard } from '../../models/flashcard.dto';
 import { Router } from '@angular/router';
 import { SearchableSelectComponent, SelectOption } from '../../shared/searchable-select/searchable-select.component';
 import { Subject } from '../../models/subject.dto';
@@ -17,9 +18,16 @@ import { TopicService } from '../../topic/topic.service';
 import { toSubjectOptions, toTopicOptions } from '../../shared/select-options.util';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 
-// At least a subject or one chosen topic: a test needs something to draw from.
-export function subjectOrTopicValidator(): ValidatorFn {
+/** The three ways a test can be built. */
+export type TestMode = 'basic' | 'wrong' | 'daily';
+
+// At least a subject or one chosen topic: a manual (basic) test needs
+// something to draw from. "Wrong" and "daily" draw from a rule instead
+// (weak cards / cards due today), so they may run on every subject at once
+// and the requirement does not apply to them.
+export function subjectOrTopicValidator(getMode: () => TestMode): ValidatorFn {
   return (group: AbstractControl): ValidationErrors | null => {
+    if (getMode() !== 'basic') return null;
     const subject = group.get('subject_id')?.value;
     const topics = (group.get('topic_ids') as FormArray | null)?.value ?? [];
     const hasTopic = topics.some((id: string | null) => !!id);
@@ -41,8 +49,22 @@ export class SetupTest implements OnInit {
   allTopics: Topic[] = [];
   flashcardCount: number | null = null;
 
+  /** Which of the three squares is selected; "basic" is today's plain manual test. */
+  mode: TestMode = 'basic';
+
+  // Only "basic" draws a fixed count from an exact set the count endpoint
+  // can size in advance; "wrong" and "daily" draw from a rule and are
+  // capped by numFlashcard rather than blocked by a known-empty count.
   get noFlashcardsAvailable(): boolean {
-    return this.flashcardCount === 0;
+    return this.mode === 'basic' && this.flashcardCount === 0;
+  }
+
+  selectMode(mode: TestMode): void {
+    this.mode = mode;
+    // The group validator reads mode through the closure it was built with;
+    // it has to be told to run again, or the switch would not be reflected
+    // until some unrelated control change re-triggered validation on its own.
+    this.testForm.updateValueAndValidity();
   }
 
   get subjectOptions(): SelectOption[] {
@@ -80,7 +102,7 @@ export class SetupTest implements OnInit {
       // Always one row to start with, which doubles as "every topic" while empty.
       topic_ids: this.fb.array([this.fb.control<string | null>(null)]),
       numFlashcard: [10, [Validators.required, Validators.min(1), Validators.max(1000)]]
-    }, { validators: subjectOrTopicValidator() });
+    }, { validators: subjectOrTopicValidator(() => this.mode) });
   }
 
   ngOnInit(): void {
@@ -202,9 +224,28 @@ export class SetupTest implements OnInit {
     }
   }
 
+  /** Which endpoint the questions are drawn from, one per square. */
+  private drawFlashcards(query: RandomCardFIlter): Promise<RandomFlashcard[]> {
+    switch (this.mode) {
+      case 'wrong':
+        return this.flashcardService.getWeak(query);
+      case 'daily':
+        return this.flashcardService.getDue(query);
+      default:
+        return this.flashcardService.getRandom(query);
+    }
+  }
+
   async createTest(query: RandomCardFIlter): Promise<void> {
     try {
-      const flashcards = await this.flashcardService.getRandom(query);
+      const flashcards = await this.drawFlashcards(query);
+      // "Wrong" and "daily" have no known size ahead of the draw (see
+      // noFlashcardsAvailable): an empty result is discovered here instead,
+      // and read as "nothing to review" rather than a failure.
+      if (!flashcards.length) {
+        this.toastService.show(this.transloco.translate('test.setup.noneToReviewError'), 'error');
+        return;
+      }
       const questions: Question[] = flashcards.map(fc => ({
         flashcard_id: fc._id,
         topic_id: fc.topic_id,

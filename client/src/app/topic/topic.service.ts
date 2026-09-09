@@ -59,4 +59,21 @@ export class TopicService {
     return this.restClient.patch(`${this.baseUrl}/${id}/visibility`, { visibility });
   }
 
+  /** Only the spaced-repetition flag, for the quick toggle in the lists. */
+  setSpacedRepetition(id: string, enabled: boolean): Promise<void> {
+    return this.restClient.patch(`${this.baseUrl}/${id}/spaced-repetition`, { enabled });
+  }
+
+  /**
+   * For each given subject, whether every one of its topics is currently in
+   * spaced repetition - what the bulk toggle on a subject's own row shows.
+   */
+  getSpacedRepetitionStatus(subjectIds: string[]): Promise<Record<string, boolean>> {
+    if (!subjectIds.length) return Promise.resolve({});
+    return this.restClient.get<Record<string, boolean>>(
+      `${this.baseUrl}/spaced-repetition-status`,
+      { subject_ids: subjectIds },
+    );
+  }
+
 }

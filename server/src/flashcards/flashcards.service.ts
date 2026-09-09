@@ -33,6 +33,12 @@ const ENTITY = 'Flashcard';
 const POPULATE = ['topic_id', 'subject_id'];
 const defaultRandomSampleSize = 10;
 
+// The Leitner boxes a card moves through: index is the box number, value is
+// how many days out the next review lands once the card reaches it. Box 0 is
+// "due now" - a brand new card, or one just gotten wrong.
+const srIntervalDays = [0, 1, 3, 7, 14, 30];
+const srMaxBox = srIntervalDays.length - 1;
+
 @Injectable()
 export class FlashcardsService {
   constructor(
@@ -145,6 +151,105 @@ export class FlashcardsService {
           },
         },
       ])
+      .exec();
+  }
+
+  /**
+   * The flashcards currently due for spaced repetition: in a topic marked for
+   * it, and not due later than now. Most overdue first, since that is the
+   * card most at risk of being forgotten if the test runs out before reaching
+   * it.
+   */
+  getDue(
+    userId: string,
+    filter: RandomFlashcardsDTO,
+  ): Promise<RandomFlashcard[]> {
+    const query = this.buildObjectIdQuery(userId, filter);
+    query.in_spaced_repetition = true;
+    // A card written before this field existed has no sr_due_at stored at
+    // all - the schema's default only applies to a document as it is
+    // created, never retroactively to one already sitting in the collection
+    // - and $lte against a field that is simply absent does not match it.
+    // Such a card is exactly as due as a brand new one would be, so missing
+    // counts as due alongside "due today or earlier".
+    query.$or = [
+      { sr_due_at: { $exists: false } },
+      { sr_due_at: { $lte: new Date() } },
+    ];
+
+    return this.flashcardModel
+      .aggregate<RandomFlashcard>([
+        { $match: query },
+        { $sort: { sr_due_at: 1 } },
+        { $limit: filter.numFlashcard || defaultRandomSampleSize },
+        {
+          $project: {
+            _id: { $toString: '$_id' },
+            topic_id: { $toString: '$topic_id' },
+          },
+        },
+      ])
+      .exec();
+  }
+
+  /**
+   * The flashcards currently at Leitner box 0 that have actually been
+   * reviewed at least once - the cards being gotten wrong right now, as
+   * opposed to a brand new card that also starts at box 0 but has never been
+   * tested. Sampled at random like getRandom, since there is no "most
+   * overdue" ordering among cards that are not on a schedule.
+   */
+  getWeak(
+    userId: string,
+    filter: RandomFlashcardsDTO,
+  ): Promise<RandomFlashcard[]> {
+    const query = this.buildObjectIdQuery(userId, filter);
+    query.sr_box = 0;
+    query.sr_last_reviewed_at = { $exists: true };
+
+    return this.flashcardModel
+      .aggregate<RandomFlashcard>([
+        { $match: query },
+        { $sample: { size: filter.numFlashcard || defaultRandomSampleSize } },
+        {
+          $project: {
+            _id: { $toString: '$_id' },
+            topic_id: { $toString: '$topic_id' },
+          },
+        },
+      ])
+      .exec();
+  }
+
+  /**
+   * Moves a card through its Leitner boxes after it is answered in any test,
+   * not only a spaced-repetition one: reviewing a topic early, ahead of its
+   * own schedule, still has to push the next date out, or studying for an
+   * exam before daily catches up would count for nothing. A card belonging to
+   * someone else, or already gone, is silently skipped - the same as any
+   * other flashcard a test's questions can outlive.
+   */
+  async recordReview(
+    userId: string,
+    id: string,
+    isCorrect: boolean,
+  ): Promise<void> {
+    const existing = await this.flashcardModel
+      .findOne({ _id: id, user_id: userId }, { sr_box: 1 })
+      .lean()
+      .exec();
+    if (!existing) return;
+
+    const nextBox = isCorrect ? Math.min((existing.sr_box ?? 0) + 1, srMaxBox) : 0;
+    const now = new Date();
+    const dueAt = new Date(now);
+    dueAt.setDate(dueAt.getDate() + srIntervalDays[nextBox]);
+
+    await this.flashcardModel
+      .updateOne(
+        { _id: id, user_id: userId },
+        { sr_box: nextBox, sr_due_at: dueAt, sr_last_reviewed_at: now },
+      )
       .exec();
   }
 

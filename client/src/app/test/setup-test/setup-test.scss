@@ -1,3 +1,64 @@
+/* The three ways a test can be built, as equal squares rather than a select:
+   there are only three, naming each one plainly is worth more screen space
+   than a dropdown would cost, and the currently picked one has to stay
+   visible while the rest of the form below it changes shape. */
+.mode-tiles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-unit);
+}
+
+.mode-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--spacing-unit) * 0.5);
+  padding: calc(var(--spacing-unit) * 2);
+  text-align: center;
+  background-color: var(--component-background);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+
+  .material-symbols-outlined {
+    font-size: 28px;
+    color: var(--text-color);
+  }
+
+  &:hover {
+    border-color: var(--primary-color);
+  }
+
+  &.is-selected {
+    background-color: var(--primary-tint-soft);
+    border-color: var(--primary-color);
+
+    .material-symbols-outlined {
+      color: var(--primary-color);
+    }
+  }
+}
+
+.mode-tile-title {
+  font-weight: 600;
+  color: var(--header-color);
+}
+
+.mode-tile-desc {
+  font-size: 0.85rem;
+  color: var(--text-color);
+}
+
+/* The tiles wrap into a column before the form below them does (the topic
+   rows keep working down to a narrow phone width on their own), so the
+   titles do not get squeezed into a wrap of their own first. */
+@media (max-width: 575.98px) {
+  .mode-tiles {
+    grid-template-columns: 1fr;
+  }
+}
+
 .number-stepper {
   position: relative;
   display: inline-flex;

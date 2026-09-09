@@ -56,4 +56,13 @@ export class SubjectService {
     return this.restClient.patch(`${this.baseUrl}/${id}/visibility`, { visibility });
   }
 
+  /**
+   * Sets spaced repetition on every topic of the subject at once - the bulk
+   * toggle on a subject's own row, so enabling 15 topics one by one is never
+   * required.
+   */
+  setSpacedRepetition(id: string, enabled: boolean): Promise<void> {
+    return this.restClient.patch(`${this.baseUrl}/${id}/spaced-repetition`, { enabled });
+  }
+
 }

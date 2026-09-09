@@ -19,9 +19,11 @@ import { ApiOperation } from '@nestjs/swagger';
 import {
   BasePaginatedResult,
   ListFilterRequest,
+  SetSpacedRepetitionDto,
   SetVisibilityDto,
 } from '../common.dto';
 import { TopicDocument } from './topic.schema';
+import { SpacedRepetitionStatusFilter } from './topic.dto';
 
 @Controller('topic')
 export class TopicController {
@@ -43,6 +45,21 @@ export class TopicController {
     @Query() filters: ListFilterRequest,
   ): Promise<BasePaginatedResult<TopicDocument>> {
     return this.topicService.findAll(user.sub, filters);
+  }
+
+  @ApiOperation({
+    description:
+      'report, for each given subject, whether every one of its topics is in spaced repetition',
+  })
+  @Get('spaced-repetition-status')
+  spacedRepetitionStatus(
+    @CurrentUser() user: JwtPayload,
+    @Query() filter: SpacedRepetitionStatusFilter,
+  ): Promise<Record<string, boolean>> {
+    return this.topicService.spacedRepetitionStatus(
+      user.sub,
+      filter.subject_ids,
+    );
   }
 
   @ApiOperation({ description: 'get a specific Topic from db' })
@@ -79,6 +96,19 @@ export class TopicController {
     @Body() dto: SetVisibilityDto,
   ): Promise<void> {
     return this.topicService.setVisibility(user.sub, id, dto.visibility);
+  }
+
+  @ApiOperation({
+    description:
+      'turn spaced repetition on or off for this topic, for the quick toggle in the lists',
+  })
+  @Patch(':id/spaced-repetition')
+  setSpacedRepetition(
+    @CurrentUser() user: JwtPayload,
+    @Param('id') id: string,
+    @Body() dto: SetSpacedRepetitionDto,
+  ): Promise<void> {
+    return this.topicService.setSpacedRepetition(user.sub, id, dto.enabled);
   }
 
 }

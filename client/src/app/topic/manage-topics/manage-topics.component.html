@@ -49,6 +49,8 @@
           <td class="cell-actions" (click)="$event.stopPropagation()">
             <app-visibility-button [visibility]="topic.visibility ?? 'private'"
               [busy]="visibilityBusyId === topic._id" (toggled)="onVisibilityToggled(topic, $event)"></app-visibility-button>
+            <app-sr-toggle-button [enabled]="topic.in_spaced_repetition ?? false"
+              [busy]="srBusyId === topic._id" (toggled)="onSrToggled(topic, $event)"></app-sr-toggle-button>
             <button type="button" class="btn btn-icon-ghost" (click)="editTopic(topic._id)" [attr.aria-label]="t('common.edit')">
               <span class="material-symbols-outlined">edit</span>
             </button>
