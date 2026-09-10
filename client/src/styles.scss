@@ -301,6 +301,7 @@ h6 {
    segmented filter, a checkbox - rather than stretch into leftover row space. */
 .filter-col--auto {
   flex: 0 1 auto;
+  min-width: 0; // lets its content (e.g. the date range filter) shrink instead of overflowing the row
 }
 
 /* Always the row's only occupant: paired with .filter-row on a control (like

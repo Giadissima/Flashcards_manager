@@ -2,10 +2,19 @@
   display: block;
 }
 
+/* One box drawing the border and background that .form-control/.form-select
+   would otherwise each draw on their own - the field selector and the two
+   date ends sit inside it borderless (below), so the icon reads as labelling
+   the whole box rather than just whichever control happens to be next to it. */
 .date-range {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: calc(var(--spacing-unit) * 0.5);
+  gap: calc(var(--spacing-unit) * 0.75);
+  border: 1.4px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  background-color: var(--component-background);
+  padding-inline: calc(var(--spacing-unit) * 1.5);
 }
 
 .date-range-icon {
@@ -13,18 +22,46 @@
   flex-shrink: 0;
 }
 
-/* Sized to its own text: it names a date and does not need the width of one. */
+/* Sized to its own text rather than stretching to fill the box (the shared
+   select's :host is width: 100% by default). */
 .date-range-field {
   width: auto;
   flex-shrink: 0;
 }
 
+/* The shared select's inner button carries .form-select's own border,
+   background and focus glow, all meant for a field standing on its own -
+   stripped here (::ng-deep, since .form-select is inside the child
+   component's template) now that the box around it draws all three itself. */
+:host ::ng-deep .date-range-field .form-select {
+  border: 0;
+  background-color: transparent;
+  padding-left: 0;
+
+  &:focus {
+    border: 0;
+    box-shadow: none;
+  }
+}
+
+/* A thin rule standing in for the border that used to separate the field
+   selector from the date ends, now that both sit inside one box. */
+.date-range-divider {
+  width: 1px;
+  align-self: stretch;
+  margin-block: calc(var(--spacing-unit) * 0.75);
+  background-color: var(--border-color);
+  flex-shrink: 0;
+}
+
 /* Wide enough for both ends of the range at once, no wider: it sits in a
-   filter bar beside the selects, not on a line of its own. */
+   filter bar beside the selects, not on a line of its own. Borderless and
+   transparent so Material's own outline doesn't double up on the box's. */
 .date-range-field-group {
   width: auto;
   min-width: 13rem;
-  background-color: var(--component-background);
+  max-width: 100%;
+  background-color: transparent;
 }
 
 .date-range-clear {
@@ -48,6 +85,15 @@
    the same padding .form-control uses, and the flex row that holds it
    recentred now that the box is a different height than Material expects. */
 :host ::ng-deep .date-range-field-group {
+  /* Drawn by the box around the whole control instead - left in place (not
+     display: none) since the notched outline also reserves the layout gap
+     Material leaves for the notch around the field-selector's label. */
+  .mdc-notched-outline__leading,
+  .mdc-notched-outline__notch,
+  .mdc-notched-outline__trailing {
+    border-color: transparent !important;
+  }
+
   .mdc-text-field {
     padding-top: 0;
     padding-bottom: 0;

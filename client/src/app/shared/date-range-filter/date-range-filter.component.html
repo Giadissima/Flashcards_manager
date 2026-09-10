@@ -1,18 +1,13 @@
+<!-- One bordered box around the icon and both fields, read left to right as one
+     sentence ("publication, from this day to that one"), so the icon reads as
+     labelling the whole control rather than just the select beside it. -->
 <div class="date-range">
-
-  <!-- In front of the two ends and not above them: read left to right it makes
-  one sentence, "publication, from this day to that one". -->
-  @if (fields.length) {
   <span class="material-symbols-outlined date-range-icon">date_range</span>
-  <select class="form-select date-range-field" [disabled]="disabled" [title]="'common.dateFieldLabel' | transloco"
-    [attr.aria-label]="'common.dateFieldLabel' | transloco" (change)="onField($any($event.target).value)">
-    <!-- Marked on the option and not bound on the select: the value of a
-         select is set before its options exist, and would find nothing to
-         match on the first draw. -->
-    @for (option of fields; track option.value) {
-    <option [value]="option.value" [selected]="option.value === field">{{ option.label }}</option>
-    }
-  </select>
+
+  @if (fields.length) {
+  <app-searchable-select class="date-range-field" [options]="fields" [value]="field" [disabled]="disabled"
+    [title]="'common.dateFieldLabel' | transloco" [attr.aria-label]="'common.dateFieldLabel' | transloco"
+    (valueChange)="onField($event)"></app-searchable-select>
   }
 
   <!-- The far end limits the near one and the other way round, so the calendar

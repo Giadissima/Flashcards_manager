@@ -1,8 +1,8 @@
 <div class="dropdown" (appClickOutside)="close()" (keydown)="onKeydown($event)">
   <!-- The title carries the whole name, which the field itself may have had to
        cut short. -->
-  <button class="form-select text-start" type="button" [disabled]="disabled" [title]="selectedLabel"
-    (click)="toggle()" (blur)="blurred.emit()">
+  <button class="form-select text-start" type="button" [class.is-empty]="isEmpty" [disabled]="disabled"
+    [title]="selectedLabel" (click)="toggle()" (blur)="blurred.emit()">
     @if (selectedOption?.iconUrl) {
     <img [src]="selectedOption!.iconUrl" alt="" class="select-option-icon">
     } @else if (selectedOption?.color) {

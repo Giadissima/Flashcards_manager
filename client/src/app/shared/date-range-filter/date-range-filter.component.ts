@@ -13,6 +13,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { TranslocoModule } from '@jsverse/transloco';
+import { SearchableSelectComponent } from '../searchable-select/searchable-select.component';
 
 /** Turns a YYYY-MM-DD day into a local Date, so no UTC offset shifts it by a day. */
 function toDate(value: string | null): Date | null {
@@ -65,6 +66,7 @@ export interface DateFieldOption {
     MatFormFieldModule,
     MatInputModule,
     ReactiveFormsModule,
+    SearchableSelectComponent,
   ],
   templateUrl: './date-range-filter.component.html',
   styleUrl: './date-range-filter.component.scss',
@@ -119,7 +121,11 @@ export class DateRangeFilterComponent implements OnChanges {
     }
   }
 
-  onField(value: string): void {
+  // The shared select's valueChange can carry null/undefined (its
+  // all-options case), which this field never offers - there is always one
+  // of the two dates selected, so only a real value is ever passed through.
+  onField(value: string | null | undefined): void {
+    if (!value) return;
     this.field = value;
     this.fieldChange.emit(value);
   }

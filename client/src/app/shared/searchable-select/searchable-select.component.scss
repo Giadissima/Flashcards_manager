@@ -49,6 +49,11 @@
   }
 }
 
+.form-select.is-empty {
+  color: var(--danger-color);
+  border-color: var(--danger-color);
+}
+
 .select-option-icon {
   width: 20px;
   height: 20px;

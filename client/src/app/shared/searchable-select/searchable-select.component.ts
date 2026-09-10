@@ -53,6 +53,12 @@ export class SearchableSelectComponent {
     return this.selectedOption?.label ?? this.placeholder;
   }
 
+  // Nothing the user could ever pick: signals a broken/misconfigured select
+  // (e.g. options failed to load) rather than a normal "nothing selected yet".
+  get isEmpty(): boolean {
+    return this.options.length === 0 && !this.allOptionLabel;
+  }
+
   toggle(): void {
     if (this.disabled) return;
     this.isOpen = !this.isOpen;
