@@ -30,17 +30,20 @@ export class TopicService {
   ) {}
 
   async create(userId: string, createTopicDto: ModifyTopicDto): Promise<void> {
-    await this.publishing.assertMayPublish(userId, createTopicDto.visibility);
+    // A topic added to a subject that is already shared is shared too, unless
+    // the form said otherwise: having to publish it again by hand would be a
+    // trap, since the subject is public precisely to carry what is under it.
+    const visibility =
+      createTopicDto.visibility ??
+      (await this.parentVisibility(userId, createTopicDto.subject_id));
+    // Checked against the resolved value, not the raw one: inheriting public
+    // from the subject counts as publishing too.
+    await this.publishing.assertMayPublish(userId, visibility);
 
     const created = await new this.topicModel({
       ...createTopicDto,
       user_id: userId,
-      // A topic added to a subject that is already shared is shared too, unless
-      // the form said otherwise: having to publish it again by hand would be a
-      // trap, since the subject is public precisely to carry what is under it.
-      visibility:
-        createTopicDto.visibility ??
-        (await this.parentVisibility(userId, createTopicDto.subject_id)),
+      visibility,
     }).save();
 
     await this.postService.refresh(userId, created.subject_id);

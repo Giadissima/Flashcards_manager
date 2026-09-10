@@ -12,7 +12,12 @@ import { CommonModule } from '@angular/common';
 import { ModalComponent } from '../../shared/modal/modal.component';
 import { Router } from '@angular/router';
 import { VisibilityToggleComponent } from '../../shared/visibility-toggle/visibility-toggle.component';
-import { Visibility, defaultVisibility } from '../../models/visibility.dto';
+import { Visibility } from '../../models/visibility.dto';
+import {
+  DefaultFlashcardVisibility,
+  readDefaultFlashcardVisibility,
+  resolveDefaultFlashcardVisibility,
+} from '../../shared/default-flashcard-visibility';
 import { Editor } from '@tiptap/core';
 import { createRichTextEditor } from '../../shared/rich-text-editor/editor.factory';
 import { FlashcardService } from '../flashcard.service';
@@ -70,6 +75,9 @@ export class CreateFlashcard implements OnInit, OnDestroy {
     return this.cardForm.get('visibility') as FormControl<Visibility>;
   }
 
+  /** Read once when the form opens - see create-topic.component.ts for why. */
+  private visibilityDefaultMode: DefaultFlashcardVisibility = 'inherit';
+
   constructor(
     private fb: FormBuilder,
     private flashcardService: FlashcardService,
@@ -93,8 +101,11 @@ export class CreateFlashcard implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.visibilityDefaultMode = readDefaultFlashcardVisibility();
     this.cardForm = this.fb.group({
-      visibility: [defaultVisibility as Visibility],
+      visibility: [
+        resolveDefaultFlashcardVisibility(this.visibilityDefaultMode, undefined) as Visibility,
+      ],
       title: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(titleMaxLength)]],
       question: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(questionMaxLength)]],
       answer: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(answerMaxLength)]],
@@ -177,8 +188,14 @@ export class CreateFlashcard implements OnInit, OnDestroy {
       return;
     }
 
+    // Untouched "inherit" is left unset rather than sent as whatever the
+    // toggle happened to show before a topic/subject was chosen: the server
+    // then resolves it itself - see create-topic.component.ts for the same idea.
+    const stillInheriting =
+      this.visibilityDefaultMode === 'inherit' && !this.visibilityControl.dirty;
     const newCard = {
       ...this.cardForm.value,
+      visibility: stillInheriting ? undefined : this.cardForm.value.visibility,
       question: this.questionEditor.getHTML(),
       answer: this.answerEditor.getHTML()
     };
@@ -234,6 +251,7 @@ export class CreateFlashcard implements OnInit, OnDestroy {
       this.selectedTopicId = null;
       this.cardForm.get('topic_id')?.setValue(null);
     }
+    this.applyInheritedVisibility();
   }
 
   onTopicSelected(id: string | null | undefined): void {
@@ -250,5 +268,22 @@ export class CreateFlashcard implements OnInit, OnDestroy {
         (t) => (t.subject_id as Subject)?._id === subjectId,
       );
     }
+    this.applyInheritedVisibility();
+  }
+
+  /**
+   * "Inherit" (the settings default) follows the topic once one is chosen, or
+   * the subject failing that - the same priority the server falls back to
+   * itself. Left alone once the visitor has touched the toggle themselves.
+   */
+  private applyInheritedVisibility(): void {
+    if (this.visibilityDefaultMode !== 'inherit' || this.visibilityControl.dirty) return;
+
+    const topic = this.topics.find((t) => t._id === this.selectedTopicId);
+    const subject = this.subjects.find((s) => s._id === this.selectedSubjectId);
+    const parentVisibility = topic?.visibility ?? subject?.visibility;
+    this.visibilityControl.setValue(
+      resolveDefaultFlashcardVisibility('inherit', parentVisibility),
+    );
   }
 }

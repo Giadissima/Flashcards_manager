@@ -54,19 +54,20 @@ export class FlashcardsService {
     userId: string,
     createFlashcardDto: ModifyFlashcardDto,
   ): Promise<void> {
-    await this.publishing.assertMayPublish(
-      userId,
-      createFlashcardDto.visibility,
-    );
-
     const owned = await this.claimImages(userId, createFlashcardDto);
+    // A card added under something already shared is shared with it, unless
+    // the form said otherwise: the topic or subject was made public exactly
+    // to carry what goes in it.
+    const visibility =
+      owned.visibility ?? (await this.inheritedVisibility(userId, owned));
+    // Checked against the resolved value, not the raw one: inheriting public
+    // from the topic or subject counts as publishing too.
+    await this.publishing.assertMayPublish(userId, visibility);
+
     const created = await new this.flashcardModel({
       ...owned,
       user_id: userId,
-      // A card added under something already shared is shared with it, unless
-      // the form said otherwise: the topic or subject was made public exactly
-      // to carry what goes in it.
-      visibility: owned.visibility ?? (await this.inheritedVisibility(userId, owned)),
+      visibility,
       // Same idea for spaced repetition: a card added to a topic already
       // turned on for it starts on, instead of waiting for the topic's
       // toggle to be flipped off and on again to catch it.

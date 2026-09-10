@@ -7,6 +7,18 @@ import { CommonModule } from '@angular/common';
 import { ModalComponent } from '../shared/modal/modal.component';
 import { ThemeService } from '../shared/theme/theme.service';
 import { TutorialService } from '../shared/tutorial/tutorial.service';
+import {
+  DefaultTopicVisibility,
+  defaultTopicVisibilityDefault,
+  readDefaultTopicVisibility,
+  storeDefaultTopicVisibility,
+} from '../shared/default-topic-visibility';
+import {
+  DefaultFlashcardVisibility,
+  defaultFlashcardVisibilityDefault,
+  readDefaultFlashcardVisibility,
+  storeDefaultFlashcardVisibility,
+} from '../shared/default-flashcard-visibility';
 
 @Component({
   selector: 'app-settings-modal',
@@ -39,6 +51,32 @@ import { TutorialService } from '../shared/tutorial/tutorial.service';
           </div>
           <span class="settings-section-desc">{{ 'settings.darkModeDesc' | transloco }}</span>
         </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">
+          <span class="material-symbols-outlined">visibility</span>
+          {{ 'settings.topicVisibility' | transloco }}
+        </div>
+        <app-searchable-select
+          [options]="topicVisibilityOptions"
+          [value]="topicVisibilityDefault"
+          (valueChange)="setTopicVisibilityDefault($event)"
+        ></app-searchable-select>
+        <div class="settings-section-desc mt-2">{{ 'settings.topicVisibilityDesc' | transloco }}</div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">
+          <span class="material-symbols-outlined">visibility</span>
+          {{ 'settings.flashcardVisibility' | transloco }}
+        </div>
+        <app-searchable-select
+          [options]="flashcardVisibilityOptions"
+          [value]="flashcardVisibilityDefault"
+          (valueChange)="setFlashcardVisibilityDefault($event)"
+        ></app-searchable-select>
+        <div class="settings-section-desc mt-2">{{ 'settings.flashcardVisibilityDesc' | transloco }}</div>
       </div>
 
       <div class="settings-section">
@@ -111,6 +149,8 @@ export class SettingsModalComponent implements OnInit, OnChanges {
 
   isDarkMode = false;
   language: AppLanguage = 'it';
+  topicVisibilityDefault: DefaultTopicVisibility = defaultTopicVisibilityDefault;
+  flashcardVisibilityDefault: DefaultFlashcardVisibility = defaultFlashcardVisibilityDefault;
 
   readonly feedbackUrl = 'https://t.me/giadissima1234';
 
@@ -119,8 +159,26 @@ export class SettingsModalComponent implements OnInit, OnChanges {
     { value: 'en', label: 'English' },
   ];
 
+  get topicVisibilityOptions(): SelectOption[] {
+    return [
+      { value: 'inherit', label: this.transloco.translate('visibility.inherit') },
+      { value: 'public', label: this.transloco.translate('visibility.public') },
+      { value: 'private', label: this.transloco.translate('visibility.private') },
+    ];
+  }
+
+  get flashcardVisibilityOptions(): SelectOption[] {
+    return [
+      { value: 'inherit', label: this.transloco.translate('visibility.inheritFlashcard') },
+      { value: 'public', label: this.transloco.translate('visibility.public') },
+      { value: 'private', label: this.transloco.translate('visibility.private') },
+    ];
+  }
+
   private originalDarkMode = false;
   private originalLanguage: AppLanguage = 'it';
+  private originalTopicVisibilityDefault: DefaultTopicVisibility = defaultTopicVisibilityDefault;
+  private originalFlashcardVisibilityDefault: DefaultFlashcardVisibility = defaultFlashcardVisibilityDefault;
 
   constructor(
     private transloco: TranslocoService,
@@ -131,6 +189,8 @@ export class SettingsModalComponent implements OnInit, OnChanges {
   ngOnInit(): void {
     this.isDarkMode = this.themeService.theme === 'dark';
     this.loadLanguage();
+    this.topicVisibilityDefault = readDefaultTopicVisibility();
+    this.flashcardVisibilityDefault = readDefaultFlashcardVisibility();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -138,21 +198,36 @@ export class SettingsModalComponent implements OnInit, OnChanges {
     if (changes['isOpen'] && this.isOpen) {
       this.originalDarkMode = this.isDarkMode;
       this.originalLanguage = this.language;
+      this.originalTopicVisibilityDefault = this.topicVisibilityDefault;
+      this.originalFlashcardVisibilityDefault = this.flashcardVisibilityDefault;
     }
   }
 
   save(): void {
     this.themeService.persist();
     storeLanguage(this.language);
+    storeDefaultTopicVisibility(this.topicVisibilityDefault);
+    storeDefaultFlashcardVisibility(this.flashcardVisibilityDefault);
     this.closeModal();
   }
 
   cancel(): void {
     this.isDarkMode = this.originalDarkMode;
     this.language = this.originalLanguage;
+    this.topicVisibilityDefault = this.originalTopicVisibilityDefault;
+    this.flashcardVisibilityDefault = this.originalFlashcardVisibilityDefault;
     this.themeService.setTheme(this.isDarkMode ? 'dark' : 'light');
     this.transloco.setActiveLang(this.originalLanguage);
     this.closeModal();
+  }
+
+  setTopicVisibilityDefault(value: string | null | undefined): void {
+    this.topicVisibilityDefault = (value as DefaultTopicVisibility) ?? defaultTopicVisibilityDefault;
+  }
+
+  setFlashcardVisibilityDefault(value: string | null | undefined): void {
+    this.flashcardVisibilityDefault =
+      (value as DefaultFlashcardVisibility) ?? defaultFlashcardVisibilityDefault;
   }
 
   // The theme is applied right away as a preview, but only written to

@@ -10,7 +10,8 @@ import {
 import { CommonModule } from '@angular/common';
 import { ModalComponent } from '../../shared/modal/modal.component';
 import { VisibilityToggleComponent } from '../../shared/visibility-toggle/visibility-toggle.component';
-import { Visibility, defaultVisibility } from '../../models/visibility.dto';
+import { Visibility } from '../../models/visibility.dto';
+import { Topic } from '../../models/topic.dto';
 import { NgxColorsComponent, NgxColorsTriggerDirective } from 'ngx-colors';
 import { PageCardComponent } from '../../shared/page-card/page-card.component';
 import { TopicService } from '../topic.service';
@@ -27,6 +28,11 @@ import {
 import { charMinLength, nameMaxLength } from '../../../config/config';
 import { ThemeService } from '../../shared/theme/theme.service';
 import { toSubjectOptions } from '../../shared/select-options.util';
+import {
+  DefaultTopicVisibility,
+  readDefaultTopicVisibility,
+  resolveDefaultTopicVisibility,
+} from '../../shared/default-topic-visibility';
 
 @Component({
   selector: 'app-create-topic',
@@ -64,6 +70,13 @@ export class CreateTopicComponent implements OnInit {
     return this.topicForm.get('visibility') as FormControl<Visibility>;
   }
 
+  /**
+   * Read once when the form opens: the settings modal is the only place this
+   * changes, and re-reading mid-form would fight with whatever the toggle
+   * currently shows.
+   */
+  private visibilityDefaultMode: DefaultTopicVisibility = 'inherit';
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -76,8 +89,11 @@ export class CreateTopicComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.visibilityDefaultMode = readDefaultTopicVisibility();
     this.topicForm = this.fb.group({
-      visibility: [defaultVisibility as Visibility],
+      visibility: [
+        resolveDefaultTopicVisibility(this.visibilityDefaultMode, undefined) as Visibility,
+      ],
       name: [
         '',
         [
@@ -90,6 +106,21 @@ export class CreateTopicComponent implements OnInit {
       subject_id: [null], // Assuming subject_id is required
     });
     this.loadSubjects();
+  }
+
+  /**
+   * "Inherit" (the settings default) is a moving target until a subject is
+   * picked: once it is, the toggle jumps to match it - unless the visitor
+   * already touched the toggle themselves, which always wins.
+   */
+  onSubjectChange(subjectId: string | null | undefined): void {
+    this.topicForm.get('subject_id')?.setValue(subjectId);
+
+    if (this.visibilityDefaultMode !== 'inherit' || this.visibilityControl.dirty) return;
+    const subject = this.subjects.find((s) => s._id === subjectId);
+    this.visibilityControl.setValue(
+      resolveDefaultTopicVisibility('inherit', subject?.visibility),
+    );
   }
 
   closeEmptyStateModal(): void {
@@ -113,7 +144,17 @@ export class CreateTopicComponent implements OnInit {
     }
 
     try {
-      await this.topicService.createTopic(this.topicForm.value);
+      const { visibility, ...rest } = this.topicForm.value;
+      // Untouched "inherit" is left unset rather than sent as whatever the
+      // toggle happened to show before a subject was chosen: the server then
+      // resolves it itself, which also covers the no-subject-yet case.
+      const stillInheriting =
+        this.visibilityDefaultMode === 'inherit' && !this.visibilityControl.dirty;
+      const payload: Topic = {
+        ...rest,
+        visibility: stillInheriting ? undefined : visibility,
+      };
+      await this.topicService.createTopic(payload);
       this.toastService.show(
         this.transloco.translate('topic.toast.created'),
         'success',
