@@ -9,6 +9,7 @@
       [ngModel]="value"
       [disabled]="disabled"
       (ngModelChange)="onInput($event)"
+      (keyup.enter)="onSearch()"
     />
     @if (value) {
     <button type="button" class="search-clear-btn" (click)="clear()" [attr.aria-label]="t('common.clearSearch')">
@@ -16,7 +17,7 @@
     </button>
     }
   </div>
-  <span class="input-group-text search-icon">
+  <button type="button" class="input-group-text search-icon" [disabled]="disabled" (click)="onSearch()" [attr.aria-label]="t('common.search')">
     <span class="material-symbols-outlined">search</span>
-  </span>
+  </button>
 </div>

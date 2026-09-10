@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { restrictionOf } from '../shared/restriction';
-import { Subject as RxSubject, Subscription, debounceTime } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { SearchableSelectComponent, SelectOption } from '../shared/searchable-select/searchable-select.component';
 import { SearchInputComponent } from '../shared/search-input/search-input.component';
 import { PaginationComponent } from '../shared/pagination/pagination.component';
@@ -78,11 +78,6 @@ export class Home extends PaginatedList implements OnInit, OnDestroy {
   overflowMap: Record<string, boolean> = {};
 
   private queryParamsSubscription?: Subscription;
-  // Debounces search-box typing: each keystroke updates searchTerm immediately (so
-  // the input feels responsive) but the actual reload only fires 1s after the user
-  // stops typing - otherwise every keystroke on a slow connection locks the field.
-  private readonly searchTermChanges = new RxSubject<void>();
-  private searchTermChangesSubscription?: Subscription;
   // true only for the very first queryParamMap emission: that's the one wrapped
   // in app-load-state. Later ones (filter/sort/page changes) reload in place -
   // swapping the whole page for a spinner on every filter click would be bad UX.
@@ -115,11 +110,6 @@ export class Home extends PaginatedList implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.searchTermChangesSubscription = this.searchTermChanges.pipe(debounceTime(1000)).subscribe(() => {
-      this.currentPage = 1;
-      this.updateQueryParams();
-    });
-
     // Subscription, not snapshot: navigating to /home while already on /home
     // (clicking the logo, for instance) makes Angular reuse the existing
     // component and skip ngOnInit, but this subscription fires anyway and
@@ -241,7 +231,11 @@ export class Home extends PaginatedList implements OnInit, OnDestroy {
 
   onSearchTermChange(term: string): void {
     this.searchTerm = term;
-    this.searchTermChanges.next();
+  }
+
+  onSearch(term: string): void {
+    this.searchTerm = term;
+    this.onFilterChange();
   }
 
   setSortBy(field: 'title' | 'createdAt'): void {
@@ -324,7 +318,6 @@ export class Home extends PaginatedList implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.queryParamsSubscription?.unsubscribe();
-    this.searchTermChangesSubscription?.unsubscribe();
   }
 
   async deleteCard(card: Flashcard): Promise<void> {

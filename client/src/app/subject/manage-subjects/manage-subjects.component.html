@@ -9,6 +9,7 @@
             [value]="searchTerm"
             [placeholder]="t('subject.manage.searchPlaceholder')"
             (valueChange)="onSearchTermChange($event)"
+            (search)="onSearch($event)"
           ></app-search-input>
         </div>
       </div>

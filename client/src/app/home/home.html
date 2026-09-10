@@ -62,6 +62,7 @@
           [placeholder]="t('home.searchPlaceholder')"
           [disabled]="isReloading"
           (valueChange)="onSearchTermChange($event)"
+          (search)="onSearch($event)"
         ></app-search-input>
       </div>
       <div class="filter-col--auto">

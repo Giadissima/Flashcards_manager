@@ -97,6 +97,10 @@ export class ManageSubjectsComponent extends PaginatedList implements OnInit {
 
   onSearchTermChange(term: string): void {
     this.searchTerm = term;
+  }
+
+  onSearch(term: string): void {
+    this.searchTerm = term;
     this.onFilterChange();
   }
 

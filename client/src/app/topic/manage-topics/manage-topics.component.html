@@ -22,6 +22,7 @@
             [value]="searchTerm"
             [placeholder]="t('topic.manage.searchPlaceholder')"
             (valueChange)="onSearchTermChange($event)"
+            (search)="onSearch($event)"
           ></app-search-input>
         </div>
 

@@ -10,10 +10,16 @@
    on Bootstrap. */
 .search-icon {
   background-color: var(--secondary-color);
-  border-left: 0px;
+  border: 0px;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
   color: var(--header-color);
+  cursor: pointer;
+}
+
+.search-icon:disabled {
+  cursor: default;
+  opacity: 0.7;
 }
 
 .search-input-wrapper {
