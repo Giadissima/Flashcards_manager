@@ -382,13 +382,18 @@
       "modeBasicDesc": "Pick a subject and topic, draw at random",
       "modeWrongTitle": "Weak cards",
       "modeWrongDesc": "Review the questions you're currently getting wrong",
+      "modeWrongExplain": "A card counts as weak once you've gotten it wrong on a large share of your attempts. It works on every card, whether or not spaced repetition is turned on for it.",
       "modeDailyTitle": "Daily review",
       "modeDailyDesc": "Cards due today, among the ones you've turned on",
+      "modeDailyExplain": "Spaced repetition schedules each card's next review based on how well you know it: cards you get right come back after a longer break, cards you get wrong come back right away.",
+      "manageSrButton": "Manage daily topics",
       "noneToReviewError": "There's nothing to review right now.",
+      "noneToReviewDailyError": "There's nothing due for review yet. Press \"Manage daily topics\" above and turn it on for the topics you want.",
       "subjectLabel": "Subject",
       "selectSubject": "Select subject",
       "topicLabel": "Topic",
       "selectTopic": "Select topic",
+      "dateLabel": "Added between",
       "numQuestionsLabel": "Number of questions",
       "incrementAria": "Increase number of questions",
       "decrementAria": "Decrease number of questions",
@@ -540,13 +545,15 @@
     }
   },
   "spacedRepetition": {
-    "turnOn": "Turn on spaced repetition",
-    "turnOff": "Turn off spaced repetition",
-    "toastOn": "Spaced repetition turned on",
-    "toastOff": "Spaced repetition turned off",
-    "toastOnSubject": "Turned on for every topic of the subject",
-    "toastOffSubject": "Turned off for every topic of the subject",
-    "toastError": "Couldn't change the setting"
+    "toastError": "Couldn't change the setting",
+    "manage": {
+      "title": "Manage spaced repetition",
+      "intro": "Turn spaced repetition on for the subjects or topics you want in your daily review.",
+      "empty": "You don't have any topics yet.",
+      "loadError": "Couldn't load your topics",
+      "confirmButton": "Confirm",
+      "cancelButton": "Cancel"
+    }
   },
   "visibility": {
     "label": "Visibility",

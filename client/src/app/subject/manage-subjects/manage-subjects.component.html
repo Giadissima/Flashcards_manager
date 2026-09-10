@@ -45,8 +45,6 @@
             <div class="cell-actions-inner">
               <app-visibility-button [visibility]="subject.visibility ?? 'private'"
                 [busy]="visibilityBusyId === subject._id" (toggled)="onVisibilityToggled(subject, $event)"></app-visibility-button>
-              <app-sr-toggle-button [enabled]="srStatus[subject._id ?? ''] ?? false"
-                [busy]="srBusyId === subject._id" (toggled)="onSrToggled(subject, $event)"></app-sr-toggle-button>
               <button class="btn btn-icon-ghost" (click)="editSubject(subject._id)" [attr.aria-label]="t('common.edit')">
                 <span class="material-symbols-outlined">
                 edit

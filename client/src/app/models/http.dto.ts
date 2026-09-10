@@ -32,14 +32,14 @@ export interface CardFilter extends SimplePaginatedResponse {
   imported?: boolean;
 }
 
-/** What the count endpoint takes: a set of cards, narrowed by visibility. */
-export type CountCardFilter = {
+/** What the count endpoint takes: a set of cards, narrowed by visibility and a date range. */
+export type CountCardFilter = Pick<CardFilter, 'from' | 'to'> & {
   subject_id?: string;
   topic_ids?: string[];
   visibility?: Visibility;
 };
 
-export type RandomCardFIlter = Pick<CardFilter, 'subject_id'> & {
+export type RandomCardFIlter = Pick<CardFilter, 'subject_id' | 'from' | 'to'> & {
   // Several topics of the subject at once; empty or absent means all of them.
   topic_ids?: string[];
   numFlashcard?: number;

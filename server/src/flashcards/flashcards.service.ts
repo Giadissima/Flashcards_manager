@@ -507,6 +507,8 @@ export class FlashcardsService {
     if ('visibility' in filter && filter.visibility) {
       query.visibility = filter.visibility;
     }
+    const createdAt = dateRangeQuery(filter);
+    if (createdAt) query.createdAt = createdAt;
     return query;
   }
 

@@ -19,6 +19,23 @@
       </button>
     </div>
 
+    <!-- What the picked mode actually means, for whoever does not already know
+         the term - and, for "daily", the one control it depends on. -->
+    @if (mode === 'wrong') {
+    <div class="mode-info mb-4">
+      <p class="mode-info-text">{{ 'test.setup.modeWrongExplain' | transloco }}</p>
+    </div>
+    }
+    @if (mode === 'daily') {
+    <div class="mode-info mb-4">
+      <p class="mode-info-text">{{ 'test.setup.modeDailyExplain' | transloco }}</p>
+      <button type="button" class="btn btn-outline-primary btn-sm" (click)="openManageSr()">
+        <span class="material-symbols-outlined">tune</span>
+        {{ 'test.setup.manageSrButton' | transloco }}
+      </button>
+    </div>
+    }
+
     <form [formGroup]="testForm" (ngSubmit)="startTest()" novalidate>
       <div class="mb-3">
         <label class="form-label">{{ 'test.setup.subjectLabel' | transloco }}</label>
@@ -51,6 +68,12 @@
           [attr.aria-disabled]="!canAddTopic" (click)="addTopic()" (keydown.enter)="addTopic()">
           <span class="material-symbols-outlined">add</span>{{ 'test.setup.addTopic' | transloco }}
         </a>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">{{ 'test.setup.dateLabel' | transloco }}</label>
+        <app-date-range-filter class="date-filter" [from]="dateFrom" [to]="dateTo"
+          (rangeChange)="onDateRangeChange($event)"></app-date-range-filter>
       </div>
 
       <div class="mb-3">
@@ -107,3 +130,5 @@
     </form>
   </app-page-card>
 </div>
+
+<app-sr-manage-modal [isOpen]="manageSrOpen" (isOpenChange)="manageSrOpen = $event"></app-sr-manage-modal>

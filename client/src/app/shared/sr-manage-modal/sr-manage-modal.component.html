@@ -1,0 +1,45 @@
+<app-modal [isOpen]="isOpen" [title]="'spacedRepetition.manage.title' | transloco" dialogClass="modal-lg"
+  [showFooter]="true" (closed)="cancel()" *transloco="let t">
+  @if (loading) {
+  <div class="sr-manage-loading">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">{{ 'common.loading' | transloco }}</span>
+    </div>
+  </div>
+  } @else if (!groups.length) {
+  <p class="sr-manage-empty">{{ 'spacedRepetition.manage.empty' | transloco }}</p>
+  } @else {
+  <p class="sr-manage-intro">{{ 'spacedRepetition.manage.intro' | transloco }}</p>
+
+  @for (group of groups; track group.subject._id) {
+  <section class="sr-manage-group">
+    <label class="sr-row is-root">
+      <input type="checkbox" class="form-check-input" [checked]="allEnabled(group)"
+        [indeterminate]="someEnabled(group)" [disabled]="isBusy('subject:' + group.subject._id) || reverting"
+        (change)="toggleSubject(group)">
+      <span class="sr-name">{{ group.subject.name }}</span>
+    </label>
+
+    <div class="sr-children">
+      @for (topic of group.topics; track topic._id) {
+      <label class="sr-row">
+        <input type="checkbox" class="form-check-input" [checked]="!!topic.in_spaced_repetition"
+          [disabled]="isBusy('topic:' + topic._id) || reverting" (change)="toggleTopic(topic)">
+        <span class="sr-dot" [style.background-color]="topic.color || 'transparent'"></span>
+        <span class="sr-name">{{ topic.name }}</span>
+      </label>
+      }
+    </div>
+  </section>
+  }
+  }
+
+  <ng-container modal-footer>
+    <button type="button" class="btn btn-outline-primary" [disabled]="reverting" (click)="cancel()">
+      <span class="material-symbols-outlined">close</span>{{ 'spacedRepetition.manage.cancelButton' | transloco }}
+    </button>
+    <button type="button" class="btn btn-primary" [disabled]="reverting" (click)="confirm()">
+      <span class="material-symbols-outlined">check</span>{{ 'spacedRepetition.manage.confirmButton' | transloco }}
+    </button>
+  </ng-container>
+</app-modal>

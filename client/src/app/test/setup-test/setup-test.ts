@@ -4,11 +4,14 @@ import { PageCardComponent } from '../../shared/page-card/page-card.component';
 import { Question } from '../../models/test.dto';
 
 import { CommonModule } from '@angular/common';
+import { DateRange, DateRangeFilterComponent } from '../../shared/date-range-filter/date-range-filter.component';
 import { FlashcardService } from '../../flashcard/flashcard.service';
+import { hasSeenDailyReviewSetup, markDailyReviewSetupSeen } from '../../shared/daily-review-setup-seen';
 import { RandomCardFIlter } from '../../models/http.dto';
 import { RandomFlashcard } from '../../models/flashcard.dto';
 import { Router } from '@angular/router';
 import { SearchableSelectComponent, SelectOption } from '../../shared/searchable-select/searchable-select.component';
+import { SrManageModalComponent } from '../../shared/sr-manage-modal/sr-manage-modal.component';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
 import { TestService } from '../test.service';
@@ -38,7 +41,7 @@ export function subjectOrTopicValidator(getMode: () => TestMode): ValidatorFn {
 @Component({
   selector: 'app-setup-test',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, SearchableSelectComponent, TranslocoModule, PageCardComponent],
+  imports: [ReactiveFormsModule, CommonModule, SearchableSelectComponent, TranslocoModule, PageCardComponent, DateRangeFilterComponent, SrManageModalComponent],
   templateUrl: './setup-test.html',
   styleUrls: ['./setup-test.scss']
 })
@@ -51,6 +54,13 @@ export class SetupTest implements OnInit {
 
   /** Which of the three squares is selected; "basic" is today's plain manual test. */
   mode: TestMode = 'basic';
+
+  /** Whether the "manage spaced repetition" tree dialog is open. */
+  manageSrOpen = false;
+
+  /** The two ends of the range cards are drawn from, as YYYY-MM-DD days; null is an open end. */
+  dateFrom: string | null = null;
+  dateTo: string | null = null;
 
   // Only "basic" draws a fixed count from an exact set the count endpoint
   // can size in advance; "wrong" and "daily" draw from a rule and are
@@ -65,6 +75,18 @@ export class SetupTest implements OnInit {
     // it has to be told to run again, or the switch would not be reflected
     // until some unrelated control change re-triggered validation on its own.
     this.testForm.updateValueAndValidity();
+
+    // The first time "daily" is picked, nothing is turned on yet and the
+    // test would just come back empty - open the manager itself instead of
+    // leaving that to be discovered from a failed submit.
+    if (mode === 'daily' && !hasSeenDailyReviewSetup()) {
+      markDailyReviewSetupSeen();
+      this.manageSrOpen = true;
+    }
+  }
+
+  openManageSr(): void {
+    this.manageSrOpen = true;
   }
 
   get subjectOptions(): SelectOption[] {
@@ -169,6 +191,17 @@ export class SetupTest implements OnInit {
     this.testForm.get(controlName)?.markAsTouched();
   }
 
+  onDateRangeChange(range: DateRange): void {
+    this.dateFrom = range.from;
+    this.dateTo = range.to;
+    this.updateFlashcardCount();
+  }
+
+  /** The date range as it goes on every request: an open end left out entirely. */
+  private get dateFilter(): Pick<RandomCardFIlter, 'from' | 'to'> {
+    return { from: this.dateFrom ?? undefined, to: this.dateTo ?? undefined };
+  }
+
   async updateFlashcardCount(): Promise<void> {
     const subject_id = this.testForm.get('subject_id')?.value;
     const topic_ids = this.selectedTopicIds;
@@ -176,12 +209,12 @@ export class SetupTest implements OnInit {
       this.flashcardCount = null;
       return;
     }
-    this.flashcardCount = await this.flashcardService.count({ subject_id, topic_ids });
+    this.flashcardCount = await this.flashcardService.count({ subject_id, topic_ids, ...this.dateFilter });
   }
 
   async setMaxQuestions(): Promise<void> {
     const subject_id = this.testForm.get('subject_id')?.value;
-    const count = await this.flashcardService.count({ subject_id, topic_ids: this.selectedTopicIds });
+    const count = await this.flashcardService.count({ subject_id, topic_ids: this.selectedTopicIds, ...this.dateFilter });
     this.testForm.get('numFlashcard')?.setValue(Math.min(count, 1000) || 1);
   }
 
@@ -218,7 +251,12 @@ export class SetupTest implements OnInit {
     if (this.testForm.valid && !this.noFlashcardsAvailable) {
       const subject_id = this.testForm.get('subject_id')?.value;
       const numFlashcard = this.testForm.get('numFlashcard')?.value;
-      const queryParams: RandomCardFIlter = { subject_id, topic_ids: this.selectedTopicIds, numFlashcard };
+      const queryParams: RandomCardFIlter = {
+        subject_id,
+        topic_ids: this.selectedTopicIds,
+        numFlashcard,
+        ...this.dateFilter,
+      };
 
       await this.createTest(queryParams);
     }
@@ -241,9 +279,12 @@ export class SetupTest implements OnInit {
       const flashcards = await this.drawFlashcards(query);
       // "Wrong" and "daily" have no known size ahead of the draw (see
       // noFlashcardsAvailable): an empty result is discovered here instead,
-      // and read as "nothing to review" rather than a failure.
+      // and read as "nothing to review" rather than a failure. "Daily" gets
+      // its own message pointing at the manager, since an empty draw there
+      // almost always means nothing has been turned on yet.
       if (!flashcards.length) {
-        this.toastService.show(this.transloco.translate('test.setup.noneToReviewError'), 'error');
+        const key = this.mode === 'daily' ? 'test.setup.noneToReviewDailyError' : 'test.setup.noneToReviewError';
+        this.toastService.show(this.transloco.translate(key), 'error');
         return;
       }
       const questions: Question[] = flashcards.map(fc => ({

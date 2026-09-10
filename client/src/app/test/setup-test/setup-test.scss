@@ -50,6 +50,26 @@
   color: var(--text-color);
 }
 
+/* The plain-language explanation of whichever mode is picked, plus the
+   activation shortcut for "daily" - sits between the tiles and the form so
+   it reads before the fields it justifies, not after them. */
+.mode-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(var(--spacing-unit) * 0.75);
+  padding: calc(var(--spacing-unit) * 1.25);
+  background-color: var(--primary-tint-soft);
+  border: 1px solid var(--primary-color);
+  border-radius: var(--border-radius-md);
+}
+
+.mode-info-text {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-color);
+}
+
 /* The tiles wrap into a column before the form below them does (the topic
    rows keep working down to a narrow phone width on their own), so the
    titles do not get squeezed into a wrap of their own first. */
@@ -57,6 +77,12 @@
   .mode-tiles {
     grid-template-columns: 1fr;
   }
+}
+
+/* Sized to fit the range itself, not stretched to the form's full width -
+   the date-range filter's :host is display: block by default. */
+.date-filter {
+  max-width: 18rem;
 }
 
 .number-stepper {

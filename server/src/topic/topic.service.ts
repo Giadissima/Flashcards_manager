@@ -40,10 +40,19 @@ export class TopicService {
     // from the subject counts as publishing too.
     await this.publishing.assertMayPublish(userId, visibility);
 
+    // Same idea for spaced repetition: a topic added under a subject whose
+    // other topics are all already in it joins them too, rather than sitting
+    // out until someone remembers to turn it on by hand.
+    const inSpacedRepetition = await this.parentSpacedRepetition(
+      userId,
+      createTopicDto.subject_id,
+    );
+
     const created = await new this.topicModel({
       ...createTopicDto,
       user_id: userId,
       visibility,
+      in_spaced_repetition: inSpacedRepetition,
     }).save();
 
     await this.postService.refresh(userId, created.subject_id);
@@ -61,6 +70,21 @@ export class TopicService {
       .lean()
       .exec();
     return subject?.visibility === 'public' ? 'public' : defaultVisibility;
+  }
+
+  /**
+   * Whether the subject this hangs under currently reads as "on" - every one
+   * of its existing topics already in spaced repetition. A subject with no
+   * topics yet has nothing to inherit, so a first topic never starts on by
+   * itself.
+   */
+  private async parentSpacedRepetition(
+    userId: string,
+    subjectId?: string,
+  ): Promise<boolean> {
+    if (!subjectId) return false;
+    const status = await this.spacedRepetitionStatus(userId, [subjectId]);
+    return status[subjectId] ?? false;
   }
 
   findOne(userId: string, id: string): Promise<TopicDocument> {

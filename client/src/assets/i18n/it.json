@@ -382,13 +382,18 @@
       "modeBasicDesc": "Scegli materia e argomento, pesca a caso",
       "modeWrongTitle": "Flashcard deboli",
       "modeWrongDesc": "Ripassa le domande che stai sbagliando",
+      "modeWrongExplain": "Una flashcard è considerata debole quando la sbagli in una grande parte dei tentativi. Funziona su tutte le carte, indipendentemente dal fatto che la ripetizione dilazionata sia attiva o meno.",
       "modeDailyTitle": "Ripasso del giorno",
       "modeDailyDesc": "Le flashcard in scadenza oggi, tra quelle attivate",
+      "modeDailyExplain": "La ripetizione dilazionata programma il prossimo ripasso di ogni carta in base a quanto la conosci: le carte che rispondi bene tornano dopo un intervallo più lungo, quelle che sbagli tornano subito.",
+      "manageSrButton": "Gestisci argomenti del giorno",
       "noneToReviewError": "Non c'è nulla da ripassare al momento.",
+      "noneToReviewDailyError": "Non c'è ancora nulla da ripassare. Premi \"Gestisci argomenti del giorno\" qui sopra e attivala sugli argomenti che vuoi.",
       "subjectLabel": "Materia",
       "selectSubject": "Seleziona materia",
       "topicLabel": "Argomento",
       "selectTopic": "Seleziona argomento",
+      "dateLabel": "Aggiunte tra",
       "numQuestionsLabel": "Numero di domande",
       "incrementAria": "Aumenta il numero di domande",
       "decrementAria": "Diminuisci il numero di domande",
@@ -540,13 +545,15 @@
     }
   },
   "spacedRepetition": {
-    "turnOn": "Attiva la ripetizione dilazionata",
-    "turnOff": "Disattiva la ripetizione dilazionata",
-    "toastOn": "Ripetizione dilazionata attivata",
-    "toastOff": "Ripetizione dilazionata disattivata",
-    "toastOnSubject": "Attivata per tutti gli argomenti della materia",
-    "toastOffSubject": "Disattivata per tutti gli argomenti della materia",
-    "toastError": "Non è stato possibile cambiare l'impostazione"
+    "toastError": "Non è stato possibile cambiare l'impostazione",
+    "manage": {
+      "title": "Gestisci ripetizione dilazionata",
+      "intro": "Attiva la ripetizione dilazionata per le materie o gli argomenti che vuoi nel ripasso del giorno.",
+      "empty": "Non hai ancora nessun argomento.",
+      "loadError": "Non è stato possibile caricare i tuoi argomenti",
+      "confirmButton": "Conferma",
+      "cancelButton": "Annulla"
+    }
   },
   "visibility": {
     "label": "Visibilità",

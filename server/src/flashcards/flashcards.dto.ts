@@ -67,9 +67,9 @@ export class ModifyFlashcardDto {
 
 }
 
-/** Subject/topic filters shared by the "count" and "random" endpoints. */
+/** Subject/topic/date filters shared by the "count" and "random" endpoints. */
 /** Where a set of cards is taken from: a subject, and any of its topics. */
-export class CardSetFilter {
+export class CardSetFilter extends DateRangeRequest {
   @IsOptional()
   @IsMongoId()
   @ApiProperty({
