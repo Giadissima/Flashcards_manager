@@ -1,4 +1,5 @@
-import { Controller, Get, Param, Patch, Query } from '@nestjs/common';
+import { Controller, Get, Param, Patch, Query, Sse } from '@nestjs/common';
+import { Observable, map } from 'rxjs';
 
 import { ApiOperation } from '@nestjs/swagger';
 import { BasePaginatedResult } from 'src/common.dto';
@@ -27,6 +28,17 @@ export class NotificationController {
   @Get('unread-count')
   countUnread(@CurrentUser() user: JwtPayload): Promise<number> {
     return this.notificationService.countUnread(user.sub);
+  }
+
+  @ApiOperation({
+    description:
+      'pushes one empty event whenever a new notification is recorded, so the bell can refresh its badge without polling',
+  })
+  @Sse('stream')
+  stream(@CurrentUser() user: JwtPayload): Observable<{ data: string }> {
+    return this.notificationService
+      .watch(user.sub)
+      .pipe(map(() => ({ data: '' })));
   }
 
   @ApiOperation({ description: 'mark every notification as read' })

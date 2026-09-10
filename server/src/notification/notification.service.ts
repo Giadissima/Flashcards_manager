@@ -9,6 +9,7 @@ import { BasePaginatedResult } from 'src/common.dto';
 import { NotificationFilterRequest } from './notification.dto';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { Observable, Subject } from 'rxjs';
 
 /** What a notification needs to be recorded. */
 export interface NewNotification {
@@ -27,6 +28,12 @@ const previewLength = 120;
 
 @Injectable()
 export class NotificationService {
+  // One Subject per user with a stream open, so the SSE endpoint below can
+  // push "you have something new" the moment record() writes it - kept in
+  // memory only, since a missed event just means the badge waits for the
+  // next one, or the poll on reconnect, instead of staying wrong.
+  private readonly streams = new Map<string, Subject<void>>();
+
   constructor(
     @InjectModel(Notification.name)
     private notificationModel: Model<Notification>,
@@ -53,6 +60,18 @@ export class NotificationService {
       moderation: event.moderation,
       read: false,
     });
+
+    this.streams.get(user_id.toString())?.next();
+  }
+
+  /** One update per new notification for this user, for as long as they are listening. */
+  watch(userId: string): Observable<void> {
+    let stream = this.streams.get(userId);
+    if (!stream) {
+      stream = new Subject<void>();
+      this.streams.set(userId, stream);
+    }
+    return stream.asObservable();
   }
 
   async findMine(

@@ -1,5 +1,5 @@
 import { AppNotification, Feedback, FeedbackMessage, NotificationKind, notificationKinds } from '../models/social.dto';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 
 import { AuthService } from '../auth/auth.service';
@@ -13,6 +13,7 @@ import { PaginationComponent } from '../shared/pagination/pagination.component';
 import { PostReportModalComponent, ReportKind } from '../community/post-report-modal/post-report-modal.component';
 import { restrictionMessage } from '../shared/restriction';
 import { SearchableSelectComponent, SelectOption } from '../shared/searchable-select/searchable-select.component';
+import { Subscription } from 'rxjs';
 import { ToastService } from '../shared/toast/toast.service';
 
 /** How many messages an exchange holds before it is closed. */
@@ -41,7 +42,7 @@ const maxFeedbackMessages = 3;
   templateUrl: './notification-panel.component.html',
   styleUrl: './notification-panel.component.scss',
 })
-export class NotificationPanelComponent extends PaginatedList implements OnInit {
+export class NotificationPanelComponent extends PaginatedList implements OnInit, OnDestroy {
   // Rendered as a labelled row (icon + "Notifiche") instead of the plain
   // round bell button, for the drawer's profile card where it sits alongside
   // "Profilo" and "Esci" as one of a list rather than a standalone control.
@@ -78,6 +79,8 @@ export class NotificationPanelComponent extends PaginatedList implements OnInit 
   reportMessageId = '';
   reportAuthorUsername = '';
 
+  private unreadSub: Subscription | null = null;
+
   constructor(
     private notificationService: NotificationService,
     private communityService: CommunityService,
@@ -89,7 +92,15 @@ export class NotificationPanelComponent extends PaginatedList implements OnInit 
   }
 
   ngOnInit(): void {
-    void this.refreshBadge();
+    // The service owns the count - kept live by its own SSE connection - and
+    // this just mirrors it into the field the template already binds to.
+    this.unreadSub = this.notificationService.unread$.subscribe((count) => {
+      this.unread = count;
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.unreadSub?.unsubscribe();
   }
 
   async toggle(): Promise<void> {
@@ -235,7 +246,6 @@ export class NotificationPanelComponent extends PaginatedList implements OnInit 
   async onNotificationClick(notification: AppNotification): Promise<void> {
     if (!notification.read) {
       notification.read = true;
-      this.unread = Math.max(0, this.unread - 1);
       void this.notificationService.markRead(notification._id);
     }
     if (notification.feedback_id) await this.openFeedback(notification.feedback_id);
@@ -244,7 +254,6 @@ export class NotificationPanelComponent extends PaginatedList implements OnInit 
   async markAllRead(): Promise<void> {
     await this.notificationService.markAllRead();
     this.notifications.forEach((n) => (n.read = true));
-    this.unread = 0;
   }
 
   /** True while it is this user's turn and the exchange still has room. */
@@ -327,19 +336,11 @@ export class NotificationPanelComponent extends PaginatedList implements OnInit 
       this.totalCount = page.count;
       // Counted from the server, not from the page on screen: a filtered list
       // says nothing about how many are unread in total
-      this.unread = Number(await this.notificationService.countUnread()) || 0;
+      await this.notificationService.refreshUnread();
       this.openReports = open.data;
       this.openCount = open.count;
     } finally {
       this.loading = false;
-    }
-  }
-
-  private async refreshBadge(): Promise<void> {
-    try {
-      this.unread = Number(await this.notificationService.countUnread()) || 0;
-    } catch {
-      this.unread = 0;
     }
   }
 }
