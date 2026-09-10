@@ -463,8 +463,14 @@
       "endConfirmTitle": "End the test?",
       "endConfirmMessage": "You answered {{answered}} questions out of {{total}}. The remaining {{remaining}} will stay unanswered and the test can no longer be resumed.",
       "endConfirmMessageAll": "You answered every question. The test will be closed and you will see the result.",
+      "backToCommunity": "Back to Community",
+      "communityExitTitle": "Save this run?",
+      "communityExitMessage": "This test was started from a community post. You can save it to your test history, or leave without keeping it.",
+      "communityExitSave": "Save and exit",
+      "communityExitDiscard": "Discard and exit",
       "toast": {
-        "exited": "Test paused, your progress is saved"
+        "exited": "Test paused, your progress is saved",
+        "discarded": "Test discarded"
       }
     },
     "topicCount": "{{count}} topics"
@@ -589,12 +595,8 @@
     "reportPost": "Report this post",
     "importAll": "Add the whole set to my flashcards",
     "tryDeck": "Try this deck",
-    "try": {
-      "subtitle": "A trial run: nothing here is saved to your account.",
-      "exit": "Back to Community",
-      "score": "{{correct}} correct out of {{answered}} answered",
-      "error": "The deck could not be loaded"
-    },
+    "tryDeckError": "The deck could not be loaded",
+    "tryDeckEmpty": "There is nothing to test yet",
     "importSet": {
       "title": "Add this set to your flashcards",
       "what": "What to take",

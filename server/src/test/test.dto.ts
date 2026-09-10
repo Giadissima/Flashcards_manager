@@ -26,6 +26,10 @@ export class TestCreateRequest {
   @IsOptional()
   @IsMongoId()
   parent_test_id?: string;
+
+  @IsOptional()
+  @IsMongoId()
+  source_post_id?: string;
 }
 
 // Filters shared between the test list (TestFilterDto) and the aggregate stats

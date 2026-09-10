@@ -463,8 +463,14 @@
       "endConfirmTitle": "Terminare il test?",
       "endConfirmMessage": "Hai risposto a {{answered}} domande su {{total}}. Le {{remaining}} rimanenti resteranno senza risposta e il test non potrà più essere ripreso.",
       "endConfirmMessageAll": "Hai risposto a tutte le domande. Il test verrà chiuso e vedrai il risultato.",
+      "backToCommunity": "Torna alla Community",
+      "communityExitTitle": "Vuoi salvare questo test?",
+      "communityExitMessage": "Questo test è stato avviato da un post della community. Puoi salvarlo nel tuo storico test, oppure uscire senza tenerlo.",
+      "communityExitSave": "Salva ed esci",
+      "communityExitDiscard": "Scarta ed esci",
       "toast": {
-        "exited": "Test messo in pausa, i progressi sono salvati"
+        "exited": "Test messo in pausa, i progressi sono salvati",
+        "discarded": "Test scartato"
       }
     },
     "topicCount": "{{count}} argomenti"
@@ -589,12 +595,8 @@
     "reportPost": "Segnala il post",
     "importAll": "Aggiungi tutte le flashcard alle mie",
     "tryDeck": "Prova questo mazzo",
-    "try": {
-      "subtitle": "Una prova: qui non viene salvato nulla sul tuo account.",
-      "exit": "Torna alla Community",
-      "score": "{{correct}} corrette su {{answered}} risposte",
-      "error": "Impossibile caricare il mazzo"
-    },
+    "tryDeckError": "Impossibile caricare il mazzo",
+    "tryDeckEmpty": "Non c'è ancora nulla da provare",
     "importSet": {
       "title": "Aggiungi queste flashcard alle tue",
       "what": "Cosa importare",

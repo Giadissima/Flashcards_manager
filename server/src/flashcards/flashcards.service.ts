@@ -19,7 +19,6 @@ import { BasePaginatedResult } from 'src/common.dto';
 import { dateRangeQuery } from 'src/common/date-range.util';
 import {
   assertValidObjectId,
-  findOwnedOrThrow,
   findPaginated,
   updateOwnedOrThrow,
 } from 'src/common/mongo.util';
@@ -114,14 +113,25 @@ export class FlashcardsService {
     return topic?.in_spaced_repetition ?? false;
   }
 
-  findOne(userId: string, id: string): Promise<FlashcardDocument> {
-    return findOwnedOrThrow<FlashcardDocument>(
-      this.flashcardModel,
-      id,
-      userId,
-      ENTITY,
-      POPULATE,
-    );
+  /**
+   * Owned by the caller, or public: a test built from a community post
+   * references cards that belong to whoever shared them, and the runner reads
+   * each one back through this same endpoint - the same rule the post's own
+   * carousel and import already read them under, just reached a different way.
+   */
+  async findOne(userId: string, id: string): Promise<FlashcardDocument> {
+    assertValidObjectId(id);
+    const card = await this.flashcardModel
+      .findOne({
+        _id: id,
+        $or: [{ user_id: userId }, { visibility: 'public' }],
+      })
+      .populate(POPULATE)
+      .exec();
+    if (!card) {
+      throw new NotFoundException(`${ENTITY} with id ${id} not found`);
+    }
+    return card;
   }
 
   findAll(
@@ -277,6 +287,11 @@ export class FlashcardsService {
    * Used when a test is created, to store on it what it is about. Its topics
    * are not asked for here: the questions of a test carry the topic each is on,
    * which is where the test reads them from.
+   *
+   * Owned by the caller, or public: a test can also be built from a community
+   * post's flashcards (see PostCardComponent.openTry), which belong to
+   * whoever shared them - the subject is still theirs to read, the same way
+   * the post's own carousel already does.
    */
   async getSubject(
     userId: string,
@@ -289,7 +304,10 @@ export class FlashcardsService {
         {
           $match: {
             _id: { $in: ids.map((id) => new Types.ObjectId(id)) },
-            user_id: new Types.ObjectId(userId),
+            $or: [
+              { user_id: new Types.ObjectId(userId) },
+              { visibility: 'public' },
+            ],
           },
         },
         { $group: { _id: null, subject_id: { $first: '$subject_id' } } },

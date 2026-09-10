@@ -148,7 +148,7 @@
       <!-- Studying a set changes nothing, so it stays open on the author's own
            post too - unlike report and import, which only make sense on
            someone else's. -->
-      <button type="button" class="btn btn-icon-ghost" (click)="openTry()"
+      <button type="button" class="btn btn-icon-ghost" [disabled]="startingTry" (click)="openTry()"
         [title]="'community.tryDeck' | transloco" [attr.aria-label]="'community.tryDeck' | transloco">
         <span class="material-symbols-outlined">quiz</span>
       </button>

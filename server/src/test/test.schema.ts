@@ -81,6 +81,14 @@ export class Test {
   // test as a continuation of another instead of an unrelated attempt.
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Test', required: false })
   parent_test_id?: Types.ObjectId;
+
+  // Set when the test was started from a community post rather than the
+  // tester's own library: its questions reference flashcards someone else
+  // shared, and the runner uses this to send "exit" back to the Community
+  // instead of the tester's own test history, and to ask first whether such a
+  // run is worth keeping there at all.
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Post', required: false })
+  source_post_id?: Types.ObjectId;
 }
 
 export const TestSchema = SchemaFactory.createForClass(Test);

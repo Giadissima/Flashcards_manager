@@ -15,6 +15,11 @@ export interface Test {
 
   // The test this one was built from (e.g. "repeat the wrong ones"), if any.
   parent_test_id?: string;
+
+  // Set when the test was started from a community post instead of the
+  // tester's own library: the runner reads it to send "exit" back to the
+  // Community, and to ask first whether such a run is worth keeping.
+  source_post_id?: string;
 }
 
 /**
@@ -26,6 +31,7 @@ export interface Test {
 export interface TestCreateRequest {
   questions: Question[];
   parent_test_id?: string;
+  source_post_id?: string;
 }
 
 export type Question = {

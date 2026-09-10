@@ -12,6 +12,7 @@ import { FlashcardService } from '../../flashcard/flashcard.service';
 import { KatexRendererPipe } from '../../pipes/katex-renderer.pipe';
 import { LoadStateComponent } from '../../shared/load-state/load-state.component';
 import { ImageLightboxComponent } from '../../shared/image-lightbox/image-lightbox.component';
+import { ModalComponent } from '../../shared/modal/modal.component';
 import { PaginatedList } from '../../shared/paginated-list';
 import { ZoomableImagesDirective } from '../../shared/zoomable-images.directive';
 import * as cardView from '../../shared/flashcard-view.util';
@@ -22,7 +23,7 @@ import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 @Component({
   selector: 'app-test-runner',
   standalone: true,
-  imports: [CommonModule, DurationPipe, KatexRendererPipe, ConfirmDialogComponent, TranslocoModule, LoadStateComponent, ImageLightboxComponent, ZoomableImagesDirective, PaginationComponent, PageCardComponent],
+  imports: [CommonModule, DurationPipe, KatexRendererPipe, ConfirmDialogComponent, TranslocoModule, LoadStateComponent, ImageLightboxComponent, ZoomableImagesDirective, PaginationComponent, PageCardComponent, ModalComponent],
   templateUrl: './test-runner.html',
   styleUrls: ['./test-runner.scss']
 })
@@ -54,6 +55,15 @@ export class TestRunner extends PaginatedList implements OnInit {
   subjectIconUrl = '';
   testStartDate?: Date;
   answeredCount = 0;
+
+  /** Set when this test was started from a community post rather than the
+   *  tester's own library: it changes what "exit" offers (see exitTest). */
+  sourcePostId?: string;
+  showCommunityExitConfirm = false;
+
+  get isFromCommunity(): boolean {
+    return !!this.sourcePostId;
+  }
 
   /** Share of the test already answered, for the progress bar in the header. */
   get progressPercent(): number {
@@ -131,6 +141,7 @@ export class TestRunner extends PaginatedList implements OnInit {
       this.elapsed_time = elapsed_time ?? 0;
 
     this.testStartDate = test.createdAt;
+    this.sourcePostId = test.source_post_id;
     this.answeredCount = test.questions.filter(q => q.is_correct !== undefined).length;
 
     await this.loadPage();
@@ -233,14 +244,45 @@ export class TestRunner extends PaginatedList implements OnInit {
   // so there is nothing to confirm and nothing to lose. The test stays in
   // progress and the history it lands on is where it is resumed from, even from
   // another device.
-  async exitTest(): Promise<void> {
+  //
+  // A test started from a community post asks first instead: unlike the
+  // tester's own tests, keeping it in the history is a choice and not a given
+  // - the cards are not theirs, and a run tried on a whim is not necessarily
+  // worth cluttering it with.
+  exitTest(): void {
+    if (this.isFromCommunity) {
+      this.showCommunityExitConfirm = true;
+      return;
+    }
+    void this.saveAndExit(['/test-result']);
+  }
+
+  private async saveAndExit(route: string[]): Promise<void> {
     if (this.testId) {
       await this.testService
         .updateElapsedTime(this.testId, this.elapsed_time)
         .catch(err => console.error('Errore salvataggio progressi', err));
     }
     this.toast.show(this.transloco.translate('test.runner.toast.exited'), 'success');
-    this.router.navigate(['/test-result']);
+    this.router.navigate(route);
+  }
+
+  cancelCommunityExit(): void {
+    this.showCommunityExitConfirm = false;
+  }
+
+  async saveAndExitToCommunity(): Promise<void> {
+    this.showCommunityExitConfirm = false;
+    await this.saveAndExit(['/community']);
+  }
+
+  async discardAndExitToCommunity(): Promise<void> {
+    this.showCommunityExitConfirm = false;
+    if (this.testId) {
+      await this.testService.delete(this.testId).catch(err => console.error('Errore eliminazione test', err));
+    }
+    this.toast.show(this.transloco.translate('test.runner.toast.discarded'), 'success');
+    this.router.navigate(['/community']);
   }
 
   // The one action of the page that cannot be undone, and the only one that

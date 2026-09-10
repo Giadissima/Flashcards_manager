@@ -13,9 +13,13 @@ import { PostImportModalComponent } from '../post-import-modal/post-import-modal
 import { PostReportModalComponent, ReportKind } from '../post-report-modal/post-report-modal.component';
 import { restrictionMessage, restrictionOf } from '../../shared/restriction';
 import { PostComment } from '../../models/social.dto';
+import { Question } from '../../models/test.dto';
 import { SearchableSelectComponent, SelectOption } from '../../shared/searchable-select/searchable-select.component';
 import { PaginationComponent } from '../../shared/pagination/pagination.component';
 import { KatexRendererPipe } from '../../pipes/katex-renderer.pipe';
+import { shuffle } from '../../shared/array.util';
+import { TestService } from '../../test/test.service';
+import { Topic } from '../../models/topic.dto';
 import { ToastService } from '../../shared/toast/toast.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import * as cardView from '../../shared/flashcard-view.util';
@@ -112,24 +116,62 @@ export class PostCardComponent implements OnInit, AfterViewInit, OnDestroy {
   private expandedMap: Record<string, boolean> = {};
   private overflowMap: Record<string, boolean> = {};
 
+  /** Set while a test is being created, so a second click cannot start two. */
+  startingTry = false;
+
   constructor(
     private communityService: CommunityService,
     private authService: AuthService,
+    private testService: TestService,
     private toast: ToastService,
     private transloco: TranslocoService,
     private router: Router,
   ) {}
 
   /**
-   * Opens a trial run over the post's cards, narrowed to whatever topic the
-   * carousel is currently filtered to. Unlike import, this works on the
-   * reader's own posts too: trying a set is just studying it, nothing is
-   * copied or changed either way.
+   * Starts a real test over the post's cards, narrowed to whatever topic the
+   * carousel is currently filtered to, and drops it straight into the usual
+   * runner - timer, random order and history included, the same as a test
+   * built from the reader's own library.
+   *
+   * Unlike import, this works on the reader's own posts too: taking a test is
+   * just studying, nothing is copied or changed either way. The cards stay
+   * whoever's they were; only the flashcard_ids end up in a Test that is the
+   * reader's own to keep or discard (see TestRunner.exitTest, which asks
+   * which one when source_post_id is set).
    */
-  openTry(): void {
-    this.router.navigate(['/community/try', this.post._id], {
-      queryParams: this.selectedTopicId ? { topicId: this.selectedTopicId } : {},
-    });
+  async openTry(): Promise<void> {
+    if (this.startingTry) return;
+
+    this.startingTry = true;
+    try {
+      // Already accurate for whatever the carousel is currently filtered to
+      // (see loadPage): the full set when there is no topic filter, and just
+      // that topic's count when there is one.
+      const count = this.filteredCount;
+      if (!count) {
+        this.toast.show(this.transloco.translate('community.tryDeckEmpty'), 'info');
+        return;
+      }
+
+      const page = await this.communityService.getFlashcards(
+        this.post._id,
+        0,
+        count,
+        this.selectedTopicId ?? undefined,
+      );
+      const questions: Question[] = shuffle(page.data).map((card) => ({
+        flashcard_id: card._id,
+        topic_id: typeof card.topic_id === 'string' ? card.topic_id : (card.topic_id as Topic | undefined)?._id,
+      }));
+
+      const test = await this.testService.create({ questions, source_post_id: this.post._id });
+      this.router.navigate(['/test', test._id]);
+    } catch {
+      this.toast.show(this.transloco.translate('community.tryDeckError'), 'error');
+    } finally {
+      this.startingTry = false;
+    }
   }
 
   // The strip on top, the icon and the topic under the title: the same four
