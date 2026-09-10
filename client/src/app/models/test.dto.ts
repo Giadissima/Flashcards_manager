@@ -16,6 +16,11 @@ export interface Test {
   // The test this one was built from (e.g. "repeat the wrong ones"), if any.
   parent_test_id?: string;
 
+  // Set alongside parent_test_id when this repeats only the questions the
+  // parent got wrong, rather than every question of it: what the history's
+  // "repeat of ..." caption is worded from.
+  only_wrong?: boolean;
+
   // Whether at least one test was built from this one, resolved by the
   // server so the history can show an expand arrow before ever fetching
   // this test's children.
@@ -36,6 +41,7 @@ export interface Test {
 export interface TestCreateRequest {
   questions: Question[];
   parent_test_id?: string;
+  only_wrong?: boolean;
   source_post_id?: string;
 }
 

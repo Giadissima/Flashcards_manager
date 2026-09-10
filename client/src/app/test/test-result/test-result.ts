@@ -287,25 +287,32 @@ export class TestResult extends PaginatedList {
   }
 
   /**
-   * The actions of the header. Repeating is the only one that reports back, so
-   * the page listens to (action) without having to ask which was pressed.
+   * The actions of the header. Both report back through (action), so the
+   * template tells them apart by id rather than binding a method each.
    */
   get headerActions(): PageCardAction[] {
     const actions: PageCardAction[] = [];
     if (this.wrongQuestions.length) {
       actions.push({
+        id: 'repeatWrong',
         label: this.transloco.translate('test.result.repeatWrong'),
         icon: 'replay',
         disabled: this.repeating,
       });
     }
     actions.push({
-      label: this.transloco.translate('test.result.backHome'),
-      icon: 'home',
-      link: '/',
-      variant: 'outline',
+      id: 'repeatTest',
+      label: this.transloco.translate('test.result.repeatTest'),
+      icon: 'refresh',
+      variant: 'outline-secondary',
+      disabled: this.repeating,
     });
     return actions;
+  }
+
+  onHeaderAction(action: PageCardAction): void {
+    if (action.id === 'repeatWrong') this.repeatWrong();
+    else if (action.id === 'repeatTest') this.repeatTest();
   }
 
   /**
@@ -326,17 +333,30 @@ export class TestResult extends PaginatedList {
    * decided, so there is nothing left to set up.
    */
   async repeatWrong(): Promise<void> {
-    const wrong = this.wrongQuestions;
-    if (!wrong.length || this.repeating) return;
+    await this.createRepeat(this.wrongQuestions, true);
+  }
+
+  /**
+   * Starts a new test identical to this one - every question, in the same
+   * order - as a child of it, the way "repeat the wrong ones" is: a fresh run
+   * rather than a reopening of the one just finished.
+   */
+  async repeatTest(): Promise<void> {
+    await this.createRepeat(this.test?.questions ?? [], false);
+  }
+
+  private async createRepeat(questions: Question[], onlyWrong: boolean): Promise<void> {
+    if (!questions.length || this.repeating) return;
 
     this.repeating = true;
     try {
       const test = await this.testService.create({
-        questions: wrong.map(({ flashcard_id, topic_id }) => ({
+        questions: questions.map(({ flashcard_id, topic_id }) => ({
           flashcard_id,
           topic_id,
         })),
         parent_test_id: this.test?._id,
+        only_wrong: onlyWrong,
       });
       this.router.navigate(['/test', test._id]);
     } catch (err) {

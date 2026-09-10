@@ -4,6 +4,9 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
 export interface PageCardAction {
+  /** Lets a caller with more than one button tell them apart in (action), since the emitted value is the whole action. */
+  id?: string;
+
   /** Already translated, like the title and the subtitle. */
   label: string;
 
@@ -14,8 +17,9 @@ export interface PageCardAction {
       reporting through (action). */
   link?: string | unknown[];
 
-  /** 'primary' is the action the page exists for; 'outline' is anything beside it. */
-  variant?: 'primary' | 'outline';
+  /** 'primary' is the action the page exists for; 'outline' is anything beside it;
+      'outline-secondary' is beside it too, but played down further still. */
+  variant?: 'primary' | 'outline' | 'outline-secondary';
 
   disabled?: boolean;
 }
@@ -64,6 +68,8 @@ export class PageCardComponent {
   @Output() action = new EventEmitter<PageCardAction>();
 
   buttonClass(action: PageCardAction): string {
-    return action.variant === 'outline' ? 'btn-outline-primary' : 'btn-primary';
+    if (action.variant === 'outline-secondary') return 'btn-outline-secondary';
+    if (action.variant === 'outline') return 'btn-outline-primary';
+    return 'btn-primary';
   }
 }

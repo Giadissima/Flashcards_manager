@@ -82,6 +82,14 @@ export class Test {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Test', required: false })
   parent_test_id?: Types.ObjectId;
 
+  // Set alongside parent_test_id when the questions carried over are only the
+  // ones the parent got wrong, rather than every question of it - the history
+  // captions a repeat by which of the two this was, and cannot tell them
+  // apart from the question count alone (a parent gotten entirely wrong
+  // repeats the same number of questions either way).
+  @Prop({ type: Boolean, required: false })
+  only_wrong?: boolean;
+
   // Set when the test was started from a community post rather than the
   // tester's own library: its questions reference flashcards someone else
   // shared, and the runner uses this to send "exit" back to the Community

@@ -28,6 +28,10 @@ export class TestCreateRequest {
   parent_test_id?: string;
 
   @IsOptional()
+  @IsBoolean()
+  only_wrong?: boolean;
+
+  @IsOptional()
   @IsMongoId()
   source_post_id?: string;
 }

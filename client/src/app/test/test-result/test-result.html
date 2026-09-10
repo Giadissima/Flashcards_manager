@@ -3,10 +3,10 @@
   <!-- Opened from the history, a result would otherwise say when it was taken
        but never what it was about, which is the first thing being looked for. -->
   <!-- A result is read to find out what went wrong, and the next thing wanted
-       is a run on exactly those questions: that is the action of this page, and
-       going home is the one beside it. -->
+       is a run on exactly those questions - or on the whole test again, the
+       action beside it. -->
   <app-page-card icon="fact_check" [title]="t('test.result.title')" [subtitle]="subtitle" bodyClass="p-4"
-    [actions]="headerActions" (action)="repeatWrong()">
+    [actions]="headerActions" (action)="onHeaderAction($event)">
 
     <!-- The score is what the page is opened for, so it leads the body: the
          ratio, and one bar that splits it into right, wrong and unanswered.

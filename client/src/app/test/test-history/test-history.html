@@ -105,7 +105,10 @@
             @if (isChild) {
             <div class="test-repeat-of">
               <span class="material-symbols-outlined">subdirectory_arrow_right</span>
-              {{ 'test.history.repeatOf' | transloco }}
+              <!-- Every repeat used to be of the wrong ones only, before "repeat
+                   the test" existed: only_wrong is unset on one from back then,
+                   and defaults to that same caption rather than the new one. -->
+              {{ (test.only_wrong === false ? 'test.history.repeatOfFull' : 'test.history.repeatOf') | transloco }}
             </div>
             }
             @if (getSubjectLabel(test); as subjectLabel) {
@@ -149,8 +152,13 @@
               <span class="material-symbols-outlined">visibility</span>
               {{ 'test.history.review' | transloco }}
             </button>
-            <button type="button" class="btn btn-outline-danger test-card-delete" (click)="deleteTest(test)"
-              [attr.aria-label]="t('common.delete')" [title]="t('common.delete')">
+            <button type="button" class="btn btn-outline-secondary" [disabled]="isRepeating(test)"
+              (click)="repeatTest(test)">
+              <span class="material-symbols-outlined">refresh</span>
+              {{ 'test.history.repeatTest' | transloco }}
+            </button>
+            <button type="button" class="btn btn-icon-ghost btn-danger-hover test-card-delete"
+              (click)="deleteTest(test)" [attr.aria-label]="t('common.delete')" [title]="t('common.delete')">
               <span class="material-symbols-outlined">delete</span>
             </button>
             } @else {

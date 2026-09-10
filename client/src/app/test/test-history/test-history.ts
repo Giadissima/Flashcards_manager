@@ -375,6 +375,46 @@ export class TestHistory extends PaginatedList implements OnInit, OnDestroy {
     this.router.navigate(['/test', test._id]);
   }
 
+  /* Ids currently creating a repeat, so the row's button cannot be pressed a
+     second time while the request is in flight. */
+  private repeatingIds = new Set<string>();
+
+  isRepeating(test: Test): boolean {
+    return !!test._id && this.repeatingIds.has(test._id);
+  }
+
+  /**
+   * Starts a new test identical to this one - every question, in the same
+   * order - as its child, the same way the result page's "repeat the test"
+   * does. Reached straight from the history so a completed test can be redone
+   * without opening its review first.
+   */
+  async repeatTest(test: Test): Promise<void> {
+    const id = test._id;
+    if (!id || this.repeatingIds.has(id)) return;
+
+    this.repeatingIds.add(id);
+    try {
+      const newTest = await this.testService.create({
+        questions: test.questions.map(({ flashcard_id, topic_id }) => ({
+          flashcard_id,
+          topic_id,
+        })),
+        parent_test_id: id,
+        only_wrong: false,
+      });
+      this.router.navigate(['/test', newTest._id]);
+    } catch (err) {
+      console.error('Error creating repeat test', err);
+      this.toast.show(
+        this.transloco.translate('test.history.repeatError'),
+        'error',
+      );
+    } finally {
+      this.repeatingIds.delete(id);
+    }
+  }
+
   // The row goes as soon as the button is pressed and the server is told only
   // once the window to take it back has passed: the deletion is what the user
   // asked for, so it is carried out without a dialog in the way, and undoing it
