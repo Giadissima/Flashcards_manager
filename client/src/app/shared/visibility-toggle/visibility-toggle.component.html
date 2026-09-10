@@ -10,9 +10,6 @@
       {{ (isPublic ? 'visibility.public' : 'visibility.private') | transloco }}
     </span>
   </div>
-  <!-- Says what the switch actually does, since "public" on its own does not
-       tell where the thing would show up. -->
-  <div class="form-text">{{ (isPublic ? 'visibility.publicHint' : 'visibility.privateHint') | transloco }}</div>
   @if (cascadeKey) {
   <div class="form-text">{{ cascadeKey | transloco }}</div>
   }
