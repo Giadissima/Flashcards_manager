@@ -61,6 +61,7 @@ export class StudyFieldsComponent implements OnInit {
 
   universityOptions: SelectOption[] = [];
   courseOptions: SelectOption[] = [];
+  loadingUniversities = true;
   loadingCourses = false;
   /**
    * True once a university with no degree courses is picked: the post-graduate
@@ -92,6 +93,8 @@ export class StudyFieldsComponent implements OnInit {
       // An optional field is not worth blocking the page for: the selects stay
       // empty and everything else still works.
       this.toastService.show(this.transloco.translate('studyFields.universitiesError'), 'warning');
+    } finally {
+      this.loadingUniversities = false;
     }
 
     if (this.universityCode) await this.loadCourses(this.universityCode);

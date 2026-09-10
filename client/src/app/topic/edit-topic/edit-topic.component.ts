@@ -32,6 +32,10 @@ export class EditTopicComponent implements OnInit {
   topicId?: string;
   subjects: Subject[] = [];
 
+  // While true, an empty options list is a normal "still fetching" state, not
+  // a broken select - see SearchableSelectComponent.isEmpty.
+  subjectsLoading = true;
+
   get subjectOptions(): SelectOption[] {
     return toSubjectOptions(this.subjects);
   }
@@ -72,11 +76,14 @@ export class EditTopicComponent implements OnInit {
   }
 
   async loadSubjects() {
+    this.subjectsLoading = true;
     try {
       this.subjects = await this.subjectService.getSelectableSubjects();
     } catch (err) {
       console.error('Error loading subjects', err);
       this.toastService.show(this.transloco.translate('topic.toast.subjectsLoadError'), 'error');
+    } finally {
+      this.subjectsLoading = false;
     }
   }
 

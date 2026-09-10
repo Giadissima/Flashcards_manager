@@ -24,7 +24,7 @@
 
       <div class="form-group">
         <label for="subject" class="form-label">{{ 'common.subject' | transloco }}</label>
-        <app-searchable-select [options]="subjectOptions" [value]="topicForm.get('subject_id')?.value"
+        <app-searchable-select [options]="subjectOptions" [value]="topicForm.get('subject_id')?.value" [loading]="subjectsLoading"
           [placeholder]="t('common.chooseSubject')"
           (valueChange)="topicForm.get('subject_id')?.setValue($event)"></app-searchable-select>
       </div>

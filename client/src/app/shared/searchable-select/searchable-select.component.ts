@@ -31,6 +31,9 @@ export class SearchableSelectComponent {
   @Input() disabled = false;
   // When set, adds a first option (e.g. "All Subjects") that clears the selection
   @Input() allOptionLabel: string | null = null;
+  // While the options are still being fetched, an empty list is expected and
+  // not yet a broken/misconfigured select - see isEmpty.
+  @Input() loading = false;
   // Idle time after which the typed search text is discarded
   @Input() typeaheadDelayMs = 1000;
 
@@ -56,7 +59,7 @@ export class SearchableSelectComponent {
   // Nothing the user could ever pick: signals a broken/misconfigured select
   // (e.g. options failed to load) rather than a normal "nothing selected yet".
   get isEmpty(): boolean {
-    return this.options.length === 0 && !this.allOptionLabel;
+    return !this.loading && this.options.length === 0 && !this.allOptionLabel;
   }
 
   toggle(): void {

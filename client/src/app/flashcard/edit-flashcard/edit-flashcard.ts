@@ -38,6 +38,11 @@ export class EditFlashcard implements OnInit, OnDestroy {
   topics: Topic[] = [];
   subjects: Subject[] = [];
 
+  // While true, an empty options list is a normal "still fetching" state, not
+  // a broken select - see SearchableSelectComponent.isEmpty.
+  subjectsLoading = true;
+  topicsLoading = true;
+
   get subjectOptions(): SelectOption[] {
     return toSubjectOptions(this.subjects);
   }
@@ -171,20 +176,26 @@ export class EditFlashcard implements OnInit, OnDestroy {
   }
 
   async loadTopicsBySubject(subjectId: string | undefined) {
+    this.topicsLoading = true;
     try {
       this.topics = await this.topicService.getSelectableTopics(subjectId);
     } catch (err) {
       console.error('Error loading topics for subject ' + subjectId, err);
       this.toastService.show(this.transloco.translate('flashcard.toast.topicsLoadError'), 'error');
+    } finally {
+      this.topicsLoading = false;
     }
   }
 
   async loadSubjects() {
+    this.subjectsLoading = true;
     try {
       this.subjects = await this.subjectService.getSelectableSubjects();
     } catch (err) {
       console.error('Error loading subjects', err);
       this.toastService.show(this.transloco.translate('flashcard.toast.subjectsLoadError'), 'error');
+    } finally {
+      this.subjectsLoading = false;
     }
   }
 }

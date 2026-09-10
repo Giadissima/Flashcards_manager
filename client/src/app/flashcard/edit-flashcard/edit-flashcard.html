@@ -63,7 +63,7 @@
         <div class="form-row">
           <div class="form-group">
             <label for="subject" class="form-label">{{ 'flashcard.create.subjectLabel' | transloco }}</label>
-            <app-searchable-select [options]="subjectOptions" [value]="editForm.get('subject_id')?.value"
+            <app-searchable-select [options]="subjectOptions" [value]="editForm.get('subject_id')?.value" [loading]="subjectsLoading"
               [placeholder]="t('common.chooseSubject')"
               (valueChange)="editForm.get('subject_id')?.setValue($event)"></app-searchable-select>
             @if (editForm.get('subject_id')?.touched && editForm.get('subject_id')?.hasError('required')) {
@@ -73,7 +73,7 @@
 
           <div class="form-group">
             <label for="topic" class="form-label">{{ 'flashcard.create.topicLabel' | transloco }}</label>
-            <app-searchable-select [options]="topicOptions" [value]="editForm.get('topic_id')?.value"
+            <app-searchable-select [options]="topicOptions" [value]="editForm.get('topic_id')?.value" [loading]="topicsLoading"
               [placeholder]="t('common.chooseTopic')"
               (valueChange)="editForm.get('topic_id')?.setValue($event)"></app-searchable-select>
             @if (editForm.get('topic_id')?.touched && editForm.get('topic_id')?.hasError('required')) {

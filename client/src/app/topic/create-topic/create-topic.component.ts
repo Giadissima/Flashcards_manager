@@ -52,6 +52,10 @@ export class CreateTopicComponent implements OnInit {
   // form is blocked behind a modal pointing at "create subject" instead.
   showEmptyStateModal = false;
 
+  // While true, an empty options list is a normal "still fetching" state, not
+  // a broken select - see SearchableSelectComponent.isEmpty.
+  subjectsLoading = true;
+
   get subjectOptions(): SelectOption[] {
     return toSubjectOptions(this.subjects);
   }
@@ -124,6 +128,7 @@ export class CreateTopicComponent implements OnInit {
   }
 
   async loadSubjects() {
+    this.subjectsLoading = true;
     try {
       this.subjects = await this.subjectService.getSelectableSubjects();
       this.showEmptyStateModal = this.subjects.length === 0;
@@ -133,6 +138,8 @@ export class CreateTopicComponent implements OnInit {
         this.transloco.translate('topic.toast.subjectsLoadError'),
         'error',
       );
+    } finally {
+      this.subjectsLoading = false;
     }
   }
 }
