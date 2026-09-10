@@ -16,6 +16,11 @@ export interface Test {
   // The test this one was built from (e.g. "repeat the wrong ones"), if any.
   parent_test_id?: string;
 
+  // Whether at least one test was built from this one, resolved by the
+  // server so the history can show an expand arrow before ever fetching
+  // this test's children.
+  hasChildren?: boolean;
+
   // Set when the test was started from a community post instead of the
   // tester's own library: the runner reads it to send "exit" back to the
   // Community, and to ask first whether such a run is worth keeping.

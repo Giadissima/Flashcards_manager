@@ -565,6 +565,7 @@ input:-webkit-autofill:active {
   --bs-body-bg: var(--component-background);
   --bs-table-color: var(--text-color);
   --bs-table-border-color: var(--border-color);
+  vertical-align: baseline;
 }
 
 /* Some of the buttons in an actions cell (visibility, spaced repetition) sit

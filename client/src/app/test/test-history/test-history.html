@@ -30,6 +30,13 @@
 
         </div>
 
+        <div class="filter-col">
+          <label class="visually-hidden">{{ 'test.history.sourceLabel' | transloco }}</label>
+          <app-searchable-select [options]="sourceOptions" [value]="selectedSource"
+            [allOptionLabel]="t('test.history.sourceAll')" [placeholder]="t('test.history.sourceAll')"
+            (valueChange)="onSourceChange($event)"></app-searchable-select>
+        </div>
+
         <div class="filter-col--auto">
           <div class="form-check mb-0">
             <input type="checkbox" class="form-check-input" id="onlyWrongFilter" [checked]="onlyWrong"
@@ -66,15 +73,7 @@
     <p>{{ 'test.history.noTests' | transloco }}</p>
     } @else {
     <div class="test-list">
-      @for (root of rootTests; track root._id) {
-      @if (hasHiddenAncestor(root)) {
-      <button type="button" class="btn-load-more-ancestors" [disabled]="isLoadingMoreAncestors(root)"
-        (click)="loadMoreAncestors(root)">
-        <span class="material-symbols-outlined">expand_less</span>
-        {{ (isLoadingMoreAncestors(root) ? 'test.history.loadingMoreAncestors' :
-        'test.history.loadMoreAncestors') | transloco }}
-      </button>
-      }
+      @for (root of tests; track root._id) {
       <ng-container
         *ngTemplateOutlet="testNode; context: { $implicit: root, isChild: false, depth: 0 }"></ng-container>
       }
@@ -90,8 +89,18 @@
          separate component so the row markup below is written once and
          still shares this component's methods and translations directly. -->
     <ng-template #testNode let-test let-isChild="isChild" let-depth="depth">
+      @let children = childrenOf(test);
       <div class="test-node">
         <div class="card test-card">
+          @if (test.hasChildren) {
+          <button type="button" class="test-card-expand" [disabled]="isLoadingChildren(test)"
+            (click)="toggleChildren(test)" [attr.aria-expanded]="isExpanded(test)"
+            [attr.aria-label]="t(isExpanded(test) ? 'test.history.collapseChildren' : 'test.history.expandChildren')"
+            [title]="t(isExpanded(test) ? 'test.history.collapseChildren' : 'test.history.expandChildren')">
+            <span class="material-symbols-outlined">{{ isLoadingChildren(test) ? 'progress_activity' : (isExpanded(test)
+              ? 'expand_more' : 'chevron_right') }}</span>
+          </button>
+          }
           <div class="test-card-main">
             @if (isChild) {
             <div class="test-repeat-of">
@@ -100,7 +109,14 @@
             </div>
             }
             @if (getSubjectLabel(test); as subjectLabel) {
-            <div class="test-subject">{{ subjectLabel }}</div>
+            <div class="test-subject">
+              {{ subjectLabel }}
+              @if (test.source_post_id) {
+              <span class="test-source-community material-symbols-outlined"
+                [title]="t('test.history.sourceCommunityHint')"
+                [attr.aria-label]="t('test.history.sourceCommunityHint')">diversity_3</span>
+              }
+            </div>
             }
             <div class="test-score">
               {{ getCorrectCount(test) }} / {{ test.questions.length }} {{ 'test.history.correctSuffix' | transloco }}
@@ -125,10 +141,6 @@
               @if (!test.completedAt) {
               <span class="badge-in-progress">{{ 'test.history.inProgress' | transloco }}</span>
               }
-              @if (isAncestor(test)) {
-              <span class="badge-context" [title]="t('test.history.contextHint')">{{
-                'test.history.contextBadge' | transloco }}</span>
-              }
             </div>
           </div>
           <div class="test-card-actions">
@@ -137,34 +149,24 @@
               <span class="material-symbols-outlined">visibility</span>
               {{ 'test.history.review' | transloco }}
             </button>
-            <!-- Only on a test that is over: one still in progress is not
-                 finished with, and the action next to it there is the one that
-                 ends it. Also only on a row of this page: a test fetched purely
-                 to complete the tree is deleted from wherever its own page is,
-                 not from here. -->
-            @if (!isAncestor(test)) {
             <button type="button" class="btn btn-outline-danger test-card-delete" (click)="deleteTest(test)"
               [attr.aria-label]="t('common.delete')" [title]="t('common.delete')">
               <span class="material-symbols-outlined">delete</span>
             </button>
-            }
             } @else {
             <button type="button" class="btn btn-primary" (click)="resumeTest(test)">
               <span class="material-symbols-outlined">play_arrow</span>
               {{ 'test.history.resume' | transloco }}
             </button>
-            @if (!isAncestor(test)) {
             <button type="button" class="btn btn-outline-danger" (click)="stopTest(test)">
               <span class="material-symbols-outlined">stop</span>
               {{ 'test.history.terminate' | transloco }}
             </button>
             }
-            }
           </div>
         </div>
 
-        @let children = childrenOf(test);
-        @if (children.length) {
+        @if (children.length && isExpanded(test)) {
         <div class="test-children" [class.test-children--flat]="depth + 1 >= maxIndentDepth">
           @for (child of children; track child._id) {
           <ng-container

@@ -41,15 +41,25 @@ private baseUrl = 'test';
     return this.restClient.get<TestTopic[]>(`${this.baseUrl}/${testId}/topics`);
   }
 
+  // The tests built as a direct repeat of this one, fetched only once its row is expanded
+  getChildren(testId: string): Promise<Test[]> {
+    return this.restClient.get<Test[]>(`${this.baseUrl}/${testId}/children`);
+  }
+
   // Marks the test as completed without reading back and rewriting the whole document
   completeTest(testId: string, elapsed_time: number): Promise<void> {
     const params = new HttpParams().set('time', elapsed_time);
     return this.restClient.patch(`${this.baseUrl}/${testId}/complete`, {}, params);
   }
 
+  // Closes an unfinished test early from the history page, without touching its date
+  terminateTest(testId: string): Promise<void> {
+    return this.restClient.patch(`${this.baseUrl}/${testId}/terminate`, {});
+  }
+
   // Aggregate stats over the tests, filtered the same way as getAll
   getStats(
-    filter?: Pick<TestFilter, 'subject_id' | 'topic_id' | 'onlyWrong' | 'completed' | 'from' | 'to'>,
+    filter?: Pick<TestFilter, 'subject_id' | 'topic_id' | 'onlyWrong' | 'completed' | 'from' | 'to' | 'source'>,
   ): Promise<TestStats> {
     return this.restClient.get<TestStats>(this.baseUrl + '/stats', filter);
   }

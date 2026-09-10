@@ -18,33 +18,6 @@
   gap: calc(var(--spacing-unit) * 2);
 }
 
-/* Offered above a root whose own parent exists but wasn't fetched - the
-   automatic load stopped at its cap, or the lookup failed. Styled as a quiet
-   text link rather than a button of its own weight: it extends a tree
-   already on screen, it doesn't start a new action. */
-.btn-load-more-ancestors {
-  display: inline-flex;
-  align-items: center;
-  gap: calc(var(--spacing-unit) * 0.5);
-  align-self: flex-start;
-  background: none;
-  border: none;
-  padding: 0;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--primary-color);
-  cursor: pointer;
-
-  &:disabled {
-    color: var(--text-color);
-    cursor: default;
-  }
-
-  .material-symbols-outlined {
-    font-size: 18px;
-  }
-}
-
 /* One test plus, indented below it, every test repeated from it. Just a
    flex column: the card and the (optional) .test-children that follows it
    are the only two things in it, so no positioning of its own is needed. */
@@ -136,11 +109,58 @@
   /* Bootstrap sets flex-direction: column on .card, so the row this layout is
      built around has to be asked for explicitly. */
   flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
+  justify-content: flex-start;
+  /* Top-aligned rather than centered: centering only ever looked right
+     while every row held a single line of text, and the expand arrow next
+     to a taller card made that obvious. */
+  align-items: flex-start;
   flex-wrap: wrap;
   gap: calc(var(--spacing-unit) * 2);
   padding: calc(var(--spacing-unit) * 2.5);
+}
+
+/* Disclosure triangle for a test's children, file-explorer style: collapsed
+   (chevron_right) by default so a chain of "repeat the wrong ones" opens as
+   just its root, and rotated to expand_more once the reader asks for the
+   rest. Only rendered on a card that actually has children, so it never
+   competes with .test-card-delete for the same corner on a leaf test. */
+.test-card-expand {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  /* A touch of its own top margin so the glyph lands level with the subject
+     line's text instead of flush against the card's padding edge. */
+  margin-top: calc(var(--spacing-unit) * 0.25);
+  width: 28px;
+  aspect-ratio: 1;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: var(--border-radius, 6px);
+  color: var(--text-color-muted, var(--text-color));
+  cursor: pointer;
+
+  &:hover {
+    background: var(--hover-bg, rgba(0, 0, 0, 0.05));
+  }
+
+  .material-symbols-outlined {
+    font-size: 22px;
+  }
+
+  /* While its children are mid-fetch: the same glyph shown for any other
+     wait in this app, spun in place instead of swapped for a whole spinner
+     that would shove the row's layout around for what is normally instant. */
+  &:disabled .material-symbols-outlined {
+    animation: test-card-expand-spin 0.9s linear infinite;
+  }
+}
+
+@keyframes test-card-expand-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .test-card-main {
@@ -154,6 +174,10 @@
   display: flex;
   gap: var(--spacing-unit);
   flex-shrink: 0;
+  /* Pushed to the far right of the row and centred on its own height, unlike
+     the rest of the card which stays top-aligned (see .test-card above). */
+  margin-left: auto;
+  align-self: center;
 
   .btn {
     display: inline-flex;
@@ -204,6 +228,17 @@
   font-size: 22px;
   font-weight: 700;
   color: var(--header-color);
+}
+
+/* Marks a test as built from a community post rather than the tester's own
+   deck, right next to the subject it names: the same glyph the Community
+   page itself uses, so it reads as "from there" at a glance. */
+.test-source-community {
+  font-size: 16px;
+  line-height: 1;
+  vertical-align: middle;
+  margin-left: calc(var(--spacing-unit) * 0.5);
+  color: var(--text-color-muted, var(--text-color));
 }
 
 /* The proportion the line above states in words, in the green and the red the
@@ -265,21 +300,6 @@
   color: var(--header-color);
 }
 
-/* Marks a card pulled in only to complete the tree - an ancestor old enough
-   to have fallen off this page - so its actions (no delete, review only)
-   read as belonging elsewhere rather than as a row of this page gone quiet. */
-.badge-context {
-  display: inline-block;
-  white-space: nowrap;
-  font-size: 12px;
-  font-weight: 600;
-  padding: 1px 8px;
-  border-radius: var(--border-radius-sm);
-  background-color: transparent;
-  border: 1px dashed var(--secondary-color);
-  color: var(--text-color);
-}
-
 /* Phone layout. The page is built for a row of filters and cards split between
    text on the left and buttons on the right; below this width there is room
    for neither, so the filters and the cards both become single columns and the
@@ -308,6 +328,13 @@
   .test-card {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  /* The row layout's right-align/center trick doesn't apply once the card
+     stacks into a column: back to a full-width row of its own like the rest. */
+  .test-card-actions {
+    margin-left: 0;
+    align-self: stretch;
   }
 
   .test-card-actions button {

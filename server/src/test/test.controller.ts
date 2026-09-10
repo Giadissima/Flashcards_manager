@@ -119,6 +119,14 @@ export class TestController {
     return this.testService.getTopics(user.sub, id);
   }
 
+  @ApiOperation({
+    description: 'get the tests built as a repeat of this one, directly',
+  })
+  @Get(':id/children')
+  getChildren(@CurrentUser() user: JwtPayload, @Param('id') id: string) {
+    return this.testService.getChildren(user.sub, id);
+  }
+
   @Patch(':id/time')
   updateelapsed_time(
     @CurrentUser() user: JwtPayload,
@@ -135,6 +143,11 @@ export class TestController {
     @Query('time') time: number,
   ) {
     return this.testService.completeTest(user.sub, id, Number(time));
+  }
+
+  @Patch(':id/terminate')
+  terminate(@CurrentUser() user: JwtPayload, @Param('id') id: string) {
+    return this.testService.terminateTest(user.sub, id);
   }
 
   @ApiOperation({ description: 'Delete one Flashcard from db' })

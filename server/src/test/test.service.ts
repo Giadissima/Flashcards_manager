@@ -121,6 +121,22 @@ export class TestService {
       { completedAt: new Date(), elapsed_time },
     );
   }
+
+  // Closes an unfinished test early, from the history page, with nothing new
+  // to say about it: the remaining questions stay blank. Unlike completeTest,
+  // this backdates completedAt to the test's own updatedAt - its last actual
+  // activity - and skips the timestamps plugin so updatedAt itself does not
+  // move. Otherwise closing it would read as new activity and jump the test
+  // to the top of a history sorted by updatedAt, ahead of tests genuinely
+  // worked on more recently.
+  terminateTest(userId: string, id: string) {
+    assertValidObjectId(id);
+    return this.testModel.findOneAndUpdate(
+      { _id: id, user_id: userId },
+      [{ $set: { completedAt: '$updatedAt' } }],
+      { timestamps: false },
+    );
+  }
   // TODO find a way to filter only the questions that have no category
   async create(
     userId: string,
@@ -248,6 +264,14 @@ export class TestService {
       });
     }
 
+    // Whether the test was built from the tester's own library or from a
+    // community post, told apart by source_post_id: set only in the latter case.
+    if (filter.source === 'own') {
+      pipeline.push({ $match: { source_post_id: { $exists: false } } });
+    } else if (filter.source === 'community') {
+      pipeline.push({ $match: { source_post_id: { $exists: true } } });
+    }
+
     return pipeline;
   }
 
@@ -296,11 +320,64 @@ export class TestService {
     ];
   }
 
+  // The list only ever shows root tests - a "repeat the wrong ones" is
+  // reached by expanding its parent in the tree, not as a row of its own -
+  // so the filters above narrow the roots themselves (a chain with a match
+  // buried in a child, but not at the root, does not surface it).
   async findAll(
     userId: string,
     filter: TestFilterDto,
   ): Promise<BasePaginatedResult<TestDocument>> {
     const pipeline = this.buildFilterPipeline(userId, filter);
+    pipeline.push({ $match: { parent_test_id: { $exists: false } } });
+
+    // Every descendant of each root, however many generations down, walked
+    // by repeatedly matching a found test's _id against the next one's
+    // parent_test_id. A root sorts by the newest activity anywhere under it -
+    // otherwise every fresh "repeat the wrong ones" would bury the tree it
+    // belongs to at the bottom of a list ordered by updatedAt, behind trees
+    // nobody has touched today. hasChildren is read off the same lookup, so
+    // the tree can offer an expand arrow before the client ever asks for a
+    // single child.
+    pipeline.push(
+      {
+        $graphLookup: {
+          from: 'test',
+          startWith: '$_id',
+          connectFromField: '_id',
+          connectToField: 'parent_test_id',
+          as: 'descendants',
+        },
+      },
+      {
+        $addFields: {
+          lastActivityAt: {
+            $max: ['$updatedAt', { $max: '$descendants.updatedAt' }],
+          },
+          hasChildren: {
+            $gt: [
+              {
+                $size: {
+                  $filter: {
+                    input: '$descendants',
+                    as: 'd',
+                    cond: { $eq: ['$$d.parent_test_id', '$_id'] },
+                  },
+                },
+              },
+              0,
+            ],
+          },
+        },
+      },
+      { $project: { descendants: 0 } },
+    );
+
+    // The only sort the history offers is "most recently active", which for a
+    // root means lastActivityAt rather than its own updatedAt; any other sort
+    // field passes through unchanged.
+    const sortField =
+      filter.sortField === 'updatedAt' ? 'lastActivityAt' : filter.sortField;
 
     // $facet runs several independent sub-pipelines over the *same* input
     // documents and returns each result under its own key, as one document.
@@ -315,7 +392,7 @@ export class TestService {
         data: [
           {
             $sort: {
-              [filter.sortField]: filter.sortDirection === 'asc' ? 1 : -1,
+              [sortField]: filter.sortDirection === 'asc' ? 1 : -1,
               _id: -1,
             },
           },
@@ -333,6 +410,39 @@ export class TestService {
       data: result.data,
       count: result.totalCount[0]?.count ?? 0,
     };
+  }
+
+  /**
+   * Immediate children of one test - the "repeat the wrong ones" runs built
+   * from it - fetched on demand as the reader expands a node in the history
+   * tree rather than walked down for every test on the page. Each child
+   * carries its own hasChildren, so a further arrow can be offered without a
+   * round trip just to find out one is needed.
+   */
+  async getChildren(userId: string, id: string): Promise<TestDocument[]> {
+    assertValidObjectId(id);
+
+    return this.testModel.aggregate<TestDocument>([
+      {
+        $match: {
+          parent_test_id: new Types.ObjectId(id),
+          user_id: new Types.ObjectId(userId),
+        },
+      },
+      {
+        $lookup: {
+          from: 'test',
+          localField: '_id',
+          foreignField: 'parent_test_id',
+          as: 'ownChildren',
+          pipeline: [{ $limit: 1 }, { $project: { _id: 1 } }],
+        },
+      },
+      { $addFields: { hasChildren: { $gt: [{ $size: '$ownChildren' }, 0] } } },
+      { $project: { ownChildren: 0 } },
+      ...this.subjectAndTopicStages(),
+      { $sort: { updatedAt: -1 } },
+    ]);
   }
 
   async getStats(

@@ -77,26 +77,6 @@ export class TestHistory extends PaginatedList implements OnInit, OnDestroy {
   override pageSize = 20;
   stats: TestStats | null = null;
 
-  /* Parent tests pulled in only to complete the tree: a test on this page may
-     be a "repeat the wrong ones" of a test that fell off an earlier page (or
-     was taken well before it), and that ancestor is fetched on its own so the
-     tree still shows where the test on screen came from, rather than only
-     linking tests that happen to land on the same page. Keyed by id, and
-     rebuilt every time the page loads. */
-  ancestorTests = new Map<string, Test>();
-
-  /* How many tests the tree shows at once, this page's own rows included.
-     Without it, a long enough chain of "repeat the wrong ones" - or, worse, a
-     wide one, a test with several - would walk back through every test that
-     ever fed into today's page, one request per generation, for a tree most
-     of which scrolled out of view long ago. */
-  private static readonly MAX_TREE_SIZE = 20;
-
-  /* How many more are pulled in by the "load more" button on one click - a
-     fixed step past MAX_TREE_SIZE, since that button is the reader asking for
-     more themselves rather than the automatic load reaching its own cap. */
-  private static readonly ANCESTORS_PER_LOAD_MORE = 20;
-
   /* How many levels of "repeat the wrong ones" keep growing the indent before
      it stops: a chain long enough (each repeat born from the last) would
      otherwise push itself further right forever and run off a narrow screen
@@ -115,6 +95,7 @@ export class TestHistory extends PaginatedList implements OnInit, OnDestroy {
   selectedTopicId: string | null = null;
   onlyWrong = false;
   selectedStatus: string | null = null;
+  selectedSource: 'own' | 'community' | null = null;
   /** The two ends of the range, as YYYY-MM-DD days; null is an open end. */
   dateFrom: string | null = null;
   dateTo: string | null = null;
@@ -127,6 +108,7 @@ export class TestHistory extends PaginatedList implements OnInit, OnDestroy {
       this.onlyWrong || null,
       // One filter and not two: an open end is still the same range
       this.dateFrom || this.dateTo,
+      this.selectedSource,
     ].filter(Boolean).length;
   }
 
@@ -136,6 +118,13 @@ export class TestHistory extends PaginatedList implements OnInit, OnDestroy {
 
   get topicOptions(): SelectOption[] {
     return toTopicOptions(this.topics);
+  }
+
+  get sourceOptions(): SelectOption[] {
+    return [
+      { value: 'own', label: this.transloco.translate('test.history.sourceOwn') },
+      { value: 'community', label: this.transloco.translate('test.history.sourceCommunity') },
+    ];
   }
 
   ngOnInit(): void {
@@ -228,6 +217,11 @@ export class TestHistory extends PaginatedList implements OnInit, OnDestroy {
     this.onFilterChange();
   }
 
+  onSourceChange(source: string | null | undefined): void {
+    this.selectedSource = (source as 'own' | 'community' | null) ?? null;
+    this.onFilterChange();
+  }
+
   private get activeFilters() {
     return {
       subject_id: this.selectedSubjectId || undefined,
@@ -235,6 +229,7 @@ export class TestHistory extends PaginatedList implements OnInit, OnDestroy {
       onlyWrong: this.onlyWrong || undefined,
       from: this.dateFrom || undefined,
       to: this.dateTo || undefined,
+      source: this.selectedSource || undefined,
       completed:
         this.selectedStatus === 'completed'
           ? true
@@ -270,18 +265,24 @@ export class TestHistory extends PaginatedList implements OnInit, OnDestroy {
   loadTests(): void {
     this.testService
       .getAll({
+        // A root's own updatedAt would bury a chain still being worked on
+        // (fresh "repeat the wrong ones" only) at the bottom of the list -
+        // the server sorts by the newest activity anywhere in the tree
+        // instead when asked for this field.
         sortField: 'updatedAt',
         sortDirection: 'desc',
         skip: this.pageSkip,
         limit: this.pageSize,
         ...this.activeFilters,
       })
-      .then(async (data) => {
+      .then((data) => {
+        // Every row here is a root: the list only ever shows top-level
+        // tests, and a "repeat the wrong ones" is reached by expanding its
+        // parent rather than appearing as a row of its own.
         this.tests = data.data.filter(
           (t) => !t._id || !this.pendingDeletions.has(t._id),
         );
         this.totalCount = data.count;
-        await this.loadMissingAncestors();
       });
   }
 
@@ -289,160 +290,64 @@ export class TestHistory extends PaginatedList implements OnInit, OnDestroy {
     this.loadTests();
   }
 
-  /**
-   * Fetches, one generation at a time, every parent test referenced by a test
-   * on this page (and by whatever is fetched after it) that isn't already
-   * known - on this page or already fetched. This is what lets the tree link
-   * a test back to the one it repeats even when that one is old enough to
-   * have fallen off the current page entirely.
-   *
-   * Stops once the tree reaches MAX_TREE_SIZE tests in total - this page's own
-   * rows counted in - even mid-generation: a chain (or a wide spread of
-   * repeats) can otherwise keep growing it one request after another, for a
-   * tree most of which scrolled out of view long ago.
-   */
-  private async loadMissingAncestors(): Promise<void> {
-    this.ancestorTests = new Map();
-    const known = new Set(
-      this.tests.map((t) => t._id).filter((id): id is string => !!id),
-    );
-    const budget = TestHistory.MAX_TREE_SIZE - this.tests.length;
-    if (budget <= 0) return;
+  /* Children fetched from the server, by parent id, the first time a node is
+     expanded - not walked down for every test on the page, so a long or wide
+     tree costs nothing until the reader actually opens a branch of it. Kept
+     once fetched: collapsing and reopening a node does not ask again. */
+  private childrenByParent = new Map<string, Test[]>();
 
-    await this.fetchAncestorGenerations(
-      this.missingParentIds(this.tests, known),
-      known,
-      budget,
-    );
-  }
+  /* Which nodes currently show their children. A tree starts collapsed to
+     just its root, and this is only added to as the reader opens one
+     themselves. */
+  private expandedIds = new Set<string>();
 
-  /* Ids of a root currently fetching more of its own chain, so its button can
-     show a spinner and not be clicked a second time while it's mid-request. */
-  private loadingMoreAncestors = new Set<string>();
+  /* Ids currently fetching their children, so the arrow can show a spinner
+     and not be clicked a second time while the request is in flight. */
+  private loadingChildrenIds = new Set<string>();
 
-  /**
-   * Fetches one more batch of ancestors above a root whose own chain was cut
-   * short by MAX_TREE_SIZE - the button on screen only offers this when
-   * {@link hasHiddenAncestor} says there is more to find.
-   */
-  async loadMoreAncestors(test: Test): Promise<void> {
-    const parentId = test.parent_test_id;
-    if (!parentId || !test._id || this.loadingMoreAncestors.has(test._id)) return;
-
-    this.loadingMoreAncestors.add(test._id);
-    try {
-      const known = new Set(this.testPool.keys());
-      await this.fetchAncestorGenerations(
-        new Set([parentId]),
-        known,
-        TestHistory.ANCESTORS_PER_LOAD_MORE,
-      );
-    } finally {
-      this.loadingMoreAncestors.delete(test._id);
-    }
-  }
-
-  isLoadingMoreAncestors(test: Test): boolean {
-    return !!test._id && this.loadingMoreAncestors.has(test._id);
-  }
-
-  /**
-   * True on the root of a tree whose own parent exists but wasn't fetched -
-   * either the automatic load stopped at MAX_TREE_SIZE, or a lookup failed.
-   * Either way, there is more chain above this card than is shown.
-   */
-  hasHiddenAncestor(test: Test): boolean {
-    return !!test.parent_test_id && !this.testPool.has(test.parent_test_id);
-  }
-
-  /**
-   * Fetches ancestors generation by generation starting from `seedIds`,
-   * stopping once `budget` new ones have been added to ancestorTests (which
-   * it only ever adds to - resetting it, when wanted, is the caller's job).
-   * Shared by the automatic load on page load and the manual "load more".
-   */
-  private async fetchAncestorGenerations(
-    seedIds: Set<string>,
-    known: Set<string>,
-    budget: number,
-  ): Promise<void> {
-    let toFetch = new Set([...seedIds].filter((id) => !known.has(id)));
-    let remaining = budget;
-
-    while (toFetch.size > 0 && remaining > 0) {
-      const batch = [...toFetch].slice(0, remaining);
-      const fetched = await Promise.all(
-        batch.map((id) => this.testService.getById(id).catch(() => null)),
-      );
-      const newlyKnown: Test[] = [];
-      for (const ancestor of fetched) {
-        if (!ancestor?._id || known.has(ancestor._id)) continue;
-        known.add(ancestor._id);
-        this.ancestorTests.set(ancestor._id, ancestor);
-        newlyKnown.push(ancestor);
-        remaining--;
-      }
-      toFetch = this.missingParentIds(newlyKnown, known);
-    }
-  }
-
-  /** Every parent_test_id referenced by the given tests that isn't in `known` yet. */
-  private missingParentIds(tests: Test[], known: Set<string>): Set<string> {
-    const ids = new Set<string>();
-    for (const test of tests) {
-      if (test.parent_test_id && !known.has(test.parent_test_id)) {
-        ids.add(test.parent_test_id);
-      }
-    }
-    return ids;
-  }
-
-  /** This page's tests plus whatever ancestor was fetched in to complete their tree. */
-  private get testPool(): Map<string, Test> {
-    const pool = new Map(this.ancestorTests);
-    for (const test of this.tests) if (test._id) pool.set(test._id, test);
-    return pool;
-  }
-
-  /**
-   * The top of each tree shown on this page: for every test on the page, the
-   * furthest-back ancestor reachable through parent_test_id (itself, if it has
-   * none, or its parent wasn't found). Listed once each, in the order their
-   * first descendant appears on the page, so the tree lands roughly where its
-   * newest test would have sorted to on its own.
-   */
-  get rootTests(): Test[] {
-    const pool = this.testPool;
-    const roots: Test[] = [];
-    const seenRootIds = new Set<string>();
-
-    for (const test of this.tests) {
-      let node = test;
-      while (node.parent_test_id) {
-        const parent = pool.get(node.parent_test_id);
-        if (!parent) break;
-        node = parent;
-      }
-      if (node._id && !seenRootIds.has(node._id)) {
-        seenRootIds.add(node._id);
-        roots.push(node);
-      }
-    }
-
-    return roots;
-  }
-
-  /** The tests directly repeated from the given one, among this page's tree. */
+  /** Only what has actually been fetched for this test so far - nothing before it is expanded. */
   childrenOf(test: Test): Test[] {
-    if (!test._id) return [];
-    return [...this.testPool.values()].filter(
-      (t) => t.parent_test_id === test._id,
-    );
+    return (test._id && this.childrenByParent.get(test._id)) || [];
   }
 
-  /** Fetched in only to complete the tree: not one of this page's own rows. */
-  isAncestor(test: Test): boolean {
-    return !!test._id && this.ancestorTests.has(test._id);
+  isExpanded(test: Test): boolean {
+    return !!test._id && this.expandedIds.has(test._id);
+  }
+
+  isLoadingChildren(test: Test): boolean {
+    return !!test._id && this.loadingChildrenIds.has(test._id);
+  }
+
+  // Toggles the row's children open or closed, fetching them from the server
+  // the first time - hasChildren (resolved by the server) is what tells the
+  // template to offer the arrow at all, so this never has to guess.
+  async toggleChildren(test: Test): Promise<void> {
+    const id = test._id;
+    if (!id || this.loadingChildrenIds.has(id)) return;
+
+    if (this.expandedIds.has(id)) {
+      this.expandedIds.delete(id);
+      return;
+    }
+    this.expandedIds.add(id);
+    if (this.childrenByParent.has(id)) return;
+
+    this.loadingChildrenIds.add(id);
+    try {
+      const children = await this.testService.getChildren(id);
+      this.childrenByParent.set(id, children);
+    } catch (err) {
+      console.error('Error loading test children', err);
+      this.expandedIds.delete(id);
+    } finally {
+      this.loadingChildrenIds.delete(id);
+    }
+  }
+
+  /** Where a test currently lives: this page's own roots, or its parent's fetched children. */
+  private arrayContaining(test: Test): Test[] | undefined {
+    if (!test.parent_test_id) return this.tests;
+    return this.childrenByParent.get(test.parent_test_id);
   }
 
   getCorrectCount(test: Test): number {
@@ -478,11 +383,13 @@ export class TestHistory extends PaginatedList implements OnInit, OnDestroy {
     const id = test._id;
     if (!id) return;
 
-    const index = this.tests.indexOf(test);
-    this.tests = this.tests.filter((t) => t._id !== id);
+    const list = this.arrayContaining(test);
+    const index = list ? list.indexOf(test) : -1;
+    if (list && index !== -1) list.splice(index, 1);
+
     this.pendingDeletions.set(
       id,
-      setTimeout(() => this.commitDelete(id), TestHistory.UNDO_WINDOW_MS),
+      setTimeout(() => this.commitDelete(test), TestHistory.UNDO_WINDOW_MS),
     );
 
     this.toast.show(
@@ -494,7 +401,7 @@ export class TestHistory extends PaginatedList implements OnInit, OnDestroy {
         // Closing the toast is deciding: the offer to take it back was the only
         // reason to wait, so the deletion is sent without sitting out the rest
         // of the window.
-        onDismiss: () => this.commitDelete(id),
+        onDismiss: () => this.commitDelete(test),
         duration: TestHistory.UNDO_WINDOW_MS,
       },
     );
@@ -509,12 +416,15 @@ export class TestHistory extends PaginatedList implements OnInit, OnDestroy {
 
     clearTimeout(timer);
     this.pendingDeletions.delete(id);
-    // Back where it was, unless the list has been reloaded meanwhile and is
-    // now shorter than it was.
-    this.tests.splice(Math.min(index, this.tests.length), 0, test);
+    // Back where it was, unless its list has changed meanwhile and is now
+    // shorter than it was.
+    const list = this.arrayContaining(test);
+    if (list) list.splice(Math.min(index, list.length), 0, test);
   }
 
-  private async commitDelete(id: string): Promise<void> {
+  private async commitDelete(test: Test): Promise<void> {
+    const id = test._id;
+    if (!id) return;
     const timer = this.pendingDeletions.get(id);
     // Already sent: the window can be closed early from the toast, and the
     // timer it was racing has to find nothing left to do.
@@ -524,10 +434,14 @@ export class TestHistory extends PaginatedList implements OnInit, OnDestroy {
 
     try {
       await this.testService.delete(id);
-      // Deleting the last test of a page would otherwise leave the reader on a
-      // page that no longer exists, empty and past the end of the list.
-      if (this.tests.length === 0 && this.currentPage > 1) this.currentPage--;
-      this.loadTests();
+      // A deleted child's row is already gone from its parent's cached list;
+      // only a deleted root changes what this page itself shows, and
+      // deleting the last one of a page would otherwise leave the reader on
+      // a page that no longer exists, empty and past the end of the list.
+      if (!test.parent_test_id) {
+        if (this.tests.length === 0 && this.currentPage > 1) this.currentPage--;
+        this.loadTests();
+      }
       this.loadStats();
     } catch (err) {
       console.error('Error deleting test', err);
@@ -535,8 +449,13 @@ export class TestHistory extends PaginatedList implements OnInit, OnDestroy {
         this.transloco.translate('test.history.toast.deleteError'),
         'error',
       );
-      // The row is on screen again: it was never deleted.
-      this.loadTests();
+      // The row was never deleted: put it back where it can be found again.
+      if (!test.parent_test_id) {
+        this.loadTests();
+      } else {
+        const list = this.childrenByParent.get(test.parent_test_id);
+        if (list && !list.includes(test)) list.push(test);
+      }
     }
   }
 
@@ -554,12 +473,13 @@ export class TestHistory extends PaginatedList implements OnInit, OnDestroy {
   }
 
   // Closes an unfinished test without answering the remaining questions:
-  // they stay blank, as if the test had been ended early. The same endpoint the
-  // runner ends a test with, keeping the time already on the test.
+  // they stay blank, as if the test had been ended early. Unlike the
+  // runner's own finish, this does not touch the test's date - it was not
+  // worked on just now, so it should not jump to the top of the history.
   async stopTest(test: Test): Promise<void> {
     if (!test._id) return;
     try {
-      await this.testService.completeTest(test._id, test.elapsed_time ?? 0);
+      await this.testService.terminateTest(test._id);
       this.toast.show(
         this.transloco.translate('test.history.toast.terminated'),
         'success',

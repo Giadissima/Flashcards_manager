@@ -1,5 +1,5 @@
 import { Types } from 'mongoose';
-import { IsArray, IsBoolean, IsMongoId, IsOptional, IsString, ValidateNested } from "class-validator";
+import { IsArray, IsBoolean, IsIn, IsMongoId, IsOptional, IsString, ValidateNested } from "class-validator";
 
 import { ApiProperty, IntersectionType } from "@nestjs/swagger";
 import { Transform, Type } from "class-transformer";
@@ -70,6 +70,16 @@ export class TestStatsFilterDto extends DateRangeRequest {
     required: false,
   })
   completed?: boolean;
+
+  @IsOptional()
+  @IsIn(['own', 'community'])
+  @ApiProperty({
+    description:
+      "Filter by where the test's flashcards came from: 'own' for the tester's own library, 'community' for a community post",
+    required: false,
+    enum: ['own', 'community'],
+  })
+  source?: 'own' | 'community';
 }
 
 export class TestFilterDto extends IntersectionType(

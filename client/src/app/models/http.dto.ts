@@ -47,5 +47,8 @@ export type RandomCardFIlter = Pick<CardFilter, 'subject_id'> & {
 export type TestFilter = Omit<CardFilter, 'title'> & {
   onlyWrong?: boolean;
   completed?: boolean;
+  // 'own' for tests built from the tester's own library, 'community' for
+  // ones started from a community post; absent shows both.
+  source?: 'own' | 'community';
 };
 
