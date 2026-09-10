@@ -177,7 +177,7 @@ export class CreateFlashcard implements OnInit, OnDestroy {
   get subjectOptions(): SelectOption[] {
     return toSubjectOptions(this.subjects);
   }
-  
+
     get topicOptions(): SelectOption[] {
     return toTopicOptions(this.topics);
   }
@@ -233,6 +233,7 @@ export class CreateFlashcard implements OnInit, OnDestroy {
     this.cardForm.get('title')?.setValue(parsed.title);
     this.questionEditor.commands.setContent(parsed.question);
     this.answerEditor.commands.setContent(parsed.answer);
+    this.toastService.show(this.transloco.translate('flashcard.create.importSuccess'), 'success');
 
     this.showImport = false;
     this.importText = '';
