@@ -1,0 +1,106 @@
+/* Same shape as .test-runner-container: a single column of questions reads
+   better narrowed to the width it actually wants. */
+.post-try-container {
+  max-width: 820px;
+}
+
+.test-progress-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--spacing-unit);
+  margin-bottom: var(--spacing-unit);
+  font-weight: 600;
+  color: var(--header-color);
+}
+
+.test-progress-percent {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-color);
+}
+
+.test-progress-track {
+  height: 8px;
+  border-radius: var(--border-radius-sm);
+  background-color: var(--track-background);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+}
+
+.test-progress-fill {
+  height: 100%;
+  background-color: var(--primary-color);
+  transition: width 0.2s ease;
+}
+
+.flashcard-meta {
+  font-size: 1rem;
+}
+
+.flashcard {
+  width: 100%;
+  min-height: 220px;
+
+  .card-title {
+    font-size: 1.5rem;
+  }
+
+  .flashcard-title {
+    padding: calc(var(--spacing-unit) * 3) calc(var(--spacing-unit) * 3) calc(var(--spacing-unit) * 2);
+  }
+
+  .flashcard-body {
+    padding: 0 calc(var(--spacing-unit) * 3) calc(var(--spacing-unit) * 3);
+    justify-content: center;
+    gap: calc(var(--spacing-unit) * 2);
+  }
+
+  .flashcard-text {
+    flex-grow: 0;
+    margin-bottom: 0;
+    font-size: 1.2rem;
+    line-height: 1.6;
+  }
+
+  .flashcard-actions {
+    margin-top: 0;
+  }
+
+  .flashcard-actions .btn:not(.icon-wrapper) {
+    font-size: 1.1rem;
+    padding: 0.5rem 1.1rem;
+  }
+}
+
+.flashcard.card--correct,
+.flashcard.card--incorrect {
+  box-shadow: inset 5px 0 0 0 var(--edge-color);
+}
+
+.flashcard.card--correct {
+  --edge-color: var(--success-color);
+}
+
+.flashcard.card--incorrect {
+  --edge-color: var(--danger-color);
+}
+
+.icon-wrapper {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  .material-symbols-outlined {
+    font-size: 30px;
+  }
+}
+
+.try-score {
+  font-weight: 600;
+  color: var(--header-color);
+}

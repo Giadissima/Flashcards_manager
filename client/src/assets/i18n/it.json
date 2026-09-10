@@ -588,6 +588,13 @@
     "dateUpdated": "Ultima modifica",
     "reportPost": "Segnala il post",
     "importAll": "Aggiungi tutte le flashcard alle mie",
+    "tryDeck": "Prova questo mazzo",
+    "try": {
+      "subtitle": "Una prova: qui non viene salvato nulla sul tuo account.",
+      "exit": "Torna alla Community",
+      "score": "{{correct}} corrette su {{answered}} risposte",
+      "error": "Impossibile caricare il mazzo"
+    },
     "importSet": {
       "title": "Aggiungi queste flashcard alle tue",
       "what": "Cosa importare",

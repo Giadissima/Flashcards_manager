@@ -144,8 +144,15 @@
 
     <!-- At the far end of the same row: what is done to the post as a whole,
          where the per-card buttons on the cards themselves are not. -->
-    @if (!isMine) {
     <div class="post-actions">
+      <!-- Studying a set changes nothing, so it stays open on the author's own
+           post too - unlike report and import, which only make sense on
+           someone else's. -->
+      <button type="button" class="btn btn-icon-ghost" (click)="openTry()"
+        [title]="'community.tryDeck' | transloco" [attr.aria-label]="'community.tryDeck' | transloco">
+        <span class="material-symbols-outlined">quiz</span>
+      </button>
+      @if (!isMine) {
       <button type="button" class="btn btn-icon-ghost" [class.is-reported]="reported" [disabled]="reported"
         (click)="openReport()"
         [title]="(reported ? 'community.report.already' : 'community.reportPost') | transloco"
@@ -156,8 +163,8 @@
         [title]="'community.importAll' | transloco" [attr.aria-label]="'community.importAll' | transloco">
         <span class="material-symbols-outlined">playlist_add</span>
       </button>
+      }
     </div>
-    }
   </div>
 
   <div class="post-comments">

@@ -19,7 +19,8 @@
           "options": {
             "outputPath": "dist/client",
             "polyfills": [
-              "zone.js"
+              "zone.js",
+              "zone.js/plugins/zone-patch-resize-observer"
             ],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
@@ -86,6 +87,7 @@
           "options": {
             "polyfills": [
               "zone.js",
+              "zone.js/plugins/zone-patch-resize-observer",
               "zone.js/testing"
             ],
             "tsConfig": "tsconfig.spec.json",

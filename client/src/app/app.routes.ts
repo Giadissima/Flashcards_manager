@@ -14,6 +14,7 @@ import { LoginComponent } from './auth/login/login.component';
 import { ManageSubjectsComponent } from './subject/manage-subjects/manage-subjects.component';
 import { ManageTopicsComponent } from './topic/manage-topics/manage-topics.component';
 import { NotFoundComponent } from './shared/not-found/not-found.component';
+import { PostTryComponent } from './community/post-try/post-try.component';
 import { ProfileComponent } from './profile/profile.component';
 import { RegisterComponent } from './auth/register/register.component';
 import { Routes } from '@angular/router';
@@ -42,6 +43,7 @@ export const routes: Routes = [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: 'home', component: Home },
       { path: 'community', component: CommunityComponent },
+      { path: 'community/try/:postId', component: PostTryComponent },
       { path: 'profile', component: ProfileComponent },
       { path: 'create-card', component: CreateFlashcard },
       { path: 'edit-card/:id', component: EditFlashcard },

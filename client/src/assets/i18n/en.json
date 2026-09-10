@@ -588,6 +588,13 @@
     "dateUpdated": "Last changed",
     "reportPost": "Report this post",
     "importAll": "Add the whole set to my flashcards",
+    "tryDeck": "Try this deck",
+    "try": {
+      "subtitle": "A trial run: nothing here is saved to your account.",
+      "exit": "Back to Community",
+      "score": "{{correct}} correct out of {{answered}} answered",
+      "error": "The deck could not be loaded"
+    },
     "importSet": {
       "title": "Add this set to your flashcards",
       "what": "What to take",

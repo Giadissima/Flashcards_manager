@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { ContentOverflowDirective } from '../../shared/content-overflow.directive';
 import { AuthService } from '../../auth/auth.service';
 import { CommunityService } from '../community.service';
@@ -116,7 +117,20 @@ export class PostCardComponent implements OnInit, AfterViewInit, OnDestroy {
     private authService: AuthService,
     private toast: ToastService,
     private transloco: TranslocoService,
+    private router: Router,
   ) {}
+
+  /**
+   * Opens a trial run over the post's cards, narrowed to whatever topic the
+   * carousel is currently filtered to. Unlike import, this works on the
+   * reader's own posts too: trying a set is just studying it, nothing is
+   * copied or changed either way.
+   */
+  openTry(): void {
+    this.router.navigate(['/community/try', this.post._id], {
+      queryParams: this.selectedTopicId ? { topicId: this.selectedTopicId } : {},
+    });
+  }
 
   // The strip on top, the icon and the topic under the title: the same four
   // helpers the home grid and the test runner draw a card with.
