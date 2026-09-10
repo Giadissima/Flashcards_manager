@@ -1,5 +1,5 @@
 $desktop-dim: 1100px;
-$mid-dim: 920px;
+$mid-dim: 1050px;
 $nav-button-min-display: 620px;
 $logo-resize: 445px;
 $create-btn-remove: 412px;
@@ -40,7 +40,7 @@ nav {
 
 .menu-container {
   display: flex;
-  gap: calc(var(--spacing-unit) * 4);
+  gap: calc(var(--spacing-unit) * 2.5);
 }
 
 .menu-item {
@@ -103,18 +103,11 @@ nav {
 .actions-container {
   display: flex;
   align-items: center;
-  gap: calc(var(--spacing-unit) * 2);
+  gap: var(--spacing-unit);
 }
 
 .create-card-btn {
   flex-shrink: 0;
-}
-
-/* The drawer-only stand-in for .create-card-btn: out of the way above the
-   hamburger breakpoint, where the button in actions-container already covers
-   the same two destinations. */
-.mobile-only-item {
-  display: none;
 }
 
 /* The drawer-only stand-in for .profile-group: out of the way above the
@@ -278,13 +271,14 @@ nav {
     gap: var(--spacing-unit);
   }
 
-  /* Shrunk rather than dropped: same variables Bootstrap's .btn-sm sets, kept
-     as a button (not just an icon) as long as the bar is still the desktop
-     layout - it only gives way to the drawer link once the hamburger does. */
-  .create-card-btn {
-    --bs-btn-padding-y: 0.25rem;
-    --bs-btn-padding-x: 0.5rem;
-    --bs-btn-font-size: 0.875rem;
+  // Shrinks the labels themselves once the tighter gaps above stop being
+  // enough on their own, buying more room before the drawer takes over.
+  .menu-item {
+    font-size: 14px;
+  }
+
+  .project-name {
+    font-size: 16px;
   }
 }
 
@@ -450,14 +444,10 @@ nav {
 }
 
 // Below this width the button no longer fits even at btn-sm: it steps aside
-// for the .mobile-only-item link inside the drawer instead.
+// for the "Flashcard" dropdown in the menu instead.
 @media (max-width: $create-btn-remove) {
   .create-card-btn {
     display: none;
-  }
-
-  .mobile-only-item {
-    display: block;
   }
 }
 

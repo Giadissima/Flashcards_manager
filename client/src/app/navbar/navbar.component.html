@@ -49,10 +49,7 @@
         </div>
       </div>
     </div>
-    <!-- Only shown in the hamburger drawer: above that breakpoint "Crea Flashcard"
-         already has its own button in actions-container, and the plain link
-         below is a stand-in for that button once it runs out of room. -->
-    <div class="dropdown mobile-only-item" routerLinkActive="is-active" (appClickOutside)="closeDropdown('flashcards')">
+    <div class="dropdown" routerLinkActive="is-active" (appClickOutside)="closeDropdown('flashcards')">
       <span class="menu-item" (click)="toggleDropdown('flashcards')">
         <span class="menu-label">{{ 'navbar.flashcards' | transloco }}</span>
         <span class="material-symbols-outlined">arrow_drop_down</span>
@@ -113,7 +110,7 @@
     <!-- Shrinks to a compact size once space runs out on desktop, and only
          disappears once the hamburger drawer takes over - where it comes back
          as a link inside it (the .mobile-only-item dropdown above). -->
-    <button routerLink="/create-card" type="button" class="btn btn-primary create-card-btn"
+    <button routerLink="/create-card" type="button" class="btn btn-sm btn-primary create-card-btn"
       [attr.aria-label]="'navbar.createCard' | transloco">
       <span class="material-symbols-outlined">
         add
