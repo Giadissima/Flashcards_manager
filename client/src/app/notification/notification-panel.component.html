@@ -90,6 +90,10 @@
     } @empty {
     <div class="panel-empty">{{ 'notifications.empty' | transloco }}</div>
     }
+    @if (totalPages > 1) {
+    <app-pagination [currentPage]="currentPage" [totalPages]="totalPages" [disabled]="loading"
+      (previous)="previousPage()" (next)="nextPage()"></app-pagination>
+    }
     }
     }
 
@@ -103,10 +107,22 @@
       <strong>{{ openThread.flashcard_id.title }}</strong>
     </div>
 
-    @for (message of openThread.messages; track message.createdAt) {
+    @for (message of openThread.messages; track message._id || message.createdAt) {
     <div class="thread-message">
       <span class="thread-author">{{ message.user_id.username }}</span>
-      <span class="thread-text">{{ message.text }}</span>
+      <div class="thread-text-row">
+        @if (message.redactedAt) {
+        <span class="thread-text thread-text-removed">{{ 'notifications.messageRemoved' | transloco }}</span>
+        } @else {
+        <span class="thread-text">{{ message.text }}</span>
+        @if (mayReportMessage(message)) {
+        <button type="button" class="btn btn-icon-ghost thread-report-btn" (click)="openMessageReport(message)"
+          [title]="'community.reportMessage' | transloco" [attr.aria-label]="'community.reportMessage' | transloco">
+          <span class="material-symbols-outlined">flag</span>
+        </button>
+        }
+        }
+      </div>
     </div>
     }
 
@@ -135,6 +151,15 @@
     } @else {
     <p class="panel-empty">{{ 'notifications.threadClosed' | transloco }}</p>
     }
+    }
+
+    <!-- Nested inside the click-outside boundary on purpose: a sibling here
+         would have every click inside the report modal - a radio button, the
+         send button itself - read as a click outside the panel, which closes
+         it (and clears openThread with it) before the report ever goes out. -->
+    @if (openThread) {
+    <app-post-report-modal [kind]="reportKind" [targetId]="openThread._id" [messageId]="reportMessageId"
+      [authorUsername]="reportAuthorUsername" [isOpen]="reportOpen" (closed)="reportOpen = false"></app-post-report-modal>
     }
   </div>
 </div>

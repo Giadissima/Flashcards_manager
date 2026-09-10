@@ -69,4 +69,29 @@ export class ModerationController {
 
     return { reports: filed.reports };
   }
+
+  @ApiOperation({
+    description: 'report one message in a private feedback exchange',
+  })
+  @Throttle({ all: rateLimits.write })
+  @Post('feedback/:id/messages/:messageId/report')
+  async reportFeedbackMessage(
+    @CurrentUser() user: JwtPayload,
+    @Param('id') id: string,
+    @Param('messageId') messageId: string,
+    @Body() dto: ReportPostDto,
+  ): Promise<ReportResult> {
+    const filed = await this.moderation.reportFeedbackMessage(
+      user.sub,
+      id,
+      messageId,
+      dto.reason,
+      dto.note,
+    );
+
+    const summary = await this.moderation.summarise(filed.reportId);
+    if (summary) await this.telegram.announce(summary);
+
+    return { reports: filed.reports };
+  }
 }

@@ -1,5 +1,5 @@
 <app-modal [isOpen]="isOpen"
-  [title]="(kind === 'comment' ? 'community.report.titleComment' : 'community.report.title') | transloco"
+  [title]="(kind === 'comment' ? 'community.report.titleComment' : kind === 'feedback' ? 'community.report.titleFeedback' : 'community.report.title') | transloco"
   [showFooter]="true" (closed)="close()">
   <p class="report-intro">{{ 'community.report.intro' | transloco:{ author: authorUsername } }}</p>
 

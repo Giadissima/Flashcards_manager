@@ -58,9 +58,14 @@ export class TelegramService {
   async announce(summary: ReportSummary): Promise<void> {
     if (!this.enabled) return;
 
+    const suffix =
+      summary.target === 'comment'
+        ? ' (commento)'
+        : summary.target === 'feedback'
+          ? ' (messaggio privato)'
+          : '';
     const lines = [
-      `<b>${escape(summary.author)}</b> — ${escape(summary.subject)}` +
-        (summary.target === 'comment' ? ' (commento)' : ''),
+      `<b>${escape(summary.author)}</b> — ${escape(summary.subject)}${suffix}`,
       `segnalato da: ${escape(summary.reporter)}`,
       `motivo: ${reasons[summary.reason] ?? summary.reason}`,
     ];
@@ -68,9 +73,15 @@ export class TelegramService {
     if (summary.target === 'comment' && summary.commentText) {
       lines.push(`commento: ${escape(summary.commentText)}`);
     }
+    if (summary.target === 'feedback' && summary.feedbackText) {
+      lines.push(`testo segnalato: ${escape(summary.feedbackText)}`);
+    }
 
+    // Not "messaggio", to keep it apart from a feedback report's own reported
+    // text above: this is what whoever filed the report added on top of it,
+    // not the thing they are complaining about.
     if (summary.note) {
-      lines.push(`messaggio utente: ${escape(summary.note)}`);
+      lines.push(`nota di chi segnala: ${escape(summary.note)}`);
     }
 
     lines.push(

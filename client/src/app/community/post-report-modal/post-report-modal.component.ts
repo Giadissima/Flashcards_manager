@@ -11,7 +11,7 @@ import { restrictionOf } from '../../shared/restriction';
 import { ToastService } from '../../shared/toast/toast.service';
 
 /** What this report is filed against. */
-export type ReportKind = 'post' | 'comment';
+export type ReportKind = 'post' | 'comment' | 'feedback';
 
 /**
  * What is wrong with a post, or a comment under one, in the reporter's words.
@@ -36,6 +36,8 @@ export type ReportKind = 'post' | 'comment';
 export class PostReportModalComponent implements OnChanges {
   @Input() kind: ReportKind = 'post';
   @Input({ required: true }) targetId!: string;
+  /** Set only when kind is 'feedback': which message of the exchange. */
+  @Input() messageId = '';
   @Input({ required: true }) authorUsername!: string;
   @Input() isOpen = false;
 
@@ -73,7 +75,9 @@ export class PostReportModalComponent implements OnChanges {
     this.sending = true;
     try {
       const request = { reason: this.reason, note: this.note.trim() || undefined };
-      if (this.kind === 'comment') {
+      if (this.kind === 'feedback') {
+        await this.communityService.reportFeedbackMessage(this.targetId, this.messageId, request);
+      } else if (this.kind === 'comment') {
         await this.communityService.reportComment(this.targetId, request);
       } else {
         await this.communityService.reportPost(this.targetId, request);

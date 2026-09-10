@@ -15,6 +15,7 @@ import { extractImageFileIds } from 'src/common/html.util';
 import { allCards } from 'src/config';
 import { Post } from 'src/post/post.schema';
 import { Comment } from 'src/post/comment.schema';
+import { Feedback } from 'src/post/feedback.schema';
 import { banUntil, blockUntil, blocksAt, privileges } from 'src/common/privileges';
 import { AdminReport, ModerationAction, ModerationSubject } from './moderation.dto';
 import { Report, ReportReason, ReportTarget } from './report.schema';
@@ -39,6 +40,10 @@ export interface ReportSummary {
   /** Set only when target is 'comment'. */
   commentId?: string;
   commentText?: string;
+  /** Set only when target is 'feedback'. */
+  feedbackId?: string;
+  messageId?: string;
+  feedbackText?: string;
   authorId: string;
   author: string;
   /** Whoever filed this particular report. */
@@ -72,6 +77,7 @@ export class ModerationService {
     private readonly signupBlockModel: Model<SignupBlock>,
     @InjectModel(Post.name) private readonly postModel: Model<Post>,
     @InjectModel(Comment.name) private readonly commentModel: Model<Comment>,
+    @InjectModel(Feedback.name) private readonly feedbackModel: Model<Feedback>,
     @InjectModel(User.name) private readonly userModel: Model<User>,
     private readonly notificationService: NotificationService,
     private readonly postService: PostService,
@@ -195,12 +201,73 @@ export class ModerationService {
     return { reportId, reports, hidden };
   }
 
+  /**
+   * Same idea, for one message inside a private feedback exchange: either
+   * side of the thread can find the other's message out of place, so this is
+   * open to whichever of the two did not write it.
+   */
+  async reportFeedbackMessage(
+    userId: string,
+    feedbackId: string,
+    messageId: string,
+    reason: ReportReason,
+    note?: string,
+  ): Promise<{ reportId: string; reports: number; hidden: boolean }> {
+    await this.restrictions.assertMay(userId, 'report');
+    const feedback = await this.feedbackModel.findById(feedbackId).lean().exec();
+    // Someone else's exchange is not found rather than forbidden, the same as
+    // reading one: a 403 would confirm it exists.
+    const mine =
+      feedback &&
+      (String(feedback.author_id) === userId || String(feedback.reporter_id) === userId);
+    if (!feedback || !mine) {
+      throw new NotFoundException(`Feedback with id ${feedbackId} not found`);
+    }
+
+    const message = feedback.messages.find((m) => String(m._id) === messageId);
+    if (!message) {
+      throw new NotFoundException(`Message with id ${messageId} not found`);
+    }
+    if (String(message.user_id) === userId) {
+      throw new BadRequestException('This message is yours');
+    }
+
+    let reportId = '';
+    try {
+      const report = await this.reportModel.create({
+        target: 'feedback',
+        feedback_id: feedback._id,
+        message_id: message._id,
+        reporter_id: new Types.ObjectId(userId),
+        reason,
+        note,
+        state: 'open',
+      });
+      reportId = String(report._id);
+    } catch (error) {
+      if ((error as { code?: number }).code === 11000) {
+        throw new ConflictException('You already reported this message');
+      }
+      throw error;
+    }
+
+    const reports = await this.reportModel
+      .countDocuments({ feedback_id: feedback._id, message_id: message._id, state: 'open' })
+      .exec();
+
+    // No auto-hide here: unlike a post or a comment, nobody but the two
+    // people in the exchange ever sees this message, so there is no crowd of
+    // readers to protect by taking it down early.
+    return { reportId, reports, hidden: false };
+  }
+
   /** Everything one report is about, for the message that asks about it. */
   async summarise(reportId: string): Promise<ReportSummary | null> {
     const report = await this.reportModel.findById(reportId).lean().exec();
     if (!report) return null;
 
     if (report.target === 'comment') return this.summariseComment(report);
+    if (report.target === 'feedback') return this.summariseFeedback(report);
 
     const post = await this.postModel
       .findById(report.post_id)
@@ -289,6 +356,62 @@ export class ModerationService {
     };
   }
 
+  /** summarise(), for a report whose target is one feedback message. */
+  private async summariseFeedback(
+    report: Report & { _id: Types.ObjectId; createdAt?: Date },
+  ): Promise<ReportSummary | null> {
+    const feedback = await this.feedbackModel
+      .findById(report.feedback_id)
+      .populate('flashcard_id', 'title')
+      .lean()
+      .exec();
+    if (!feedback) return null;
+
+    const message = feedback.messages.find(
+      (m) => String(m._id) === String(report.message_id),
+    );
+    if (!message) return null;
+
+    const [author, reporter, reports] = await Promise.all([
+      this.userModel
+        .findById(message.user_id, { username: 1, strikes: 1 })
+        .lean()
+        .exec(),
+      this.userModel
+        .findById(report.reporter_id, { username: 1, strikes: 1 })
+        .lean()
+        .exec(),
+      this.reportModel
+        .countDocuments({
+          feedback_id: feedback._id,
+          message_id: message._id,
+          state: 'open',
+        })
+        .exec(),
+    ]);
+
+    return {
+      reportId: String(report._id),
+      target: 'feedback',
+      postId: '',
+      feedbackId: String(feedback._id),
+      messageId: String(message._id),
+      feedbackText: message.text,
+      authorId: String(message.user_id),
+      author: author?.username ?? '?',
+      reporterId: String(report.reporter_id),
+      reporter: reporter?.username ?? '?',
+      reporterStrikes: reporter?.strikes ?? 0,
+      subject: (feedback.flashcard_id as unknown as { title?: string })?.title ?? '?',
+      reason: report.reason,
+      note: report.note,
+      reports,
+      strikes: author?.strikes ?? 0,
+      hidden: !!message.redactedAt,
+      createdAt: report.createdAt as unknown as Date,
+    };
+  }
+
   // ---------------------------------------------------- the moderation page
 
   /**
@@ -346,13 +469,24 @@ export class ModerationService {
         .exec();
       await this.forgetGone(comments, alive, 'comment_id', 'comments');
     }
+
+    const feedbacks = await this.reportModel
+      .distinct('feedback_id', { target: 'feedback' })
+      .exec();
+    if (feedbacks.length) {
+      const alive = await this.feedbackModel
+        .find({ _id: { $in: feedbacks } }, { _id: 1 })
+        .lean()
+        .exec();
+      await this.forgetGone(feedbacks, alive, 'feedback_id', 'feedback exchanges');
+    }
   }
 
   /** Deletes the reports pointing at whichever of `ids` are not in `alive`. */
   private async forgetGone(
     ids: Types.ObjectId[],
     alive: { _id: Types.ObjectId }[],
-    field: 'post_id' | 'comment_id',
+    field: 'post_id' | 'comment_id' | 'feedback_id',
     noun: string,
   ): Promise<void> {
     const living = new Set(alive.map((doc) => String(doc._id)));
@@ -381,9 +515,9 @@ export class ModerationService {
     ]);
     const reporterBanned = isBanned(reporter);
 
-    if (summary.target === 'comment') {
+    if (summary.target === 'comment' || summary.target === 'feedback') {
       // No cards to draw here: the whole point being decided on is the one
-      // comment already carried in the summary.
+      // comment, or the one message, already carried in the summary.
       return {
         ...summary,
         state: report?.state ?? 'open',
@@ -446,6 +580,17 @@ export class ModerationService {
       if (action === 'keep' || action === 'restore') return this.keepComment(commentId);
       if (action === 'remove') return this.removeComment(commentId);
       if (action === 'warn') return this.warn(summary.authorId, summary.postId);
+      return this.ban(summary.authorId);
+    }
+
+    if (summary.target === 'feedback') {
+      const feedbackId = summary.feedbackId as string;
+      const messageId = summary.messageId as string;
+      if (action === 'keep' || action === 'restore') {
+        return this.keepFeedbackMessage(feedbackId, messageId);
+      }
+      if (action === 'remove') return this.removeFeedbackMessage(feedbackId, messageId);
+      if (action === 'warn') return this.warn(summary.authorId);
       return this.ban(summary.authorId);
     }
 
@@ -549,6 +694,69 @@ export class ModerationService {
     });
 
     return { done: "Commento tolto, l'autore è stato avvisato" };
+  }
+
+  /** Same idea as keep(), for one feedback message: its text is put back. */
+  async keepFeedbackMessage(feedbackId: string, messageId: string): Promise<Verdict> {
+    await this.closeFeedbackReports(feedbackId, messageId, 'kept');
+    const feedback = await this.feedbackModel.findById(feedbackId).lean().exec();
+    const message = feedback?.messages.find((m) => String(m._id) === messageId);
+
+    const back = await this.feedbackModel
+      .updateOne(
+        { _id: feedbackId, 'messages._id': messageId },
+        { $unset: { 'messages.$.redactedAt': '' } },
+      )
+      .exec();
+    if (back.modifiedCount && feedback && message) {
+      await this.notificationService.restoreFeedbackPreview(feedback._id, message.text);
+    }
+
+    return {
+      done: back.modifiedCount
+        ? 'Segnalazione chiusa, il messaggio torna visibile'
+        : 'Segnalazione chiusa, il messaggio era già visibile',
+    };
+  }
+
+  /**
+   * The message's text is redacted rather than removed from the array: the
+   * exchange's turn order is worked out from how many messages it has, and
+   * shortening it mid-conversation would hand the turn to the wrong side or
+   * reopen a slot that had already been used.
+   */
+  async removeFeedbackMessage(feedbackId: string, messageId: string): Promise<Verdict> {
+    const feedback = await this.feedbackModel.findById(feedbackId).lean().exec();
+    if (!feedback) throw new NotFoundException('Feedback not found');
+    const message = feedback.messages.find((m) => String(m._id) === messageId);
+    if (!message) throw new NotFoundException('Message not found');
+
+    await this.feedbackModel
+      .updateOne(
+        { _id: feedback._id, 'messages._id': message._id },
+        { $set: { 'messages.$.redactedAt': new Date() } },
+      )
+      .exec();
+    await this.closeFeedbackReports(feedbackId, messageId, 'removed');
+    // The message went out as a notification already, and that copy does not
+    // update itself just because the exchange behind it now does.
+    await this.notificationService.redactFeedbackPreview(feedback._id, message.text);
+
+    await this.notificationService.record({
+      userId: message.user_id,
+      kind: 'moderation',
+      feedbackId: feedback._id as Types.ObjectId,
+      moderation: { event: 'feedbackMessageRemoved', privileges: [] },
+    });
+
+    await this.sanctionModel.create({
+      user_id: message.user_id,
+      kind: 'warning',
+      privileges: [],
+      note: 'feedback message removed',
+    });
+
+    return { done: "Messaggio tolto, l'autore è stato avvisato" };
   }
 
   /** The post goes, and its author is told which one and why. */
@@ -886,6 +1094,25 @@ export class ModerationService {
       )
       .exec();
     this.logger.log(`reports on comment ${commentId} closed as ${state}`);
+  }
+
+  /** Same idea as closeCommentReports(), for the reports on one message. */
+  private async closeFeedbackReports(
+    feedbackId: string,
+    messageId: string,
+    state: 'kept' | 'removed',
+  ): Promise<void> {
+    await this.reportModel
+      .updateMany(
+        {
+          feedback_id: new Types.ObjectId(feedbackId),
+          message_id: new Types.ObjectId(messageId),
+          state: { $ne: state },
+        },
+        { $set: { state, handledAt: new Date() } },
+      )
+      .exec();
+    this.logger.log(`reports on feedback message ${messageId} closed as ${state}`);
   }
 }
 

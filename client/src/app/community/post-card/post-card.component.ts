@@ -367,9 +367,15 @@ export class PostCardComponent implements OnInit, AfterViewInit, OnDestroy {
   /**
    * Whoever may not report right now is told immediately: opening the dialog
    * only to have it fail on submit would say the same thing, a click later.
+   *
+   * Asked of the server fresh each time rather than read off the cached
+   * profile: a restriction lifted by moderation only reaches that cache on
+   * the next login, so trusting it would keep telling a pardoned account it
+   * is still blocked until it happens to log in again.
    */
-  private blockedFromReporting(): boolean {
-    const blocked = this.authService.user?.reportBlocked;
+  private async blockedFromReporting(): Promise<boolean> {
+    const fresh = await this.authService.fetchMe().catch(() => this.authService.user);
+    const blocked = fresh?.reportBlocked;
     if (!blocked) return false;
 
     const message = restrictionMessage('report', blocked.until);
@@ -377,8 +383,8 @@ export class PostCardComponent implements OnInit, AfterViewInit, OnDestroy {
     return true;
   }
 
-  openReport(): void {
-    if (this.blockedFromReporting()) return;
+  async openReport(): Promise<void> {
+    if (await this.blockedFromReporting()) return;
 
     this.reportKind = 'post';
     this.reportTargetId = this.post._id;
@@ -386,8 +392,8 @@ export class PostCardComponent implements OnInit, AfterViewInit, OnDestroy {
     this.reportOpen = true;
   }
 
-  openCommentReport(comment: PostComment): void {
-    if (this.blockedFromReporting()) return;
+  async openCommentReport(comment: PostComment): Promise<void> {
+    if (await this.blockedFromReporting()) return;
 
     this.reportKind = 'comment';
     this.reportTargetId = comment._id;

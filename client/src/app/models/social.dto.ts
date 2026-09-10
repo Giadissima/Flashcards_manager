@@ -10,9 +10,12 @@ export interface PostComment {
 }
 
 export interface FeedbackMessage {
+  _id: string;
   user_id: { _id: string; username: string };
   text: string;
   createdAt: string;
+  /** Set once moderation has taken this one message's text down. */
+  redactedAt?: string;
 }
 
 /** A private exchange about one flashcard, closed at three messages. */
@@ -37,7 +40,7 @@ export type NotificationKind = (typeof notificationKinds)[number];
 
 /** What the site decided about the account, on the one kind nobody caused. */
 export interface ModerationNotice {
-  event: 'warned' | 'blocked' | 'lifted' | 'removed';
+  event: 'warned' | 'blocked' | 'lifted' | 'removed' | 'commentRemoved' | 'feedbackMessageRemoved';
   /** What was taken away, or given back. */
   privileges: string[];
   /** When it ends. Absent means there is no date to wait for. */

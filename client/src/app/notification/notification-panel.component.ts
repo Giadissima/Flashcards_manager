@@ -1,4 +1,4 @@
-import { AppNotification, Feedback, NotificationKind, notificationKinds } from '../models/social.dto';
+import { AppNotification, Feedback, FeedbackMessage, NotificationKind, notificationKinds } from '../models/social.dto';
 import { Component, Input, OnInit } from '@angular/core';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 
@@ -8,6 +8,10 @@ import { CommonModule } from '@angular/common';
 import { CommunityService } from '../community/community.service';
 import { FormsModule } from '@angular/forms';
 import { NotificationService } from './notification.service';
+import { PaginatedList } from '../shared/paginated-list';
+import { PaginationComponent } from '../shared/pagination/pagination.component';
+import { PostReportModalComponent, ReportKind } from '../community/post-report-modal/post-report-modal.component';
+import { restrictionMessage } from '../shared/restriction';
 import { SearchableSelectComponent, SelectOption } from '../shared/searchable-select/searchable-select.component';
 import { ToastService } from '../shared/toast/toast.service';
 
@@ -25,15 +29,26 @@ const maxFeedbackMessages = 3;
 @Component({
   selector: 'app-notification-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslocoModule, ClickOutsideDirective, SearchableSelectComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    TranslocoModule,
+    ClickOutsideDirective,
+    SearchableSelectComponent,
+    PaginationComponent,
+    PostReportModalComponent,
+  ],
   templateUrl: './notification-panel.component.html',
   styleUrl: './notification-panel.component.scss',
 })
-export class NotificationPanelComponent implements OnInit {
+export class NotificationPanelComponent extends PaginatedList implements OnInit {
   // Rendered as a labelled row (icon + "Notifiche") instead of the plain
   // round bell button, for the drawer's profile card where it sits alongside
   // "Profilo" and "Esci" as one of a list rather than a standalone control.
   @Input() listStyle = false;
+
+  // Small: this list lives in a dropdown, not a page.
+  override pageSize = 8;
 
   isOpen = false;
   loading = false;
@@ -56,13 +71,22 @@ export class NotificationPanelComponent implements OnInit {
   sendingReply = false;
   resolving = false;
 
+  // ----------------------------------------------- reporting one message
+
+  reportOpen = false;
+  reportKind: ReportKind = 'feedback';
+  reportMessageId = '';
+  reportAuthorUsername = '';
+
   constructor(
     private notificationService: NotificationService,
     private communityService: CommunityService,
     private authService: AuthService,
     private toast: ToastService,
     private transloco: TranslocoService,
-  ) {}
+  ) {
+    super();
+  }
 
   ngOnInit(): void {
     void this.refreshBadge();
@@ -73,7 +97,10 @@ export class NotificationPanelComponent implements OnInit {
     this.openThread = null;
     // Fetched when the panel is opened, not on every page: the badge alone is
     // what the bar needs to show, and that is one number
-    if (this.isOpen) await this.load();
+    if (this.isOpen) {
+      this.currentPage = 1;
+      await this.load();
+    }
   }
 
   async showTab(tab: 'all' | 'open'): Promise<void> {
@@ -118,6 +145,12 @@ export class NotificationPanelComponent implements OnInit {
   }
 
   async onFilterChange(): Promise<void> {
+    // A new filter starts back at the top of its own result set.
+    this.currentPage = 1;
+    await this.load();
+  }
+
+  protected async onPageChange(): Promise<void> {
     await this.load();
   }
 
@@ -242,6 +275,35 @@ export class NotificationPanelComponent implements OnInit {
     }
   }
 
+  /**
+   * Only the other side of the exchange can report a message, never its own
+   * author - and never one written before messages carried an id of their
+   * own, since there would be nothing for the report to point at.
+   */
+  mayReportMessage(message: FeedbackMessage): boolean {
+    return !!message._id && message.user_id._id !== this.authService.user?._id;
+  }
+
+  /**
+   * Asked of the server fresh each time rather than read off the cached
+   * profile: a restriction lifted by moderation only reaches that cache on
+   * the next login, so trusting it would keep telling a pardoned account it
+   * is still blocked until it happens to log in again.
+   */
+  async openMessageReport(message: FeedbackMessage): Promise<void> {
+    const fresh = await this.authService.fetchMe().catch(() => this.authService.user);
+    const blocked = fresh?.reportBlocked;
+    if (blocked) {
+      const notice = restrictionMessage('report', blocked.until);
+      this.toast.show(this.transloco.translate(notice.key, notice.params), 'error');
+      return;
+    }
+
+    this.reportMessageId = message._id;
+    this.reportAuthorUsername = message.user_id.username;
+    this.reportOpen = true;
+  }
+
   private async openFeedback(feedbackId: string): Promise<void> {
     try {
       this.openThread = await this.communityService.getFeedback(feedbackId);
@@ -255,13 +317,14 @@ export class NotificationPanelComponent implements OnInit {
     this.loading = true;
     try {
       const [page, open] = await Promise.all([
-        this.notificationService.getMine(0, 20, {
+        this.notificationService.getMine(this.pageSkip, this.pageSize, {
           kind: this.kindFilter || undefined,
           unread: this.unreadOnly,
         }),
         this.communityService.getOpenFeedback(0, 20),
       ]);
       this.notifications = page.data;
+      this.totalCount = page.count;
       // Counted from the server, not from the page on screen: a filtered list
       // says nothing about how many are unread in total
       this.unread = Number(await this.notificationService.countUnread()) || 0;

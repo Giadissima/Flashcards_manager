@@ -402,7 +402,7 @@
       "statsCompleted": "Completati",
       "statsAvgScore": "Media risposte corrette",
       "statsTotalTime": "Tempo totale di studio",
-      "noTests": "Nessun test svolto ancora.",
+      "noTests": "Nessun test ancora svolto.",
       "repeatOf": "Ripetizione delle errate",
       "contextBadge": "Contesto",
       "contextHint": "Mostrato solo per completare l'albero: non fa parte di questa pagina.",
@@ -528,19 +528,17 @@
     "label": "Visibilità",
     "public": "Pubblica",
     "private": "Privata",
-    "publicHint": "Comparirà agli altri nella sezione Community, raggruppata per il tuo corso di laurea.",
-    "privateHint": "La vedi solo tu.",
     "makePublic": "Rendi pubblica",
     "makePrivate": "Rendi privata",
     "toastPublic": "Ora è pubblica",
     "toastPrivate": "Ora è privata",
     "toastError": "Non è stato possibile cambiare la visibilità",
-    "cascadeSubject": "I suoi argomenti e le sue flashcard la seguono, sia quando la pubblichi sia quando la togli.",
-    "cascadeTopic": "Le sue flashcard lo seguono, sia quando lo pubblichi sia quando lo togli.",
+    "cascadeSubject": "Se cambi la visibilità di questa materia, la cambierai anche ai suoi argomenti e alle sue flashcard",
+    "cascadeTopic": "Se cambi la visibilità di questo argomento, la cambierai anche alle sue flashcard",
     "imported": "Card importata",
     "publicSubjectNoCards": "Questa materia non ha ancora nessuna flashcard, quindi non compare nella Community.",
     "publicSubjectAllPrivate": "Le flashcard di questa materia sono tutte private, quindi non compare nella Community finché non ne condividi almeno una.",
-    "needUniversity": "Indica la tua università prima di condividere: la Community si legge un ateneo alla volta.",
+    "needUniversity": "Devi indicare la tua università prima di poter condivivere nella community.",
     "goToProfile": "Vai al profilo"
   },
   "community": {
@@ -566,6 +564,7 @@
     "commentPlaceholder": "Scrivi un commento",
     "commentError": "Non è stato possibile inviare il commento",
     "reportComment": "Segnala il commento",
+    "reportMessage": "Segnala il messaggio",
     "flooding": "Stai scrivendo troppo velocemente. Aspetta un momento e riprova.",
     "feedback": "Feedback all'autore",
     "feedbackTitle": "Segnala all'autore",
@@ -623,6 +622,7 @@
     "report": {
       "title": "Segnala questo post",
       "titleComment": "Segnala questo commento",
+      "titleFeedback": "Segnala questo messaggio",
       "intro": "La segnalazione arriva a chi amministra il sito. {{author}} non saprà che sei stato tu.",
       "reason": {
         "explicit": "Contenuto esplicito o volgare",
@@ -646,6 +646,7 @@
     "replyError": "Non è stato possibile inviare la risposta",
     "threadError": "Non è stato possibile aprire lo scambio",
     "threadClosed": "Questo scambio è chiuso",
+    "messageRemoved": "Messaggio tolto dalla moderazione",
     "kind": {
       "upvote": "ha messo mi piace al tuo post",
       "comment": "ha commentato il tuo post",
@@ -678,7 +679,8 @@
       "blockedForever": "ha limitato il tuo account.",
       "lifted": "ti ha ridato i permessi: puoi tornare a pubblicare, commentare e mandare feedback.",
       "removed": "ha tolto un tuo post dalla community.",
-      "commentRemoved": "ha tolto un tuo commento dalla community."
+      "commentRemoved": "ha tolto un tuo commento dalla community.",
+      "feedbackMessageRemoved": "ha tolto un tuo messaggio da uno scambio di feedback."
     }
   },
   "moderation": {

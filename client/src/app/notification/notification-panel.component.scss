@@ -7,6 +7,12 @@
   width: 340px;
   max-width: 90vw;
   white-space: normal;
+  // Roomy enough for a full page of the list (header + tabs + filters +
+  // 8 notification rows + the pagination bar) instead of the global
+  // .dropdown-content's 320px, which only fit about four rows and made
+  // every page scroll to see the rest. Capped by viewport height so it
+  // still fits on a short screen.
+  max-height: min(650px, 85vh);
 }
 
 /* In the drawer's list-trigger variant, navbar.component.scss turns every
@@ -204,6 +210,39 @@
   text-align: center;
 }
 
+/* The default pagination bar is sized for a page's width and the room under a
+   whole list; here it sits at the foot of a 340px-wide dropdown, so the
+   margin shrinks and the "Precedente"/"Successivo" words drop in favour of
+   the arrows alone, the way the component itself already does on a phone. */
+::ng-deep .notification-panel .pagination-bar {
+  gap: var(--spacing-unit);
+  margin-top: 0px !important;
+  padding: 0 calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 0.5);
+}
+
+::ng-deep .notification-panel .pagination-label {
+  display: none;
+}
+
+/* Down to btn-sm sizing: at the full 44px touch-target size the two circles
+   plus "Pagina X di Y" ran wider than the 340px panel and forced a
+   horizontal scrollbar even for a handful of notifications, which a mouse
+   pointer doesn't need the way a phone does. */
+::ng-deep .notification-panel .pagination-step {
+  padding: 0;
+  min-width: 26px;
+  min-height: 26px;
+}
+
+::ng-deep .notification-panel .pagination-step .material-symbols-outlined {
+  font-size: 15px;
+}
+
+::ng-deep .notification-panel .pagination-position {
+  min-width: 6ch;
+  font-size: 0.8rem;
+}
+
 .notification {
   display: flex;
   gap: var(--spacing-unit);
@@ -250,9 +289,30 @@
   color: var(--header-color);
 }
 
+.thread-text-row {
+  display: flex;
+  align-items: flex-start;
+  gap: calc(var(--spacing-unit) * 0.5);
+}
+
 .thread-text {
+  flex: 1;
   color: var(--text-color);
   overflow-wrap: anywhere;
+}
+
+.thread-text-removed {
+  font-style: italic;
+  color: var(--muted-color);
+}
+
+.thread-report-btn {
+  flex: none;
+  padding: 2px;
+
+  .material-symbols-outlined {
+    font-size: 16px;
+  }
 }
 
 .thread-resolved {

@@ -11,8 +11,15 @@ export type FeedbackDocument = Feedback & Document;
  */
 export const maxFeedbackMessages = 3;
 
-@Schema({ _id: false })
+// Carries its own _id (the schema default, not suppressed here as elsewhere)
+// so a single message can be addressed on its own - which reporting one needs
+// and nothing else so far has.
+@Schema()
 export class FeedbackMessage {
+  /** Assigned by Mongoose on insert; optional here only so a message literal
+   * can be built before it exists. */
+  _id?: mongoose.Types.ObjectId;
+
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -25,6 +32,10 @@ export class FeedbackMessage {
 
   @Prop({ type: Date, required: true, default: () => new Date() })
   createdAt: Date;
+
+  /** Set once moderation has taken this one message's text down. */
+  @Prop({ type: Date, required: false })
+  redactedAt?: Date;
 }
 
 export const FeedbackMessageSchema =

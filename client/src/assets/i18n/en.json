@@ -11,7 +11,7 @@
     "test": "Test",
     "startTest": "Start Test",
     "results": "Results",
-    "createCard": "Create Card",
+    "createCard": "Create Flashcard",
     "menu": "Menu",
     "account": "Account",
     "community": "Community"
@@ -181,12 +181,12 @@
     "expand": "Expand",
     "collapse": "Collapse",
     "toast": {
-      "cardDeleted": "Card successfully deleted",
-      "deleteError": "Error deleting card",
+      "cardDeleted": "Flashcard successfully deleted",
+      "deleteError": "Error deleting Flashcard",
       "undo": "Undo",
-      "cardRestored": "Card restored",
-      "restoreError": "Error restoring card",
-      "cardCopied": "Card copied successfully",
+      "cardRestored": "Flashcard restored",
+      "restoreError": "Error restoring flashcard",
+      "cardCopied": "Flashcard copied successfully",
       "copyError": "Copy error",
       "topicsLoadError": "Failed to load topics for the selected subject",
       "flashcardsLoadError": "Unable to load the flashcards"
@@ -225,7 +225,7 @@
   "flashcard": {
     "create": {
       "title": "Create a New Flashcard",
-      "subtitle": "Add a new card to your deck",
+      "subtitle": "Add a new flashcard to your deck",
       "titleLabel": "Title",
       "titlePlaceholder": "e.g., Photosynthesis",
       "titleMinError": "Title should have min 2 characters.",
@@ -246,9 +246,9 @@
       "subjectRequiredError": "Please choose a subject.",
       "topicLabel": "Topic",
       "topicRequiredError": "Select a topic: it helps you find the flashcard again later.",
-      "addButton": "Add New Card",
+      "addButton": "Add New Flashcard",
       "importButton": "Import from text",
-      "importLabel": "Paste the text copied with \"Copy card\"",
+      "importLabel": "Paste the text copied with \"Copy flashcard\"",
       "importPlaceholder": "Title\nQuestion: ...\nAnswer: ...",
       "importApply": "Import",
       "importParseError": "The text isn't in the expected format (Title / Question / Answer).",
@@ -262,15 +262,15 @@
     },
     "edit": {
       "title": "Edit Flashcard",
-      "subtitle": "Update the card's question and answer",
+      "subtitle": "Update the flashcard's question and answer",
       "saveChanges": "Save changes"
     },
     "toast": {
-      "cardAdded": "Card successfully added",
-      "addError": "Error adding card",
-      "cardUpdated": "Card updated successfully",
-      "updateError": "Failed to update card",
-      "loadError": "Failed to load card data",
+      "cardAdded": "Flashcard successfully added",
+      "addError": "Error adding flashcard",
+      "cardUpdated": "Flashcard updated successfully",
+      "updateError": "Failed to update flashcard",
+      "loadError": "Failed to load flashcard data",
       "subjectsLoadError": "Failed to load subjects",
       "topicsLoadError": "Failed to load topics for the selected subject",
       "imageUploadError": "Error uploading image",
@@ -528,19 +528,17 @@
     "label": "Visibility",
     "public": "Public",
     "private": "Private",
-    "publicHint": "Others will find it in the Community section, grouped by your degree course.",
-    "privateHint": "Only you can see it.",
     "makePublic": "Make it public",
     "makePrivate": "Make it private",
     "toastPublic": "Now public",
     "toastPrivate": "Now private",
     "toastError": "The visibility could not be changed",
-    "cascadeSubject": "Its topics and flashcards follow it, both when it is published and when it is taken back.",
-    "cascadeTopic": "Its flashcards follow it, both when it is published and when it is taken back.",
-    "imported": "Imported card",
+    "cascadeSubject": "If you change the visibility of this subject, you will also change it for its topics and flashcards.",
+    "cascadeTopic": "If you change the visibility of this topic, you will also change it for its flashcards.",
+    "imported": "Imported flashcard",
     "publicSubjectNoCards": "This subject has no flashcards yet, so it does not show up in the Community.",
     "publicSubjectAllPrivate": "Every flashcard in this subject is private, so it does not show up in the Community until you share at least one.",
-    "needUniversity": "Say which university you are at before sharing anything: the Community is read one university at a time.",
+    "needUniversity": "You must indicate your university before you can share in the community.",
     "goToProfile": "Go to the profile"
   },
   "community": {
@@ -566,6 +564,7 @@
     "commentPlaceholder": "Write a comment",
     "commentError": "The comment could not be sent",
     "reportComment": "Report the comment",
+    "reportMessage": "Report the message",
     "flooding": "You're posting too fast. Wait a moment and try again.",
     "feedback": "Feedback to the author",
     "feedbackTitle": "Report to the author",
@@ -623,6 +622,7 @@
     "report": {
       "title": "Report this post",
       "titleComment": "Report this comment",
+      "titleFeedback": "Report this message",
       "intro": "The report goes to whoever administers the site. {{author}} will not know it was you.",
       "reason": {
         "explicit": "Explicit or vulgar content",
@@ -646,6 +646,7 @@
     "replyError": "The reply could not be sent",
     "threadError": "The exchange could not be opened",
     "threadClosed": "This exchange is closed",
+    "messageRemoved": "Message removed by moderation",
     "kind": {
       "upvote": "liked your post",
       "comment": "commented on your post",
@@ -678,7 +679,8 @@
       "blockedForever": "has limited your account.",
       "lifted": "gave your account back: you can publish, comment and send feedback again.",
       "removed": "took one of your posts out of the community.",
-      "commentRemoved": "took one of your comments out of the community."
+      "commentRemoved": "took one of your comments out of the community.",
+      "feedbackMessageRemoved": "took one of your messages out of a feedback exchange."
     }
   },
   "moderation": {

@@ -31,7 +31,7 @@
         <strong>{{ report.author }}</strong>
         <span class="admin-badge" [class.is-open]="report.state === 'open'">{{ stateOf(report) }}</span>
       </span>
-      <span class="admin-row-sub">{{ report.subject }}{{ report.target === 'comment' ? ' · commento' : '' }}</span>
+      <span class="admin-row-sub">{{ report.subject }}{{ report.target === 'comment' ? ' · commento' : report.target === 'feedback' ? ' · messaggio' : '' }}</span>
       <span class="admin-row-sub">segnalato da {{ report.reporter }}</span>
       <span class="admin-row-sub">{{ reasonOf(report) }} · {{ when(report.createdAt) }}</span>
     </button>
@@ -44,16 +44,16 @@
   <main class="admin-detail">
     @if (chosen) {
     <header class="admin-head">
-      <h2>{{ chosen.author }} — {{ chosen.subject }}{{ chosen.target === 'comment' ? ' (commento)' : '' }}</h2>
+      <h2>{{ chosen.author }} — {{ chosen.subject }}{{ chosen.target === 'comment' ? ' (commento)' : chosen.target === 'feedback' ? ' (messaggio)' : '' }}</h2>
       <p class="admin-meta">
         motivo: {{ reasonOf(chosen) }}<br>
-        @if (chosen.note) { messaggio utente: {{ chosen.note }}<br> }
+        @if (chosen.note) { nota di chi segnala: {{ chosen.note }}<br> }
         segnalato da: <strong>{{ chosen.reporter }}</strong>
         (ammonizioni: {{ chosen.reporterStrikes }}{{ chosen.reporterBanned ? ' · bannato' : '' }})<br>
         segnalazioni aperte: {{ chosen.reports }} ·
         ammonizioni dell'autore: {{ chosen.strikes }} ·
         stato: {{ stateOf(chosen) }}
-        @if (chosen.hidden) { · <span class="admin-flag">{{ chosen.target === 'comment' ? 'fuori dal thread' : 'fuori dal feed' }}</span> }
+        @if (chosen.hidden) { · <span class="admin-flag">{{ chosen.target === 'comment' ? 'fuori dal thread' : chosen.target === 'feedback' ? 'oscurato' : 'fuori dal feed' }}</span> }
         @if (chosen.banned) { · <span class="admin-flag">autore bannato</span> }
       </p>
 
@@ -64,10 +64,10 @@
           Va bene
         </button>
         <button type="button" class="btn btn-outline-danger" [disabled]="!can('remove')" (click)="act('remove')">
-          {{ chosen.target === 'comment' ? 'Togli il commento' : 'Togli il post' }}
+          {{ chosen.target === 'comment' ? 'Togli il commento' : chosen.target === 'feedback' ? 'Oscura il messaggio' : 'Togli il post' }}
         </button>
         <button type="button" class="btn btn-outline-primary" [disabled]="!can('restore')" (click)="act('restore')">
-          {{ chosen.target === 'comment' ? 'Rimetti il commento' : 'Rimetti il post' }}
+          {{ chosen.target === 'comment' ? 'Rimetti il commento' : chosen.target === 'feedback' ? 'Rimetti il messaggio' : 'Rimetti il post' }}
         </button>
       </div>
 
@@ -134,6 +134,15 @@
       <article class="admin-card">
         <p class="admin-card-label">Commento</p>
         <div class="admin-card-text">{{ chosen.commentText }}</div>
+      </article>
+    </section>
+    } @else if (chosen.target === 'feedback') {
+    <!-- Just the one message: it lives in a private exchange between two
+         people, and nothing else in that exchange belongs on this page. -->
+    <section class="admin-cards">
+      <article class="admin-card">
+        <p class="admin-card-label">Messaggio</p>
+        <div class="admin-card-text">{{ chosen.feedbackText }}</div>
       </article>
     </section>
     } @else {

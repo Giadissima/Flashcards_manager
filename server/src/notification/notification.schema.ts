@@ -22,6 +22,8 @@ export const moderationEvents = [
   'blocked',
   'lifted',
   'removed',
+  'commentRemoved',
+  'feedbackMessageRemoved',
 ] as const;
 export type ModerationEvent = (typeof moderationEvents)[number];
 

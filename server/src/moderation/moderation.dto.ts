@@ -80,11 +80,13 @@ export interface AdminCard {
 /** One report with everything needed to decide on it. */
 export interface AdminReport {
   reportId: string;
-  target: 'post' | 'comment';
+  target: 'post' | 'comment' | 'feedback';
   postId: string;
   /** Set only when target is 'comment'. */
   commentId?: string;
   commentText?: string;
+  /** Set only when target is 'feedback': the text of the message reported. */
+  feedbackText?: string;
   authorId: string;
   author: string;
   reporterId: string;

@@ -166,4 +166,16 @@ export class CommunityService {
     return this.restClient.post(`${this.baseUrl}/feedback/${feedbackId}/reply`, { text });
   }
 
+  /** Says one message in a feedback exchange should not be there, and why. */
+  reportFeedbackMessage(
+    feedbackId: string,
+    messageId: string,
+    request: ReportRequest,
+  ): Promise<ReportResult> {
+    return this.restClient.post(
+      `${this.baseUrl}/feedback/${feedbackId}/messages/${messageId}/report`,
+      request,
+    ) as Promise<ReportResult>;
+  }
+
 }

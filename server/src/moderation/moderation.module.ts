@@ -12,6 +12,7 @@ import { PostModule } from 'src/post/post.module';
 import { SubjectModule } from 'src/subject/subject.module';
 import { Post, PostSchema } from 'src/post/post.schema';
 import { Comment, CommentSchema } from 'src/post/comment.schema';
+import { Feedback, FeedbackSchema } from 'src/post/feedback.schema';
 import { Report, ReportSchema } from './report.schema';
 import { Sanction, SanctionSchema } from './sanction.schema';
 import { SignupBlock, SignupBlockSchema } from './signup-block.schema';
@@ -26,6 +27,7 @@ import { User, UserSchema } from 'src/auth/user.schema';
       { name: SignupBlock.name, schema: SignupBlockSchema },
       { name: Post.name, schema: PostSchema },
       { name: Comment.name, schema: CommentSchema },
+      { name: Feedback.name, schema: FeedbackSchema },
       { name: User.name, schema: UserSchema },
     ]),
     NotificationModule,

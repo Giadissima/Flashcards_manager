@@ -25,11 +25,13 @@ export type ReportReason = (typeof reportReasons)[number];
 export const reportStates = ['open', 'kept', 'removed'] as const;
 export type ReportState = (typeof reportStates)[number];
 
-/** What a report is about - a whole post, or one comment under it. */
-export const reportTargets = ['post', 'comment'] as const;
+/** What a report is about - a whole post, one comment under it, or one
+ * message in a private feedback exchange. */
+export const reportTargets = ['post', 'comment', 'feedback'] as const;
 export type ReportTarget = (typeof reportTargets)[number];
 
-/** Somebody saying a post, or a comment under it, should not be there. */
+/** Somebody saying a post, a comment under it, or a private message, should
+ * not be there. */
 @Schema({
   collection: 'report',
   timestamps: { createdAt: true, updatedAt: false },
@@ -39,17 +41,18 @@ export class Report {
   target: ReportTarget;
 
   /**
-   * The post, in both cases: it is what a post report is about, and what a
-   * comment report's comment lives under - kept here too so the post a
-   * reported comment belongs to never needs a second lookup.
+   * The post, for the first two targets: it is what a post report is about,
+   * and what a comment report's comment lives under - kept here too so the
+   * post a reported comment belongs to never needs a second lookup. Absent
+   * for a feedback report, which lives under a flashcard instead.
    */
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Post',
-    required: true,
+    required: false,
     index: true,
   })
-  post_id: mongoose.Types.ObjectId;
+  post_id?: mongoose.Types.ObjectId;
 
   /** Set only when target is 'comment'. */
   @Prop({
@@ -59,6 +62,23 @@ export class Report {
     index: true,
   })
   comment_id?: mongoose.Types.ObjectId;
+
+  /** Set only when target is 'feedback': the exchange the message lives in. */
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Feedback',
+    required: false,
+    index: true,
+  })
+  feedback_id?: mongoose.Types.ObjectId;
+
+  /**
+   * Set only when target is 'feedback': which of the exchange's few messages
+   * this is about. Not a ref - it addresses a subdocument, not a collection
+   * of its own.
+   */
+  @Prop({ type: mongoose.Schema.Types.ObjectId, required: false })
+  message_id?: mongoose.Types.ObjectId;
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
@@ -101,4 +121,8 @@ ReportSchema.index(
 ReportSchema.index(
   { comment_id: 1, reporter_id: 1 },
   { unique: true, partialFilterExpression: { target: 'comment' } },
+);
+ReportSchema.index(
+  { feedback_id: 1, message_id: 1, reporter_id: 1 },
+  { unique: true, partialFilterExpression: { target: 'feedback' } },
 );

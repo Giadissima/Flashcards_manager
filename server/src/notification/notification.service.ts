@@ -96,4 +96,39 @@ export class NotificationService {
 
     await this.notificationModel.updateMany(query, { read: true }).exec();
   }
+
+  /**
+   * Wipes a redacted message back out of the notification list it already
+   * reached, not only out of the exchange itself.
+   *
+   * The preview is a snapshot taken when the notification was written, so
+   * moderation taking a message down later leaves that copy untouched - the
+   * list would go on showing exactly the words just judged unfit to stand,
+   * to the one person it was written to reach. Matched on the same slice
+   * record() itself took, since a longer message was never stored whole.
+   */
+  async redactFeedbackPreview(
+    feedbackId: Types.ObjectId,
+    originalText: string,
+  ): Promise<void> {
+    await this.notificationModel
+      .updateMany(
+        { feedback_id: feedbackId, preview: originalText.slice(0, previewLength) },
+        { $set: { preview: '[messaggio rimosso]' } },
+      )
+      .exec();
+  }
+
+  /** The other side of redactFeedbackPreview(): a decision undone, undone here too. */
+  async restoreFeedbackPreview(
+    feedbackId: Types.ObjectId,
+    originalText: string,
+  ): Promise<void> {
+    await this.notificationModel
+      .updateMany(
+        { feedback_id: feedbackId, preview: '[messaggio rimosso]' },
+        { $set: { preview: originalText.slice(0, previewLength) } },
+      )
+      .exec();
+  }
 }
