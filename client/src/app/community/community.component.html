@@ -11,7 +11,8 @@
       <div class="filter-row">
         <div class="filter-col filter-col--xwide">
           <app-search-input [value]="searchTerm" [placeholder]="'community.searchPlaceholder' | transloco"
-            inputId="communitySearch" (valueChange)="onSearchTermChange($event)"></app-search-input>
+            inputId="communitySearch" (valueChange)="onSearchTermChange($event)"
+            (search)="onSearch($event)"></app-search-input>
         </div>
         <div class="filter-col--auto">
           <!-- The feed has two dates and the filter has to say which one it
@@ -49,7 +50,7 @@
       </div>
       } @else {
       @for (post of posts; track post._id) {
-      <app-post-card [post]="post"></app-post-card>
+      <app-post-card [post]="post" (authorSelected)="onAuthorSelected($event)"></app-post-card>
       } @empty {
       <p class="community-empty">{{ 'community.empty' | transloco }}</p>
       }

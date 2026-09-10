@@ -1,6 +1,6 @@
 import { ActivatedRoute, ParamMap, Router, RouterLink } from '@angular/router';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Subject as RxSubject, Subscription, debounceTime } from 'rxjs';
+import { Subscription } from 'rxjs';
 import {
   FeedDateField,
   FeedPost,
@@ -76,10 +76,6 @@ export class CommunityComponent implements OnInit, OnDestroy {
   study: StudyFields = emptyStudyFields();
   searchTerm = '';
 
-  // Typed letter by letter, so the request waits for the typing to stop: a
-  // search is three collections asked at once on the server side.
-  private readonly searchChanges = new RxSubject<void>();
-  private searchSubscription?: Subscription;
   private queryParamsSubscription?: Subscription;
   // true only for the very first queryParamMap emission: that is the one wrapped
   // in app-load-state. Later ones (filter, sort, page) reload in place - swapping
@@ -115,10 +111,6 @@ export class CommunityComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.searchSubscription = this.searchChanges
-      .pipe(debounceTime(500))
-      .subscribe(() => this.onFilterChange());
-
     // Subscription, not snapshot: navigating to /community while already on
     // /community makes Angular reuse the existing component and skip ngOnInit,
     // but this subscription fires anyway and re-reads the filters from the URL,
@@ -142,7 +134,6 @@ export class CommunityComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.searchSubscription?.unsubscribe();
     this.queryParamsSubscription?.unsubscribe();
   }
 
@@ -209,7 +200,16 @@ export class CommunityComponent implements OnInit, OnDestroy {
 
   onSearchTermChange(term: string): void {
     this.searchTerm = term;
-    this.searchChanges.next();
+  }
+
+  onSearch(term: string): void {
+    this.searchTerm = term;
+    this.onFilterChange();
+  }
+
+  /** Clicking a post's author name filters the feed down to just their posts. */
+  onAuthorSelected(username: string): void {
+    this.onSearch(username);
   }
 
   onStudyChange(study: StudyFields): void {

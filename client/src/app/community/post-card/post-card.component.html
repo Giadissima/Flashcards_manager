@@ -3,7 +3,7 @@
     <img [src]="subjectIconUrl" alt="" class="post-subject-icon">
     <h3 class="post-heading">{{ heading }}</h3>
     <div class="post-author">
-      <span class="post-username">{{ post.author.username }}</span>
+      <a class="post-username" role="button" tabindex="0" (click)="searchAuthor()" (keydown.enter)="searchAuthor()">{{ post.author.username }}</a>
       <img [src]="avatarUrl" alt="" class="post-avatar">
     </div>
   </header>
@@ -161,7 +161,7 @@
       </button>
       <button type="button" class="btn btn-icon-ghost" (click)="openImport()"
         [title]="'community.importAll' | transloco" [attr.aria-label]="'community.importAll' | transloco">
-        <span class="material-symbols-outlined">playlist_add</span>
+        <span class="material-symbols-outlined">library_add</span>
       </button>
       }
     </div>

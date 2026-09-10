@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
@@ -75,6 +75,8 @@ const commentPageSize = 20;
 })
 export class PostCardComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input({ required: true }) post!: FeedPost;
+  /** Fired when the reader clicks the author's name, to filter the feed down to them. */
+  @Output() authorSelected = new EventEmitter<string>();
   @ViewChild('track') private trackRef!: ElementRef<HTMLDivElement>;
 
   cards: Flashcard[] = [];
@@ -362,6 +364,10 @@ export class PostCardComponent implements OnInit, AfterViewInit, OnDestroy {
 
   get avatarUrl(): string {
     return getAvatarUrl(this.post.author);
+  }
+
+  searchAuthor(): void {
+    this.authorSelected.emit(this.post.author.username);
   }
 
   /** "Materia - Argomento", or the subject alone when all of it is shared. */

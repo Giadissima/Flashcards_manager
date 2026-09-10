@@ -44,6 +44,13 @@
 .post-username {
   color: var(--text-color);
   font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    text-decoration: underline;
+  }
 }
 
 .post-avatar {
