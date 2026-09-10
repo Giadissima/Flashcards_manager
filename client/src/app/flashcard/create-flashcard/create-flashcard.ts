@@ -203,11 +203,18 @@ export class CreateFlashcard implements OnInit, OnDestroy {
     try {
       await this.flashcardService.create(newCard);
       this.toastService.show(this.transloco.translate('flashcard.toast.cardAdded'), 'success')
+
+      // Keep subject/topic selected so the next card defaults to the same
+      // ones - creating several cards in a row for the same topic is the
+      // common case. Only the card-specific fields are cleared.
+      const subjectId = this.selectedSubjectId;
+      const topicId = this.selectedTopicId;
       this.cardForm.reset();
-      this.selectedSubjectId = null;
-      this.selectedTopicId = null;
-      this.topics = [];
-      this.loadTopicsBySubject(undefined);
+      this.selectedSubjectId = subjectId;
+      this.selectedTopicId = topicId;
+      this.cardForm.get('subject_id')?.setValue(subjectId);
+      this.cardForm.get('topic_id')?.setValue(topicId);
+      this.applyInheritedVisibility();
       this.questionEditor.commands.clearContent();
       this.answerEditor.commands.clearContent();
     } catch (err: any) {
