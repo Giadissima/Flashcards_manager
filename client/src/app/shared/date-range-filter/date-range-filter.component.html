@@ -2,8 +2,6 @@
      sentence ("publication, from this day to that one"), so the icon reads as
      labelling the whole control rather than just the select beside it. -->
 <div class="date-range">
-  <span class="material-symbols-outlined date-range-icon">date_range</span>
-
   @if (fields.length) {
   <app-searchable-select class="date-range-field" [options]="fields" [value]="field" [disabled]="disabled"
     [title]="'common.dateFieldLabel' | transloco" [attr.aria-label]="'common.dateFieldLabel' | transloco"
