@@ -21,6 +21,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Model } from 'mongoose';
 import { FileService } from 'src/file/file.service';
 import { ModerationService } from 'src/moderation/moderation.service';
+import { RestrictionsService } from 'src/common/restrictions.service';
 import { UniversityService } from 'src/university/university.service';
 import { VerificationService } from './verification.service';
 import bcrypt from 'bcryptjs';
@@ -35,6 +36,7 @@ export class AuthService {
     private readonly fileService: FileService,
     private readonly moderation: ModerationService,
     private readonly verification: VerificationService,
+    private readonly restrictions: RestrictionsService,
   ) {}
 
   async register(dto: RegisterDto, ip?: string): Promise<AuthResponse> {
@@ -140,7 +142,7 @@ export class AuthService {
     };
     return {
       access_token: await this.jwtService.signAsync(payload),
-      user: this.toPublicUser(user),
+      user: await this.toPublicUser(user),
     };
   }
 
@@ -229,7 +231,9 @@ export class AuthService {
     }
   }
 
-  private toPublicUser(user: UserDocument): PublicUser {
+  private async toPublicUser(user: UserDocument): Promise<PublicUser> {
+    const reportRestriction = await this.restrictions.inForce(String(user._id), 'report');
+
     return {
       _id: String(user._id),
       username: user.username,
@@ -243,6 +247,9 @@ export class AuthService {
       // counts as confirmed: the alternative is locking out everybody who
       // registered first.
       emailVerified: !user.email || !!user.emailVerifiedAt,
+      reportBlocked: reportRestriction
+        ? { until: reportRestriction.until?.toISOString() ?? null }
+        : undefined,
     };
   }
 }

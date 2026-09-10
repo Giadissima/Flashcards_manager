@@ -9,6 +9,7 @@ import { FileModule } from 'src/file/file.module';
 import { MailModule } from 'src/mail/mail.module';
 import { ModerationModule } from 'src/moderation/moderation.module';
 import { MongooseModule } from '@nestjs/mongoose';
+import { RestrictionsModule } from 'src/common/restrictions.module';
 import { UniversityModule } from 'src/university/university.module';
 import { VerificationService } from './verification.service';
 
@@ -18,6 +19,7 @@ import { VerificationService } from './verification.service';
     UniversityModule,
     FileModule,
     ModerationModule,
+    RestrictionsModule,
     MailModule,
     JwtModule.registerAsync({
       global: true, // the guard registered in AppModule needs JwtService too

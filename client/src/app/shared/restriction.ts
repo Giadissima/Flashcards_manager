@@ -46,6 +46,19 @@ export function restrictionOf(error: unknown): RestrictionError | null {
   const until = failure.error.until;
   const privilege = failure.error.privilege ?? 'publish';
 
+  return restrictionMessage(privilege, until);
+}
+
+/**
+ * Same sentence as restrictionOf(), built from a block the profile already
+ * carries rather than from a failed call - for the one case where opening a
+ * dialog just to have it fail on submit would be a worse answer than not
+ * opening it at all.
+ */
+export function restrictionMessage(
+  privilege: string,
+  until: string | null | undefined,
+): RestrictionError {
   return {
     // A block with no end reads differently from one with a date on it, and
     // "until Invalid Date" is the worst of both.

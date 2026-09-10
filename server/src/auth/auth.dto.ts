@@ -185,6 +185,12 @@ export interface PublicUser {
   /** Id of the uploaded picture; absent means the default drawing. */
   avatar?: string;
   avatarColor?: string;
+  /**
+   * Present only while reporting is blocked, so the client can refuse to open
+   * the report dialog in the first place rather than open it and fail on
+   * submit. `until` is null for a block with no end date.
+   */
+  reportBlocked?: { until: string | null };
 }
 
 /** What is signed into the JWT, and what the guard puts back on the request. */

@@ -10,7 +10,7 @@ import { FormsModule } from '@angular/forms';
 import { ModalComponent } from '../../shared/modal/modal.component';
 import { PostImportModalComponent } from '../post-import-modal/post-import-modal.component';
 import { PostReportModalComponent, ReportKind } from '../post-report-modal/post-report-modal.component';
-import { restrictionOf } from '../../shared/restriction';
+import { restrictionMessage, restrictionOf } from '../../shared/restriction';
 import { PostComment } from '../../models/social.dto';
 import { SearchableSelectComponent, SelectOption } from '../../shared/searchable-select/searchable-select.component';
 import { PaginationComponent } from '../../shared/pagination/pagination.component';
@@ -364,7 +364,22 @@ export class PostCardComponent implements OnInit, AfterViewInit, OnDestroy {
   /** Same idea, one entry per comment already reported. */
   private readonly reportedCommentIds = new Set<string>();
 
+  /**
+   * Whoever may not report right now is told immediately: opening the dialog
+   * only to have it fail on submit would say the same thing, a click later.
+   */
+  private blockedFromReporting(): boolean {
+    const blocked = this.authService.user?.reportBlocked;
+    if (!blocked) return false;
+
+    const message = restrictionMessage('report', blocked.until);
+    this.toast.show(this.transloco.translate(message.key, message.params), 'error');
+    return true;
+  }
+
   openReport(): void {
+    if (this.blockedFromReporting()) return;
+
     this.reportKind = 'post';
     this.reportTargetId = this.post._id;
     this.reportAuthorUsername = this.post.author.username;
@@ -372,6 +387,8 @@ export class PostCardComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   openCommentReport(comment: PostComment): void {
+    if (this.blockedFromReporting()) return;
+
     this.reportKind = 'comment';
     this.reportTargetId = comment._id;
     this.reportAuthorUsername = comment.user_id.username;

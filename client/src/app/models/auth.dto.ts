@@ -15,6 +15,8 @@ export interface AuthUser {
   /** Id of the uploaded picture; absent means the default drawing. */
   avatar?: string;
   avatarColor?: string;
+  /** Present only while reporting is blocked. `until` is null for good. */
+  reportBlocked?: { until: string | null };
 }
 
 export interface AuthResponse {
