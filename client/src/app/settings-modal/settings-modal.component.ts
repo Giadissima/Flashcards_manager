@@ -25,7 +25,7 @@ import {
   standalone: true,
   imports: [CommonModule, SearchableSelectComponent, TranslocoModule, ModalComponent],
   template: `
-    <app-modal [isOpen]="isOpen" [title]="'settings.title' | transloco" [showFooter]="true" (closed)="cancel()">
+    <app-modal [isOpen]="isOpen" [title]="'settings.title' | transloco" [showFooter]="true" (closed)="save()">
 
       <div class="settings-section">
         <div class="settings-section-title">
@@ -56,27 +56,26 @@ import {
       <div class="settings-section">
         <div class="settings-section-title">
           <span class="material-symbols-outlined">visibility</span>
-          {{ 'settings.topicVisibility' | transloco }}
+          {{ 'settings.defaultVisibility' | transloco }}
         </div>
-        <app-searchable-select
-          [options]="topicVisibilityOptions"
-          [value]="topicVisibilityDefault"
-          (valueChange)="setTopicVisibilityDefault($event)"
-        ></app-searchable-select>
-        <div class="settings-section-desc mt-2">{{ 'settings.topicVisibilityDesc' | transloco }}</div>
-      </div>
-
-      <div class="settings-section">
-        <div class="settings-section-title">
-          <span class="material-symbols-outlined">visibility</span>
-          {{ 'settings.flashcardVisibility' | transloco }}
+        <div class="settings-subsection">
+          <div class="settings-subsection-label">{{ 'settings.topicVisibility' | transloco }}</div>
+          <app-searchable-select
+            [options]="topicVisibilityOptions"
+            [value]="topicVisibilityDefault"
+            (valueChange)="setTopicVisibilityDefault($event)"
+          ></app-searchable-select>
+          <div class="settings-section-desc mt-2">{{ 'settings.topicVisibilityDesc' | transloco }}</div>
         </div>
-        <app-searchable-select
-          [options]="flashcardVisibilityOptions"
-          [value]="flashcardVisibilityDefault"
-          (valueChange)="setFlashcardVisibilityDefault($event)"
-        ></app-searchable-select>
-        <div class="settings-section-desc mt-2">{{ 'settings.flashcardVisibilityDesc' | transloco }}</div>
+        <div class="settings-subsection">
+          <div class="settings-subsection-label">{{ 'settings.flashcardVisibility' | transloco }}</div>
+          <app-searchable-select
+            [options]="flashcardVisibilityOptions"
+            [value]="flashcardVisibilityDefault"
+            (valueChange)="setFlashcardVisibilityDefault($event)"
+          ></app-searchable-select>
+          <div class="settings-section-desc mt-2">{{ 'settings.flashcardVisibilityDesc' | transloco }}</div>
+        </div>
       </div>
 
       <div class="settings-section">
@@ -139,6 +138,16 @@ import {
     .settings-section-desc {
       color: var(--text-color);
       font-size: 0.9rem;
+    }
+    .settings-subsection {
+      margin-bottom: calc(var(--spacing-unit) * 2);
+    }
+    .settings-subsection:last-child {
+      margin-bottom: 0;
+    }
+    .settings-subsection-label {
+      font-weight: 600;
+      margin-bottom: var(--spacing-unit);
     }
   `]
 })
