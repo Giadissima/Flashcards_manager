@@ -86,6 +86,10 @@ export class StudyFieldsComponent implements OnInit {
       this.value.course && this.value.courseKind
         ? `${this.value.courseKind}|${this.value.course}`
         : null;
+    // Set before the first await, so the very first render already shows the
+    // course select as loading instead of briefly empty (and flagged invalid)
+    // while the university list is still being fetched.
+    this.loadingCourses = !!this.universityCode;
 
     try {
       this.universityOptions = toUniversityOptions(await this.universityService.getUniversities());
