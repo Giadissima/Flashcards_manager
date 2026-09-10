@@ -46,7 +46,7 @@ import { TutorialService } from '../shared/tutorial/tutorial.service';
           <span class="material-symbols-outlined">compare_arrows</span>
           {{ 'settings.importExport' | transloco }}
         </div>
-        <button class="btn btn-outline-primary w-100" (click)="openImportExport.emit()">
+        <button class="btn btn-outline-secondary w-100" (click)="openImportExport.emit()">
           <span class="material-symbols-outlined">upload_file</span>
           {{ 'settings.importExportButton' | transloco }}
         </button>
@@ -57,7 +57,7 @@ import { TutorialService } from '../shared/tutorial/tutorial.service';
           <span class="material-symbols-outlined">help</span>
           {{ 'settings.tutorial' | transloco }}
         </div>
-        <button class="btn btn-outline-primary w-100" (click)="showTutorial()">
+        <button class="btn btn-outline-secondary w-100" (click)="showTutorial()">
           <span class="material-symbols-outlined">school</span>
           {{ 'settings.tutorialButton' | transloco }}
         </button>
