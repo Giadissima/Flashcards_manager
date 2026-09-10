@@ -38,6 +38,11 @@ const defaultRandomSampleSize = 10;
 const srIntervalDays = [0, 1, 3, 7, 14, 30];
 const srMaxBox = srIntervalDays.length - 1;
 
+// A card counts as "weak" once it has been gotten wrong at least this share
+// of the times it has been reviewed - independent of the Leitner box, which
+// tracks how soon a card is due rather than how often it is missed.
+const weakWrongRatio = 0.45;
+
 @Injectable()
 export class FlashcardsService {
   constructor(
@@ -221,19 +226,22 @@ export class FlashcardsService {
   }
 
   /**
-   * The flashcards currently at Leitner box 0 that have actually been
-   * reviewed at least once - the cards being gotten wrong right now, as
-   * opposed to a brand new card that also starts at box 0 but has never been
-   * tested. Sampled at random like getRandom, since there is no "most
-   * overdue" ordering among cards that are not on a schedule.
+   * The flashcards gotten wrong at least weakWrongRatio of the times they
+   * have been reviewed - the cards actually worth retrying, as opposed to
+   * ones merely due soon (that is what the Leitner-driven daily test is
+   * for). A card never reviewed has no ratio to speak of and is excluded.
+   * Sampled at random like getRandom, since there is no ordering among these
+   * cards that means more than another.
    */
   getWeak(
     userId: string,
     filter: RandomFlashcardsDTO,
   ): Promise<RandomFlashcard[]> {
     const query = this.buildObjectIdQuery(userId, filter);
-    query.sr_box = 0;
-    query.sr_last_reviewed_at = { $exists: true };
+    query.review_count = { $gt: 0 };
+    query.$expr = {
+      $gte: [{ $divide: ['$wrong_count', '$review_count'] }, weakWrongRatio],
+    };
 
     return this.flashcardModel
       .aggregate<RandomFlashcard>([
@@ -276,7 +284,10 @@ export class FlashcardsService {
     await this.flashcardModel
       .updateOne(
         { _id: id, user_id: userId },
-        { sr_box: nextBox, sr_due_at: dueAt, sr_last_reviewed_at: now },
+        {
+          $set: { sr_box: nextBox, sr_due_at: dueAt, sr_last_reviewed_at: now },
+          $inc: { review_count: 1, wrong_count: isCorrect ? 0 : 1 },
+        },
       )
       .exec();
   }

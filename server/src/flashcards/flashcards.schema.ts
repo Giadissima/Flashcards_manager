@@ -95,11 +95,22 @@ export class Flashcard {
   sr_due_at: Date;
 
   /**
-   * Unset until the first review. What tells "never studied" (also box 0)
-   * apart from "studied and still wrong" - the pair the weak-cards test reads.
+   * Unset until the first review.
    */
   @Prop({ required: false })
   sr_last_reviewed_at?: Date;
+
+  /**
+   * How many times this card has been answered in any test, and how many of
+   * those were wrong - what the weak-cards test reads to find the cards
+   * actually gotten wrong often, regardless of where they stand in the
+   * Leitner schedule (see FlashcardsService.getWeak).
+   */
+  @Prop({ required: true, default: 0 })
+  review_count: number;
+
+  @Prop({ required: true, default: 0 })
+  wrong_count: number;
 }
 // ! known gap: by editing the request by hand a client can create a flashcard
 // whose topic and subject are not related to each other, since nothing checks
