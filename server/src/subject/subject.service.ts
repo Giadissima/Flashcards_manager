@@ -187,6 +187,37 @@ export class SubjectService {
   }
 
   /**
+   * Takes every public subject of this user back to private, topics and
+   * flashcards included - and with them, whatever posts they were holding up
+   * in the feed.
+   *
+   * Used by a ban rather than by the person themselves, so nothing here asks
+   * assertMayPublish: making something private needs nobody's permission.
+   */
+  async unpublishAll(userId: string): Promise<void> {
+    const subjects = await this.subjectModel
+      .find({ user_id: userId, visibility: 'public' }, { _id: 1 })
+      .lean()
+      .exec();
+
+    await Promise.all([
+      this.subjectModel
+        .updateMany({ user_id: userId, visibility: 'public' }, { visibility: 'private' })
+        .exec(),
+      this.topicModel
+        .updateMany({ user_id: userId, visibility: 'public' }, { visibility: 'private' })
+        .exec(),
+      this.flashcardModel
+        .updateMany({ user_id: userId, visibility: 'public' }, { visibility: 'private' })
+        .exec(),
+    ]);
+
+    await Promise.all(
+      subjects.map((subject) => this.postService.refresh(userId, String(subject._id))),
+    );
+  }
+
+  /**
    * Carries the choice down to everything under the subject.
    *
    * Both ways round, and the second is the one that matters: a subject shared

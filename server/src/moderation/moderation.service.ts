@@ -15,7 +15,7 @@ import { extractImageFileIds } from 'src/common/html.util';
 import { allCards } from 'src/config';
 import { Post } from 'src/post/post.schema';
 import { Comment } from 'src/post/comment.schema';
-import { blockUntil, blocksAt, privileges } from 'src/common/privileges';
+import { banUntil, blockUntil, blocksAt, privileges } from 'src/common/privileges';
 import { AdminReport, ModerationAction, ModerationSubject } from './moderation.dto';
 import { Report, ReportReason, ReportTarget } from './report.schema';
 import { Sanction } from './sanction.schema';
@@ -23,6 +23,7 @@ import { SignupBlock } from './signup-block.schema';
 import { User } from 'src/auth/user.schema';
 import { isSharedAddress } from 'src/common/address.util';
 import { RestrictionsService } from 'src/common/restrictions.service';
+import { SubjectService } from 'src/subject/subject.service';
 import {
   autoHideCommentReports,
   autoHideReports,
@@ -76,6 +77,7 @@ export class ModerationService {
     private readonly postService: PostService,
     private readonly fileService: FileService,
     private readonly restrictions: RestrictionsService,
+    private readonly subjectService: SubjectService,
   ) {}
 
   // --------------------------------------------------------- what readers do
@@ -369,15 +371,15 @@ export class ModerationService {
     const [report, author, reporter] = await Promise.all([
       this.reportModel.findById(reportId, { state: 1 }).lean().exec(),
       this.userModel
-        .findById(summary.authorId, { bannedAt: 1 })
+        .findById(summary.authorId, { bannedAt: 1, restrictions: 1 })
         .lean()
         .exec(),
       this.userModel
-        .findById(summary.reporterId, { bannedAt: 1 })
+        .findById(summary.reporterId, { bannedAt: 1, restrictions: 1 })
         .lean()
         .exec(),
     ]);
-    const reporterBanned = !!reporter?.bannedAt;
+    const reporterBanned = isBanned(reporter);
 
     if (summary.target === 'comment') {
       // No cards to draw here: the whole point being decided on is the one
@@ -385,7 +387,7 @@ export class ModerationService {
       return {
         ...summary,
         state: report?.state ?? 'open',
-        banned: !!author?.bannedAt,
+        banned: isBanned(author),
         reporterBanned,
         cards: [],
       };
@@ -396,7 +398,7 @@ export class ModerationService {
     return {
       ...summary,
       state: report?.state ?? 'open',
-      banned: !!author?.bannedAt,
+      banned: isBanned(author),
       reporterBanned,
       // Whole, pictures and all: the page shows the post the way the people
       // who reported it saw it, which is the only fair way to decide about it.
@@ -479,8 +481,7 @@ export class ModerationService {
    * The post stays: the reports on it are closed and it goes back up.
    *
    * Back up whether it went down on its own or by hand - saying "va bene"
-   * about a post that stays invisible is the button lying. The one hiding it
-   * does not lift is a ban's, which is about the author and not about this.
+   * about a post that stays invisible is the button lying.
    */
   async keep(postId: string): Promise<Verdict> {
     await this.closeReports(postId, 'kept');
@@ -491,16 +492,10 @@ export class ModerationService {
       )
       .exec();
 
-    const banned = await this.postModel
-      .exists({ _id: postId, hiddenReason: 'ban' })
-      .exec();
-
     return {
-      done: banned
-        ? "Segnalazione chiusa, ma il post resta giù col ban dell'autore"
-        : back.modifiedCount
-          ? 'Segnalazione chiusa, il post torna nel feed'
-          : 'Segnalazione chiusa, il post era già nel feed',
+      done: back.modifiedCount
+        ? 'Segnalazione chiusa, il post torna nel feed'
+        : 'Segnalazione chiusa, il post era già nel feed',
       postId,
     };
   }
@@ -542,7 +537,7 @@ export class ModerationService {
       userId: comment.user_id,
       kind: 'moderation',
       postId: comment.post_id,
-      moderation: { event: 'removed', privileges: [] },
+      moderation: { event: 'commentRemoved', privileges: [] },
     });
 
     await this.sanctionModel.create({
@@ -598,6 +593,14 @@ export class ModerationService {
     const user = await this.userModel.findById(userId).exec();
     if (!user) throw new NotFoundException('User not found');
 
+    // A warning climbs the strike ladder and rewrites restrictions to match
+    // it - which, on somebody already serving a ban, would silently swap the
+    // ban's own restriction for a shorter or even absent one. The ban is
+    // already the harsher answer; there is nothing a warning adds to it.
+    if (isBanned(user)) {
+      throw new ConflictException('Account is already serving a ban');
+    }
+
     const strikes = (user.strikes ?? 0) + 1;
     const blocks = blocksAt(strikes);
     const until = blocks ? blockUntil(strikes) : undefined;
@@ -652,29 +655,43 @@ export class ModerationService {
   }
 
   /**
-   * The end of the line: nothing they publish is in the Community any more,
-   * they cannot reach anybody, and the address they signed up from cannot open
-   * a new account for a few hours.
+   * A week off the first time, a month the second, for good from the third:
+   * everything they had shared goes back to being private, they cannot reach
+   * anybody for as long as the ban lasts, and the address they signed up from
+   * cannot open a new account for a few hours.
    */
   async ban(userId: string): Promise<Verdict> {
     const user = await this.userModel.findById(userId).exec();
     if (!user) throw new NotFoundException('User not found');
 
-    user.bannedAt = new Date();
+    // Already serving one: a second ban now would only count as one more rung
+    // climbed on a ladder the account is already partway up, for no reason
+    // beyond a stray click. Nothing changes until the one already in force
+    // runs out or is pardoned.
+    if (isBanned(user)) {
+      throw new ConflictException('Account is already serving a ban');
+    }
+
+    const previousBans = await this.sanctionModel
+      .countDocuments({ user_id: user._id, kind: 'ban' })
+      .exec();
+    const until = banUntil(previousBans + 1) ?? undefined;
+
+    // Set for good only when the ban itself is: a week or a month off is
+    // still a restriction with an end, and bannedAt is reserved for the one
+    // that has none - the ladder's last rung, not every rung on it.
+    if (!until) user.bannedAt = new Date();
     user.restrictions = privileges.map((privilege) => ({
       privilege,
+      until,
       reason: 'banned',
     }));
     await user.save();
 
-    // Marked as the ban's doing, and not as a decision about each post: a
-    // pardon has to know which ones it may put back.
-    const posts = await this.postModel
-      .updateMany(
-        { user_id: user._id, hiddenAt: { $exists: false } },
-        { $set: { hiddenAt: new Date(), hiddenReason: 'ban' } },
-      )
-      .exec();
+    // Taken private the same way the author's own toggle would, rather than
+    // merely hidden: reading the Community is still allowed, only sharing to
+    // it is not, so what they had up there stops being public content.
+    await this.subjectService.unpublishAll(String(user._id));
 
     // Never an address that stands for more than one person: behind a proxy
     // whose forwarded header is not trusted, everybody looks like the proxy,
@@ -717,20 +734,28 @@ export class ModerationService {
       user_id: user._id,
       kind: 'ban',
       privileges: [...privileges],
+      until,
     });
 
     await this.notificationService.record({
       userId: user._id as Types.ObjectId,
       kind: 'moderation',
-      moderation: { event: 'blocked', privileges: [...privileges] },
+      moderation: { event: 'blocked', privileges: [...privileges], until },
     });
 
     return {
-      done: `Bannato — ${posts.modifiedCount} post tolti dal feed`,
+      done: until
+        ? `Bannato fino al ${day(until)} — i suoi contenuti condivisi sono tornati privati`
+        : 'Bannato per sempre — i suoi contenuti condivisi sono tornati privati',
     };
   }
 
-  /** Everything back: the mistake this makes right is the admin's own. */
+  /**
+   * The restrictions come off: the mistake this makes right is the admin's
+   * own. What had gone private with the ban stays private - that was the
+   * author's content and coming back is their own choice to make again, the
+   * same as anything else they had ever taken back themselves.
+   */
   async pardon(username: string): Promise<Verdict> {
     const user = await this.userModel
       .findOne({ username: username.toLowerCase() })
@@ -742,25 +767,6 @@ export class ModerationService {
     user.bannedAt = undefined;
     user.strikes = 0;
     await user.save();
-
-    // What the ban swept up comes back with them. The posts taken down one by
-    // one stay down: those were decided on, and a pardon is not a retrial.
-    const restored = await this.postModel
-      .find({ user_id: user._id, hiddenReason: 'ban' }, { _id: 1 })
-      .lean()
-      .exec();
-    const back = await this.postModel
-      .updateMany(
-        { user_id: user._id, hiddenReason: 'ban' },
-        { $unset: { hiddenAt: '', hiddenReason: '' } },
-      )
-      .exec();
-
-    // And so do their reports: a post back in the feed reading "tolto" is the
-    // list saying the opposite of what the feed shows.
-    for (const post of restored) {
-      await this.closeReports(String(post._id), 'kept');
-    }
 
     await this.sanctionModel.create({
       user_id: user._id,
@@ -777,7 +783,7 @@ export class ModerationService {
     }
 
     return {
-      done: `${user.username}: tutto ridato, ${back.modifiedCount} post rimessi nel feed`,
+      done: `${user.username}: tutto ridato`,
     };
   }
 
@@ -881,6 +887,16 @@ export class ModerationService {
       .exec();
     this.logger.log(`reports on comment ${commentId} closed as ${state}`);
   }
+}
+
+/** True while a ban is still in force, whether it has an end date or not. */
+function isBanned(user?: { bannedAt?: Date; restrictions?: { reason?: string; until?: Date }[] } | null): boolean {
+  if (!user) return false;
+  if (user.bannedAt) return true;
+  const now = new Date();
+  return !!user.restrictions?.some(
+    (r) => r.reason === 'banned' && (!r.until || r.until > now),
+  );
 }
 
 /** A date the way it is read here, since these sentences are read by a person. */

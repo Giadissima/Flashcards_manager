@@ -35,3 +35,18 @@ export function blockUntil(strikes: number, from = new Date()): Date | null {
 export function blocksAt(strikes: number): boolean {
   return strikes >= 1 && strikeBlockDays[Math.min(strikes, strikeBlockDays.length) - 1] !== 0;
 }
+
+/**
+ * How long an explicit ban lasts, by how many the account has already
+ * served: a week off the first time, a month the second, and for good from
+ * the third - a ladder rather than a cliff here too, since a ban handed out
+ * by a person already skipped the warnings that lead up to one.
+ */
+export const banBlockDays: (number | null)[] = [7, 30, null];
+
+/** When a ban handed down now would end, or null for "never". */
+export function banUntil(banCount: number, from = new Date()): Date | null {
+  const step = banBlockDays[Math.min(banCount, banBlockDays.length) - 1];
+  if (step === null) return null;
+  return new Date(from.getTime() + step * 24 * 60 * 60 * 1000);
+}

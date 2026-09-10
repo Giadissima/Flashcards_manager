@@ -9,6 +9,7 @@ import { FileModule } from 'src/file/file.module';
 import { NotificationModule } from 'src/notification/notification.module';
 import { RestrictionsModule } from 'src/common/restrictions.module';
 import { PostModule } from 'src/post/post.module';
+import { SubjectModule } from 'src/subject/subject.module';
 import { Post, PostSchema } from 'src/post/post.schema';
 import { Comment, CommentSchema } from 'src/post/comment.schema';
 import { Report, ReportSchema } from './report.schema';
@@ -30,6 +31,8 @@ import { User, UserSchema } from 'src/auth/user.schema';
     NotificationModule,
     // For the cards of the post being decided on, and the pictures in them
     PostModule,
+    // A ban takes the banned user's own content private through it
+    SubjectModule,
     FileModule,
     RestrictionsModule,
   ],

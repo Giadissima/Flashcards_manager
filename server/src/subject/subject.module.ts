@@ -23,5 +23,6 @@ import { SubjectService } from './subject.service';
   ],
   controllers: [SubjectController],
   providers: [SubjectService],
+  exports: [SubjectService],
 })
 export class SubjectModule {}

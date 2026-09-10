@@ -194,7 +194,9 @@ export class AdminComponent implements OnInit {
     // The reporter is a person, not a piece of content: nothing here to keep,
     // remove or put back, only their own account to warn or ban.
     if (against === 'reporter') {
-      if (action === 'warn') return true;
+      // Already serving a ban: a warning would rewrite its restriction rather
+      // than add to it, so there is nothing left for this button to do.
+      if (action === 'warn') return !report.reporterBanned;
       if (action === 'ban') return !report.reporterBanned;
       return false;
     }
@@ -206,6 +208,7 @@ export class AdminComponent implements OnInit {
     // once. The way back for them is "ridagli tutto".
     if (action === 'restore') return report.hidden && !report.banned;
     if (action === 'ban') return !report.banned;
+    if (action === 'warn') return !report.banned;
     return true;
   }
 

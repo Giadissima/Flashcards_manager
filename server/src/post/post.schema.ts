@@ -98,13 +98,13 @@ export class Post {
   hiddenAt?: Date;
 
   /**
-   * 'reports' is waiting to be looked at, 'admin' was taken down on its own,
-   * 'ban' went down with its author - which is the one that has to be told
-   * apart, so that lifting the ban puts back what the ban took and nothing
-   * else.
+   * 'reports' is waiting to be looked at, 'admin' was taken down on its own.
+   * A ban does not set this: it takes the author's content private instead,
+   * which empties the post's cardCount and drops it out of the feed on its
+   * own, the same way taking a subject back does.
    */
-  @Prop({ required: false, enum: ['reports', 'admin', 'ban'] })
-  hiddenReason?: 'reports' | 'admin' | 'ban';
+  @Prop({ required: false, enum: ['reports', 'admin'] })
+  hiddenReason?: 'reports' | 'admin';
 }
 
 export const PostSchema = SchemaFactory.createForClass(Post);
