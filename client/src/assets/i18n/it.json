@@ -663,6 +663,30 @@
       "done": "Segnalazione inviata, ci pensiamo noi.",
       "already": "L'hai già segnalato",
       "error": "Non è stato possibile inviare la segnalazione"
+    },
+    "rules": {
+      "title": "Regole della community",
+      "intro": "Alcune regole per mantenere la Community un buon posto dove condividere e studiare.",
+      "openButton": "Regole della community",
+      "close": "Ho capito",
+      "respectTitle": "Rispetto reciproco",
+      "respectBody": "Niente insulti, minacce, molestie o linguaggio d'odio verso altri utenti (per razza, genere, orientamento, religione, disabilità, ecc.).",
+      "contentTitle": "Contenuti appropriati",
+      "contentBody": "Vietati contenuti violenti, sessualmente espliciti, illegali o che promuovono l'autolesionismo.",
+      "spamTitle": "No spam e pubblicità non richiesta",
+      "spamBody": "Vietato pubblicare contenuti ripetitivi, link ingannevoli, promozioni commerciali non pertinenti o catene di messaggi.",
+      "relevanceTitle": "Pertinenza al contesto educativo",
+      "relevanceBody": "I contenuti (flashcard, post, commenti) devono essere pertinenti allo studio/apprendimento. Materiale palesemente fuori tema o inutile può essere segnalato.",
+      "plagiarismTitle": "No plagio o contenuti rubati",
+      "plagiarismBody": "Non pubblicare materiale protetto da copyright senza autorizzazione o spacciare per proprio il lavoro altrui.",
+      "accuracyTitle": "Informazioni corrette",
+      "accuracyBody": "Evitare la diffusione intenzionale di disinformazione o contenuti falsi presentati come fatti, soprattutto in flashcard e materiale didattico.",
+      "privacyTitle": "Privacy",
+      "privacyBody": "Non condividere dati personali propri o di terzi (numeri di telefono, indirizzi, foto private, ecc.) senza consenso.",
+      "fraudTitle": "Account e comportamento fraudolento",
+      "fraudBody": "Vietati account falsi, impersonificazione di altre persone, o tentativi di truffa/phishing.",
+      "manipulationTitle": "Manipolazione della piattaforma",
+      "manipulationBody": "Vietato l'uso di bot, voti falsi o altri sistemi per alterare artificialmente la visibilità o la popolarità dei contenuti."
     }
   },
   "notifications": {

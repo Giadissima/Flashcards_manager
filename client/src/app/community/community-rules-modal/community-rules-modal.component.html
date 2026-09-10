@@ -1,0 +1,19 @@
+<app-modal [isOpen]="isOpen" [title]="'community.rules.title' | transloco" [showFooter]="true"
+  (closed)="close()">
+  <p class="rules-intro">{{ 'community.rules.intro' | transloco }}</p>
+
+  <ul class="rules-list">
+    @for (rule of rules; track rule.titleKey) {
+    <li class="rules-item">
+      <strong>{{ ('community.rules.' + rule.titleKey) | transloco }}</strong>
+      <p class="mb-0">{{ ('community.rules.' + rule.bodyKey) | transloco }}</p>
+    </li>
+    }
+  </ul>
+
+  <ng-container modal-footer>
+    <button type="button" class="btn btn-primary" (click)="close()">
+      {{ 'community.rules.close' | transloco }}
+    </button>
+  </ng-container>
+</app-modal>

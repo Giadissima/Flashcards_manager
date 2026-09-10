@@ -663,6 +663,30 @@
       "done": "Reported. We will look at it.",
       "already": "You already reported it",
       "error": "The report could not be sent"
+    },
+    "rules": {
+      "title": "Community rules",
+      "intro": "A few rules to keep the Community a good place to share and study.",
+      "openButton": "Community rules",
+      "close": "Got it",
+      "respectTitle": "Mutual respect",
+      "respectBody": "No insults, threats, harassment or hate speech based on race, gender, orientation, religion, disability or anything else.",
+      "contentTitle": "Appropriate content",
+      "contentBody": "No violent or sexually explicit content, anything illegal, or material that promotes self-harm.",
+      "spamTitle": "No spam or unsolicited ads",
+      "spamBody": "No repetitive posts, misleading links, unrelated promotions or chain messages.",
+      "relevanceTitle": "Stay on topic",
+      "relevanceBody": "Flashcards, posts and comments should be relevant to studying. Off-topic or useless material can be reported.",
+      "plagiarismTitle": "No plagiarism",
+      "plagiarismBody": "Do not share copyrighted material without permission, or pass someone else's work off as your own.",
+      "accuracyTitle": "Accurate information",
+      "accuracyBody": "Avoid spreading misinformation, especially in flashcards and study material presented as fact.",
+      "privacyTitle": "Privacy",
+      "privacyBody": "Do not share personal data about yourself or others (phone numbers, addresses, private photos) without consent.",
+      "fraudTitle": "Fake accounts and fraud",
+      "fraudBody": "No fake accounts, impersonation of other people, or phishing/scam attempts.",
+      "manipulationTitle": "No platform manipulation",
+      "manipulationBody": "No bots, fake votes or other means of artificially inflating a post's visibility or popularity."
     }
   },
   "notifications": {

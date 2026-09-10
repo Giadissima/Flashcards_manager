@@ -1,0 +1,28 @@
+.rules-intro {
+  margin-bottom: calc(var(--spacing-unit) * 1.5);
+}
+
+.rules-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.rules-item {
+  padding: calc(var(--spacing-unit) * 0.75) 0;
+  border-bottom: 1px solid var(--border-color);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  strong {
+    display: block;
+    margin-bottom: calc(var(--spacing-unit) * 0.25);
+  }
+
+  p {
+    color: var(--muted-color);
+    font-size: 0.9rem;
+  }
+}

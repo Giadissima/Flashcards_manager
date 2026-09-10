@@ -5,7 +5,7 @@
      the card, so the pipe is what keeps the header on screen while loading. -->
 <div class="container-md">
   <app-page-card icon="diversity_3" [title]="'community.title' | transloco"
-    [subtitle]="'community.subtitle' | transloco">
+    [subtitle]="'community.subtitle' | transloco" [actions]="pageActions" (action)="openRulesModal()">
     <app-filter-bar [activeCount]="activeFilterCount" appearance="inset"
       [caption]="'common.filters' | transloco">
       <div class="filter-row">
@@ -62,4 +62,7 @@
       }
     </app-load-state>
   </app-page-card>
+
+  <app-community-rules-modal [isOpen]="rulesModalOpen"
+    (closed)="rulesModalOpen = false"></app-community-rules-modal>
 </div>

@@ -12,6 +12,8 @@ import {
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../auth/auth.service';
 import { CommunityService } from './community.service';
+import { CommunityRulesModalComponent } from './community-rules-modal/community-rules-modal.component';
+import { hasSeenCommunityRules, markCommunityRulesSeen } from '../shared/community-rules-seen';
 import { FilterBarComponent } from '../shared/filter-bar/filter-bar.component';
 import { SearchInputComponent } from '../shared/search-input/search-input.component';
 import {
@@ -24,11 +26,11 @@ import {
   DateRangeFilterComponent,
 } from '../shared/date-range-filter/date-range-filter.component';
 import { LoadStateComponent } from '../shared/load-state/load-state.component';
-import { PageCardComponent } from '../shared/page-card/page-card.component';
+import { PageCardAction, PageCardComponent } from '../shared/page-card/page-card.component';
 import { PaginationComponent } from '../shared/pagination/pagination.component';
 import { PostCardComponent } from './post-card/post-card.component';
 import { SegmentedFilterComponent } from '../shared/segmented-filter/segmented-filter.component';
-import { TranslocoModule } from '@jsverse/transloco';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 
 const pageSize = 5;
 
@@ -55,6 +57,7 @@ const pageSize = 5;
     SearchInputComponent,
     StudyFieldsComponent,
     RouterLink,
+    CommunityRulesModalComponent,
   ],
   templateUrl: './community.component.html',
   styleUrl: './community.component.scss',
@@ -103,14 +106,35 @@ export class CommunityComponent implements OnInit, OnDestroy {
    */
   scopeChosen = false;
 
+  rulesModalOpen = false;
+
   constructor(
     private communityService: CommunityService,
     private authService: AuthService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
+    private transloco: TranslocoService,
   ) {}
 
+  get pageActions(): PageCardAction[] {
+    return [
+      {
+        label: this.transloco.translate('community.rules.openButton'),
+        icon: 'gavel',
+        variant: 'outline',
+      },
+    ];
+  }
+
   ngOnInit(): void {
+    // Shown once on its own, the first time this reader ever opens the
+    // Community: after that it stays a click away in the header, not a
+    // pop-up they have to dismiss on every visit.
+    if (!hasSeenCommunityRules()) {
+      this.rulesModalOpen = true;
+      markCommunityRulesSeen();
+    }
+
     // Subscription, not snapshot: navigating to /community while already on
     // /community makes Angular reuse the existing component and skip ngOnInit,
     // but this subscription fires anyway and re-reads the filters from the URL,
@@ -210,6 +234,10 @@ export class CommunityComponent implements OnInit, OnDestroy {
   /** Clicking a post's author name filters the feed down to just their posts. */
   onAuthorSelected(username: string): void {
     this.onSearch(username);
+  }
+
+  openRulesModal(): void {
+    this.rulesModalOpen = true;
   }
 
   onStudyChange(study: StudyFields): void {
