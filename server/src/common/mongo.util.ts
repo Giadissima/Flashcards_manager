@@ -1,6 +1,13 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { BasePaginatedResult, BasicFilterRequest } from 'src/common.dto';
-import { FilterQuery, Model, SortOrder, Types, UpdateQuery } from 'mongoose';
+import {
+  FilterQuery,
+  Model,
+  PopulateOptions,
+  SortOrder,
+  Types,
+  UpdateQuery,
+} from 'mongoose';
 
 import { idLength } from 'src/config';
 
@@ -34,7 +41,7 @@ export async function findPaginated<T>(
   model: Model<any>,
   query: FilterQuery<any>,
   filter: BasicFilterRequest,
-  populate?: string | string[],
+  populate?: string | (string | PopulateOptions)[],
 ): Promise<BasePaginatedResult<T>> {
   const page = model
     .find(query)

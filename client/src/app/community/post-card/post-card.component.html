@@ -41,6 +41,12 @@
         <!-- No subject icon here, unlike the home card: a post is one subject,
              so the icon in the header above already says which, and repeating
              it on every card of the row says it three times over. -->
+        <!-- Same corner as the home grid, and the same reason: the sharer
+             kept the source's owner on it, so the carousel says whose work
+             this still is even once it is somebody else's post. -->
+        <app-imported-badge class="post-flashcard-imported" [imported]="!!card.imported"
+          [username]="card.imported_from?.user_id?.username"></app-imported-badge>
+
         <div class="flashcard-title">
           <div>
             <h5 class="card-title mb-0">{{ card.title }}</h5>

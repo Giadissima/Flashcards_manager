@@ -3,6 +3,7 @@ import { DateRangeRequest, ListFilterRequest } from 'src/common.dto';
 import { Visibility, visibilities } from 'src/common/visibility';
 import {
   IsArray,
+  IsBoolean,
   IsInt,
   IsMongoId,
   IsIn,
@@ -12,7 +13,7 @@ import {
   Max,
   Min,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   answerMaxLength,
   charMinLength,
@@ -136,4 +137,14 @@ export interface RandomFlashcard {
 export class CardListFilterRequest extends IntersectionType(
   ListFilterRequest,
   DateRangeRequest,
-) {}
+) {
+  @IsOptional()
+  @Transform(({ value }) => value === true || value === 'true')
+  @IsBoolean()
+  @ApiProperty({
+    description:
+      'true = only cards imported from someone else, false = only the reader\'s own, absent = both',
+    required: false,
+  })
+  imported?: boolean;
+}

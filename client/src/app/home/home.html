@@ -69,6 +69,15 @@
         <app-date-range-filter [from]="dateFrom" [to]="dateTo" [disabled]="isReloading"
           (rangeChange)="onDateRangeChange($event)"></app-date-range-filter>
       </div>
+      <div class="filter-col">
+        <label class="visually-hidden">{{ 'home.importFilter.label' | transloco }}</label>
+        <app-searchable-select
+          [options]="importFilterOptions"
+          [value]="importFilter"
+          [disabled]="isReloading"
+          (valueChange)="onImportFilterChange($event)"
+        ></app-searchable-select>
+      </div>
     </div>
   </app-filter-bar>
 
@@ -85,10 +94,16 @@
     <div class="card flashcard flashcard-topic-color" [style.border-top-color]="getCardColor(card)">
       <!-- Top right, out of the row of actions: it is the state of the card,
            not one more thing to do to it, and the corner is where a lock is
-           looked for. -->
-      <app-visibility-button class="card-visibility" [visibility]="card.visibility ?? 'private'"
-        [imported]="!!card.imported" [busy]="visibilityBusyId === card._id"
-        (toggled)="onVisibilityToggled(card, $event)"></app-visibility-button>
+           looked for. The import badge sits beside it rather than replacing
+           it: where the card came from and whether it is public are two
+           different questions, and an imported card can now answer both. -->
+      <div class="card-visibility">
+        <app-imported-badge [imported]="!!card.imported" [username]="card.imported_from?.user_id?.username">
+        </app-imported-badge>
+        <app-visibility-button [visibility]="card.visibility ?? 'private'"
+          [busy]="visibilityBusyId === card._id"
+          (toggled)="onVisibilityToggled(card, $event)"></app-visibility-button>
+      </div>
 
       <div class="flashcard-title">
         <img [src]="getCardSubjectIconUrl(card)" alt="" class="flashcard-subject-icon">

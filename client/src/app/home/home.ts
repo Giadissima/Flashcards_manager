@@ -8,6 +8,7 @@ import { FilterBarComponent } from '../shared/filter-bar/filter-bar.component';
 
 import { CommonModule } from '@angular/common';
 import { VisibilityButtonComponent } from '../shared/visibility-toggle/visibility-button.component';
+import { ImportedBadgeComponent } from '../shared/imported-badge/imported-badge.component';
 import { Visibility } from '../models/visibility.dto';
 import { Flashcard } from '../models/flashcard.dto';
 import { FlashcardService } from '../flashcard/flashcard.service';
@@ -34,7 +35,7 @@ import {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, KatexRendererPipe, SearchableSelectComponent, SearchInputComponent, TranslocoModule, ImageLightboxComponent, ZoomableImagesDirective, ContentOverflowDirective, LoadStateComponent, PaginationComponent, FilterBarComponent, VisibilityButtonComponent, DateRangeFilterComponent],
+  imports: [CommonModule, KatexRendererPipe, SearchableSelectComponent, SearchInputComponent, TranslocoModule, ImageLightboxComponent, ZoomableImagesDirective, ContentOverflowDirective, LoadStateComponent, PaginationComponent, FilterBarComponent, VisibilityButtonComponent, ImportedBadgeComponent, DateRangeFilterComponent],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
@@ -49,11 +50,21 @@ export class Home extends PaginatedList implements OnInit, OnDestroy {
   searchTerm: string = '';
   sortBy: 'title' | 'createdAt' = 'title';
   sortDirection: 'asc' | 'desc' = 'asc';
+  /** Whether the grid holds everything, only what was taken from someone else, or only what is the reader's own. */
+  importFilter: 'all' | 'imported' | 'personal' = 'all';
 
   // Sorting is left out: it always has a value, so it would never read as off.
   /** The two ends of the range, as YYYY-MM-DD days; null is an open end. */
   dateFrom: string | null = null;
   dateTo: string | null = null;
+
+  get importFilterOptions(): SelectOption[] {
+    return [
+      { value: 'all', label: this.transloco.translate('home.importFilter.all') },
+      { value: 'imported', label: this.transloco.translate('home.importFilter.imported') },
+      { value: 'personal', label: this.transloco.translate('home.importFilter.personal') },
+    ];
+  }
 
   get activeFilterCount(): number {
     return [
@@ -62,6 +73,7 @@ export class Home extends PaginatedList implements OnInit, OnDestroy {
       this.searchTerm,
       // One filter and not two: an open end is still the same range
       this.dateFrom || this.dateTo,
+      this.importFilter !== 'all' ? this.importFilter : null,
     ].filter(Boolean).length;
   }
 
@@ -120,6 +132,7 @@ export class Home extends PaginatedList implements OnInit, OnDestroy {
       this.searchTerm = qp.get('search') || '';
       this.dateFrom = qp.get('from') || null;
       this.dateTo = qp.get('to') || null;
+      this.importFilter = (qp.get('imported') as 'all' | 'imported' | 'personal') || 'all';
       this.sortBy = (qp.get('sortBy') as 'title' | 'createdAt') || 'title';
       this.sortDirection = (qp.get('sortDirection') as 'asc' | 'desc') || 'asc';
       this.currentPage = Number(qp.get('page')) || 1;
@@ -184,6 +197,7 @@ export class Home extends PaginatedList implements OnInit, OnDestroy {
         search: this.searchTerm || null,
         from: this.dateFrom,
         to: this.dateTo,
+        imported: this.importFilter !== 'all' ? this.importFilter : null,
         sortBy: this.sortBy,
         sortDirection: this.sortDirection,
         page: this.currentPage,
@@ -204,6 +218,8 @@ export class Home extends PaginatedList implements OnInit, OnDestroy {
       title: this.searchTerm || undefined,
       from: this.dateFrom || undefined,
       to: this.dateTo || undefined,
+      imported:
+        this.importFilter === 'all' ? undefined : this.importFilter === 'imported',
     });
     this.flashcards = data.data;
     this.totalCount = data.count;
@@ -226,6 +242,11 @@ export class Home extends PaginatedList implements OnInit, OnDestroy {
   onDateRangeChange(range: DateRange): void {
     this.dateFrom = range.from;
     this.dateTo = range.to;
+    this.onFilterChange();
+  }
+
+  onImportFilterChange(value: string | null | undefined): void {
+    this.importFilter = (value as 'all' | 'imported' | 'personal') || 'all';
     this.onFilterChange();
   }
 

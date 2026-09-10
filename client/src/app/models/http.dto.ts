@@ -28,6 +28,8 @@ export interface CardFilter extends SimplePaginatedResponse {
   /** The two ends of a date range over createdAt, as YYYY-MM-DD days. */
   from?: string;
   to?: string;
+  /** Show only cards imported from someone else. */
+  imported?: boolean;
 }
 
 /** What the count endpoint takes: a set of cards, narrowed by visibility. */

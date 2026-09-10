@@ -53,18 +53,19 @@ export class Flashcard {
   visibility: Visibility;
 
   /**
-   * True on a copy taken from somebody else's post. Such a card can be studied,
-   * edited and deleted like any other, but never published again: passing on
-   * someone's work as one's own is the one thing the Community must not make
-   * easy.
+   * True on a copy taken from somebody else's post. Such a card can be
+   * studied, edited, deleted and published like any other - publishing one
+   * keeps the source's owner on it (see imported_from) so the Community
+   * still reads it as a copy, not as the copier's own work.
    */
   @Prop({ required: true, default: false, index: true })
   imported: boolean;
 
   /**
    * The card this was copied from. Kept so the same card cannot be imported
-   * twice, and so "how many people took this" can be counted later - a better
-   * measure of usefulness than a vote, since it costs the reader something.
+   * twice, so "how many people took this" can be counted later - a better
+   * measure of usefulness than a vote, since it costs the reader something -
+   * and so a published copy can still say whose it originally was.
    */
   @Prop({
     type: mongoose.Schema.Types.ObjectId,

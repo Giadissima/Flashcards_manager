@@ -16,6 +16,7 @@ import { PostComment } from '../../models/social.dto';
 import { Question } from '../../models/test.dto';
 import { SearchableSelectComponent, SelectOption } from '../../shared/searchable-select/searchable-select.component';
 import { PaginationComponent } from '../../shared/pagination/pagination.component';
+import { ImportedBadgeComponent } from '../../shared/imported-badge/imported-badge.component';
 import { KatexRendererPipe } from '../../pipes/katex-renderer.pipe';
 import { shuffle } from '../../shared/array.util';
 import { TestService } from '../../test/test.service';
@@ -69,6 +70,7 @@ const commentPageSize = 20;
     PostReportModalComponent,
     SearchableSelectComponent,
     PaginationComponent,
+    ImportedBadgeComponent,
   ],
   templateUrl: './post-card.component.html',
   styleUrl: './post-card.component.scss',

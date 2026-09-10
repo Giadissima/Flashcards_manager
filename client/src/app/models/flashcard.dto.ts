@@ -15,8 +15,16 @@ export interface Flashcard {
   /** Who may see it; absent on payloads that leave it unchanged. */
   visibility?: Visibility;
 
-  /** True on a copy taken from someone else's post, which can never go back out. */
+  /** True on a copy taken from someone else's post. */
   imported?: boolean;
+
+  /**
+   * The card this was copied from, populated by the server down to its
+   * owner's username - live, not a snapshot, so a rename shows up and a
+   * source card or account gone by then leaves user_id absent. Only ever
+   * set when `imported` is true.
+   */
+  imported_from?: { user_id?: { username: string } | null } | null;
 }
 
 /** One of the flashcards drawn for a new test, with the topic it is on. */

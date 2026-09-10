@@ -168,6 +168,9 @@ app-pagination {
    Only what belongs to a carousel is set here: how wide a card is in the row,
    and the floor under its height, which is the home grid's own. */
 .post-flashcard {
+  /* Anchor for the imported badge in the corner, see .post-flashcard-imported. */
+  position: relative;
+
   /* Shrinkable, unlike before: the page is now sized in TypeScript to the
      number of 300px cards the track actually measures room for, but that
      count is still a whole-pixel floor division - shrink is only there to
@@ -185,6 +188,16 @@ app-pagination {
   /* "both" for the staggered delay: without it a card would be drawn in place
      for its first frames and then jump back to the start of the animation. */
   animation: carousel-card-in 0.32s ease both;
+}
+
+/* Same corner as the home grid's .card-visibility, but alone here: a
+   published post is never anybody's to unpublish but its author's own, so
+   there is no visibility toggle on the carousel to sit beside. */
+.post-flashcard-imported {
+  position: absolute;
+  top: var(--spacing-unit);
+  right: var(--spacing-unit);
+  z-index: 1;
 }
 
 .carousel-track.is-back .post-flashcard {

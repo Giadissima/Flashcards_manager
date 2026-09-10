@@ -659,7 +659,18 @@ export class PostService {
         .sort({ _id: -1 })
         .skip(skip)
         .limit(limit)
-        .populate(['topic_id', 'subject_id'])
+        .populate([
+          'topic_id',
+          'subject_id',
+          // Live, not snapshotted: the "imported from" badge on the carousel
+          // reads the source owner's username fresh every time, same as the
+          // one in the reader's own library.
+          {
+            path: 'imported_from',
+            select: 'user_id',
+            populate: { path: 'user_id', select: 'username' },
+          },
+        ])
         .exec(),
       this.flashcardModel.countDocuments(query),
     ]);

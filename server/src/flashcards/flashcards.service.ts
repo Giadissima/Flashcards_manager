@@ -8,11 +8,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { PublishingService } from 'src/common/publishing.service';
 import { Visibility, defaultVisibility } from 'src/common/visibility';
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Flashcard, FlashcardDocument } from './flashcards.schema';
 import { FilterQuery, Model, Types } from 'mongoose';
 import { BasePaginatedResult } from 'src/common.dto';
@@ -29,7 +25,18 @@ import { Subject } from 'src/subject/subject.schema';
 import { Topic } from 'src/topic/topic.schema';
 
 const ENTITY = 'Flashcard';
-const POPULATE = ['topic_id', 'subject_id'];
+// The source card's owner is populated two levels deep, live rather than
+// snapshotted: the badge reads it fresh every time, so a rename shows up
+// right away and a source card or account gone by then just reads as unknown.
+const POPULATE = [
+  'topic_id',
+  'subject_id',
+  {
+    path: 'imported_from',
+    select: 'user_id',
+    populate: { path: 'user_id', select: 'username' },
+  },
+];
 const defaultRandomSampleSize = 10;
 
 // The Leitner boxes a card moves through: index is the box number, value is
@@ -150,6 +157,11 @@ export class FlashcardsService {
     if (filter.subject_id) query.subject_id = filter.subject_id;
     if (filter.topic_id) query.topic_id = filter.topic_id;
     if (filter.title) query.title = { $regex: filter.title, $options: 'i' };
+    // A three-way filter over one boolean field: present and true narrows to
+    // imported cards, present and false to the reader's own, absent leaves
+    // both in.
+    if (filter.imported === true) query.imported = true;
+    else if (filter.imported === false) query.imported = { $ne: true };
 
     // On when the card was written, which is the only date it has and the one
     // the list can already be sorted by.
@@ -384,8 +396,8 @@ export class FlashcardsService {
     updateObj: ModifyFlashcardDto,
   ): Promise<void> {
     assertValidObjectId(id);
-    if (updateObj.visibility) {
-      await this.assertCanBePublished(userId, id, updateObj.visibility);
+    if (updateObj.visibility === 'public') {
+      await this.publishing.assertMayPublish(userId, updateObj.visibility);
     }
 
     const existing = await this.flashcardModel
@@ -504,7 +516,9 @@ export class FlashcardsService {
     id: string,
     visibility: Visibility,
   ): Promise<void> {
-    await this.assertCanBePublished(userId, id, visibility);
+    if (visibility === 'public') {
+      await this.publishing.assertMayPublish(userId, visibility);
+    }
     await updateOwnedOrThrow(
       this.flashcardModel,
       id,
@@ -513,31 +527,6 @@ export class FlashcardsService {
       ENTITY,
     );
     await this.refreshPostOf(userId, id);
-  }
-
-  /**
-   * An imported card cannot go back out. It is somebody else's work, kept for
-   * studying: republishing it would let the Community fill with copies whose
-   * author has no say in them.
-   */
-  private async assertCanBePublished(
-    userId: string,
-    cardId: string,
-    visibility: Visibility,
-  ): Promise<void> {
-    if (visibility !== 'public') return;
-
-    await this.publishing.assertMayPublish(userId, visibility);
-
-    const card = await this.flashcardModel
-      .findOne({ _id: cardId, user_id: userId }, { imported: 1 })
-      .lean()
-      .exec();
-    if (card?.imported) {
-      throw new BadRequestException(
-        'An imported flashcard cannot be published again',
-      );
-    }
   }
 
   private async refreshPostOf(userId: string, cardId: string): Promise<void> {

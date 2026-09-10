@@ -118,6 +118,9 @@
   top: var(--spacing-unit);
   right: var(--spacing-unit);
   z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: calc(var(--spacing-unit) / 2);
 }
 
 /* Room kept for it, so a long title breaks before it rather than running

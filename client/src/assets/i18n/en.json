@@ -179,6 +179,12 @@
   },
   "home": {
     "searchPlaceholder": "Search flashcards...",
+    "importFilter": {
+      "label": "Origin",
+      "all": "All flashcards",
+      "imported": "Imported only",
+      "personal": "Personal only"
+    },
     "sortName": "Name",
     "sortDate": "Date",
     "seeAnswer": "See answer",
@@ -257,6 +263,7 @@
       "importPlaceholder": "Title\nQuestion: ...\nAnswer: ...",
       "importApply": "Import",
       "importParseError": "The text isn't in the expected format (Title / Question / Answer).",
+      "importSuccess": "The text has been correctly imported into the fields.",
       "noSubjectsTitle": "You haven't created any subject yet",
       "noSubjectsMessage": "Create a subject to be able to create your first flashcard.",
       "createSubjectButton": "Create subject",
@@ -551,7 +558,8 @@
     "toastError": "The visibility could not be changed",
     "cascadeSubject": "If you change the visibility of this subject, you will also change it for its topics and flashcards.",
     "cascadeTopic": "If you change the visibility of this topic, you will also change it for its flashcards.",
-    "imported": "Imported flashcard",
+    "importedFrom": "Imported from {{username}}",
+    "importedFromUnknown": "Imported from a deleted user",
     "publicSubjectNoCards": "This subject has no flashcards yet, so it does not show up in the Community.",
     "publicSubjectAllPrivate": "Every flashcard in this subject is private, so it does not show up in the Community until you share at least one.",
     "needUniversity": "You must indicate your university before you can share in the community.",
