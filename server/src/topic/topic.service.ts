@@ -15,6 +15,7 @@ import {
   findPaginated,
   updateOwnedOrThrow,
 } from 'src/common/mongo.util';
+import { FlashcardsService } from 'src/flashcards/flashcards.service';
 
 const ENTITY = 'Topic';
 const POPULATE = 'subject_id';
@@ -27,6 +28,7 @@ export class TopicService {
     private readonly postService: PostService,
     @InjectModel(Flashcard.name) private flashcardModel: Model<Flashcard>,
     private readonly publishing: PublishingService,
+    private readonly flashcardsService: FlashcardsService,
   ) {}
 
   async create(userId: string, createTopicDto: ModifyTopicDto): Promise<void> {
@@ -122,6 +124,8 @@ export class TopicService {
       .exec();
 
     await deleteOwnedOrThrow(this.topicModel, id, userId, ENTITY);
+    // The topic is gone, so its flashcards can never be left pointing at it.
+    await this.flashcardsService.deleteMany(userId, { topic_id: id });
     if (existing?.subject_id) {
       await this.postService.refresh(userId, existing.subject_id);
     }

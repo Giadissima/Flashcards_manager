@@ -15,6 +15,7 @@ import {
 import { FileService } from 'src/file/file.service';
 import { PostService } from 'src/post/post.service';
 import { Flashcard } from 'src/flashcards/flashcards.schema';
+import { FlashcardsService } from 'src/flashcards/flashcards.service';
 import { Topic } from 'src/topic/topic.schema';
 
 const ENTITY = 'Subject';
@@ -28,6 +29,7 @@ export class SubjectService {
     @InjectModel(Topic.name) private topicModel: Model<Topic>,
     @InjectModel(Flashcard.name) private flashcardModel: Model<Flashcard>,
     private readonly publishing: PublishingService,
+    private readonly flashcardsService: FlashcardsService,
   ) {}
 
   async create(
@@ -86,6 +88,11 @@ export class SubjectService {
     if (existing.icon) {
       await this.fileService.delete(existing.icon.toString());
     }
+
+    // The subject is gone, so its topics and flashcards can never be left
+    // pointing at it.
+    await this.flashcardsService.deleteMany(userId, { subject_id: id });
+    await this.topicModel.deleteMany({ user_id: userId, subject_id: id }).exec();
 
     // The subject is gone, so its post has nothing left to hang off
     await this.postService.refresh(userId, id);
