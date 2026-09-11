@@ -7,7 +7,7 @@ import { PageCardComponent } from '../../shared/page-card/page-card.component';
 import { TranslocoModule } from '@jsverse/transloco';
 
 /** What the page is doing, and what it has to say about it. */
-type State = 'checking' | 'done' | 'failed';
+type State = 'ready' | 'checking' | 'done' | 'failed';
 
 /**
  * Where a confirmation link lands.
@@ -25,7 +25,8 @@ type State = 'checking' | 'done' | 'failed';
   styleUrl: '../auth-page.scss',
 })
 export class VerifyEmailComponent implements OnInit {
-  state: State = 'checking';
+  state: State = 'ready';
+  private token = '';
 
   /** Where the button underneath goes: home for whoever is already logged in. */
   get target(): string {
@@ -43,7 +44,7 @@ export class VerifyEmailComponent implements OnInit {
     private authService: AuthService,
   ) {}
 
-  async ngOnInit(): Promise<void> {
+  ngOnInit(): void {
     const token = this.route.snapshot.queryParamMap.get('token');
     // An address with no token in it is a link that was cut in half by a mail
     // client, which reads the same way as one that has expired: the answer is
@@ -53,8 +54,17 @@ export class VerifyEmailComponent implements OnInit {
       return;
     }
 
+    this.token = token;
+  }
+
+  // Left for an explicit click rather than fired on page load: mail
+  // security scanners (Microsoft Safe Links and the like) open links
+  // automatically to inspect them, which would otherwise spend the
+  // single-use token before the person ever sees the page.
+  async confirm(): Promise<void> {
+    this.state = 'checking';
     try {
-      await this.authService.verifyEmail(token);
+      await this.authService.verifyEmail(this.token);
       this.state = 'done';
     } catch {
       this.state = 'failed';

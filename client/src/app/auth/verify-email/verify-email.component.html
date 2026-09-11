@@ -6,6 +6,15 @@
   </div>
 
   @switch (state) {
+  @case ('ready') {
+  <app-page-card icon="mail" [title]="t('auth.verify.readyTitle')" [subtitle]="t('auth.verify.readySubtitle')">
+    <div class="form-actions">
+      <button type="button" class="btn btn-primary" (click)="confirm()">
+        <span class="material-symbols-outlined">check</span>{{ t('auth.verify.confirm') }}
+      </button>
+    </div>
+  </app-page-card>
+  }
   @case ('checking') {
   <app-page-card icon="hourglass_top" [title]="t('auth.verify.checkingTitle')">
     <div class="text-center py-3">
