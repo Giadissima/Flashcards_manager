@@ -520,6 +520,8 @@
     "whyText": "In the Community section the shared flashcards are grouped by degree course: tell us yours and you go straight to the ones made by people sitting your same exams.",
     "university": "University",
     "universityPlaceholder": "Choose your university",
+    "chooseUniversity": "Choose a university",
+    "cityFilterPlaceholder": "Filter by city",
     "course": "Degree course",
     "coursePlaceholder": "Choose your course",
     "coursePlaceholderLocked": "Choose a university first",
@@ -528,7 +530,6 @@
     "clear": "Clear the selection",
     "universitiesError": "The list of universities could not be loaded",
     "coursesError": "The courses of this university could not be loaded",
-    "allUniversities": "All universities",
     "allCourses": "All courses"
   },
   "profile": {
@@ -582,7 +583,7 @@
     "sortCreated": "Newest",
     "sortUpdated": "Recently updated",
     "empty": "Nothing has been shared yet.",
-    "noUniversityHint": "Pick a university in the filters to see posts, or set yours on your profile to start there.",
+    "noUniversityHint": "Choose a university to see its posts, or set yours on your profile to start there.",
     "loadError": "The feed could not be loaded",
     "noFlashcards": "No flashcards to show",
     "cardCount": "{{count}} flashcards",

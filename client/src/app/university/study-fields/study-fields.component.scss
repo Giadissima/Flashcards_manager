@@ -11,6 +11,13 @@
   }
 }
 
+/* The filter sits right above the select it narrows down, closer to it than to
+   the field's own label. */
+app-search-input {
+  display: block;
+  margin-bottom: calc(var(--spacing-unit) / 2);
+}
+
 /* Explains what the university and course fields are for, right before asking:
    they are the only two fields whose point is not self-evident. */
 .study-callout {

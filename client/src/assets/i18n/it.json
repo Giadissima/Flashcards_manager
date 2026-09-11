@@ -520,6 +520,8 @@
     "whyText": "Nella sezione Community le flashcard condivise sono raggruppate per corso di laurea: indicando il tuo, arrivi subito a quelle di chi prepara i tuoi stessi esami.",
     "university": "Università",
     "universityPlaceholder": "Scegli la tua università",
+    "chooseUniversity": "Scegli università",
+    "cityFilterPlaceholder": "Filtra per città",
     "course": "Corso di laurea",
     "coursePlaceholder": "Scegli il tuo corso",
     "coursePlaceholderLocked": "Scegli prima un'università",
@@ -528,7 +530,6 @@
     "clear": "Annulla la selezione",
     "universitiesError": "Non è stato possibile caricare l'elenco delle università",
     "coursesError": "Non è stato possibile caricare i corsi di questa università",
-    "allUniversities": "Tutte le università",
     "allCourses": "Tutti i corsi"
   },
   "profile": {
@@ -582,7 +583,7 @@
     "sortCreated": "Più recenti",
     "sortUpdated": "Aggiornati di recente",
     "empty": "Non è ancora stato condiviso nulla.",
-    "noUniversityHint": "Scegli un'università nei filtri per vedere i post, o indica la tua nel profilo per partire da lì.",
+    "noUniversityHint": "Scegli un'università per visualizzarne i post, o indica la tua nel profilo per partire da lì.",
     "loadError": "Non è stato possibile caricare il feed",
     "noFlashcards": "Nessuna flashcard da mostrare",
     "cardCount": "{{count}} flashcard",

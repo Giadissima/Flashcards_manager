@@ -14,9 +14,12 @@
 <div class="study-fields" [class.is-filter]="variant === 'filter'">
   <div class="form-group">
     <label class="form-label">{{ 'studyFields.university' | transloco }}</label>
+    <app-search-input [inputId]="'universityCityFilter'" [value]="cityFilter" [disabled]="loadingUniversities"
+      [placeholder]="'studyFields.cityFilterPlaceholder' | transloco"
+      (valueChange)="cityFilter = $event" (search)="onCityFilterChange($event)"></app-search-input>
     <app-searchable-select [options]="universityOptions" [value]="universityCode" [loading]="loadingUniversities"
-      [placeholder]="'studyFields.universityPlaceholder' | transloco"
-      [allOptionLabel]="universityAllLabel | transloco"
+      [placeholder]="universityPlaceholderKey | transloco"
+      [allOptionLabel]="universityAllLabel ? (universityAllLabel | transloco) : null"
       (valueChange)="onUniversityChange($event)"></app-searchable-select>
   </div>
 
