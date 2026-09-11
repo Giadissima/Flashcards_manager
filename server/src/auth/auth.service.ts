@@ -20,6 +20,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { Model } from 'mongoose';
 import { FileService } from 'src/file/file.service';
+import { MailLang } from 'src/mail/mail.service';
 import { ModerationService } from 'src/moderation/moderation.service';
 import { RestrictionsService } from 'src/common/restrictions.service';
 import { UniversityService } from 'src/university/university.service';
@@ -39,7 +40,11 @@ export class AuthService {
     private readonly restrictions: RestrictionsService,
   ) {}
 
-  async register(dto: RegisterDto, ip?: string): Promise<AuthResponse> {
+  async register(
+    dto: RegisterDto,
+    ip?: string,
+    lang?: MailLang,
+  ): Promise<AuthResponse> {
     // Neither an invitation nor a payment: an account still costs a minute.
     // What it does cost is one address that answers, which is what stands
     // between a ban and the same person back an hour later - and the address
@@ -101,14 +106,14 @@ export class AuthService {
     // After the account exists, and never in its way: a mail that does not go
     // out leaves somebody logged in with a button to ask for it again, while a
     // failure here would leave them with nothing.
-    await this.verification.send(user);
+    await this.verification.send(user, lang);
 
     return this.buildResponse(user);
   }
 
   /** Asks for the confirmation mail again, for the account that is asking. */
-  async resendVerification(payload: JwtPayload): Promise<void> {
-    await this.verification.resend(payload.sub);
+  async resendVerification(payload: JwtPayload, lang?: MailLang): Promise<void> {
+    await this.verification.resend(payload.sub, lang);
   }
 
   async login(dto: LoginDto): Promise<AuthResponse> {

@@ -15,12 +15,18 @@ export const defaultLanguage: AppLanguage = 'en';
 /**
  * The stored language, checked against the ones the app actually ships: a key
  * that was never written, or written by hand with something else in it, falls
- * back to the default instead of asking Transloco for a file that is not there.
+ * back to the browser/system language (if supported) or the default instead
+ * of asking Transloco for a file that is not there.
  */
 export function readStoredLanguage(): AppLanguage {
   const stored = localStorage.getItem(languageStorageKey);
-  return availableLanguages.includes(stored as AppLanguage)
-    ? (stored as AppLanguage)
+  if (availableLanguages.includes(stored as AppLanguage)) {
+    return stored as AppLanguage;
+  }
+
+  const browserLang = navigator.language.slice(0, 2);
+  return availableLanguages.includes(browserLang as AppLanguage)
+    ? (browserLang as AppLanguage)
     : defaultLanguage;
 }
 

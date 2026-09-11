@@ -7,6 +7,7 @@ import {
 import { provideHttpClient, withInterceptors, withInterceptorsFromDi } from '@angular/common/http';
 import { availableLanguages, readStoredLanguage } from './shared/language';
 import { authInterceptor } from './auth/auth.interceptor';
+import { langInterceptor } from './shared/lang.interceptor';
 
 import { provideRouter } from '@angular/router';
 import { provideTransloco } from '@jsverse/transloco';
@@ -22,7 +23,7 @@ export const appConfig: ApplicationConfig = {
     // the Material datepicker needs a DateAdapter to turn Date <-> calendar text
     provideNativeDateAdapter(),
     // replaces HttpClientModule, registers HttpClient in the standalone DI system
-    provideHttpClient(withInterceptorsFromDi(), withInterceptors([authInterceptor])),
+    provideHttpClient(withInterceptorsFromDi(), withInterceptors([authInterceptor, langInterceptor])),
     provideTransloco({
       config: {
         availableLangs: [...availableLanguages],

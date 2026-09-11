@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { createHash, randomBytes } from 'crypto';
 
-import { MailService } from 'src/mail/mail.service';
+import { MailLang, MailService } from 'src/mail/mail.service';
 import { User, UserDocument } from './user.schema';
 import { verificationTokenHours } from 'src/config';
 
@@ -37,7 +37,7 @@ export class VerificationService {
    * account is already made and perfectly usable; what is missing is one mail,
    * and there is a button that asks for it again.
    */
-  async send(user: UserDocument): Promise<void> {
+  async send(user: UserDocument, lang: MailLang = 'it'): Promise<void> {
     if (!user.email || user.emailVerifiedAt) return;
 
     // Nobody can confirm anything while the mail is switched off, so the
@@ -58,7 +58,12 @@ export class VerificationService {
     await user.save();
 
     try {
-      await this.mail.sendVerification(user.email, user.username, this.link(token));
+      await this.mail.sendVerification(
+        user.email,
+        user.username,
+        this.link(token),
+        lang,
+      );
     } catch (error) {
       this.logger.warn(
         `confirmation mail for ${user.username} not sent: ${String(error)}`,
@@ -91,12 +96,12 @@ export class VerificationService {
   }
 
   /** Asks for the mail again, for somebody who never got the first one. */
-  async resend(userId: string): Promise<void> {
+  async resend(userId: string, lang: MailLang = 'it'): Promise<void> {
     const user = await this.userModel.findById(userId).exec();
     // Nothing to do, and nothing to complain about: an account with no address
     // or an address already confirmed is exactly where it should be.
     if (!user) return;
-    await this.send(user);
+    await this.send(user, lang);
   }
 
   private link(token: string): string {

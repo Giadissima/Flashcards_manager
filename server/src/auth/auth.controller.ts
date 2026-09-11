@@ -11,6 +11,7 @@ import {
   Body,
   Controller,
   Get,
+  Headers,
   HttpCode,
   HttpStatus,
   Ip,
@@ -24,10 +25,20 @@ import { ApiBody, ApiConsumes, ApiOperation } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { rateLimits } from 'src/config';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { MailLang } from 'src/mail/mail.service';
 import { AuthService } from './auth.service';
 import { CurrentUser } from './current-user.decorator';
 import { Public } from './public.decorator';
 import { VerificationService } from './verification.service';
+
+/**
+ * The client sends its active Transloco language as Accept-Language on every
+ * call (see the frontend's lang interceptor) - not a real negotiated header,
+ * just the one value the app is set to, so an exact match is enough.
+ */
+function mailLangOf(header?: string): MailLang {
+  return header === 'en' ? 'en' : 'it';
+}
 
 @Controller('auth')
 export class AuthController {
@@ -43,11 +54,12 @@ export class AuthController {
   register(
     @Body() registerDto: RegisterDto,
     @Ip() ip: string,
+    @Headers('accept-language') lang?: string,
   ): Promise<AuthResponse> {
     // The address comes from Express, which reads it through however many
     // proxies are trusted (see main.ts): behind a reverse proxy the socket
     // always says the proxy, and blocking that would block everybody.
-    return this.authService.register(registerDto, ip);
+    return this.authService.register(registerDto, ip, mailLangOf(lang));
   }
 
   @ApiOperation({ description: 'exchange username and password for an access token' })
@@ -81,8 +93,9 @@ export class AuthController {
   @HttpCode(HttpStatus.ACCEPTED)
   async resendVerification(
     @CurrentUser() user: JwtPayload,
+    @Headers('accept-language') lang?: string,
   ): Promise<{ sent: true }> {
-    await this.authService.resendVerification(user);
+    await this.authService.resendVerification(user, mailLangOf(lang));
     return { sent: true };
   }
 

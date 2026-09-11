@@ -21,6 +21,40 @@ import nodemailer, { Transporter } from 'nodemailer';
  * an unconfirmable account, whoever registers while it is off is taken at
  * their word (see VerificationService).
  */
+/** The two languages the client ships; anything else falls back to Italian. */
+export type MailLang = 'it' | 'en';
+
+const verificationCopy: Record<
+  MailLang,
+  {
+    subject: string;
+    /** Comes before the username, e.g. "Ciao" for "Ciao Giada,". */
+    greeting: string;
+    intro: string;
+    button: string;
+    footer: string;
+  }
+> = {
+  it: {
+    subject: 'Conferma il tuo indirizzo — Flashcards Manager',
+    greeting: 'Ciao',
+    intro: 'per confermare questo indirizzo apri il link qui sotto:',
+    button: 'Conferma indirizzo',
+    footer:
+      'Il link vale 24 ore. Se non hai creato tu questo account, ignora ' +
+      'questo messaggio: senza conferma non succede nulla.',
+  },
+  en: {
+    subject: 'Confirm your address — Flashcards Manager',
+    greeting: 'Hi',
+    intro: 'to confirm this address, open the link below:',
+    button: 'Confirm address',
+    footer:
+      "The link is valid for 24 hours. If you didn't create this account, " +
+      'ignore this message: without confirmation nothing happens.',
+  },
+};
+
 @Injectable()
 export class MailService {
   private readonly logger = new Logger(MailService.name);
@@ -85,35 +119,34 @@ export class MailService {
     to: string,
     username: string,
     link: string,
+    lang: MailLang = 'it',
   ): Promise<void> {
     if (!this.transport) return;
 
+    const copy = verificationCopy[lang];
     const safeUser = escape(username);
     const safeLink = escape(link);
 
     await this.transport.sendMail({
       from: this.from,
       to,
-      subject: 'Conferma il tuo indirizzo — Flashcards Manager',
+      subject: copy.subject,
       text: [
-        `Ciao ${username},`,
+        `${copy.greeting} ${username},`,
         '',
-        'per confermare questo indirizzo apri il link qui sotto:',
+        copy.intro,
         link,
         '',
-        'Il link vale 24 ore. Se non hai creato tu questo account, ignora',
-        'questo messaggio: senza conferma non succede nulla.',
+        copy.footer,
       ].join('\n'),
       html: [
-        `<p>Ciao <strong>${safeUser}</strong>,</p>`,
-        '<p>per confermare questo indirizzo apri il link qui sotto:</p>',
+        `<p>${copy.greeting} <strong>${safeUser}</strong>,</p>`,
+        `<p>${copy.intro}</p>`,
         `<p><a href="${safeLink}" style="display:inline-block;padding:10px 18px;`,
         'border-radius:8px;background:#a294f9;color:#fff;text-decoration:none">',
-        'Conferma indirizzo</a></p>',
+        `${copy.button}</a></p>`,
         `<p style="font-size:13px;color:#666">${safeLink}</p>`,
-        '<p style="font-size:13px;color:#666">Il link vale 24 ore. Se non hai',
-        'creato tu questo account, ignora questo messaggio: senza conferma non',
-        'succede nulla.</p>',
+        `<p style="font-size:13px;color:#666">${copy.footer}</p>`,
       ].join(''),
     });
   }
