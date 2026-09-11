@@ -140,9 +140,23 @@ export class ImageCropEditorComponent {
 
   private setScale(scale: number): void {
     const clamped = Math.min(MAX_SCALE, Math.max(MIN_SCALE, scale));
+    const previousScale = this.transform.scale ?? 1;
+    // translateH/V are screen pixels applied on top of the scaled image (the
+    // library composes them that way), so they stay put in absolute terms
+    // when the scale changes. Rescaling them by the same ratio as the zoom
+    // keeps the pan anchored to the same point of the image instead of
+    // drifting outside it - without this, zooming out after panning pushes
+    // the crop circle past the image edge and dragging stops working until
+    // the user zooms back in to bring it back within bounds.
+    const ratio = clamped / previousScale;
     // A new object, not a mutation: the cropper picks the transform up through
     // ngOnChanges, which never runs if the same reference is handed back.
-    this.transform = { ...this.transform, scale: clamped };
+    this.transform = {
+      ...this.transform,
+      scale: clamped,
+      translateH: (this.transform.translateH ?? 0) * ratio,
+      translateV: (this.transform.translateV ?? 0) * ratio,
+    };
   }
 
   private close(): void {
