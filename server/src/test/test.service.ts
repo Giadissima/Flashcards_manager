@@ -284,26 +284,33 @@ export class TestService {
   private subjectAndTopicStages(): PipelineStage.FacetPipelineStage[] {
     return [
       // $lookup is Mongo's join: for each test coming through, it reads the
-      // documents of another collection whose 'foreignField' matches this
-      // one's 'localField', and attaches them under 'as' - always as an array,
-      // even when a single document matches. The inner pipeline keeps only the
-      // name, which is all that travels back.
+      // documents of another collection matched by the inner pipeline, and
+      // attaches them under 'as' - always as an array, even when a single
+      // document matches. Matched through $expr rather than
+      // localField/foreignField because Mongo forbids combining those with a
+      // pipeline. The inner pipeline keeps only the name, which is all that
+      // travels back.
       {
         $lookup: {
           from: 'subject',
-          localField: 'subject_id',
-          foreignField: '_id',
+          let: { subjectId: '$subject_id' },
+          pipeline: [
+            { $match: { $expr: { $eq: ['$_id', '$$subjectId'] } } },
+            { $project: { name: 1 } },
+          ],
           as: 'testSubjects',
-          pipeline: [{ $project: { name: 1 } }],
         },
       },
       {
         $lookup: {
           from: 'topic',
-          localField: 'topic_id',
-          foreignField: '_id',
+          let: { topicIds: '$topic_id' },
+          pipeline: [
+            { $match: { $expr: { $in: ['$_id', '$$topicIds'] } } },
+            { $project: { name: 1 } },
+            { $sort: { name: 1 } },
+          ],
           as: 'testTopics',
-          pipeline: [{ $project: { name: 1 } }, { $sort: { name: 1 } }],
         },
       },
       {
@@ -432,10 +439,13 @@ export class TestService {
       {
         $lookup: {
           from: 'test',
-          localField: '_id',
-          foreignField: 'parent_test_id',
+          let: { testId: '$_id' },
+          pipeline: [
+            { $match: { $expr: { $eq: ['$parent_test_id', '$$testId'] } } },
+            { $limit: 1 },
+            { $project: { _id: 1 } },
+          ],
           as: 'ownChildren',
-          pipeline: [{ $limit: 1 }, { $project: { _id: 1 } }],
         },
       },
       { $addFields: { hasChildren: { $gt: [{ $size: '$ownChildren' }, 0] } } },

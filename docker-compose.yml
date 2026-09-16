@@ -1,6 +1,6 @@
 services:
   mongodb:
-    image: mongo:8.0.9
+    image: mongo:4.4
     command: ["mongod", "--quiet"] # log solo di errori gravi
     container_name: mongodb
     restart: unless-stopped
