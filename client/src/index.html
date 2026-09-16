@@ -11,6 +11,23 @@
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/katex.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <script>
+    // On a slow connection the Material Symbols font can take a while to
+    // arrive, and until it does its ligature names (e.g. "add_box") render as
+    // literal text. Force the font to load and only reveal icons once it has,
+    // instead of showing the raw ligature text in the meantime - see
+    // .material-symbols-outlined in styles.scss.
+    if (window.document && document.fonts && document.fonts.load) {
+      document.fonts.load('24px "Material Symbols Outlined"').catch(function () {});
+    }
+    if (window.document && document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(function () {
+        document.documentElement.classList.add('fonts-loaded');
+      });
+    } else {
+      document.documentElement.classList.add('fonts-loaded');
+    }
+  </script>
 </head>
 <body>
   <app-root></app-root>

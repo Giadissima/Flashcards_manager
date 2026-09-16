@@ -1534,6 +1534,14 @@ $image-modal-height: calc(
   vertical-align: middle;
 }
 
+/* Hidden until the font itself has loaded (html.fonts-loaded, set in
+   index.html) so a slow connection shows nothing instead of the ligature
+   name (e.g. "add_box") as plain text. visibility (not display) keeps the
+   layout stable once the icon appears. */
+html:not(.fonts-loaded) .material-symbols-outlined {
+  visibility: hidden;
+}
+
 /* Icon sizes that used to be set on the <svg> element itself, kept now that the
    same icons come from the Material Symbols font. */
 .search-icon .material-symbols-outlined {
