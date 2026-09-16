@@ -517,7 +517,8 @@
       "exportFailed": "Export failed",
       "importSuccess": "Import successful! {{count}} flashcards added.",
       "importCompleted": "Import completed: {{imported}} added, {{skipped}} duplicates skipped.",
-      "importFailed": "Import failed"
+      "importFailed": "Import failed",
+      "invalidFile": "Invalid file: select a valid JSON or ZIP export"
     }
   },
   "studyFields": {

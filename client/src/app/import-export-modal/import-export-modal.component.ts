@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { SearchableSelectComponent, SelectOption } from '../shared/searchable-select/searchable-select.component';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
+import { HttpErrorResponse } from '@angular/common/http';
 
 import { ImportExportService } from './import-export.service';
 import { ModalComponent } from '../shared/modal/modal.component';
@@ -170,7 +171,13 @@ export class ImportExportModalComponent implements OnInit {
       this.toastService.show(message, 'success');
       this.close();
     } catch (error) {
-      this.toastService.show(this.transloco.translate('importExport.toast.importFailed'), 'error');
+      // A 400 means the file itself is the problem (wrong format, corrupt
+      // archive) - telling them to pick a valid export is something they can
+      // act on, unlike the generic message, which fits an actual server failure.
+      const key = error instanceof HttpErrorResponse && error.status === 400
+        ? 'importExport.toast.invalidFile'
+        : 'importExport.toast.importFailed';
+      this.toastService.show(this.transloco.translate(key), 'error');
     } finally {
       this.isLoading = false;
     }

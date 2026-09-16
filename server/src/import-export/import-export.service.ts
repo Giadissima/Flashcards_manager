@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import JSZip from 'jszip';
 import { Model } from 'mongoose';
@@ -51,18 +51,18 @@ export class ImportExportService {
       zip = await JSZip.loadAsync(file.buffer);
       const jsonEntry = zip.file('flashcards.json');
       if (!jsonEntry) {
-        throw new Error('Invalid archive: missing flashcards.json');
+        throw new BadRequestException('Invalid archive: missing flashcards.json');
       }
       try {
         data = JSON.parse(await jsonEntry.async('string'));
       } catch {
-        throw new Error('Invalid JSON inside archive');
+        throw new BadRequestException('Invalid JSON inside archive');
       }
     } else {
       try {
         data = JSON.parse(file.buffer.toString('utf-8'));
       } catch {
-        throw new Error('Invalid JSON');
+        throw new BadRequestException('Invalid JSON');
       }
     }
 
