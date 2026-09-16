@@ -761,5 +761,89 @@
       "feedback": "Il tuo account non può più mandare feedback.",
       "report": "Il tuo account non può più segnalare."
     }
+  },
+  "landing": {
+    "metaTitle": "Flashcards Manager – Organizza il tuo studio con le flashcard",
+    "metaDescription": "Flashcards Manager: organizza il tuo studio con le flashcard, esegui test a ripetizione dilazionata e condividi le materie con la community della tua università. Gratis, creato da uno studente.",
+    "welcome": "Benvenuto su Flashcards Manager",
+    "subtitle": "Organizza il tuo studio con le flashcard e condividile nella tua università!",
+    "tagline": "È tutto gratis, fatto con passione da uno studente",
+    "cta": "Inizia ora",
+    "screenshotAlt": "Screenshot della lista flashcard di Flashcards Manager, con filtri e una griglia di card per materia",
+    "features": {
+      "flashcard": {
+        "title": "Cos'è una flashcard?",
+        "description": "Una <a href=\"https://en.wikipedia.org/wiki/Flashcard\" target=\"_blank\" rel=\"noopener noreferrer\">flashcard</a> è una carta a due facce: il fronte con una domanda, e il retro con una risposta.",
+        "description2": "Sono un modo efficace per mettere alla prova le tue conoscenze e prepararti agli esami orali."
+      },
+      "test": {
+        "title": "Test",
+        "description": "Flashcards Manager offre 3 tipi di test per le tue card:",
+        "basic": "test base, che puoi impostare liberamente",
+        "daily": "test giornaliero, con la tecnica di studio a <a href=\"https://en.wikipedia.org/wiki/Spaced_repetition\" target=\"_blank\" rel=\"noopener noreferrer\">ripetizione dilazionata</a>",
+        "weak": "test delle card deboli, per le card che sbagli più spesso"
+      },
+      "community": {
+        "title": "Community",
+        "description": "Esplora la community!",
+        "description2": "Fai anche dei quiz con i gruppi di flashcard degli altri utenti, aggiungili ai tuoi, e aiuta gli altri condividendo le tue materie!",
+        "description3": "La community mostra di default la tua università, ma puoi esplorare anche le altre a tua discrezione"
+      }
+    }
+  },
+  "privacyPolicy": {
+    "metaTitle": "Informativa sulla Privacy – Flashcards Manager",
+    "title": "Informativa sulla Privacy",
+    "lastUpdated": "Ultimo aggiornamento: 12 settembre 2026",
+    "intro": "Questa pagina spiega quali dati raccoglie Flashcards Manager, perché, e come puoi controllarli.",
+    "backHome": "Torna alla home",
+    "who": {
+      "title": "Chi tratta i tuoi dati",
+      "body": "Flashcards Manager è un progetto personale sviluppato e gestito da uno studente, non da una società. Per qualsiasi domanda o richiesta sui tuoi dati puoi scrivere tramite il contatto in fondo a questa pagina."
+    },
+    "dataCollected": {
+      "title": "Quali dati raccolgo",
+      "intro": "Quando crei un account raccolgo:",
+      "username": "il nome utente",
+      "password": "la password, mai salvata in chiaro: conservo solo il suo hash",
+      "email": "l'indirizzo email (facoltativo): serve solo a confermare l'account e a pubblicare nella Community",
+      "university": "università e corso di studi (facoltativi)",
+      "avatar": "un'immagine del profilo (facoltativa)",
+      "ip": "Al momento della registrazione registro anche l'indirizzo IP, solo per impedire la creazione di nuovi account dopo un ban: non viene mostrato a nessuno e non è usato per nient'altro.",
+      "content": "Oltre ai dati dell'account, conservo ciò che crei usando il servizio: le tue flashcard, materie e argomenti, e i post e le segnalazioni che pubblichi nella Community."
+    },
+    "why": {
+      "title": "Perché li uso",
+      "body": "Uso questi dati esclusivamente per far funzionare l'account e il login, inviarti l'email di conferma dell'indirizzo, mostrare le tue flashcard e i tuoi contenuti pubblici nella Community, e applicare le regole della community quando arriva una segnalazione."
+    },
+    "sharing": {
+      "title": "Con chi li condivido",
+      "body": "Non vendo né cedo i tuoi dati a nessuno. Solo due servizi tecnici li ricevono per semplificarmi la gestione della piattaforma: il fornitore che spedisce l'email di conferma (riceve solo l'indirizzo e il contenuto dell'email) ed eventualmente un bot Telegram privato che mi avvisa quando arriva una segnalazione nella Community (riceve il contenuto segnalato, mai la tua password)."
+    },
+    "storage": {
+      "title": "Dove sono conservati",
+      "body": "I dati sono conservati nel database del server che ospita il sito."
+    },
+    "retention": {
+      "title": "Per quanto tempo",
+      "body": "I dati dell'account restano finché l'account esiste. L'indirizzo IP registrato alla creazione dell'account viene cancellato automaticamente dopo poche ore. Puoi chiedere la cancellazione completa del tuo account in qualsiasi momento."
+    },
+    "rights": {
+      "title": "I tuoi diritti",
+      "body": "Puoi chiedere in qualsiasi momento di vedere, correggere o cancellare i tuoi dati, scrivendo tramite il contatto qui sotto."
+    },
+    "localStorage": {
+      "title": "Cookie e memoria del browser",
+      "body": "Il sito non usa cookie di tracciamento o pubblicitari. Usa solo la memoria locale del tuo browser (local storage) per tenerti connesso e ricordare le tue preferenze (tema chiaro/scuro, lingua): questi dati restano sul tuo dispositivo e non vengono mai inviati a terzi."
+    },
+    "changes": {
+      "title": "Modifiche a questa informativa",
+      "body": "Questa pagina può essere aggiornata in futuro; la data in cima indica l'ultima modifica."
+    },
+    "contact": {
+      "title": "Contatti",
+      "body": "Per qualsiasi domanda su questa informativa o sui tuoi dati, scrivimi su Telegram:",
+      "linkText": "Contattami su Telegram"
+    }
   }
 }

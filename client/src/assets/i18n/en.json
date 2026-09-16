@@ -761,5 +761,89 @@
       "feedback": "Your account can no longer send feedback.",
       "report": "Your account can no longer report."
     }
+  },
+  "landing": {
+    "metaTitle": "Flashcards Manager – Organize your study with flashcards",
+    "metaDescription": "Flashcards Manager: organize your study with flashcards, run spaced-repetition tests, and share subjects with your university community. Free, made by a student.",
+    "welcome": "Welcome to Flashcards Manager",
+    "subtitle": "Organize your study with flashcards and share them in your university!",
+    "tagline": "Free to use, made with heart by a student",
+    "cta": "Start now",
+    "screenshotAlt": "Screenshot of the Flashcards Manager flashcard list, with filters and a grid of subject cards",
+    "features": {
+      "flashcard": {
+        "title": "What is a flashcard?",
+        "description": "A <a href=\"https://en.wikipedia.org/wiki/Flashcard\" target=\"_blank\" rel=\"noopener noreferrer\">flashcard</a> is a two-sided card: the front side with a question and the back side with an answer.",
+        "description2": "They're an efficient way to test your knowledge and prepare for oral exams."
+      },
+      "test": {
+        "title": "Test",
+        "description": "Flashcards Manager offers 3 types of test for your cards:",
+        "basic": "basic test, which you can set up freely",
+        "daily": "daily test, using the <a href=\"https://en.wikipedia.org/wiki/Spaced_repetition\" target=\"_blank\" rel=\"noopener noreferrer\">spaced repetition</a> study technique",
+        "weak": "weak cards test, for the cards you get wrong the most"
+      },
+      "community": {
+        "title": "Community",
+        "description": "Explore the community!",
+        "description2": "Test yourself with other flashcards’ groups, add them to yours, and help others by sharing what you created!",
+        "description3": "The community shows your university by default, but you can explore other universities as you wish!"
+      }
+    }
+  },
+  "privacyPolicy": {
+    "metaTitle": "Privacy Policy – Flashcards Manager",
+    "title": "Privacy Policy",
+    "lastUpdated": "Last updated: September 12, 2026",
+    "intro": "This page explains what data Flashcards Manager collects, why, and how you can control it.",
+    "backHome": "Back to home",
+    "who": {
+      "title": "Who processes your data",
+      "body": "Flashcards Manager is a personal project built and run by a student, not a company. For any question or request about your data, you can write through the contact at the bottom of this page."
+    },
+    "dataCollected": {
+      "title": "What data I collect",
+      "intro": "When you create an account, I collect:",
+      "username": "your username",
+      "password": "your password, never stored in plain text: I only keep its hash",
+      "email": "your email address (optional): only used to confirm your account and to post in the Community",
+      "university": "university and degree course (optional)",
+      "avatar": "a profile picture (optional)",
+      "ip": "At registration, I also record your IP address, only to prevent creating new accounts after a ban: it is never shown to anyone and used for nothing else.",
+      "content": "Besides account data, I keep what you create using the service: your flashcards, subjects and topics, and the posts and reports you make in the Community."
+    },
+    "why": {
+      "title": "Why I use it",
+      "body": "I use this data solely to run your account and login, send you the confirmation email, show your flashcards and your public content in the Community, and enforce the community rules when a report comes in."
+    },
+    "sharing": {
+      "title": "Who I share it with",
+      "body": "I do not sell or hand over your data to anyone. Only two technical services receive it to help me manage the platform: the provider that delivers the confirmation email (it only receives the address and the email content) and, if enabled, a private Telegram bot that notifies me when a report is filed in the Community (it receives the reported content, never your password)."
+    },
+    "storage": {
+      "title": "Where it's stored",
+      "body": "Data is stored in the database of the server hosting the site."
+    },
+    "retention": {
+      "title": "How long I keep it",
+      "body": "Account data is kept for as long as the account exists. The IP address recorded at signup is deleted automatically after a few hours. You can ask for your account to be fully deleted at any time."
+    },
+    "rights": {
+      "title": "Your rights",
+      "body": "You can ask at any time to see, correct or delete your data, by writing through the contact below."
+    },
+    "localStorage": {
+      "title": "Cookies and browser storage",
+      "body": "The site does not use tracking or advertising cookies. It only uses your browser's local storage to keep you signed in and remember your preferences (light/dark theme, language): this data stays on your device and is never sent to anyone."
+    },
+    "changes": {
+      "title": "Changes to this policy",
+      "body": "This page may be updated in the future; the date at the top shows the last change."
+    },
+    "contact": {
+      "title": "Contact",
+      "body": "For any question about this policy or your data, write to me on Telegram:",
+      "linkText": "Contact me on Telegram"
+    }
   }
 }

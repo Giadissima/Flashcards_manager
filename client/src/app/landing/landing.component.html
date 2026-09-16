@@ -1,0 +1,68 @@
+<div class="landing">
+  <header class="landing-header">
+    <div class="brand d-flex align-items-center justify-content-center gap-3">
+      <img src="assets/favicon.png" alt="" class="brand-logo">
+      <h1 class="brand-title">{{ 'landing.welcome' | transloco }}</h1>
+    </div>
+
+    <div class="language-switcher" appClickOutside (appClickOutside)="closeLanguageMenu()">
+      <button type="button" class="language-switcher-button" (click)="toggleLanguageMenu()"
+        [attr.aria-expanded]="isLanguageMenuOpen" aria-haspopup="true">
+        <span class="material-symbols-outlined">language</span>
+        <span>{{ currentLanguage.toUpperCase() }}</span>
+        <span class="material-symbols-outlined">arrow_drop_down</span>
+      </button>
+      <ul class="language-switcher-menu" *ngIf="isLanguageMenuOpen">
+        <li *ngFor="let lang of availableLanguages">
+          <button type="button" [class.active]="lang === currentLanguage" (click)="setLanguage(lang)">
+            {{ lang.toUpperCase() }}
+          </button>
+        </li>
+      </ul>
+    </div>
+  </header>
+
+  <section class="hero text-center">
+    <p class="hero-subtitle">{{ 'landing.subtitle' | transloco }}</p>
+    <p class="hero-tagline">{{ 'landing.tagline' | transloco }}</p>
+    <a routerLink="/register" class="btn btn-primary btn-lg">{{ 'landing.cta' | transloco }}</a>
+
+    <div class="hero-screenshot-frame">
+      <img [src]="screenshotUrl" [alt]="'landing.screenshotAlt' | transloco" class="hero-screenshot">
+    </div>
+  </section>
+
+  <section class="features">
+    <article class="feature-card">
+      <h2><span class="material-symbols-outlined">quiz</span>{{ 'landing.features.flashcard.title' | transloco }}</h2>
+      <!-- Static translation content, not user input - see the i18n files -->
+      <p [innerHTML]="'landing.features.flashcard.description' | transloco"></p>
+      <p>{{ 'landing.features.flashcard.description2' | transloco }}</p>
+    </article>
+
+    <article class="feature-card">
+      <h2><span class="material-symbols-outlined">school</span>{{ 'landing.features.test.title' | transloco }}</h2>
+      <p>{{ 'landing.features.test.description' | transloco }}</p>
+      <ul>
+        <li>{{ 'landing.features.test.basic' | transloco }}</li>
+        <!-- The translation string itself carries the link markup (see the
+             i18n files): it's our own static content, not user input, so
+             binding it as HTML is safe and avoids splitting one sentence
+             across three separate translation keys. -->
+        <li [innerHTML]="'landing.features.test.daily' | transloco"></li>
+        <li>{{ 'landing.features.test.weak' | transloco }}</li>
+      </ul>
+    </article>
+
+    <article class="feature-card">
+      <h2><span class="material-symbols-outlined">groups</span>{{ 'landing.features.community.title' | transloco }}</h2>
+      <p>{{ 'landing.features.community.description' | transloco }}</p>
+      <p>{{ 'landing.features.community.description2' | transloco }}</p>
+      <p>{{ 'landing.features.community.description3' | transloco }}</p>
+    </article>
+  </section>
+
+  <footer class="landing-footer text-center">
+    <a routerLink="/privacy-policy" class="btn btn-outline-secondary">{{ 'privacyPolicy.title' | transloco }}</a>
+  </footer>
+</div>

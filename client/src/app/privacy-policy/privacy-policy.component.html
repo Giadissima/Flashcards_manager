@@ -1,0 +1,73 @@
+<div class="privacy-page">
+  <a routerLink="/" class="back-link d-flex align-items-center gap-1">
+    <span class="material-symbols-outlined">arrow_back</span>
+    {{ 'privacyPolicy.backHome' | transloco }}
+  </a>
+
+  <h1>{{ 'privacyPolicy.title' | transloco }}</h1>
+  <p class="last-updated">{{ 'privacyPolicy.lastUpdated' | transloco }}</p>
+  <p class="intro">{{ 'privacyPolicy.intro' | transloco }}</p>
+
+  <section>
+    <h2>{{ 'privacyPolicy.who.title' | transloco }}</h2>
+    <p>{{ 'privacyPolicy.who.body' | transloco }}</p>
+  </section>
+
+  <section>
+    <h2>{{ 'privacyPolicy.dataCollected.title' | transloco }}</h2>
+    <p>{{ 'privacyPolicy.dataCollected.intro' | transloco }}</p>
+    <ul>
+      <li>{{ 'privacyPolicy.dataCollected.username' | transloco }}</li>
+      <li>{{ 'privacyPolicy.dataCollected.password' | transloco }}</li>
+      <li>{{ 'privacyPolicy.dataCollected.email' | transloco }}</li>
+      <li>{{ 'privacyPolicy.dataCollected.university' | transloco }}</li>
+      <li>{{ 'privacyPolicy.dataCollected.avatar' | transloco }}</li>
+    </ul>
+    <p>{{ 'privacyPolicy.dataCollected.ip' | transloco }}</p>
+    <p>{{ 'privacyPolicy.dataCollected.content' | transloco }}</p>
+  </section>
+
+  <section>
+    <h2>{{ 'privacyPolicy.why.title' | transloco }}</h2>
+    <p>{{ 'privacyPolicy.why.body' | transloco }}</p>
+  </section>
+
+  <section>
+    <h2>{{ 'privacyPolicy.sharing.title' | transloco }}</h2>
+    <p>{{ 'privacyPolicy.sharing.body' | transloco }}</p>
+  </section>
+
+  <section>
+    <h2>{{ 'privacyPolicy.storage.title' | transloco }}</h2>
+    <p>{{ 'privacyPolicy.storage.body' | transloco }}</p>
+  </section>
+
+  <section>
+    <h2>{{ 'privacyPolicy.retention.title' | transloco }}</h2>
+    <p>{{ 'privacyPolicy.retention.body' | transloco }}</p>
+  </section>
+
+  <section>
+    <h2>{{ 'privacyPolicy.rights.title' | transloco }}</h2>
+    <p>{{ 'privacyPolicy.rights.body' | transloco }}</p>
+  </section>
+
+  <section>
+    <h2>{{ 'privacyPolicy.localStorage.title' | transloco }}</h2>
+    <p>{{ 'privacyPolicy.localStorage.body' | transloco }}</p>
+  </section>
+
+  <section>
+    <h2>{{ 'privacyPolicy.changes.title' | transloco }}</h2>
+    <p>{{ 'privacyPolicy.changes.body' | transloco }}</p>
+  </section>
+
+  <section>
+    <h2>{{ 'privacyPolicy.contact.title' | transloco }}</h2>
+    <p>{{ 'privacyPolicy.contact.body' | transloco }}</p>
+    <a [href]="telegramContactUrl" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary">
+      <span class="material-symbols-outlined">send</span>
+      {{ 'privacyPolicy.contact.linkText' | transloco }}
+    </a>
+  </section>
+</div>

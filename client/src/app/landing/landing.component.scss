@@ -1,0 +1,154 @@
+.landing {
+  min-height: 100vh;
+  padding: calc(var(--spacing-unit) * 4) calc(var(--spacing-unit) * 3);
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.landing-header {
+  position: relative;
+  margin-bottom: calc(var(--spacing-unit) * 6);
+}
+
+.brand-logo {
+  width: 56px;
+  height: 56px;
+}
+
+.brand-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--header-color);
+  margin: 0;
+}
+
+.language-switcher {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.language-switcher-button {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--spacing-unit) / 2);
+  background: none;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  color: var(--text-color);
+  padding: calc(var(--spacing-unit) / 2) var(--spacing-unit);
+  cursor: pointer;
+}
+
+.language-switcher-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + var(--spacing-unit) / 2);
+  background-color: var(--component-background);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--box-shadow-md);
+  list-style: none;
+  margin: 0;
+  padding: calc(var(--spacing-unit) / 2);
+  min-width: 100px;
+  z-index: 10;
+
+  button {
+    width: 100%;
+    background: none;
+    border: none;
+    text-align: left;
+    color: var(--text-color);
+    padding: calc(var(--spacing-unit) / 2) var(--spacing-unit);
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+
+    &:hover,
+    &.active {
+      background-color: var(--primary-tint-soft);
+      color: var(--header-color);
+    }
+  }
+}
+
+.hero {
+  margin-bottom: calc(var(--spacing-unit) * 6);
+}
+
+.hero-subtitle {
+  font-size: 1.4rem;
+  color: var(--header-color);
+  margin-bottom: var(--spacing-unit);
+}
+
+.hero-tagline {
+  color: var(--sub-title-color);
+  margin-bottom: calc(var(--spacing-unit) * 3);
+}
+
+.hero-screenshot-frame {
+  margin-top: calc(var(--spacing-unit) * 4);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--box-shadow-md);
+  overflow: hidden;
+  background-color: var(--component-background);
+}
+
+.hero-screenshot {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: calc(var(--spacing-unit) * 3);
+}
+
+@media (max-width: 900px) {
+  .features {
+    grid-template-columns: 1fr;
+  }
+}
+
+.feature-card {
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  padding: calc(var(--spacing-unit) * 3);
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-unit);
+    font-size: 1.15rem;
+    color: var(--header-color);
+    margin-bottom: calc(var(--spacing-unit) * 1.5);
+  }
+
+  p {
+    color: var(--text-color);
+  }
+
+  ul {
+    color: var(--text-color);
+    padding-left: calc(var(--spacing-unit) * 2.5);
+    margin-bottom: 0;
+  }
+
+  // ::ng-deep: the "flashcard" and "spaced repetition" links come from
+  // translation strings rendered with [innerHTML] (see landing.component.html),
+  // so they never get Angular's scoping attribute and a plain `a` rule here
+  // would never match them.
+  ::ng-deep a {
+    color: var(--primary-color);
+  }
+}
+
+.landing-footer {
+  margin-top: calc(var(--spacing-unit) * 6);
+  padding-top: calc(var(--spacing-unit) * 3);
+  border-top: 1px solid var(--border-color);
+}
