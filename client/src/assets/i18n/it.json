@@ -157,7 +157,7 @@
     "error": {
       "load": "Non è stato possibile caricare i dati",
       "offline": "Nessuna connessione al server. Controlla la tua rete e riprova.",
-      "server": "Il server non è al momento raggiungibile. Riprova tra qualche istante.",
+      "server": "Si è verificato un errore sul server. Riprova tra qualche istante.",
       "notFound": "La risorsa richiesta non esiste",
       "testNotFound": "Non è stato possibile recuperare il test",
       "testAlreadyCompleted": "Questo test è già terminato e non può più essere ripreso"

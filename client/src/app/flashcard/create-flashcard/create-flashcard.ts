@@ -1,4 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder,
   FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
@@ -31,6 +32,23 @@ import { Topic } from '../../models/topic.dto';
 import { TopicService } from '../../topic/topic.service';
 import { TutorialService } from '../../shared/tutorial/tutorial.service';
 import { toSubjectOptions, toTopicOptions } from '../../shared/select-options.util';
+
+// How many times to retry fetching subjects/topics before giving up, and how
+// long to wait between attempts - covers a connection that drops briefly
+// while the (otherwise fine) create-flashcard page is already loaded.
+const MAX_LOAD_ATTEMPTS = 4;
+const LOAD_RETRY_DELAY_MS = 2000;
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// status === 0 means the request never reached the server (offline, DNS
+// failure, timeout, CORS...) - a real response from the server, even an
+// error one, means the connection is fine and retrying would not help.
+function isConnectivityError(err: unknown): boolean {
+  return err instanceof HttpErrorResponse && err.status === 0;
+}
 
 @Component({
   selector: 'app-create-card',
@@ -150,10 +168,25 @@ export class CreateFlashcard implements OnInit, OnDestroy {
     this.answerEditor.destroy();
   }
 
+  // Retries the given loader up to MAX_LOAD_ATTEMPTS times, waiting between
+  // attempts, so a flaky connection gets a chance to recover instead of
+  // leaving the select stuck empty after a single failed request.
+  private async loadWithRetry<T>(loader: () => Promise<T>): Promise<T> {
+    for (let attempt = 1; attempt <= MAX_LOAD_ATTEMPTS; attempt++) {
+      try {
+        return await loader();
+      } catch (err) {
+        if (attempt === MAX_LOAD_ATTEMPTS || !isConnectivityError(err)) throw err;
+        await delay(LOAD_RETRY_DELAY_MS);
+      }
+    }
+    throw new Error('unreachable');
+  }
+
   async loadTopicsBySubject(subjectId: string | undefined) {
     this.topicsLoading = true;
     try {
-      this.topics = await this.topicService.getSelectableTopics(subjectId);
+      this.topics = await this.loadWithRetry(() => this.topicService.getSelectableTopics(subjectId));
     } catch (err) {
       console.error('Error loading topics for subject ' + subjectId, err);
       this.toastService.show(this.transloco.translate('flashcard.toast.topicsLoadError'), 'error');
@@ -165,7 +198,7 @@ export class CreateFlashcard implements OnInit, OnDestroy {
   async loadSubjects() {
     this.subjectsLoading = true;
     try {
-      this.subjects = await this.subjectService.getSelectableSubjects();
+      this.subjects = await this.loadWithRetry(() => this.subjectService.getSelectableSubjects());
     } catch (err) {
       console.error('Error loading subjects', err);
       this.toastService.show(this.transloco.translate('flashcard.toast.subjectsLoadError'), 'error');

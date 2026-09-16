@@ -1,9 +1,11 @@
 <div class="dropdown" (appClickOutside)="close()" (keydown)="onKeydown($event)">
   <!-- The title carries the whole name, which the field itself may have had to
        cut short. -->
-  <button class="form-select text-start" type="button" [class.is-empty]="isEmpty" [disabled]="disabled"
+  <button class="form-select text-start" type="button" [class.is-empty]="isEmpty" [disabled]="disabled || loading"
     [title]="selectedLabel" (click)="toggle()" (blur)="blurred.emit()">
-    @if (selectedOption?.iconUrl) {
+    @if (loading) {
+    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+    } @else if (selectedOption?.iconUrl) {
     <img [src]="selectedOption!.iconUrl" alt="" class="select-option-icon">
     } @else if (selectedOption?.color) {
     <span class="select-option-color" [style.background-color]="selectedOption!.color"></span>

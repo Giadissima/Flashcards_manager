@@ -157,7 +157,7 @@
     "error": {
       "load": "Unable to load the data",
       "offline": "No connection to the server. Check your network and try again.",
-      "server": "The server is currently unreachable. Please try again shortly.",
+      "server": "A server error occurred. Please try again shortly.",
       "notFound": "The requested resource doesn't exist",
       "testNotFound": "Unable to retrieve the test",
       "testAlreadyCompleted": "This test is already finished and can no longer be resumed"
