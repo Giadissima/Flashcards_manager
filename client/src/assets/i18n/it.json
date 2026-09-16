@@ -398,6 +398,8 @@
       "selectTopic": "Seleziona argomento",
       "dateLabel": "Aggiunte tra",
       "numQuestionsLabel": "Numero di domande",
+      "numQuestionsOptionalHint": "Facoltativo: se lo lasci vuoto vengono mostrate tutte le carte in scadenza oggi o già scadute.",
+      "numQuestionsAllPlaceholder": "Tutte",
       "incrementAria": "Aumenta il numero di domande",
       "decrementAria": "Diminuisci il numero di domande",
       "maxButton": "Max",

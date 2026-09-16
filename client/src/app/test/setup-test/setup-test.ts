@@ -70,7 +70,22 @@ export class SetupTest implements OnInit {
   }
 
   selectMode(mode: TestMode): void {
+    const previousMode = this.mode;
     this.mode = mode;
+
+    // "daily" draws every due/overdue card by default: the count is
+    // optional there, and left blank rather than defaulting to 10 like the
+    // other modes. Switching back restores the usual required count.
+    const numFlashcard = this.testForm.get('numFlashcard');
+    if (mode === 'daily') {
+      numFlashcard?.setValidators([Validators.min(1), Validators.max(1000)]);
+      if (previousMode !== 'daily') numFlashcard?.setValue(null);
+    } else {
+      numFlashcard?.setValidators([Validators.required, Validators.min(1), Validators.max(1000)]);
+      if (previousMode === 'daily' && !numFlashcard?.value) numFlashcard?.setValue(10);
+    }
+    numFlashcard?.updateValueAndValidity();
+
     // The group validator reads mode through the closure it was built with;
     // it has to be told to run again, or the switch would not be reflected
     // until some unrelated control change re-triggered validation on its own.

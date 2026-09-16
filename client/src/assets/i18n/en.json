@@ -398,6 +398,8 @@
       "selectTopic": "Select topic",
       "dateLabel": "Added between",
       "numQuestionsLabel": "Number of questions",
+      "numQuestionsOptionalHint": "Optional: leave it blank to review every card due today or overdue.",
+      "numQuestionsAllPlaceholder": "All",
       "incrementAria": "Increase number of questions",
       "decrementAria": "Decrease number of questions",
       "maxButton": "Max",

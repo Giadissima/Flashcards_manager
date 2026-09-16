@@ -119,7 +119,7 @@ export class RandomFlashcardsDTO extends CardSetFilter {
     description: 'Number of flashcard requested',
     required: false,
   })
-  numFlashcard?: number = 10;
+  numFlashcard?: number;
 }
 
 /** One of the flashcards drawn for a new test, with the topic it is on. */

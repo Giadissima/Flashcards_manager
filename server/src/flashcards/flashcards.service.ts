@@ -10,7 +10,7 @@ import { PublishingService } from 'src/common/publishing.service';
 import { Visibility, defaultVisibility } from 'src/common/visibility';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Flashcard, FlashcardDocument } from './flashcards.schema';
-import { FilterQuery, Model, Types } from 'mongoose';
+import { FilterQuery, Model, PipelineStage, Types } from 'mongoose';
 import { BasePaginatedResult } from 'src/common.dto';
 import { dateRangeQuery } from 'src/common/date-range.util';
 import {
@@ -222,19 +222,24 @@ export class FlashcardsService {
       { sr_due_at: { $lte: new Date() } },
     ];
 
-    return this.flashcardModel
-      .aggregate<RandomFlashcard>([
-        { $match: query },
-        { $sort: { sr_due_at: 1 } },
-        { $limit: filter.numFlashcard || defaultRandomSampleSize },
-        {
-          $project: {
-            _id: { $toString: '$_id' },
-            topic_id: { $toString: '$topic_id' },
-          },
-        },
-      ])
-      .exec();
+    // Unlike getRandom/getWeak, an unset numFlashcard here is not filled in
+    // with defaultRandomSampleSize: the daily review is meant to show every
+    // due card by default, not just a sample of them.
+    const pipeline: PipelineStage[] = [
+      { $match: query },
+      { $sort: { sr_due_at: 1 } },
+    ];
+    if (filter.numFlashcard) {
+      pipeline.push({ $limit: filter.numFlashcard });
+    }
+    pipeline.push({
+      $project: {
+        _id: { $toString: '$_id' },
+        topic_id: { $toString: '$topic_id' },
+      },
+    });
+
+    return this.flashcardModel.aggregate<RandomFlashcard>(pipeline).exec();
   }
 
   /**
