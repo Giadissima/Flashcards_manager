@@ -4,6 +4,7 @@ import { StudyFields, StudyFieldsComponent, emptyStudyFields } from '../universi
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { charMinLength, usernameMaxLength } from '../../config/config';
 import { defaultAvatarColor, getAvatarUrl } from '../shared/avatar/avatar.util';
+import { waitErrorOf } from '../shared/wait-error';
 
 import { AuthService } from '../auth/auth.service';
 import { AvatarSvgComponent } from '../shared/avatar/avatar-svg.component';
@@ -133,8 +134,17 @@ export class ProfileComponent implements OnInit, OnDestroy {
       await this.authService.resendVerification();
       this.resent = true;
       this.toastService.show(this.transloco.translate('auth.verify.resent'), 'success');
-    } catch {
-      this.toastService.show(this.transloco.translate('auth.verify.resendError'), 'error');
+    } catch (error) {
+      // Asked too often is not a failure to report: it says exactly how long
+      // to wait, and that is worth more than a message telling them to retry
+      // blind while the button stays disabled either way.
+      const wait = waitErrorOf(error);
+      this.toastService.show(
+        wait
+          ? this.transloco.translate(wait.key, wait.params)
+          : this.transloco.translate('auth.verify.resendError'),
+        'error'
+      );
     } finally {
       this.resending = false;
     }
