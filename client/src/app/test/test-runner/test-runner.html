@@ -69,7 +69,7 @@
     </div>
 
     <app-pagination [currentPage]="currentPage" [totalPages]="totalPages"
-      (previous)="previousPage()" (next)="nextPage()"></app-pagination>
+      (previous)="previousPage()" (next)="nextPage()" (page)="goToPage($event)"></app-pagination>
 
     <div class="d-flex justify-content-center gap-2 mt-4">
       <button type="button" class="btn btn-outline-secondary" [disabled]="exitingTest" [appPendingButton]="exitingTest"

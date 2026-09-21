@@ -712,6 +712,13 @@ export class PostCardComponent implements OnInit, AfterViewInit, OnDestroy {
     void this.loadPage(this.skip + this.pageSize);
   }
 
+  goToPage(target: number): void {
+    if (target === this.currentPage || target < 1 || target > this.totalPages) return;
+
+    this.pageDirection = target > this.currentPage ? 'forward' : 'back';
+    void this.loadPage((target - 1) * this.pageSize);
+  }
+
   private async loadPage(skip: number): Promise<void> {
     this.loading = true;
     try {

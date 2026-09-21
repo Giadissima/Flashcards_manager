@@ -141,6 +141,7 @@
     "previous": "Previous",
     "next": "Next",
     "pageOf": "Page {{current}} of {{total}}",
+    "goToPage": "Go to page {{page}}",
     "cancel": "Cancel",
     "icon": "Icon",
     "yes": "Yes",

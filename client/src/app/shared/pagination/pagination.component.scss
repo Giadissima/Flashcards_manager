@@ -8,6 +8,10 @@
   justify-content: center;
   gap: calc(var(--spacing-unit) * 2);
   margin-top: calc(var(--spacing-unit) * 4);
+  /* Belt-and-braces: updateMaxVisiblePages sizes .pagination-pages to fit, but
+     this keeps a stray rounding pixel from ever pushing the bar wider than
+     its container. */
+  overflow: hidden;
 }
 
 .pagination-step {
@@ -64,6 +68,63 @@
   color: var(--header-color);
   font-weight: 600;
   text-align: center;
+}
+
+/* Takes the position label's place once PaginationComponent measures room for
+   it - see updateMaxVisiblePages. Sized in lockstep with the JS constants
+   PAGE_BUTTON_WIDTH and PAGE_BUTTON_GAP, so what gets measured is what gets
+   drawn. */
+.pagination-pages {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pagination-page {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+  padding: 0 calc(var(--spacing-unit) * 0.5);
+  border: 1.4px solid var(--border-color);
+  border-radius: 20px;
+  background-color: var(--component-background);
+  color: var(--header-color);
+  font-family: var(--font-family);
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s, color 0.2s;
+}
+
+@media (hover: hover) {
+  .pagination-page:hover:not(:disabled):not(.active) {
+    border-color: var(--primary-color);
+  }
+}
+
+.pagination-page.active {
+  border-color: var(--primary-color);
+  background-color: var(--primary-color);
+  color: var(--on-primary-color);
+  cursor: default;
+}
+
+.pagination-page:disabled {
+  cursor: default;
+}
+
+.pagination-page:disabled:not(.active) {
+  opacity: 0.6;
+}
+
+.pagination-ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 40px;
+  color: var(--muted-color);
 }
 
 /* A phone keeps the arrows alone: the words are what the control can least

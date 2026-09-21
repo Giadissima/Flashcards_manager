@@ -1,18 +1,35 @@
-<div class="pagination-bar" *transloco="let t">
-  <button type="button" class="pagination-step" (click)="previous.emit()"
-    [disabled]="currentPage <= 1 || disabled" [title]="t('common.previous')"
-    [attr.aria-label]="t('common.previous')">
+<div class="pagination-bar" #bar>
+  <button #prevBtn type="button" class="pagination-step" (click)="previous.emit()"
+    [disabled]="currentPage <= 1 || disabled" [title]="'common.previous' | transloco"
+    [attr.aria-label]="'common.previous' | transloco">
     <span class="material-symbols-outlined">chevron_left</span>
-    <span class="pagination-label">{{ t('common.previous') }}</span>
+    <span class="pagination-label">{{ 'common.previous' | transloco }}</span>
   </button>
 
+  @if (pageItems.length) {
+  <div class="pagination-pages">
+    @for (item of pageItems; track $index) {
+    @if (isEllipsis(item)) {
+    <span class="pagination-ellipsis" aria-hidden="true">&hellip;</span>
+    } @else {
+    <button type="button" class="pagination-page" [class.active]="item === currentPage" (click)="goToPage(item)"
+      [disabled]="disabled" [attr.aria-current]="item === currentPage ? 'page' : null"
+      [title]="'common.goToPage' | transloco:{ page: item }"
+      [attr.aria-label]="'common.goToPage' | transloco:{ page: item }">
+      {{ item }}
+    </button>
+    }
+    }
+  </div>
+  } @else {
   <span class="pagination-position" aria-live="polite">{{ 'common.pageOf' | transloco:{ current: currentPage, total:
     totalPages } }}</span>
+  }
 
-  <button type="button" class="pagination-step" (click)="next.emit()"
-    [disabled]="currentPage >= totalPages || disabled" [title]="t('common.next')"
-    [attr.aria-label]="t('common.next')">
-    <span class="pagination-label">{{ t('common.next') }}</span>
+  <button #nextBtn type="button" class="pagination-step" (click)="next.emit()"
+    [disabled]="currentPage >= totalPages || disabled" [title]="'common.next' | transloco"
+    [attr.aria-label]="'common.next' | transloco">
+    <span class="pagination-label">{{ 'common.next' | transloco }}</span>
     <span class="material-symbols-outlined">chevron_right</span>
   </button>
 </div>

@@ -134,7 +134,7 @@
   </div>
 
   <app-pagination [currentPage]="currentPage" [totalPages]="totalPages" [disabled]="loading"
-    (previous)="previous()" (next)="next()"></app-pagination>
+    (previous)="previous()" (next)="next()" (page)="goToPage($event)"></app-pagination>
 
   <!-- One button and no counterpart: what a shared set needs is a way of
        saying it was worth sharing, and nothing is gained by letting people

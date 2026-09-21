@@ -30,6 +30,12 @@ export abstract class PaginatedList {
     this.onPageChange();
   }
 
+  goToPage(page: number): void {
+    if (page === this.currentPage || page < 1 || page > this.totalPages) return;
+    this.currentPage = page;
+    this.onPageChange();
+  }
+
   /** Offset of the first item of the current page, for the `skip` query param. */
   protected get pageSkip(): number {
     return (this.currentPage - 1) * this.pageSize;

@@ -92,7 +92,7 @@
     }
     @if (totalPages > 1) {
     <app-pagination [currentPage]="currentPage" [totalPages]="totalPages" [disabled]="loading"
-      (previous)="previousPage()" (next)="nextPage()"></app-pagination>
+      (previous)="previousPage()" (next)="nextPage()" (page)="goToPage($event)"></app-pagination>
     }
     }
     }

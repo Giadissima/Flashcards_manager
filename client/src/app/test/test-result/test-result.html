@@ -123,7 +123,7 @@
       }
 
       <app-pagination [currentPage]="currentPage" [totalPages]="totalPages" [disabled]="loadingPage"
-        (previous)="previousPage()" (next)="nextPage()"></app-pagination>
+        (previous)="previousPage()" (next)="nextPage()" (page)="goToPage($event)"></app-pagination>
     </div>
     }
   </app-page-card>

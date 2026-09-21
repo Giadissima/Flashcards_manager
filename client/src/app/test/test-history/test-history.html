@@ -80,7 +80,7 @@
     </div>
 
     <app-pagination [currentPage]="currentPage" [totalPages]="totalPages"
-      (previous)="previousPage()" (next)="nextPage()"></app-pagination>
+      (previous)="previousPage()" (next)="nextPage()" (page)="goToPage($event)"></app-pagination>
     }
 
     <!-- Recursive node of the tree: the card for one test, then - indented

@@ -58,7 +58,7 @@
 
       @if (totalPages > 1) {
       <app-pagination [currentPage]="currentPage" [totalPages]="totalPages" (previous)="previousPage()"
-        (next)="nextPage()"></app-pagination>
+        (next)="nextPage()" (page)="goToPage($event)"></app-pagination>
       }
     </app-load-state>
   </app-page-card>

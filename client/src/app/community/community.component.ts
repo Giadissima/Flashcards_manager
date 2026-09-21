@@ -13,7 +13,6 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../auth/auth.service';
 import { CommunityService } from './community.service';
 import { CommunityRulesModalComponent } from './community-rules-modal/community-rules-modal.component';
-import { hasSeenCommunityRules, markCommunityRulesSeen } from '../shared/community-rules-seen';
 import { FilterBarComponent } from '../shared/filter-bar/filter-bar.component';
 import { SearchInputComponent } from '../shared/search-input/search-input.component';
 import {
@@ -129,10 +128,11 @@ export class CommunityComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     // Shown once on its own, the first time this reader ever opens the
     // Community: after that it stays a click away in the header, not a
-    // pop-up they have to dismiss on every visit.
-    if (!hasSeenCommunityRules()) {
+    // pop-up they have to dismiss on every visit. The flag lives on the
+    // account, not the browser, so it stays seen across devices too.
+    if (!this.authService.user?.communityRulesSeen) {
       this.rulesModalOpen = true;
-      markCommunityRulesSeen();
+      void this.authService.markCommunityRulesSeen();
     }
 
     // Subscription, not snapshot: navigating to /community while already on
@@ -291,6 +291,12 @@ export class CommunityComponent implements OnInit, OnDestroy {
   nextPage(): void {
     if (this.currentPage >= this.totalPages) return;
     this.page++;
+    this.updateQueryParams();
+  }
+
+  goToPage(target: number): void {
+    if (target === this.currentPage || target < 1 || target > this.totalPages) return;
+    this.page = target - 1;
     this.updateQueryParams();
   }
 

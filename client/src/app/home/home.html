@@ -153,7 +153,7 @@
 
   <app-pagination [currentPage]="currentPage" [totalPages]="totalPages"
     [disabled]="isReloading"
-    (previous)="previousPage()" (next)="nextPage()"></app-pagination>
+    (previous)="previousPage()" (next)="nextPage()" (page)="goToPage($event)"></app-pagination>
   }
 </div>
 </app-load-state>
