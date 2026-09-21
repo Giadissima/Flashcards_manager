@@ -156,7 +156,10 @@ export class FlashcardsService {
     const query: FilterQuery<Flashcard> = { user_id: userId };
     if (filter.subject_id) query.subject_id = filter.subject_id;
     if (filter.topic_id) query.topic_id = filter.topic_id;
-    if (filter.title) query.title = { $regex: filter.title, $options: 'i' };
+    if (filter.title) {
+      const regex = { $regex: filter.title, $options: 'i' };
+      query.$or = [{ title: regex }, { question: regex }];
+    }
     // A three-way filter over one boolean field: present and true narrows to
     // imported cards, present and false to the reader's own, absent leaves
     // both in.
