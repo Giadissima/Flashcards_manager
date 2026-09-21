@@ -6,7 +6,6 @@ import { Question } from '../../models/test.dto';
 import { CommonModule } from '@angular/common';
 import { DateRange, DateRangeFilterComponent } from '../../shared/date-range-filter/date-range-filter.component';
 import { FlashcardService } from '../../flashcard/flashcard.service';
-import { hasSeenDailyReviewSetup, markDailyReviewSetupSeen } from '../../shared/daily-review-setup-seen';
 import { RandomCardFIlter } from '../../models/http.dto';
 import { RandomFlashcard } from '../../models/flashcard.dto';
 import { Router } from '@angular/router';
@@ -90,14 +89,6 @@ export class SetupTest implements OnInit {
     // it has to be told to run again, or the switch would not be reflected
     // until some unrelated control change re-triggered validation on its own.
     this.testForm.updateValueAndValidity();
-
-    // The first time "daily" is picked, nothing is turned on yet and the
-    // test would just come back empty - open the manager itself instead of
-    // leaving that to be discovered from a failed submit.
-    if (mode === 'daily' && !hasSeenDailyReviewSetup()) {
-      markDailyReviewSetupSeen();
-      this.manageSrOpen = true;
-    }
   }
 
   openManageSr(): void {
