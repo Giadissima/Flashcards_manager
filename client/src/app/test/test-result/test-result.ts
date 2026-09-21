@@ -298,6 +298,7 @@ export class TestResult extends PaginatedList {
         label: this.transloco.translate('test.result.repeatWrong'),
         icon: 'replay',
         disabled: this.repeating,
+        pending: this.repeating,
       });
     }
     actions.push({
@@ -306,6 +307,7 @@ export class TestResult extends PaginatedList {
       icon: 'refresh',
       variant: 'outline-secondary',
       disabled: this.repeating,
+      pending: this.repeating,
     });
     return actions;
   }

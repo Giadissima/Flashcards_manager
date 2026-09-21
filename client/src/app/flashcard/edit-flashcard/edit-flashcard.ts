@@ -13,6 +13,7 @@ import { Flashcard } from '../../models/flashcard.dto';
 import { FlashcardService } from '../flashcard.service';
 import { LoadStateComponent } from '../../shared/load-state/load-state.component';
 import { PageCardComponent } from '../../shared/page-card/page-card.component';
+import { PendingButtonDirective } from '../../shared/pending-button.directive';
 import { RichTextEditorComponent } from '../../shared/rich-text-editor/rich-text-editor.component';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
@@ -26,7 +27,7 @@ import { SearchableSelectComponent, SelectOption } from '../../shared/searchable
 @Component({
   selector: 'app-edit-flashcard',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RichTextEditorComponent, TranslocoModule, SearchableSelectComponent, LoadStateComponent, PageCardComponent, VisibilityToggleComponent],
+  imports: [CommonModule, ReactiveFormsModule, RichTextEditorComponent, TranslocoModule, SearchableSelectComponent, LoadStateComponent, PageCardComponent, VisibilityToggleComponent, PendingButtonDirective],
   templateUrl: './edit-flashcard.html',
 })
 export class EditFlashcard implements OnInit, OnDestroy {
@@ -34,6 +35,7 @@ export class EditFlashcard implements OnInit, OnDestroy {
 
   editForm!: FormGroup;
   cardId?: string;
+  submitting = false;
 
   topics: Topic[] = [];
   subjects: Subject[] = [];
@@ -149,7 +151,7 @@ export class EditFlashcard implements OnInit, OnDestroy {
   }
 
   async updateCard(): Promise<void> {
-    if (this.editForm.invalid || !this.cardId) {
+    if (this.editForm.invalid || !this.cardId || this.submitting) {
       this.editForm.markAllAsTouched();
       return;
     }
@@ -164,7 +166,8 @@ export class EditFlashcard implements OnInit, OnDestroy {
       question: this.questionEditor.getHTML(),
       answer: this.answerEditor.getHTML(),
     };
-    
+
+    this.submitting = true;
     try {
       await this.flashcardService.update(this.cardId, card);
       this.toastService.show(this.transloco.translate('flashcard.toast.cardUpdated'), 'success');
@@ -172,6 +175,8 @@ export class EditFlashcard implements OnInit, OnDestroy {
     } catch (error) {
       console.error('Error updating card', error);
       this.toastService.show(this.transloco.translate('flashcard.toast.updateError'), 'error');
+    } finally {
+      this.submitting = false;
     }
   }
 

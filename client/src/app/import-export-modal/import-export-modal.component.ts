@@ -5,6 +5,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 
 import { ImportExportService } from './import-export.service';
 import { ModalComponent } from '../shared/modal/modal.component';
+import { PendingButtonDirective } from '../shared/pending-button.directive';
 import { Subject } from '../models/subject.dto';
 import { SubjectService } from '../subject/subject.service';
 import { ToastService } from '../shared/toast/toast.service';
@@ -13,7 +14,7 @@ import { toSubjectOptions } from '../shared/select-options.util';
 @Component({
   selector: 'app-import-export-modal',
   standalone: true,
-  imports: [SearchableSelectComponent, TranslocoModule, ModalComponent],
+  imports: [SearchableSelectComponent, TranslocoModule, ModalComponent, PendingButtonDirective],
   template: `
     <app-modal [isOpen]="isOpen" [title]="'importExport.title' | transloco" (closed)="close()" *transloco="let t">
       <ng-container modal-header-start>
@@ -35,7 +36,7 @@ import { toSubjectOptions } from '../shared/select-options.util';
             (valueChange)="selectedSubjectId = $event ?? null"
           ></app-searchable-select>
         </div>
-        <button class="btn btn-primary w-100" (click)="onExport()" [disabled]="isLoading">
+        <button class="btn btn-primary w-100" (click)="onExport()" [disabled]="isLoading" [appPendingButton]="isLoading">
           <span class="material-symbols-outlined">download</span>
           {{ 'importExport.exportButton' | transloco }}
         </button>
@@ -50,7 +51,7 @@ import { toSubjectOptions } from '../shared/select-options.util';
           <label for="importFile" class="form-label">{{ 'importExport.selectFile' | transloco }}</label>
           <input type="file" id="importFile" class="form-control" (change)="onFileSelected($event)" accept=".json,.zip">
         </div>
-        <button class="btn btn-success w-100" (click)="onImport()" [disabled]="isLoading || !selectedFile">
+        <button class="btn btn-success w-100" (click)="onImport()" [disabled]="isLoading || !selectedFile" [appPendingButton]="isLoading">
           <span class="material-symbols-outlined">upload</span>
           {{ 'importExport.importButton' | transloco }}
         </button>
@@ -134,6 +135,7 @@ export class ImportExportModalComponent implements OnInit {
   }
 
   async onExport() {
+    if (this.isLoading) return;
     this.isLoading = true;
     try {
       const blob = await this.importExportService.export(this.selectedSubjectId || undefined);
@@ -161,7 +163,7 @@ export class ImportExportModalComponent implements OnInit {
   }
 
   async onImport() {
-    if (!this.selectedFile) return;
+    if (!this.selectedFile || this.isLoading) return;
     this.isLoading = true;
     try {
       const { imported, skipped } = await this.importExportService.import(this.selectedFile);

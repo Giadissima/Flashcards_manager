@@ -7,6 +7,7 @@ import { VisibilityToggleComponent } from '../../shared/visibility-toggle/visibi
 import { Visibility, defaultVisibility } from '../../models/visibility.dto';
 import { NgxColorsComponent, NgxColorsTriggerDirective } from 'ngx-colors';
 import { PageCardComponent } from '../../shared/page-card/page-card.component';
+import { PendingButtonDirective } from '../../shared/pending-button.directive';
 import { TopicService } from './../topic.service';
 import { ToastService } from '../../shared/toast/toast.service';
 import { SubjectService } from '../../subject/subject.service';
@@ -22,7 +23,7 @@ import { toSubjectOptions } from '../../shared/select-options.util';
 @Component({
   selector: 'app-edit-topic',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, TranslocoModule, SearchableSelectComponent, NgxColorsComponent, NgxColorsTriggerDirective, LoadStateComponent, PageCardComponent, VisibilityToggleComponent],
+  imports: [ReactiveFormsModule, CommonModule, TranslocoModule, SearchableSelectComponent, NgxColorsComponent, NgxColorsTriggerDirective, LoadStateComponent, PageCardComponent, VisibilityToggleComponent, PendingButtonDirective],
   templateUrl: './edit-topic.component.html',
 })
 export class EditTopicComponent implements OnInit {
@@ -31,6 +32,7 @@ export class EditTopicComponent implements OnInit {
   editForm!: FormGroup;
   topicId?: string;
   subjects: Subject[] = [];
+  submitting = false;
 
   // While true, an empty options list is a normal "still fetching" state, not
   // a broken select - see SearchableSelectComponent.isEmpty.
@@ -103,16 +105,19 @@ export class EditTopicComponent implements OnInit {
   }
 
   async updateTopic(): Promise<void> {
-    if (this.editForm.invalid || !this.topicId) {
+    if (this.editForm.invalid || !this.topicId || this.submitting) {
       this.editForm.markAllAsTouched();
       return;
     }
+    this.submitting = true;
     try {
       await this.topicService.updateTopic(this.topicId, this.editForm.value);
       this.toastService.show(this.transloco.translate('topic.toast.updated'), 'success');
       this.router.navigate(['/manage-topics']);
     } catch (error) {
       this.toastService.show(this.transloco.translate('topic.toast.updateError'), 'error');
+    } finally {
+      this.submitting = false;
     }
   }
 }

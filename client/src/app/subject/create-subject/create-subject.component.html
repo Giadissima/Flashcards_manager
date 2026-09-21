@@ -38,7 +38,8 @@
 
       <div class="form-actions">
         <button type="submit" class="btn btn-primary"
-          [disabled]="subjectForm.invalid || descLength > descMaxLength"><span
+          [disabled]="subjectForm.invalid || descLength > descMaxLength || submitting"
+          [appPendingButton]="submitting"><span
             class="material-symbols-outlined">add</span>{{ 'subject.create.createButton' | transloco
           }}</button>
       </div>

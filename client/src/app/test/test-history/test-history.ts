@@ -23,6 +23,7 @@ import {
 import { FormsModule } from '@angular/forms';
 import { PageCardComponent } from '../../shared/page-card/page-card.component';
 import { PaginatedList } from '../../shared/paginated-list';
+import { PendingButtonDirective } from '../../shared/pending-button.directive';
 import { toSubjectOptions, toTopicOptions } from '../../shared/select-options.util';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
@@ -47,6 +48,7 @@ import { TopicService } from '../../topic/topic.service';
     ScoreBarComponent,
     SegmentedFilterComponent,
     DateRangeFilterComponent,
+    PendingButtonDirective,
   ],
   templateUrl: './test-history.html',
   styleUrl: './test-history.scss',
@@ -383,6 +385,14 @@ export class TestHistory extends PaginatedList implements OnInit, OnDestroy {
     return !!test._id && this.repeatingIds.has(test._id);
   }
 
+  /* Ids currently being stopped, so the row's terminate button cannot be
+     pressed a second time while the request is in flight. */
+  private stoppingIds = new Set<string>();
+
+  isStopping(test: Test): boolean {
+    return !!test._id && this.stoppingIds.has(test._id);
+  }
+
   /**
    * Starts a new test identical to this one - every question, in the same
    * order - as its child, the same way the result page's "repeat the test"
@@ -517,9 +527,12 @@ export class TestHistory extends PaginatedList implements OnInit, OnDestroy {
   // runner's own finish, this does not touch the test's date - it was not
   // worked on just now, so it should not jump to the top of the history.
   async stopTest(test: Test): Promise<void> {
-    if (!test._id) return;
+    const id = test._id;
+    if (!id || this.stoppingIds.has(id)) return;
+
+    this.stoppingIds.add(id);
     try {
-      await this.testService.terminateTest(test._id);
+      await this.testService.terminateTest(id);
       this.toast.show(
         this.transloco.translate('test.history.toast.terminated'),
         'success',
@@ -532,6 +545,8 @@ export class TestHistory extends PaginatedList implements OnInit, OnDestroy {
         this.transloco.translate('test.history.toast.terminateError'),
         'error',
       );
+    } finally {
+      this.stoppingIds.delete(id);
     }
   }
 }

@@ -62,6 +62,7 @@ export class VerifyEmailComponent implements OnInit {
   // automatically to inspect them, which would otherwise spend the
   // single-use token before the person ever sees the page.
   async confirm(): Promise<void> {
+    if (this.state === 'checking') return;
     this.state = 'checking';
     try {
       await this.authService.verifyEmail(this.token);

@@ -154,7 +154,8 @@
     <button type="button" class="btn btn-outline-primary" (click)="close()">
       <span class="material-symbols-outlined">close</span>{{ 'common.cancel' | transloco }}
     </button>
-    <button type="button" class="btn btn-primary" [disabled]="!canImport" (click)="confirm()">
+    <button type="button" class="btn btn-primary" [disabled]="!canImport" [appPendingButton]="importing"
+      (click)="confirm()">
       <span class="material-symbols-outlined">playlist_add</span>
       {{ (isCard ? 'community.importSet.confirmOne' : 'community.importSet.confirm') | transloco:{ count: selectedCount } }}
     </button>

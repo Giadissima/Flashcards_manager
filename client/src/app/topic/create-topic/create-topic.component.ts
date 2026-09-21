@@ -14,6 +14,7 @@ import { Visibility } from '../../models/visibility.dto';
 import { Topic } from '../../models/topic.dto';
 import { NgxColorsComponent, NgxColorsTriggerDirective } from 'ngx-colors';
 import { PageCardComponent } from '../../shared/page-card/page-card.component';
+import { PendingButtonDirective } from '../../shared/pending-button.directive';
 import { TopicService } from '../topic.service';
 import { Router } from '@angular/router';
 import { Subject } from '../../models/subject.dto';
@@ -47,12 +48,14 @@ import {
     PageCardComponent,
     VisibilityToggleComponent,
     ModalComponent,
+    PendingButtonDirective,
   ],
   templateUrl: './create-topic.component.html',
 })
 export class CreateTopicComponent implements OnInit {
   topicForm!: FormGroup;
   subjects: Subject[] = [];
+  submitting = false;
 
   // A topic needs a subject to belong to, so without any subject yet the
   // form is blocked behind a modal pointing at "create subject" instead.
@@ -138,11 +141,12 @@ export class CreateTopicComponent implements OnInit {
   }
 
   async createTopic(): Promise<void> {
-    if (this.topicForm.invalid) {
+    if (this.topicForm.invalid || this.submitting) {
       this.topicForm.markAllAsTouched();
       return;
     }
 
+    this.submitting = true;
     try {
       const { visibility, ...rest } = this.topicForm.value;
       // Untouched "inherit" is left unset rather than sent as whatever the
@@ -165,6 +169,8 @@ export class CreateTopicComponent implements OnInit {
         this.transloco.translate('topic.toast.createError'),
         'error',
       );
+    } finally {
+      this.submitting = false;
     }
   }
 

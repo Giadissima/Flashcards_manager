@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
+import { PendingButtonDirective } from '../pending-button.directive';
 import { RouterLink } from '@angular/router';
 
 export interface PageCardAction {
@@ -22,6 +23,9 @@ export interface PageCardAction {
   variant?: 'primary' | 'outline' | 'outline-secondary';
 
   disabled?: boolean;
+
+  /** Set while the action's own request is in flight, to show the spinner overlay. */
+  pending?: boolean;
 }
 
 /**
@@ -46,7 +50,7 @@ export interface PageCardAction {
 @Component({
   selector: 'app-page-card',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, PendingButtonDirective],
   templateUrl: './page-card.component.html',
   styleUrl: './page-card.component.scss'
 })

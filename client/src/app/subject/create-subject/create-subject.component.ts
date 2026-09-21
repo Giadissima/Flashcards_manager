@@ -9,6 +9,7 @@ import { Visibility, defaultVisibility } from '../../models/visibility.dto';
 import { Editor } from '@tiptap/core';
 import { createRichTextEditor } from '../../shared/rich-text-editor/editor.factory';
 import { PageCardComponent } from '../../shared/page-card/page-card.component';
+import { PendingButtonDirective } from '../../shared/pending-button.directive';
 import { Router } from '@angular/router';
 import { SubjectService } from '../subject.service';
 import { defaultSubjectIconColor } from '../subject-icon.util';
@@ -29,6 +30,7 @@ import { RichTextEditorComponent } from '../../shared/rich-text-editor/rich-text
     SubjectIconSvgComponent,
     PageCardComponent,
     VisibilityToggleComponent,
+    PendingButtonDirective,
   ],
   templateUrl: './create-subject.component.html',
 })
@@ -38,6 +40,7 @@ export class CreateSubjectComponent implements OnInit, OnDestroy {
   descEditor: Editor;
   descLength = 0;
   filePreviewUrl: string | null = null;
+  submitting = false;
 
   get colorControl(): FormControl<string> {
     return this.subjectForm.get('color') as FormControl<string>;
@@ -98,7 +101,7 @@ export class CreateSubjectComponent implements OnInit, OnDestroy {
   }
 
   async createSubject(): Promise<void> {
-    if (this.subjectForm.invalid || this.descLength > this.descMaxLength) {
+    if (this.subjectForm.invalid || this.descLength > this.descMaxLength || this.submitting) {
       this.subjectForm.markAllAsTouched();
       return;
     }
@@ -112,12 +115,15 @@ export class CreateSubjectComponent implements OnInit, OnDestroy {
       formData.append('icon', this.selectedFile, this.selectedFile.name);
     }
 
+    this.submitting = true;
     try {
       await this.subjectService.createSubject(formData);
       this.toastService.show(this.transloco.translate('subject.toast.created'), 'success');
       this.router.navigate(['/manage-subjects']);
     } catch (error) {
       this.toastService.show(this.transloco.translate('subject.toast.createError'), 'error');
+    } finally {
+      this.submitting = false;
     }
   }
 }

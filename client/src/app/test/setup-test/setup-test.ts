@@ -1,6 +1,7 @@
 import { AbstractControl, FormArray, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { PageCardComponent } from '../../shared/page-card/page-card.component';
+import { PendingButtonDirective } from '../../shared/pending-button.directive';
 import { Question } from '../../models/test.dto';
 
 import { CommonModule } from '@angular/common';
@@ -40,7 +41,7 @@ export function subjectOrTopicValidator(getMode: () => TestMode): ValidatorFn {
 @Component({
   selector: 'app-setup-test',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, SearchableSelectComponent, TranslocoModule, PageCardComponent, DateRangeFilterComponent, SrManageModalComponent],
+  imports: [ReactiveFormsModule, CommonModule, SearchableSelectComponent, TranslocoModule, PageCardComponent, DateRangeFilterComponent, SrManageModalComponent, PendingButtonDirective],
   templateUrl: './setup-test.html',
   styleUrls: ['./setup-test.scss']
 })
@@ -50,6 +51,10 @@ export class SetupTest implements OnInit {
   topics: Topic[] = [];
   allTopics: Topic[] = [];
   flashcardCount: number | null = null;
+  /** Guards startTest() against a second click/Enter while the test is being created. */
+  startingTest = false;
+  /** Guards setMaxQuestions() against a second click while the count is loading. */
+  maxQuestionsLoading = false;
 
   /** Which of the three squares is selected; "basic" is today's plain manual test. */
   mode: TestMode = 'basic';
@@ -219,9 +224,15 @@ export class SetupTest implements OnInit {
   }
 
   async setMaxQuestions(): Promise<void> {
-    const subject_id = this.testForm.get('subject_id')?.value;
-    const count = await this.flashcardService.count({ subject_id, topic_ids: this.selectedTopicIds, ...this.dateFilter });
-    this.testForm.get('numFlashcard')?.setValue(Math.min(count, 1000) || 1);
+    if (this.maxQuestionsLoading) return;
+    this.maxQuestionsLoading = true;
+    try {
+      const subject_id = this.testForm.get('subject_id')?.value;
+      const count = await this.flashcardService.count({ subject_id, topic_ids: this.selectedTopicIds, ...this.dateFilter });
+      this.testForm.get('numFlashcard')?.setValue(Math.min(count, 1000) || 1);
+    } finally {
+      this.maxQuestionsLoading = false;
+    }
   }
 
   incrementQuestions(): void {
@@ -254,7 +265,7 @@ export class SetupTest implements OnInit {
   }
 
   async startTest(): Promise<void> {
-    if (this.testForm.valid && !this.noFlashcardsAvailable) {
+    if (this.testForm.valid && !this.noFlashcardsAvailable && !this.startingTest) {
       const subject_id = this.testForm.get('subject_id')?.value;
       const numFlashcard = this.testForm.get('numFlashcard')?.value;
       const queryParams: RandomCardFIlter = {
@@ -264,7 +275,12 @@ export class SetupTest implements OnInit {
         ...this.dateFilter,
       };
 
-      await this.createTest(queryParams);
+      this.startingTest = true;
+      try {
+        await this.createTest(queryParams);
+      } finally {
+        this.startingTest = false;
+      }
     }
   }
 

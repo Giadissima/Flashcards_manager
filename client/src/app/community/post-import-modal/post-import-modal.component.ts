@@ -8,6 +8,7 @@ import { CommunityService } from '../community.service';
 import { FeedPost, ImportCollision, ImportTopicMode, PostContents } from '../../models/post.dto';
 import { Flashcard } from '../../models/flashcard.dto';
 import { ModalComponent } from '../../shared/modal/modal.component';
+import { PendingButtonDirective } from '../../shared/pending-button.directive';
 import { SearchableSelectComponent, SelectOption } from '../../shared/searchable-select/searchable-select.component';
 import { toSubjectOptions, toTopicOptions } from '../../shared/select-options.util';
 import { Topic } from '../../models/topic.dto';
@@ -45,7 +46,7 @@ const sameName = (a: string, b: string): boolean => names.compare(a.trim(), b.tr
 @Component({
   selector: 'app-post-import-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslocoModule, ModalComponent, SearchableSelectComponent],
+  imports: [CommonModule, FormsModule, TranslocoModule, ModalComponent, SearchableSelectComponent, PendingButtonDirective],
   templateUrl: './post-import-modal.component.html',
   styleUrl: './post-import-modal.component.scss',
 })

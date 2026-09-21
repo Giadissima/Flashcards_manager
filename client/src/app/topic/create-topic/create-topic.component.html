@@ -32,7 +32,8 @@
       <app-visibility-toggle [control]="visibilityControl" kind="topic"></app-visibility-toggle>
 
       <div class="form-actions">
-        <button type="submit" class="btn btn-primary" [disabled]="topicForm.invalid"><span
+        <button type="submit" class="btn btn-primary" [disabled]="topicForm.invalid || submitting"
+          [appPendingButton]="submitting"><span
             class="material-symbols-outlined">add</span>{{ 'topic.create.createButton' | transloco }}</button>
       </div>
     </form>

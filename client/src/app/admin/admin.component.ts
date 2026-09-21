@@ -7,6 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { AdminReport, AdminService, ModerationAction, ModerationSubject } from './admin.service';
 import { ImageLightboxComponent } from '../shared/image-lightbox/image-lightbox.component';
 import { KatexRendererPipe } from '../pipes/katex-renderer.pipe';
+import { PendingButtonDirective } from '../shared/pending-button.directive';
 import { ZoomableImagesDirective } from '../shared/zoomable-images.directive';
 
 /**
@@ -28,6 +29,7 @@ import { ZoomableImagesDirective } from '../shared/zoomable-images.directive';
     FormsModule,
     KatexRendererPipe,
     ImageLightboxComponent,
+    PendingButtonDirective,
     ZoomableImagesDirective,
   ],
   templateUrl: './admin.component.html',

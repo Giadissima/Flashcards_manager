@@ -34,7 +34,8 @@
         <div class="form-actions">
           <button type="button" class="btn btn-outline-primary" (click)="cancel()"><span
               class="material-symbols-outlined">close</span>{{ 'common.cancel' | transloco }}</button>
-          <button type="submit" class="btn btn-primary" [disabled]="editForm.invalid"><span
+          <button type="submit" class="btn btn-primary" [disabled]="editForm.invalid || submitting"
+            [appPendingButton]="submitting"><span
               class="material-symbols-outlined">save</span>{{ 'topic.edit.saveChanges' | transloco }}</button>
         </div>
       </form>

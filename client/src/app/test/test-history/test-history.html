@@ -153,7 +153,7 @@
               {{ 'test.history.review' | transloco }}
             </button>
             <button type="button" class="btn btn-outline-secondary" [disabled]="isRepeating(test)"
-              (click)="repeatTest(test)">
+              [appPendingButton]="isRepeating(test)" (click)="repeatTest(test)">
               <span class="material-symbols-outlined">refresh</span>
               {{ 'test.history.repeatTest' | transloco }}
             </button>
@@ -166,7 +166,8 @@
               <span class="material-symbols-outlined">play_arrow</span>
               {{ 'test.history.resume' | transloco }}
             </button>
-            <button type="button" class="btn btn-outline-danger" (click)="stopTest(test)">
+            <button type="button" class="btn btn-outline-danger" [disabled]="isStopping(test)"
+              [appPendingButton]="isStopping(test)" (click)="stopTest(test)">
               <span class="material-symbols-outlined">stop</span>
               {{ 'test.history.terminate' | transloco }}
             </button>

@@ -14,6 +14,7 @@ import { LoadStateComponent } from '../../shared/load-state/load-state.component
 import { ImageLightboxComponent } from '../../shared/image-lightbox/image-lightbox.component';
 import { ModalComponent } from '../../shared/modal/modal.component';
 import { PaginatedList } from '../../shared/paginated-list';
+import { PendingButtonDirective } from '../../shared/pending-button.directive';
 import { ZoomableImagesDirective } from '../../shared/zoomable-images.directive';
 import * as cardView from '../../shared/flashcard-view.util';
 import { TestService } from '../test.service';
@@ -23,7 +24,7 @@ import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 @Component({
   selector: 'app-test-runner',
   standalone: true,
-  imports: [CommonModule, DurationPipe, KatexRendererPipe, ConfirmDialogComponent, TranslocoModule, LoadStateComponent, ImageLightboxComponent, ZoomableImagesDirective, PaginationComponent, PageCardComponent, ModalComponent],
+  imports: [CommonModule, DurationPipe, KatexRendererPipe, ConfirmDialogComponent, TranslocoModule, LoadStateComponent, ImageLightboxComponent, ZoomableImagesDirective, PaginationComponent, PageCardComponent, ModalComponent, PendingButtonDirective],
   templateUrl: './test-runner.html',
   styleUrls: ['./test-runner.scss']
 })
@@ -60,6 +61,15 @@ export class TestRunner extends PaginatedList implements OnInit {
    *  tester's own library: it changes what "exit" offers (see exitTest). */
   sourcePostId?: string;
   showCommunityExitConfirm = false;
+
+  /** Guards exitTest() against a second click while the elapsed time is being saved. */
+  exitingTest = false;
+  /** Guards saveAndExitToCommunity() against a second click while it is in flight. */
+  savingAndExitingToCommunity = false;
+  /** Guards discardAndExitToCommunity() against a second click while it is in flight. */
+  discardingAndExitingToCommunity = false;
+  /** Guards confirmFinish() against a second click while the test is being completed. */
+  finishingTest = false;
 
   get isFromCommunity(): boolean {
     return !!this.sourcePostId;
@@ -249,12 +259,19 @@ export class TestRunner extends PaginatedList implements OnInit {
   // tester's own tests, keeping it in the history is a choice and not a given
   // - the cards are not theirs, and a run tried on a whim is not necessarily
   // worth cluttering it with.
-  exitTest(): void {
+  async exitTest(): Promise<void> {
     if (this.isFromCommunity) {
       this.showCommunityExitConfirm = true;
       return;
     }
-    void this.saveAndExit(['/test-result']);
+    if (this.exitingTest) return;
+
+    this.exitingTest = true;
+    try {
+      await this.saveAndExit(['/test-result']);
+    } finally {
+      this.exitingTest = false;
+    }
   }
 
   private async saveAndExit(route: string[]): Promise<void> {
@@ -272,17 +289,31 @@ export class TestRunner extends PaginatedList implements OnInit {
   }
 
   async saveAndExitToCommunity(): Promise<void> {
-    this.showCommunityExitConfirm = false;
-    await this.saveAndExit(['/community']);
+    if (this.savingAndExitingToCommunity) return;
+
+    this.savingAndExitingToCommunity = true;
+    try {
+      this.showCommunityExitConfirm = false;
+      await this.saveAndExit(['/community']);
+    } finally {
+      this.savingAndExitingToCommunity = false;
+    }
   }
 
   async discardAndExitToCommunity(): Promise<void> {
-    this.showCommunityExitConfirm = false;
-    if (this.testId) {
-      await this.testService.delete(this.testId).catch(err => console.error('Errore eliminazione test', err));
+    if (this.discardingAndExitingToCommunity) return;
+
+    this.discardingAndExitingToCommunity = true;
+    try {
+      this.showCommunityExitConfirm = false;
+      if (this.testId) {
+        await this.testService.delete(this.testId).catch(err => console.error('Errore eliminazione test', err));
+      }
+      this.toast.show(this.transloco.translate('test.runner.toast.discarded'), 'success');
+      this.router.navigate(['/community']);
+    } finally {
+      this.discardingAndExitingToCommunity = false;
     }
-    this.toast.show(this.transloco.translate('test.runner.toast.discarded'), 'success');
-    this.router.navigate(['/community']);
   }
 
   // The one action of the page that cannot be undone, and the only one that
@@ -296,9 +327,20 @@ export class TestRunner extends PaginatedList implements OnInit {
   }
 
   async confirmFinish(): Promise<void> {
+    // The confirm button lives inside the generic ConfirmDialogComponent, so it
+    // cannot be visually disabled from here - this guard only stops a second
+    // request from actually going out if it is somehow triggered twice.
+    if (this.finishingTest) return;
+
     this.showFinishConfirm = false;
     if (!this.testId) return;
-    await this.testService.completeTest(this.testId, this.elapsed_time);
-    this.router.navigate(['/test-result', this.testId]);
+
+    this.finishingTest = true;
+    try {
+      await this.testService.completeTest(this.testId, this.elapsed_time);
+      this.router.navigate(['/test-result', this.testId]);
+    } finally {
+      this.finishingTest = false;
+    }
   }
 }

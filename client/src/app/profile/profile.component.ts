@@ -13,6 +13,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { IconPreviewComponent } from '../shared/icon-preview/icon-preview.component';
 import { LoadStateComponent } from '../shared/load-state/load-state.component';
 import { PageCardComponent } from '../shared/page-card/page-card.component';
+import { PendingButtonDirective } from '../shared/pending-button.directive';
 import { Router } from '@angular/router';
 import { ToastService } from '../shared/toast/toast.service';
 
@@ -36,6 +37,7 @@ const usernamePattern = /^[A-Za-z0-9._-]+$/;
     StudyFieldsComponent,
     IconPreviewComponent,
     AvatarSvgComponent,
+    PendingButtonDirective,
   ],
   templateUrl: './profile.component.html',
 })

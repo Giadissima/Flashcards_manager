@@ -25,7 +25,7 @@
       </a>
       } @else {
       <button type="button" class="btn" [ngClass]="buttonClass(a)" [disabled]="a.disabled"
-        (click)="action.emit(a)">
+        [appPendingButton]="a.pending ?? false" (click)="action.emit(a)">
         <span class="material-symbols-outlined">{{ a.icon ?? 'add' }}</span>{{ a.label }}
       </button>
       }

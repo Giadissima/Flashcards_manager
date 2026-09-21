@@ -40,7 +40,7 @@
           <div class="alert alert-warning mt-2 mb-0" role="alert">
             <div>{{ t('auth.verify.pending') }}</div>
             <button type="button" class="btn btn-outline-primary btn-sm mt-2" [disabled]="resending || resent"
-              (click)="resendVerification()">
+              [appPendingButton]="resending" (click)="resendVerification()">
               <span class="material-symbols-outlined">forward_to_inbox</span>{{ t('auth.verify.resend') }}
             </button>
           </div>
@@ -56,7 +56,8 @@
           <button type="button" class="btn btn-outline-primary" (click)="cancel()">
             <span class="material-symbols-outlined">close</span>{{ t('common.cancel') }}
           </button>
-          <button type="submit" class="btn btn-primary" [disabled]="profileForm.invalid || saving">
+          <button type="submit" class="btn btn-primary" [disabled]="profileForm.invalid || saving"
+            [appPendingButton]="saving">
             <span class="material-symbols-outlined">save</span>{{ t('profile.save') }}
           </button>
         </div>

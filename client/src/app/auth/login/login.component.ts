@@ -8,13 +8,14 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { PageCardComponent } from '../../shared/page-card/page-card.component';
+import { PendingButtonDirective } from '../../shared/pending-button.directive';
 import { ToastService } from '../../shared/toast/toast.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, TranslocoModule, RouterLink, PageCardComponent],
+  imports: [CommonModule, ReactiveFormsModule, TranslocoModule, RouterLink, PageCardComponent, PendingButtonDirective],
   templateUrl: './login.component.html',
   styleUrl: '../auth-page.scss',
 })

@@ -72,7 +72,8 @@
       (previous)="previousPage()" (next)="nextPage()"></app-pagination>
 
     <div class="d-flex justify-content-center gap-2 mt-4">
-      <button type="button" class="btn btn-outline-secondary" (click)="exitTest()"><span class="material-symbols-outlined">logout</span>{{ (isFromCommunity ? 'test.runner.backToCommunity' : 'test.runner.exit') |
+      <button type="button" class="btn btn-outline-secondary" [disabled]="exitingTest" [appPendingButton]="exitingTest"
+        (click)="exitTest()"><span class="material-symbols-outlined">logout</span>{{ (isFromCommunity ? 'test.runner.backToCommunity' : 'test.runner.exit') |
         transloco }}</button>
       <button type="button" class="btn btn-primary" id="finishTest" (click)="requestFinish()"><span class="material-symbols-outlined">flag</span>{{ 'test.runner.endTest' |
         transloco }}</button>
@@ -96,10 +97,12 @@
       <button type="button" class="btn btn-outline-secondary" (click)="cancelCommunityExit()">
         <span class="material-symbols-outlined">close</span>{{ t('common.cancel') }}
       </button>
-      <button type="button" class="btn btn-outline-danger" (click)="discardAndExitToCommunity()">
+      <button type="button" class="btn btn-outline-danger" [disabled]="discardingAndExitingToCommunity"
+        [appPendingButton]="discardingAndExitingToCommunity" (click)="discardAndExitToCommunity()">
         <span class="material-symbols-outlined">delete</span>{{ t('test.runner.communityExitDiscard') }}
       </button>
-      <button type="button" class="btn btn-primary" (click)="saveAndExitToCommunity()">
+      <button type="button" class="btn btn-primary" [disabled]="savingAndExitingToCommunity"
+        [appPendingButton]="savingAndExitingToCommunity" (click)="saveAndExitToCommunity()">
         <span class="material-symbols-outlined">check</span>{{ t('test.runner.communityExitSave') }}
       </button>
     </ng-container>

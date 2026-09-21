@@ -9,6 +9,7 @@ import { FeedPost } from '../../models/post.dto';
 import { Flashcard } from '../../models/flashcard.dto';
 import { FormsModule } from '@angular/forms';
 import { ModalComponent } from '../../shared/modal/modal.component';
+import { PendingButtonDirective } from '../../shared/pending-button.directive';
 import { PostImportModalComponent } from '../post-import-modal/post-import-modal.component';
 import { PostReportModalComponent, ReportKind } from '../post-report-modal/post-report-modal.component';
 import { restrictionMessage, restrictionOf } from '../../shared/restriction';
@@ -71,6 +72,7 @@ const commentPageSize = 20;
     SearchableSelectComponent,
     PaginationComponent,
     ImportedBadgeComponent,
+    PendingButtonDirective,
   ],
   templateUrl: './post-card.component.html',
   styleUrl: './post-card.component.scss',
@@ -423,6 +425,13 @@ export class PostCardComponent implements OnInit, AfterViewInit, OnDestroy {
   reportKind: ReportKind = 'post';
   reportTargetId = '';
   reportAuthorUsername = '';
+  /**
+   * Guards the flag button against the request blockedFromReporting() makes:
+   * without it, a click during that lag does nothing visible, and a second
+   * click on another flag (post vs. a comment) before the first settles could
+   * race and leave reportKind/reportTargetId pointing at the wrong target.
+   */
+  openingReport = false;
   /** Set once this reader has reported it, so the flag says it has been. */
   reported = false;
   /** Same idea, one entry per comment already reported. */
@@ -448,21 +457,35 @@ export class PostCardComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   async openReport(): Promise<void> {
-    if (await this.blockedFromReporting()) return;
+    if (this.openingReport) return;
 
-    this.reportKind = 'post';
-    this.reportTargetId = this.post._id;
-    this.reportAuthorUsername = this.post.author.username;
-    this.reportOpen = true;
+    this.openingReport = true;
+    try {
+      if (await this.blockedFromReporting()) return;
+
+      this.reportKind = 'post';
+      this.reportTargetId = this.post._id;
+      this.reportAuthorUsername = this.post.author.username;
+      this.reportOpen = true;
+    } finally {
+      this.openingReport = false;
+    }
   }
 
   async openCommentReport(comment: PostComment): Promise<void> {
-    if (await this.blockedFromReporting()) return;
+    if (this.openingReport) return;
 
-    this.reportKind = 'comment';
-    this.reportTargetId = comment._id;
-    this.reportAuthorUsername = comment.user_id.username;
-    this.reportOpen = true;
+    this.openingReport = true;
+    try {
+      if (await this.blockedFromReporting()) return;
+
+      this.reportKind = 'comment';
+      this.reportTargetId = comment._id;
+      this.reportAuthorUsername = comment.user_id.username;
+      this.reportOpen = true;
+    } finally {
+      this.openingReport = false;
+    }
   }
 
   onReported(): void {
@@ -511,6 +534,8 @@ export class PostCardComponent implements OnInit, AfterViewInit, OnDestroy {
   commentDraft = '';
   sendingComment = false;
   loadingOlderComments = false;
+  /** Comment ids currently being deleted, so a double click cannot send two deletes. */
+  private readonly deletingCommentIds = new Set<string>();
 
   /** There are older ones left when fewer are on screen than the post has. */
   get hasOlderComments(): boolean {
@@ -580,12 +605,21 @@ export class PostCardComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   async removeComment(comment: PostComment): Promise<void> {
+    if (this.deletingCommentIds.has(comment._id)) return;
+
+    this.deletingCommentIds.add(comment._id);
     try {
       await this.communityService.deleteComment(comment._id);
       await this.loadComments();
     } catch {
       this.toast.show(this.transloco.translate('community.commentError'), 'error');
+    } finally {
+      this.deletingCommentIds.delete(comment._id);
     }
+  }
+
+  isDeletingComment(comment: PostComment): boolean {
+    return this.deletingCommentIds.has(comment._id);
   }
 
   isMyComment(comment: PostComment): boolean {

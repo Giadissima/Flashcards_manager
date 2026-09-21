@@ -32,7 +32,8 @@
       </div>
 
       <div class="form-actions">
-        <button type="submit" class="btn btn-primary" [disabled]="loginForm.invalid || submitting">
+        <button type="submit" class="btn btn-primary" [disabled]="loginForm.invalid || submitting"
+          [appPendingButton]="submitting">
           <span class="material-symbols-outlined">login</span>{{ 'auth.login.submit' | transloco }}
         </button>
       </div>

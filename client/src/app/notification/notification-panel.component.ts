@@ -10,6 +10,7 @@ import { FormsModule } from '@angular/forms';
 import { NotificationService } from './notification.service';
 import { PaginatedList } from '../shared/paginated-list';
 import { PaginationComponent } from '../shared/pagination/pagination.component';
+import { PendingButtonDirective } from '../shared/pending-button.directive';
 import { PostReportModalComponent, ReportKind } from '../community/post-report-modal/post-report-modal.component';
 import { restrictionMessage } from '../shared/restriction';
 import { SearchableSelectComponent, SelectOption } from '../shared/searchable-select/searchable-select.component';
@@ -38,6 +39,7 @@ const maxFeedbackMessages = 3;
     SearchableSelectComponent,
     PaginationComponent,
     PostReportModalComponent,
+    PendingButtonDirective,
   ],
   templateUrl: './notification-panel.component.html',
   styleUrl: './notification-panel.component.scss',
@@ -78,6 +80,8 @@ export class NotificationPanelComponent extends PaginatedList implements OnInit,
   reportKind: ReportKind = 'feedback';
   reportMessageId = '';
   reportAuthorUsername = '';
+  /** Guards the flag button against the request openMessageReport() makes before it can reveal the modal. */
+  openingMessageReport = false;
 
   private unreadSub: Subscription | null = null;
 
@@ -300,17 +304,24 @@ export class NotificationPanelComponent extends PaginatedList implements OnInit,
    * is still blocked until it happens to log in again.
    */
   async openMessageReport(message: FeedbackMessage): Promise<void> {
-    const fresh = await this.authService.fetchMe().catch(() => this.authService.user);
-    const blocked = fresh?.reportBlocked;
-    if (blocked) {
-      const notice = restrictionMessage('report', blocked.until);
-      this.toast.show(this.transloco.translate(notice.key, notice.params), 'error');
-      return;
-    }
+    if (this.openingMessageReport) return;
 
-    this.reportMessageId = message._id;
-    this.reportAuthorUsername = message.user_id.username;
-    this.reportOpen = true;
+    this.openingMessageReport = true;
+    try {
+      const fresh = await this.authService.fetchMe().catch(() => this.authService.user);
+      const blocked = fresh?.reportBlocked;
+      if (blocked) {
+        const notice = restrictionMessage('report', blocked.until);
+        this.toast.show(this.transloco.translate(notice.key, notice.params), 'error');
+        return;
+      }
+
+      this.reportMessageId = message._id;
+      this.reportAuthorUsername = message.user_id.username;
+      this.reportOpen = true;
+    } finally {
+      this.openingMessageReport = false;
+    }
   }
 
   private async openFeedback(feedbackId: string): Promise<void> {

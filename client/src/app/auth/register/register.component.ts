@@ -8,6 +8,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { PageCardComponent } from '../../shared/page-card/page-card.component';
+import { PendingButtonDirective } from '../../shared/pending-button.directive';
 import { RegistrationPayload } from '../../models/auth.dto';
 import { Router, RouterLink } from '@angular/router';
 import { ToastService } from '../../shared/toast/toast.service';
@@ -27,6 +28,7 @@ const usernamePattern = /^[A-Za-z0-9._-]+$/;
     RouterLink,
     PageCardComponent,
     StudyFieldsComponent,
+    PendingButtonDirective,
   ],
   templateUrl: './register.component.html',
   styleUrl: '../auth-page.scss',

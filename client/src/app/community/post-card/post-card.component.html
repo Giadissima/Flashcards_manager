@@ -141,7 +141,7 @@
        mark down someone who put their notes up. -->
   <div class="post-likes">
     <button type="button" class="like-button" [class.is-active]="post.liked" [disabled]="liking || isMine"
-      (click)="toggleLike()"
+      [appPendingButton]="liking" (click)="toggleLike()"
       [title]="(isMine ? 'community.ownPost' : post.liked ? 'community.unlike' : 'community.like') | transloco"
       [attr.aria-label]="'community.like' | transloco" [attr.aria-pressed]="post.liked">
       <span class="material-symbols-outlined">thumb_up</span>
@@ -154,12 +154,14 @@
       <!-- Studying a set changes nothing, so it stays open on the author's own
            post too - unlike report and import, which only make sense on
            someone else's. -->
-      <button type="button" class="btn btn-icon-ghost" [disabled]="startingTry" (click)="openTry()"
+      <button type="button" class="btn btn-icon-ghost" [disabled]="startingTry" [appPendingButton]="startingTry"
+        (click)="openTry()"
         [title]="'community.tryDeck' | transloco" [attr.aria-label]="'community.tryDeck' | transloco">
         <span class="material-symbols-outlined">quiz</span>
       </button>
       @if (!isMine) {
-      <button type="button" class="btn btn-icon-ghost" [class.is-reported]="reported" [disabled]="reported"
+      <button type="button" class="btn btn-icon-ghost" [class.is-reported]="reported"
+        [disabled]="reported || openingReport" [appPendingButton]="openingReport"
         (click)="openReport()"
         [title]="(reported ? 'community.report.already' : 'community.reportPost') | transloco"
         [attr.aria-label]="'community.reportPost' | transloco">
@@ -201,12 +203,14 @@
           [title]="comment.createdAt | date:'medium'">{{ comment.createdAt | date:'short' }}</time>
         @if (isMyComment(comment)) {
         <button type="button" class="btn btn-icon-ghost btn-danger-hover comment-delete"
+          [disabled]="isDeletingComment(comment)" [appPendingButton]="isDeletingComment(comment)"
           (click)="removeComment(comment)" [attr.aria-label]="'common.delete' | transloco">
           <span class="material-symbols-outlined">delete</span>
         </button>
         } @else {
         <button type="button" class="btn btn-icon-ghost comment-report" [class.is-reported]="isCommentReported(comment)"
-          [disabled]="isCommentReported(comment)" (click)="openCommentReport(comment)"
+          [disabled]="isCommentReported(comment) || openingReport" [appPendingButton]="openingReport"
+          (click)="openCommentReport(comment)"
           [title]="(isCommentReported(comment) ? 'community.report.already' : 'community.reportComment') | transloco"
           [attr.aria-label]="'community.reportComment' | transloco">
           <span class="material-symbols-outlined">flag</span>
@@ -222,7 +226,7 @@
       <input type="text" class="form-control" [(ngModel)]="commentDraft"
         [placeholder]="'community.commentPlaceholder' | transloco" (keydown.enter)="sendComment()">
       <button type="button" class="btn btn-primary" [disabled]="sendingComment || commentDraft.trim().length < 2"
-        (click)="sendComment()">
+        [appPendingButton]="sendingComment" (click)="sendComment()">
         <span class="material-symbols-outlined">send</span>
       </button>
     </div>
@@ -256,7 +260,7 @@
       <span class="material-symbols-outlined">close</span>{{ 'common.cancel' | transloco }}
     </button>
     <button type="button" class="btn btn-primary" [disabled]="sendingFeedback || feedbackDraft.trim().length < 2"
-      (click)="sendFeedback()">
+      [appPendingButton]="sendingFeedback" (click)="sendFeedback()">
       <span class="material-symbols-outlined">send</span>{{ 'community.feedbackSend' | transloco }}
     </button>
   </ng-container>

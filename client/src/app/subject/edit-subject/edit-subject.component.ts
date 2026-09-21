@@ -9,6 +9,7 @@ import { Editor } from '@tiptap/core';
 import { createRichTextEditor } from '../../shared/rich-text-editor/editor.factory';
 import { LoadStateComponent } from '../../shared/load-state/load-state.component';
 import { PageCardComponent } from '../../shared/page-card/page-card.component';
+import { PendingButtonDirective } from '../../shared/pending-button.directive';
 import { RichTextEditorComponent } from '../../shared/rich-text-editor/rich-text-editor.component';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../subject.service';
@@ -33,6 +34,7 @@ import { SubjectIconSvgComponent } from '../subject-icon-svg/subject-icon-svg.co
     LoadStateComponent,
     PageCardComponent,
     VisibilityToggleComponent,
+    PendingButtonDirective,
   ],
   templateUrl: './edit-subject.component.html',
 })
@@ -45,6 +47,7 @@ export class EditSubjectComponent implements OnInit, OnDestroy {
   selectedFile: File | null = null;
   descEditor: Editor;
   descLength = 0;
+  submitting = false;
   // null => nessuna icona caricata (né esistente né appena scelta): si mostra
   // the live preview generated from the colour, which follows the colour picker;
   // otherwise it is the URL of a real icon, either stored on the server or the
@@ -181,7 +184,7 @@ export class EditSubjectComponent implements OnInit, OnDestroy {
   }
 
   async updateSubject(): Promise<void> {
-    if (this.editForm.invalid || !this.subjectId || this.descLength > this.descMaxLength) {
+    if (this.editForm.invalid || !this.subjectId || this.descLength > this.descMaxLength || this.submitting) {
       this.editForm.markAllAsTouched();
       return;
     }
@@ -203,12 +206,15 @@ export class EditSubjectComponent implements OnInit, OnDestroy {
       formData.append('icon', fileToUpload, fileToUpload.name);
     }
 
+    this.submitting = true;
     try {
       await this.subjectService.updateSubject(this.subjectId, formData);
       this.toastService.show(this.transloco.translate('subject.toast.updated'), 'success');
       this.router.navigate(['/manage-subjects']);
     } catch (error) {
       this.toastService.show(this.transloco.translate('subject.toast.updateError'), 'error');
+    } finally {
+      this.submitting = false;
     }
   }
 }

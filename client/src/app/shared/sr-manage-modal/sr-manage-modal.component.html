@@ -35,7 +35,7 @@
   }
 
   <ng-container modal-footer>
-    <button type="button" class="btn btn-outline-primary" [disabled]="reverting" (click)="cancel()">
+    <button type="button" class="btn btn-outline-primary" [disabled]="reverting" [appPendingButton]="reverting" (click)="cancel()">
       <span class="material-symbols-outlined">close</span>{{ 'spacedRepetition.manage.cancelButton' | transloco }}
     </button>
     <button type="button" class="btn btn-primary" [disabled]="reverting" (click)="confirm()">

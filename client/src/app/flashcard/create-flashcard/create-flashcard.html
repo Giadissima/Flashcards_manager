@@ -89,7 +89,8 @@
       <app-visibility-toggle [control]="visibilityControl"></app-visibility-toggle>
 
       <div class="form-actions">
-        <button type="submit" class="btn btn-primary" [disabled]="cardForm.invalid"><span
+        <button type="submit" class="btn btn-primary" [disabled]="cardForm.invalid || submitting"
+          [appPendingButton]="submitting"><span
             class="material-symbols-outlined">add</span>{{ 'flashcard.create.addButton' | transloco }}</button>
       </div>
     </form>

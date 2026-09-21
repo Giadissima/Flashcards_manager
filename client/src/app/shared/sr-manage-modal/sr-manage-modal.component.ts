@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 
 import { ModalComponent } from '../modal/modal.component';
+import { PendingButtonDirective } from '../pending-button.directive';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
 import { ToastService } from '../toast/toast.service';
@@ -24,7 +25,7 @@ interface SubjectGroup {
 @Component({
   selector: 'app-sr-manage-modal',
   standalone: true,
-  imports: [CommonModule, TranslocoModule, ModalComponent],
+  imports: [CommonModule, TranslocoModule, ModalComponent, PendingButtonDirective],
   templateUrl: './sr-manage-modal.component.html',
   styleUrl: './sr-manage-modal.component.scss',
 })
@@ -139,6 +140,7 @@ export class SrManageModalComponent implements OnChanges {
    * confirming always means leaving as it was found.
    */
   async cancel(): Promise<void> {
+    if (this.reverting) return;
     await this.revertChanges();
     this.finish();
   }

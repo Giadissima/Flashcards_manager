@@ -11,6 +11,7 @@ import { answerMaxLength, charMinLength, questionMaxLength, titleMaxLength } fro
 
 import { CommonModule } from '@angular/common';
 import { ModalComponent } from '../../shared/modal/modal.component';
+import { PendingButtonDirective } from '../../shared/pending-button.directive';
 import { Router } from '@angular/router';
 import { VisibilityToggleComponent } from '../../shared/visibility-toggle/visibility-toggle.component';
 import { Visibility } from '../../models/visibility.dto';
@@ -63,11 +64,13 @@ function isConnectivityError(err: unknown): boolean {
     PageCardComponent,
     VisibilityToggleComponent,
     ModalComponent,
+    PendingButtonDirective,
   ],
   templateUrl: './create-flashcard.html',
 })
 export class CreateFlashcard implements OnInit, OnDestroy {
   cardForm!: FormGroup;
+  submitting = false;
   topics: Topic[] = [];
   subjects: Subject[] = [];
   selectedSubjectId: string | null = null;
@@ -216,7 +219,7 @@ export class CreateFlashcard implements OnInit, OnDestroy {
   }
 
   async addCard() {
-    if (this.cardForm.invalid) {
+    if (this.cardForm.invalid || this.submitting) {
       this.cardForm.markAllAsTouched();
       return;
     }
@@ -233,6 +236,7 @@ export class CreateFlashcard implements OnInit, OnDestroy {
       answer: this.answerEditor.getHTML()
     };
 
+    this.submitting = true;
     try {
       await this.flashcardService.create(newCard);
       this.toastService.show(this.transloco.translate('flashcard.toast.cardAdded'), 'success')
@@ -253,6 +257,8 @@ export class CreateFlashcard implements OnInit, OnDestroy {
     } catch (err: any) {
       console.error(err);
       this.toastService.show(this.transloco.translate('flashcard.toast.addError'), 'error')
+    } finally {
+      this.submitting = false;
     }
   }
 

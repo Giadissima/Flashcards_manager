@@ -10,7 +10,8 @@
     @if (loginError) {
     <p class="admin-error">{{ loginError }}</p>
     }
-    <button type="submit" class="btn btn-primary" [disabled]="loggingIn || password.length < 2">Entra</button>
+    <button type="submit" class="btn btn-primary" [disabled]="loggingIn || password.length < 2"
+      [appPendingButton]="loggingIn">Entra</button>
   </form>
 </div>
 } @else {
@@ -60,13 +61,13 @@
       <!-- What is decided about the content: keep it, take it down, put it
            back. Each greyed out once it has nothing left to do. -->
       <div class="admin-actions">
-        <button type="button" class="btn btn-outline-primary" [disabled]="!can('keep')" (click)="act('keep')">
+        <button type="button" class="btn btn-outline-primary" [disabled]="!can('keep')" [appPendingButton]="working" (click)="act('keep')">
           Va bene
         </button>
-        <button type="button" class="btn btn-outline-danger" [disabled]="!can('remove')" (click)="act('remove')">
+        <button type="button" class="btn btn-outline-danger" [disabled]="!can('remove')" [appPendingButton]="working" (click)="act('remove')">
           {{ chosen.target === 'comment' ? 'Togli il commento' : chosen.target === 'feedback' ? 'Oscura il messaggio' : 'Togli il post' }}
         </button>
-        <button type="button" class="btn btn-outline-primary" [disabled]="!can('restore')" (click)="act('restore')">
+        <button type="button" class="btn btn-outline-primary" [disabled]="!can('restore')" [appPendingButton]="working" (click)="act('restore')">
           {{ chosen.target === 'comment' ? 'Rimetti il commento' : chosen.target === 'feedback' ? 'Rimetti il messaggio' : 'Rimetti il post' }}
         </button>
       </div>
@@ -75,20 +76,20 @@
            and whoever reported it - a report can be exactly as much of a
            problem as the thing it is about. -->
       <div class="admin-actions">
-        <button type="button" class="btn btn-outline-danger" [disabled]="!can('warn')" (click)="act('warn')">
+        <button type="button" class="btn btn-outline-danger" [disabled]="!can('warn')" [appPendingButton]="working" (click)="act('warn')">
           Ammonisci l'autore
         </button>
         <button type="button" class="btn btn-danger" [disabled]="!can('ban')" (click)="confirming = 'author'">
           Banna l'autore
         </button>
         @if (chosen.banned || chosen.strikes) {
-        <button type="button" class="btn btn-outline-primary" [disabled]="working" (click)="pardon('author')">
+        <button type="button" class="btn btn-outline-primary" [disabled]="working" [appPendingButton]="working" (click)="pardon('author')">
           Ridagli tutto
         </button>
         }
       </div>
       <div class="admin-actions">
-        <button type="button" class="btn btn-outline-danger" [disabled]="!can('warn', 'reporter')"
+        <button type="button" class="btn btn-outline-danger" [disabled]="!can('warn', 'reporter')" [appPendingButton]="working"
           (click)="act('warn', 'reporter')">
           Ammonisci chi ha segnalato
         </button>
@@ -97,7 +98,7 @@
           Banna chi ha segnalato
         </button>
         @if (chosen.reporterBanned || chosen.reporterStrikes) {
-        <button type="button" class="btn btn-outline-primary" [disabled]="working" (click)="pardon('reporter')">
+        <button type="button" class="btn btn-outline-primary" [disabled]="working" [appPendingButton]="working" (click)="pardon('reporter')">
           Ridagli tutto
         </button>
         }
@@ -112,7 +113,7 @@
           Tutti i suoi post escono dal feed e non potrà più pubblicare, commentare, mandare feedback o segnalare.
         </p>
         <div class="admin-actions">
-          <button type="button" class="btn btn-danger" [disabled]="working" (click)="ban(confirming)">
+          <button type="button" class="btn btn-danger" [disabled]="working" [appPendingButton]="working" (click)="ban(confirming)">
             Sì, banna
           </button>
           <button type="button" class="btn btn-outline-primary" (click)="confirming = null">

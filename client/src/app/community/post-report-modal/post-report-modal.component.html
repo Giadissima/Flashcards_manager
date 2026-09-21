@@ -23,7 +23,8 @@
     <button type="button" class="btn btn-outline-primary" (click)="close()">
       <span class="material-symbols-outlined">close</span>{{ 'common.cancel' | transloco }}
     </button>
-    <button type="button" class="btn btn-danger" [disabled]="!canSend" (click)="confirm()">
+    <button type="button" class="btn btn-danger" [disabled]="!canSend" [appPendingButton]="sending"
+      (click)="confirm()">
       <span class="material-symbols-outlined">flag</span>{{ 'community.report.send' | transloco }}
     </button>
   </ng-container>

@@ -7,6 +7,7 @@ import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { CommunityService } from '../community.service';
 import { ReportReason, reportReasons } from '../../models/post.dto';
 import { ModalComponent } from '../../shared/modal/modal.component';
+import { PendingButtonDirective } from '../../shared/pending-button.directive';
 import { restrictionOf } from '../../shared/restriction';
 import { ToastService } from '../../shared/toast/toast.service';
 
@@ -29,7 +30,7 @@ export type ReportKind = 'post' | 'comment' | 'feedback';
 @Component({
   selector: 'app-post-report-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslocoModule, ModalComponent],
+  imports: [CommonModule, FormsModule, TranslocoModule, ModalComponent, PendingButtonDirective],
   templateUrl: './post-report-modal.component.html',
   styleUrl: './post-report-modal.component.scss',
 })
