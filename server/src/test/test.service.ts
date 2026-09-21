@@ -186,22 +186,74 @@ export class TestService {
   ) {
     assertValidObjectId(test_id);
     assertValidObjectId(question_id);
+
+    // Read this question's own prior state first: whether it already had a
+    // verdict, and, if a Leitner review already ran for it, what box it
+    // started from and when. A question appears at most once per test, so
+    // this state is unambiguous.
+    const before = await this.testModel.findOne(
+      { _id: test_id, user_id: userId, 'questions.flashcard_id': question_id },
+      { 'questions.$': 1 },
+    );
+    if (!before) return null;
+    const question = before.questions[0];
+    const previous = question.is_correct;
+
+    // The box this question's review is anchored to: fixed the first time it
+    // is answered (or, for a question answered before this anchor existed,
+    // recovered from the card's current box on the first touch after the
+    // upgrade). A later correction reuses the same anchor instead of
+    // re-reading the card's box, which may have moved on by then.
+    let sr_box_before = question.sr_box_before;
+    if (is_correct !== undefined && sr_box_before === undefined) {
+      sr_box_before = await this.flashcardService.getBox(userId, question_id);
+    }
+
     const update =
       is_correct === undefined
-        ? { $unset: { 'questions.$.is_correct': '' } }
-        : { $set: { 'questions.$.is_correct': is_correct } };
+        ? {
+            $unset: {
+              'questions.$.is_correct': '',
+              'questions.$.sr_box_before': '',
+              'questions.$.sr_reviewed_at': '',
+            },
+          }
+        : { $set: { 'questions.$.is_correct': is_correct, 'questions.$.sr_box_before': sr_box_before } };
+
     const result = await this.testModel.findOneAndUpdate(
       { _id: test_id, user_id: userId, 'questions.flashcard_id': question_id },
       update,
       { new: true },
     );
 
-    // Only on an actual answer, not on the undo that clears one: a card is
-    // reviewed by being judged right or wrong, and there is no sound way to
-    // roll a Leitner box back to what it was before an answer that is now
-    // being taken away.
-    if (is_correct !== undefined) {
-      await this.flashcardService.recordReview(userId, question_id, is_correct);
+    if (is_correct === undefined) {
+      // Only undo a review that actually ran: a question can be cleared
+      // before ever having an anchored box, e.g. legacy data.
+      if (previous !== undefined && sr_box_before !== undefined) {
+        await this.flashcardService.revertReview(
+          userId,
+          question_id,
+          previous === false,
+          sr_box_before,
+          question.sr_reviewed_at,
+        );
+      }
+    } else {
+      const reviewedAt = await this.flashcardService.recordReview(
+        userId,
+        question_id,
+        is_correct,
+        sr_box_before ?? 0,
+        previous === undefined,
+        previous === false,
+        previous === undefined ? undefined : question.sr_reviewed_at,
+      );
+      if (reviewedAt) {
+        await this.testModel.updateOne(
+          { _id: test_id, user_id: userId, 'questions.flashcard_id': question_id },
+          { $set: { 'questions.$.sr_reviewed_at': reviewedAt } },
+        );
+      }
     }
 
     return result;

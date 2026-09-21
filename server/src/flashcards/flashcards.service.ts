@@ -274,6 +274,17 @@ export class FlashcardsService {
       .exec();
   }
 
+  // The card's current sr_box, read for a question being answered for the
+  // first time in a test (or one with no stored anchor yet): the box the
+  // Leitner progression should start from.
+  async getBox(userId: string, id: string): Promise<number> {
+    const existing = await this.flashcardModel
+      .findOne({ _id: id, user_id: userId }, { sr_box: 1 })
+      .lean()
+      .exec();
+    return existing?.sr_box ?? 0;
+  }
+
   /**
    * Moves a card through its Leitner boxes after it is answered in any test,
    * not only a spaced-repetition one: reviewing a topic early, ahead of its
@@ -281,29 +292,118 @@ export class FlashcardsService {
    * exam before daily catches up would count for nothing. A card belonging to
    * someone else, or already gone, is silently skipped - the same as any
    * other flashcard a test's questions can outlive.
+   *
+   * fromBox is the box to progress from - normally the card's box before this
+   * question was ever answered in its test, so that flipping the same
+   * question between right and wrong (a misclick, then a correction) always
+   * lands on the same result instead of compounding with each toggle.
+   *
+   * countsAsNewReview is false when this call is only correcting an already
+   * counted answer (right<->wrong on the same question): review_count is not
+   * incremented again, and wrong_count is adjusted by the net change instead
+   * of blindly incremented.
+   *
+   * On a correction (countsAsNewReview false), reviewedAt is the timestamp
+   * the question's original review wrote onto the card. The box is only
+   * moved from fromBox when that still matches the card's current
+   * sr_last_reviewed_at - i.e. nothing else has reviewed the same card since.
+   * If another test reviewed it meanwhile, its box has moved on legitimately,
+   * and this correction must not overwrite that: the box, due date and
+   * last-reviewed date are left alone, though review_count/wrong_count - a
+   * running tally, not a snapshot of "current state" - are still adjusted.
    */
   async recordReview(
     userId: string,
     id: string,
     isCorrect: boolean,
-  ): Promise<void> {
+    fromBox: number,
+    countsAsNewReview: boolean,
+    previousWasWrong = false,
+    reviewedAt?: Date,
+  ): Promise<Date | undefined> {
     const existing = await this.flashcardModel
-      .findOne({ _id: id, user_id: userId }, { sr_box: 1 })
+      .findOne({ _id: id, user_id: userId }, { sr_last_reviewed_at: 1 })
       .lean()
       .exec();
-    if (!existing) return;
+    if (!existing) return undefined;
 
-    const nextBox = isCorrect ? Math.min((existing.sr_box ?? 0) + 1, srMaxBox) : 0;
-    const now = new Date();
-    const dueAt = new Date(now);
-    dueAt.setDate(dueAt.getDate() + srIntervalDays[nextBox]);
+    const stale =
+      !countsAsNewReview &&
+      reviewedAt !== undefined &&
+      existing.sr_last_reviewed_at?.getTime() !== reviewedAt.getTime();
+
+    const reviewDelta = countsAsNewReview ? 1 : 0;
+    // wrong_count reflects the current verdict, not every verdict a question
+    // has ever held: a first review adds one when wrong, and a correction
+    // swaps out the old verdict's contribution for the new one's.
+    const wasWrongBefore = countsAsNewReview ? false : previousWasWrong;
+    const wrongDelta = (isCorrect ? 0 : 1) - (wasWrongBefore ? 1 : 0);
+
+    let boxSet: Record<string, unknown> = {};
+    let newReviewedAt = reviewedAt;
+    if (!stale) {
+      const nextBox = isCorrect ? Math.min(fromBox + 1, srMaxBox) : 0;
+      const now = new Date();
+      const dueAt = new Date(now);
+      dueAt.setDate(dueAt.getDate() + srIntervalDays[nextBox]);
+      boxSet = { sr_box: nextBox, sr_due_at: dueAt, sr_last_reviewed_at: now };
+      newReviewedAt = now;
+    }
 
     await this.flashcardModel
       .updateOne(
         { _id: id, user_id: userId },
         {
-          $set: { sr_box: nextBox, sr_due_at: dueAt, sr_last_reviewed_at: now },
-          $inc: { review_count: 1, wrong_count: isCorrect ? 0 : 1 },
+          $set: boxSet,
+          $inc: { review_count: reviewDelta, wrong_count: wrongDelta },
+        },
+      )
+      .exec();
+
+    return newReviewedAt;
+  }
+
+  /**
+   * Undoes the single review a now-removed answer applied: review_count goes
+   * back down by one and wrong_count follows if that answer was wrong.
+   *
+   * The box itself is only restored to fromBox when reviewedAt still matches
+   * the card's sr_last_reviewed_at - i.e. nothing else has reviewed the same
+   * card since. If another test reviewed it meanwhile, its box has moved on
+   * legitimately, and undoing this stale answer must not overwrite that: the
+   * box, due date and last-reviewed date are left as they are.
+   */
+  async revertReview(
+    userId: string,
+    id: string,
+    wasWrong: boolean,
+    fromBox: number,
+    reviewedAt: Date | undefined,
+  ): Promise<void> {
+    const existing = await this.flashcardModel
+      .findOne({ _id: id, user_id: userId }, { sr_last_reviewed_at: 1 })
+      .lean()
+      .exec();
+    if (!existing) return;
+
+    const stillFresh =
+      reviewedAt !== undefined &&
+      existing.sr_last_reviewed_at?.getTime() === reviewedAt.getTime();
+
+    const boxUpdate = stillFresh
+      ? (() => {
+          const dueAt = new Date();
+          dueAt.setDate(dueAt.getDate() + srIntervalDays[fromBox]);
+          return { sr_box: fromBox, sr_due_at: dueAt };
+        })()
+      : {};
+
+    await this.flashcardModel
+      .updateOne(
+        { _id: id, user_id: userId },
+        {
+          $set: boxUpdate,
+          $inc: { review_count: -1, wrong_count: wasWrong ? -1 : 0 },
         },
       )
       .exec();

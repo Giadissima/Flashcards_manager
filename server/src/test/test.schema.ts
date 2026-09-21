@@ -11,6 +11,21 @@ export class Question {
   @Prop({ required: false, default: undefined })
   is_correct?: boolean;
 
+  // The card's sr_box right before this question was first answered in this
+  // test, and the sr_last_reviewed_at that answer wrote back onto the card.
+  // Together they let a later correction (undo, or flipping right/wrong)
+  // recompute the Leitner box from the same starting point instead of
+  // compounding on top of itself - but only while sr_last_reviewed_at on the
+  // card still matches what was stored here. If it no longer matches, another
+  // test reviewed the same card meanwhile and moved its box on legitimately;
+  // the correction then leaves the box alone rather than overwriting that
+  // more recent progress.
+  @Prop({ required: false })
+  sr_box_before?: number;
+
+  @Prop({ type: Date, required: false })
+  sr_reviewed_at?: Date;
+
   // The topic of the flashcard, kept on the question itself: the review of a
   // test filters by topic, and reading it back from hundreds of cards - some of
   // which may be deleted by then - is a join the question can carry instead.
