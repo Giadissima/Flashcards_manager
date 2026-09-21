@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { Editor } from '@tiptap/core';
@@ -59,9 +59,6 @@ const mathSymbols: MathSymbol[] = [
   styleUrls: ['./rich-text-editor.component.scss']
 })
 export class RichTextEditorComponent implements OnInit, OnDestroy {
-  private static nextId = 0;
-  readonly imageInputId = `rich-text-editor-image-${RichTextEditorComponent.nextId++}`;
-
   readonly mathSymbols = mathSymbols;
 
   @Input({ required: true }) editor!: Editor;
@@ -104,6 +101,21 @@ export class RichTextEditorComponent implements OnInit, OnDestroy {
   set mathInput(ref: ElementRef<HTMLInputElement> | undefined) {
     this.mathInputEl = ref?.nativeElement;
     this.fillMathInput();
+  }
+
+  @ViewChild('imageInput') private imageInputRef?: ElementRef<HTMLInputElement>;
+
+  /**
+   * Opening a file picker is a browser action, not a document edit, so it has
+   * no place among the editor's own commands - this is caught on the
+   * component instead, the same way the toolbar's image button does it.
+   */
+  @HostListener('keydown', ['$event'])
+  onKeydown(event: KeyboardEvent): void {
+    if (!event.ctrlKey || !event.shiftKey || event.key.toLowerCase() !== 'i') return;
+
+    event.preventDefault();
+    this.imageInputRef?.nativeElement.click();
   }
 
   ngOnInit(): void {

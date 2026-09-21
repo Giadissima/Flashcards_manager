@@ -1,5 +1,6 @@
 import { InlineMathNode } from '@aarkue/tiptap-math-extension';
 import { Node as ProseMirrorNode } from '@tiptap/pm/model';
+import { NodeSelection } from '@tiptap/pm/state';
 import katex from 'katex';
 
 /** Node name registered by the math extension, used to recognise a formula. */
@@ -16,6 +17,32 @@ export const mathNodeName = 'inlineMath';
  * same rendering.
  */
 export const InlineMath = InlineMathNode.extend({
+  /**
+   * Puts an empty inline formula where the cursor is and selects it, which is
+   * what opens the formula bar (the toolbar's LaTeX button does the same two
+   * steps; the editor's `selectionUpdate` listener reacts to the selection
+   * either way, so there is nothing else to wire up here).
+   */
+  addKeyboardShortcuts() {
+    return {
+      'Mod-Shift-f': () => {
+        this.editor
+          .chain()
+          .focus()
+          .insertContent({ type: mathNodeName, attrs: { latex: '', display: 'no', evaluate: 'no' } })
+          .run();
+
+        const pos = this.editor.state.selection.from - 1;
+        const node = this.editor.state.doc.nodeAt(pos);
+        if (node?.type.name !== mathNodeName) return true;
+
+        this.editor.view.dispatch(
+          this.editor.state.tr.setSelection(NodeSelection.create(this.editor.state.doc, pos))
+        );
+        return true;
+      },
+    };
+  },
   addNodeView() {
     return ({ node }) => {
       const dom = document.createElement('span');

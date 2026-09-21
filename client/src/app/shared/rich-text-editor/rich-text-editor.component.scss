@@ -53,6 +53,15 @@
   gap: calc(var(--spacing-unit) * 0.5);
 }
 
+/* Same idea as .math-bar above, minus the column stacking: everything here is
+   a single row of button groups, with no field of its own to wrap under. */
+.table-bar {
+  flex-basis: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--spacing-unit) * 0.75);
+}
+
 /* LaTeX is written character by character, and a monospaced face is what keeps
    a brace, a backslash and an underscore apart while it is. */
 .math-source {
@@ -74,65 +83,27 @@
   line-height: 1.5;
 }
 
-/* The toolbar folds itself on a phone: only the controls used while writing
-   stay on the first row, the rest waits behind the toggle, which the wide
-   layout does not draw at all. */
-.editor-toolbar-toggle {
+/* The two layouts are separate, complete copies of the toolbar (built from
+   the same ng-templates, so nothing is duplicated in the component), and only
+   one is ever in the DOM's tab order at a time: Tab always follows DOM order,
+   never the CSS `order` property, so a single shared DOM that tried to be
+   reshuffled per breakpoint made Tab jump around and skip buttons. Hiding the
+   other layout with `display: none` takes it out of that order entirely. */
+.editor-toolbar-mobile {
   display: none;
 }
 
-/* Wide layout: the rows the phone needs are not boxes here, so the toolbar
-   lays out the groups itself, in the reading order it has always had. Two
-   groups the phone puts on different rows used to be a single one, and a
-   join- pair draws them joined again. */
+.editor-toolbar-desktop {
+  display: none;
+}
+
+/* Wide layout: one row, in the reading order the toolbar has always had. */
 @media (min-width: 768.01px) {
-  .editor-toolbar-main,
-  .editor-toolbar-extras {
-    display: contents;
-  }
-
-  .editor-toolbar-history {
-    order: 1;
-  }
-
-  .editor-toolbar-extras > :nth-child(1) {
-    order: 2; /* text style */
-  }
-
-  .editor-toolbar-main > :nth-child(1) {
-    order: 3; /* bold, italic */
-  }
-
-  .editor-toolbar-extras > :nth-child(2) {
-    order: 4; /* underline, strikethrough, code */
-  }
-
-  .editor-toolbar-main > :nth-child(2) {
-    order: 5; /* bullet list */
-  }
-
-  .editor-toolbar-extras > :nth-child(3) {
-    order: 6; /* ordered list */
-  }
-
-  .editor-toolbar-extras > :nth-child(4) {
-    order: 7; /* blockquote, code block, rule */
-  }
-
-  .editor-toolbar-main > :nth-child(3) {
-    order: 8; /* link */
-  }
-
-  .editor-toolbar-extras > :nth-child(5) {
-    order: 9; /* image */
-  }
-
-  .editor-toolbar-extras > :nth-child(6) {
-    order: 10; /* LaTeX */
-  }
-
-  .math-bar {
-    order: 11;
+  .editor-toolbar-desktop {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: calc(var(--spacing-unit) * 1.25);
   }
 
   /* Pulled back over the gap of the toolbar and over the border the two
@@ -150,9 +121,21 @@
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
   }
+
+  .editor-toolbar-toggle {
+    display: none;
+  }
 }
 
 @media (max-width: 768px) {
+  .editor-toolbar-mobile {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: calc(var(--spacing-unit) * 1.25);
+    flex: 1 1 100%;
+  }
+
   .editor-toolbar {
     /* A long answer scrolls the toolbar away, so it stays pinned to the top of
        its own editor. */

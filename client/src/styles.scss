@@ -1128,6 +1128,58 @@ fieldset:disabled .btn {
   margin-bottom: 0;
 }
 
+/* A bare <table> has no border of its own, so without this it would read as
+   plain left-aligned text laid out in a grid rather than as a table. */
+.flashcard-text table,
+.question-text table,
+.answer table,
+.subject-description table,
+.tiptap table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: calc(var(--spacing-unit) * 1.5) 0;
+}
+
+.flashcard-text th,
+.flashcard-text td,
+.question-text th,
+.question-text td,
+.answer th,
+.answer td,
+.subject-description th,
+.subject-description td,
+.tiptap th,
+.tiptap td {
+  border: 1px solid var(--border-color);
+  padding: calc(var(--spacing-unit) * 0.5) calc(var(--spacing-unit) * 0.75);
+  text-align: left;
+}
+
+.flashcard-text th,
+.question-text th,
+.answer th,
+.subject-description th,
+.tiptap th {
+  background-color: var(--component-background);
+  font-weight: 600;
+}
+
+/* Bootstrap's own <mark> (its `--bs-highlight-bg`/`-color` pair) is a pale
+   cream that barely reads as "highlighted" - a marker is supposed to stand out.
+   `--bs-highlight-bg` only ever repaints under `[data-bs-theme='dark']`, an
+   attribute this app never sets (it themes through `[data-theme]` instead), so
+   without an override here the dark theme would be stuck with the same pale
+   light-mode colour, all but invisible against dark text on a dark page. */
+mark {
+  background-color: #ffd43b;
+  color: #1a1a1a;
+}
+
+[data-theme='dark'] mark {
+  background-color: #f2c94c;
+  color: #1a1a1a;
+}
+
 /* Placeholder from @tiptap/extension-placeholder: shows the sample text on the
    first empty node through a pseudo-element, without taking up any height. It
    is taken out of the flow by being positioned rather than floated, so that a
