@@ -137,14 +137,6 @@
     padding-left: calc(var(--spacing-unit) * 2.5);
     margin-bottom: 0;
   }
-
-  // ::ng-deep: the "flashcard" and "spaced repetition" links come from
-  // translation strings rendered with [innerHTML] (see landing.component.html),
-  // so they never get Angular's scoping attribute and a plain `a` rule here
-  // would never match them.
-  ::ng-deep a {
-    color: var(--primary-color);
-  }
 }
 
 .landing-footer {

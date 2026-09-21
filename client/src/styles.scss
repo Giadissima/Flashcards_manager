@@ -251,6 +251,19 @@ h6 {
   color: var(--header-color);
 }
 
+/* Plain content links (e.g. inside translated copy or modal bodies) follow
+   the theme instead of the browser's default blue. Button-styled anchors
+   (.btn) set their own color and are unaffected since a class selector
+   always wins over this bare-tag one. */
+a {
+  color: var(--primary-color);
+}
+
+a:hover,
+a:focus {
+  color: var(--accent-color);
+}
+
 /* ---------------------------------- */
 /* 3. Common Layout & Components      */
 /* ---------------------------------- */
@@ -883,8 +896,9 @@ fieldset:disabled .btn {
 }
 
 /* Text-only actions. They are plain links, not buttons: no padding, no border
-   and no hover box, so only the coloured label shows. Used on <a> elements that
-   act on the page, hence the role/aria-disabled attributes at the call sites. */
+   and no hover box, so only the coloured label shows (color/hover come from
+   the global `a` rule). Used on <a> elements that act on the page, hence the
+   role/aria-disabled attributes at the call sites. */
 .link-action {
   display: inline-flex;
   align-items: center;
@@ -892,14 +906,9 @@ fieldset:disabled .btn {
   padding: 0;
   border: none;
   background: none;
-  color: var(--primary-color);
   text-decoration: underline;
   cursor: pointer;
   margin-block: var(--spacing-unit);
-
-  &:hover {
-    color: var(--accent-color);
-  }
 
   &:active {
     color: var(--primary-color);

@@ -32,11 +32,13 @@
     </div>
   </section>
 
-  <section class="features">
+  <section class="features" (click)="onFeatureClick($event)">
     <article class="feature-card">
       <h2><span class="material-symbols-outlined">quiz</span>{{ 'landing.features.flashcard.title' | transloco }}</h2>
-      <!-- Static translation content, not user input - see the i18n files -->
-      <p [innerHTML]="'landing.features.flashcard.description' | transloco"></p>
+      <!-- Static translation content, not user input - see the i18n files.
+           trustHtml (not Angular's default sanitizer) so the data-term
+           attribute the definition-modal trigger relies on survives. -->
+      <p [innerHTML]="'landing.features.flashcard.description' | transloco | trustHtml"></p>
       <p>{{ 'landing.features.flashcard.description2' | transloco }}</p>
     </article>
 
@@ -44,12 +46,13 @@
       <h2><span class="material-symbols-outlined">school</span>{{ 'landing.features.test.title' | transloco }}</h2>
       <p>{{ 'landing.features.test.description' | transloco }}</p>
       <ul>
-        <li>{{ 'landing.features.test.basic' | transloco }}</li>
-        <!-- The translation string itself carries the link markup (see the
+        <!-- The translation strings themselves carry the link markup (see the
              i18n files): it's our own static content, not user input, so
-             binding it as HTML is safe and avoids splitting one sentence
-             across three separate translation keys. -->
-        <li [innerHTML]="'landing.features.test.daily' | transloco"></li>
+             binding it as HTML is safe and avoids splitting each sentence
+             across separate translation keys. trustHtml preserves the
+             data-term attribute the definition-modal trigger relies on. -->
+        <li [innerHTML]="'landing.features.test.basic' | transloco | trustHtml"></li>
+        <li [innerHTML]="'landing.features.test.daily' | transloco | trustHtml"></li>
         <li>{{ 'landing.features.test.weak' | transloco }}</li>
       </ul>
     </article>
@@ -61,6 +64,8 @@
       <p>{{ 'landing.features.community.description3' | transloco }}</p>
     </article>
   </section>
+
+  <app-definition-modal [term]="openDefinition" (closed)="closeDefinitionModal()"></app-definition-modal>
 
   <footer class="landing-footer text-center">
     <a routerLink="/privacy-policy" class="btn btn-outline-secondary">{{ 'privacyPolicy.title' | transloco }}</a>

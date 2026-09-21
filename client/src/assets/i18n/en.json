@@ -807,14 +807,14 @@
     "features": {
       "flashcard": {
         "title": "What is a flashcard?",
-        "description": "A <a href=\"https://en.wikipedia.org/wiki/Flashcard\" target=\"_blank\" rel=\"noopener noreferrer\">flashcard</a> is a two-sided card: the front side with a question and the back side with an answer.",
+        "description": "A <a href=\"#\" data-term=\"flashcard\">flashcard</a> is a two-sided card: the front side with a question and the back side with an answer.",
         "description2": "They're an efficient way to test your knowledge and prepare for oral exams."
       },
       "test": {
         "title": "Test",
         "description": "Flashcards Manager offers 3 types of test for your cards:",
-        "basic": "basic test, which you can set up freely",
-        "daily": "daily test, using the <a href=\"https://en.wikipedia.org/wiki/Spaced_repetition\" target=\"_blank\" rel=\"noopener noreferrer\">spaced repetition</a> study technique",
+        "basic": "<a href=\"#\" data-term=\"basicTest\">basic test</a>, which you can set up freely",
+        "daily": "daily test, using the <a href=\"#\" data-term=\"spacedRepetition\">spaced repetition</a> study technique",
         "weak": "weak cards test, for the cards you get wrong the most"
       },
       "community": {
@@ -822,6 +822,24 @@
         "description": "Explore the community!",
         "description2": "Test yourself with other flashcards’ groups, add them to yours, and help others by sharing what you created!",
         "description3": "The community shows your university by default, but you can explore other universities as you wish!"
+      }
+    },
+    "definitions": {
+      "sourceLabel": "Source:",
+      "wikipedia": "Wikipedia",
+      "flashcard": {
+        "title": "Flashcard",
+        "body": "A flashcard or flash card is a card bearing information on both sides, usually intended to practice and/or aid memorization. It can be virtual or physical. As such, flashcards are often used to memorize vocabulary, historical dates, formulae, or any subject matter that can be learned via a question-and-answer format, whether at school, outside school, or for self-study. Flashcards are therefore often used in vocabulary acquisition for second-language (L2) learning.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Flashcard"
+      },
+      "spacedRepetition": {
+        "title": "Spaced repetition",
+        "body": "Spaced repetition is an evidence-based learning technique that is usually performed with flashcards. Newly introduced and more difficult flashcards are shown more frequently, while older and less difficult flashcards are shown less frequently in order to exploit the psychological spacing effect. The use of spaced repetition has been proven to increase the rate of learning.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Spaced_repetition"
+      },
+      "basicTest": {
+        "title": "Basic test",
+        "body": "The basic test is one of Flashcards Manager's quiz modes: you choose which flashcards to include, even from just one or a few specific topics within a subject, and how many questions to answer. You can also pause the test at any time and resume it later right where you left off."
       }
     }
   },

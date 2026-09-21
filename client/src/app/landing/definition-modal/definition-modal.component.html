@@ -1,0 +1,12 @@
+@if (term) {
+<app-modal [isOpen]="true" [title]="('landing.definitions.' + term + '.title') | transloco" (closed)="close()">
+  <p class="mb-0">{{ ('landing.definitions.' + term + '.body') | transloco }}</p>
+
+  @if (hasSource) {
+  <p class="definition-source">
+    {{ 'landing.definitions.sourceLabel' | transloco }}
+    <a [href]="('landing.definitions.' + term + '.sourceUrl') | transloco" target="_blank" rel="noopener noreferrer">{{ 'landing.definitions.wikipedia' | transloco }}</a>
+  </p>
+  }
+</app-modal>
+}

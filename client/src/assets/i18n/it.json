@@ -807,14 +807,14 @@
     "features": {
       "flashcard": {
         "title": "Cos'è una flashcard?",
-        "description": "Una <a href=\"https://en.wikipedia.org/wiki/Flashcard\" target=\"_blank\" rel=\"noopener noreferrer\">flashcard</a> è una carta a due facce: il fronte con una domanda, e il retro con una risposta.",
+        "description": "Una <a href=\"#\" data-term=\"flashcard\">flashcard</a> è una carta a due facce: il fronte con una domanda, e il retro con una risposta.",
         "description2": "Sono un modo efficace per mettere alla prova le tue conoscenze e prepararti agli esami orali."
       },
       "test": {
         "title": "Test",
         "description": "Flashcards Manager offre 3 tipi di test per le tue card:",
-        "basic": "test base, che puoi impostare liberamente",
-        "daily": "test giornaliero, con la tecnica di studio a <a href=\"https://en.wikipedia.org/wiki/Spaced_repetition\" target=\"_blank\" rel=\"noopener noreferrer\">ripetizione dilazionata</a>",
+        "basic": "<a href=\"#\" data-term=\"basicTest\">test base</a>, che puoi impostare liberamente",
+        "daily": "test giornaliero, con la tecnica di studio a <a href=\"#\" data-term=\"spacedRepetition\">ripetizione dilazionata</a>",
         "weak": "test delle card deboli, per le card che sbagli più spesso"
       },
       "community": {
@@ -822,6 +822,24 @@
         "description": "Esplora la community!",
         "description2": "Fai anche dei quiz con i gruppi di flashcard degli altri utenti, aggiungili ai tuoi, e aiuta gli altri condividendo le tue materie!",
         "description3": "La community mostra di default la tua università, ma puoi esplorare anche le altre a tua discrezione"
+      }
+    },
+    "definitions": {
+      "sourceLabel": "Fonte:",
+      "wikipedia": "Wikipedia",
+      "flashcard": {
+        "title": "Flashcard",
+        "body": "Le flashcard sono la rappresentazione, cartacea o elettronica, di un insieme di informazioni. In genere, ognuna di questa carte conserva la rappresentazione dell'informazione sul dorso e dall'altra la sua descrizione. Questa loro caratteristica consente un loro impiego pratico ed efficiente per la memorizzazione dell'informazione alla quale corrispondono. Mediante un esercizio di stimolazione attiva della memoria attraverso la ripetizione dilazionata, possono infatti consentire l'apprendimento del dato rappresentato. Le flashcard sono utilizzabili in qualunque materia sia in contesto scolastico che extrascolastico e da autodidatta. In particolare, sono usate nell'apprendimento e acquisizione del vocabolario in una lingua straniera (L2).",
+        "sourceUrl": "https://it.wikipedia.org/wiki/Flashcard"
+      },
+      "spacedRepetition": {
+        "title": "Ripetizione dilazionata",
+        "body": "La ripetizione dilazionata o ripetizione spaziata è un sistema didattico volto all'ausilio della memorizzazione di informazioni di qualunque tipo sfruttando non solo la mera ripetizione delle informazioni, bensì l'effetto spaziatura o \"effetto di distribuzione temporale\", ovvero il fatto che la memorizzazione a lungo termine di una informazione è più facile quando essa viene ripetuta poche volte anziché numerose volte su un tempo breve o su intervalli di tempo dalla durata rigida e immutabile. A questo effetto, si aggiunge l'effetto ritardo, per cui la memorizzazione è migliore e più efficace se gli intervalli di tempo tra una ripetizione e l'altra su tempi via via crescenti, per cui tali intervalli di tempo non devono avere una durata rigida, inflessibile e immutabile.",
+        "sourceUrl": "https://it.wikipedia.org/wiki/Ripetizione_dilazionata"
+      },
+      "basicTest": {
+        "title": "Test base",
+        "body": "Il test base è una delle modalità di quiz di Flashcards Manager: scegli quali flashcard includere, anche su uno o più argomenti specifici di una materia, e quante domande affrontare. Puoi inoltre mettere il test in pausa in qualsiasi momento e riprenderlo più tardi da dove l'avevi lasciato."
       }
     }
   },
