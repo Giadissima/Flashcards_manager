@@ -136,7 +136,8 @@ export class EditFlashcard implements OnInit, OnDestroy {
     this.editForm.patchValue({
       title: card.title,
       subject_id: subjectId,
-      topic_id: topicId
+      topic_id: topicId,
+      visibility: card.visibility
     });
 
     this.questionEditor.commands.setContent(card.question);
