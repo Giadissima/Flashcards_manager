@@ -152,6 +152,14 @@
   </div>
 </nav>
 
+<!-- Stand-in for .create-card-btn once it disappears from the bar (below
+     $create-btn-remove): pinned to the corner so the shortcut stays reachable
+     without opening the drawer. -->
+<button routerLink="/create-card" type="button" class="create-card-fab"
+  [attr.aria-label]="'navbar.createCard' | transloco">
+  <span class="material-symbols-outlined">add</span>
+</button>
+
 <app-settings-modal [(isOpen)]="isSettingsOpen"
   (openImportExport)="onOpenImportExportFromSettings()"></app-settings-modal>
 <app-import-export-modal [(isOpen)]="isImportExportOpen" (back)="onImportExportBack()"></app-import-export-modal>

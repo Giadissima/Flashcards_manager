@@ -451,3 +451,37 @@ nav {
   }
 }
 
+.create-card-fab {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  right: calc(var(--spacing-unit) * 2);
+  bottom: calc(var(--spacing-unit) * 2);
+  width: 56px;
+  height: 56px;
+  border: none;
+  border-radius: 50%;
+  background-color: var(--primary-color);
+  color: var(--component-background);
+  box-shadow: var(--box-shadow-md);
+  cursor: pointer;
+  z-index: 1040; // above the page content, below the mobile drawer (1045)
+
+  .material-symbols-outlined {
+    font-size: 28px;
+  }
+}
+
+.create-card-fab:hover {
+  filter: brightness(0.92);
+}
+
+// Shown only once .create-card-btn has left the bar, so the shortcut it
+// replaces is always available somewhere on screen.
+@media (max-width: $create-btn-remove) {
+  .create-card-fab {
+    display: flex;
+  }
+}
+
