@@ -1,4 +1,5 @@
-<div class="editor-toolbar" [class.is-expanded]="showExtraTools" *transloco="let t">
+<div class="editor-toolbar" [class.is-expanded]="showExtraTools" *transloco="let t"
+  (mousedown)="preventButtonFocus($event)">
   <!-- Each group is written once as a template and reused below, so its
        markup and bindings are not duplicated between the two layouts.
        Tab order always follows DOM order, never the CSS `order` property, so
@@ -191,13 +192,9 @@
       <button type="button" class="btn btn-secondary" (click)="finishMath()" [title]="t('editor.latexDone')"><span
           class="material-symbols-outlined">check</span></button>
     </div>
-    <!-- mousedown is stopped rather than click: pressing a button would take
-         the focus off the field, and with it the caret the symbol is written
-         at. -->
     <div class="math-symbols">
       <button *ngFor="let symbol of mathSymbols" type="button" class="btn btn-outline-secondary math-symbol"
-        [title]="symbol.latex" (mousedown)="$event.preventDefault()"
-        (click)="insertMathSymbol(symbol)">{{ symbol.label }}</button>
+        [title]="symbol.latex" (click)="insertMathSymbol(symbol)">{{ symbol.label }}</button>
     </div>
   </div>
 

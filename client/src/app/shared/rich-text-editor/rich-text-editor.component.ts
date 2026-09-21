@@ -142,6 +142,19 @@ export class RichTextEditorComponent implements OnInit, OnDestroy {
     this.showExtraTools = !this.showExtraTools;
   }
 
+  /**
+   * Every toolbar button runs its command and puts the focus straight back on
+   * the editor, but on mobile the tap still lands on the button first, which
+   * is enough for its `:focus`/`:active` styling to stick as if it were still
+   * being pressed. Stopping mousedown's default action keeps focus off the
+   * button in the first place, the same trick the formula palette already
+   * uses below. The math field is exempt: it needs mousedown to place its own
+   * caret.
+   */
+  preventButtonFocus(event: MouseEvent): void {
+    if ((event.target as HTMLElement).closest('button')) event.preventDefault();
+  }
+
   toggleLink(): void {
     // Already writing inside a link: stop it here, so what follows is plain
     // text. Only the pending mark is dropped - unsetLink() would have used

@@ -26,6 +26,32 @@
     gap: calc(var(--spacing-unit) * 0.5);
   }
 
+  /* A toggle button's "on" state is already shown by the ngClass swap to
+     btn-secondary; Bootstrap's own `:active` look (same muted fill, from
+     --bs-btn-active-bg) would only repeat that on top of it. On mobile the
+     press state can outlast the tap, which then reads as the button being
+     stuck "on" right after switching it off - so the press look is dropped
+     here rather than left to occasionally stick around. */
+  .btn-outline-secondary {
+    --bs-btn-active-bg: transparent;
+    --bs-btn-active-border-color: var(--muted-color);
+    --bs-btn-active-color: var(--muted-color);
+  }
+
+  /* A touch tap simulates :hover as well as :active, and on a phone that
+     :hover often outlasts the tap instead of clearing with it. Bootstrap's
+     own hover fill for an outline button is its stock grey (#6c757d),
+     never themed to this app's palette, so a stuck one reads as the button
+     suddenly lighting up rather than as a lingering press. A device with no
+     real hover (touch) gets that fill turned off; a mouse still gets it. */
+  @media (hover: none) {
+    .btn-outline-secondary {
+      --bs-btn-hover-bg: transparent;
+      --bs-btn-hover-border-color: var(--muted-color);
+      --bs-btn-hover-color: var(--muted-color);
+    }
+  }
+
   .dropdown-menu {
     --bs-dropdown-bg: var(--component-background);
     --bs-dropdown-color: var(--text-color);
