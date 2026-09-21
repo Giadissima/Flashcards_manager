@@ -413,8 +413,9 @@ export class FlashcardsService {
   }
 
   /**
-   * The subject the given flashcards belong to. A test is built from a single
-   * subject, so it is taken from the first card that answers.
+   * Every subject the given flashcards belong to. A daily review can draw
+   * cards from several subjects at once, so a test is not assumed to be on a
+   * single one - every distinct subject among its cards is returned.
    *
    * Used when a test is created, to store on it what it is about. Its topics
    * are not asked for here: the questions of a test carry the topic each is on,
@@ -425,14 +426,14 @@ export class FlashcardsService {
    * whoever shared them - the subject is still theirs to read, the same way
    * the post's own carousel already does.
    */
-  async getSubject(
+  async getSubjects(
     userId: string,
     ids: (string | Types.ObjectId)[],
-  ): Promise<Types.ObjectId | undefined> {
-    if (!ids.length) return undefined;
+  ): Promise<Types.ObjectId[]> {
+    if (!ids.length) return [];
 
     const [result] = await this.flashcardModel
-      .aggregate<{ subject_id?: Types.ObjectId }>([
+      .aggregate<{ subject_id: Types.ObjectId[] }>([
         {
           $match: {
             _id: { $in: ids.map((id) => new Types.ObjectId(id)) },
@@ -442,11 +443,11 @@ export class FlashcardsService {
             ],
           },
         },
-        { $group: { _id: null, subject_id: { $first: '$subject_id' } } },
+        { $group: { _id: null, subject_id: { $addToSet: '$subject_id' } } },
       ])
       .exec();
 
-    return result?.subject_id ?? undefined;
+    return result?.subject_id ?? [];
   }
 
   count(userId: string, filter: CountFlashcardsDTO): Promise<number> {

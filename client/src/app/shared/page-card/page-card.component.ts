@@ -59,6 +59,9 @@ export class PageCardComponent {
   @Input({ required: true }) title = '';
   @Input() subtitle = '';
 
+  /** Shown on hover over the subtitle, e.g. the full list behind a "N subjects" summary. */
+  @Input() subtitleTooltip?: string;
+
   /** Overrides icon with an image (e.g. a subject icon), when the header stands for a specific subject rather than the page itself. */
   @Input() iconUrl = '';
 

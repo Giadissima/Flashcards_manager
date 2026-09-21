@@ -112,7 +112,7 @@
             </div>
             }
             @if (getSubjectLabel(test); as subjectLabel) {
-            <div class="test-subject">
+            <div class="test-subject" [attr.title]="getSubjectTooltip(test)">
               {{ subjectLabel }}
               @if (test.source_post_id) {
               <span class="test-source-community material-symbols-outlined"

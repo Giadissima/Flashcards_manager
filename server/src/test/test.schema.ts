@@ -74,10 +74,16 @@ export class Test {
   // What the test is about, resolved from its flashcards when it is created and
   // stored here: every screen of a test states it, and reading it back through
   // the cards of every question meant a join over hundreds of documents each
-  // time. Optional because tests created before this field exists do not carry
-  // it - they are backfilled at startup, see TestService.backfillSubjectAndTopic.
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Subject', required: false })
-  subject_id?: Types.ObjectId;
+  // time. A daily review can draw cards from several subjects at once, so this
+  // holds every subject the test touches, the same way topic_id does - a test
+  // on a single subject holds an array of one.
+  @Prop({
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: 'Subject',
+    required: false,
+    default: undefined,
+  })
+  subject_id?: Types.ObjectId[];
 
   // Every topic the questions of the test are on, so a test set up by subject
   // states all of them instead of none. A test on a single topic holds an array

@@ -26,7 +26,7 @@ import {
   SelectOption,
 } from '../../shared/searchable-select/searchable-select.component';
 import { Question, Test, TestTopic } from '../../models/test.dto';
-import { getTestScore, getTestSubjectLabel } from '../test-view.util';
+import { getTestScore, getTestSubjectLabel, getTestSubjectTooltip } from '../test-view.util';
 import { TestService } from '../test.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 
@@ -68,6 +68,11 @@ export class TestResult extends PaginatedList {
      control with one choice. */
   topics: TestTopic[] = [];
   selectedTopicId: string | null = null;
+
+  /* The subject being read, on a test spanning more than one (a daily review
+     can draw cards from several at once). Narrows which topics are offered
+     the same way picking a subject does in setup-test and the history filters. */
+  selectedSubjectId: string | null = null;
 
   /** Turns the review into a pass of study: the answers are asked for, one by one. */
   hideAnswers = false;
@@ -130,13 +135,44 @@ export class TestResult extends PaginatedList {
     this.topics = await this.testService.getTopics(this.testId);
   }
 
+  /**
+   * The subjects behind the test's topics, each named once. A test on a
+   * single subject has nothing to offer here - subject_id/subject_name are
+   * only missing when the subject itself was deleted since, which also
+   * leaves nothing choosable.
+   */
+  private get subjects(): { _id: string; name: string }[] {
+    const seen = new Map<string, string>();
+    for (const topic of this.topics) {
+      if (topic.subject_id && topic.subject_name && !seen.has(topic.subject_id)) {
+        seen.set(topic.subject_id, topic.subject_name);
+      }
+    }
+    return Array.from(seen, ([_id, name]) => ({ _id, name })).sort((a, b) =>
+      a.name.localeCompare(b.name)
+    );
+  }
+
+  /** Offered only when there is something to choose between. */
+  get showSubjectFilter(): boolean {
+    return this.subjects.length > 1;
+  }
+
+  get subjectOptions(): SelectOption[] {
+    return this.subjects.map((subject) => ({ value: subject._id, label: subject.name }));
+  }
+
   /** Offered only when there is something to choose between. */
   get showTopicFilter(): boolean {
     return this.topics.length > 1;
   }
 
+  /** Narrowed to the selected subject's topics, same as setup-test and the history filters. */
   get topicOptions(): SelectOption[] {
-    return this.topics.map((topic) => ({
+    const topics = this.selectedSubjectId
+      ? this.topics.filter((t) => t.subject_id === this.selectedSubjectId)
+      : this.topics;
+    return topics.map((topic) => ({
       value: topic._id,
       label: topic.name,
       color: topic.color,
@@ -144,10 +180,24 @@ export class TestResult extends PaginatedList {
   }
 
   /**
-   * The questions of the topic being read, or all of them. The outcome filter
-   * and the counts on its strip are both taken from here, so the strip states
-   * what picking an outcome would leave within the topic on screen and not
-   * within the whole test.
+   * The questions of the subject being read, or all of them. Topics with no
+   * resolved subject_id (the subject was deleted since) are left out once a
+   * subject is picked, the same way an unresolved topic already is.
+   */
+  private get subjectQuestions(): Question[] {
+    const questions = this.test?.questions ?? [];
+    if (!this.selectedSubjectId) return questions;
+    const topicIds = new Set(
+      this.topics.filter((t) => t.subject_id === this.selectedSubjectId).map((t) => t._id)
+    );
+    return questions.filter((q) => q.topic_id && topicIds.has(q.topic_id));
+  }
+
+  /**
+   * The questions of the topic being read, within the subject already
+   * selected, or all of them. The outcome filter and the counts on its strip
+   * are both taken from here, so the strip states what picking an outcome
+   * would leave within the topic on screen and not within the whole test.
    *
    * A question of a test created before the topic was kept on it is on no topic
    * at all, so picking one leaves it out: it is only listed with no topic
@@ -155,7 +205,7 @@ export class TestResult extends PaginatedList {
    * topics to pick from.
    */
   private get topicQuestions(): Question[] {
-    const questions = this.test?.questions ?? [];
+    const questions = this.subjectQuestions;
     if (!this.selectedTopicId) return questions;
     return questions.filter((q) => q.topic_id === this.selectedTopicId);
   }
@@ -236,6 +286,11 @@ export class TestResult extends PaginatedList {
     return parts.join(' — ');
   }
 
+  /** The subjects behind a "N materie" subtitle, for its hover tooltip. */
+  get subtitleTooltip(): string | undefined {
+    return this.test ? getTestSubjectTooltip(this.test) : undefined;
+  }
+
   /** The counts are the point of the strip: they say what filtering would leave. */
   get outcomeOptions(): SegmentedOption[] {
     const questions = this.topicQuestions;
@@ -251,9 +306,28 @@ export class TestResult extends PaginatedList {
   get activeFilterCount(): number {
     return (
       (this.outcome === 'all' ? 0 : 1) +
+      (this.selectedSubjectId ? 1 : 0) +
       (this.selectedTopicId ? 1 : 0) +
       (this.hideAnswers ? 1 : 0)
     );
+  }
+
+  onSubjectSelected(id: string | null | undefined): void {
+    this.selectedSubjectId = id ?? null;
+    // A topic of another subject no longer applies once the subject narrows,
+    // same as setup-test and the history filters.
+    if (
+      this.selectedSubjectId &&
+      this.selectedTopicId &&
+      !this.topics.some(
+        (t) => t._id === this.selectedTopicId && t.subject_id === this.selectedSubjectId
+      )
+    ) {
+      this.selectedTopicId = null;
+    }
+    // As for the topic and the outcome: the pages of one subject are not the pages of another.
+    this.currentPage = 1;
+    this.loadPage();
   }
 
   onTopicSelected(id: string | null | undefined): void {

@@ -8,9 +8,10 @@ export interface Test {
   elapsed_time?: number;
   questions: Question[];
 
-  // Names resolved by the server from the subject and the topics stored on the
-  // test. topic_names holds one name per topic the test touches.
-  subject_name?: string;
+  // Names resolved by the server from the subjects and topics stored on the
+  // test. Each holds one name per subject/topic the test touches - a daily
+  // review can span several of either.
+  subject_names?: string[];
   topic_names?: string[];
 
   // The test this one was built from (e.g. "repeat the wrong ones"), if any.
@@ -54,13 +55,16 @@ export type Question = {
 }
 
 /**
- * One of the topics the questions of a test are on: what the review of a test
- * spanning several topics filters by.
+ * One of the topics the questions of a test are on, with the subject it
+ * belongs to: what the review of a test spanning several topics or subjects
+ * filters by.
  */
 export interface TestTopic {
   _id: string;
   name: string;
   color?: string;
+  subject_id?: string;
+  subject_name?: string;
 }
 
 export interface TestStats {

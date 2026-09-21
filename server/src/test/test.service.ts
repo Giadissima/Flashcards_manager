@@ -79,14 +79,16 @@ export class TestService {
   }
 
   /**
-   * The topics the questions of a test are on, named. Read from the questions
-   * themselves, which carry their topic, so the flashcards are not touched: the
-   * review filters by topic and the cards behind the questions are only fetched
-   * one page at a time.
+   * The topics the questions of a test are on, named, each with the subject it
+   * belongs to. Read from the questions themselves, which carry their topic, so
+   * the flashcards are not touched: the review filters by topic (and, on a
+   * daily review spanning several subjects, by subject too) and the cards
+   * behind the questions are only fetched one page at a time.
    *
    * A topic that has been deleted since drops out rather than being listed
    * without a name: what comes back is a list of choices, and a choice with no
-   * label cannot be offered.
+   * label cannot be offered. Its subject can still be missing on its own (e.g.
+   * deleted separately), in which case the topic is kept but names no subject.
    */
   async getTopics(userId: string, id: string): Promise<TestTopic[]> {
     assertValidObjectId(id);
@@ -107,7 +109,24 @@ export class TestService {
         },
       },
       { $unwind: '$topic' },
-      { $project: { _id: 1, name: '$topic.name', color: '$topic.color' } },
+      {
+        $lookup: {
+          from: 'subject',
+          localField: 'topic.subject_id',
+          foreignField: '_id',
+          as: 'subject',
+        },
+      },
+      { $unwind: { path: '$subject', preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          _id: 1,
+          name: '$topic.name',
+          color: '$topic.color',
+          subject_id: '$topic.subject_id',
+          subject_name: '$subject.name',
+        },
+      },
       { $sort: { name: 1 } },
     ]);
   }
@@ -150,11 +169,12 @@ export class TestService {
     const topic_id = [
       ...new Set(test.questions.map((q) => q.topic_id).filter(Boolean)),
     ];
-    // The subject is the one thing a question does not carry, and a test has
-    // exactly one: it is still read from the cards.
+    // The subject is the one thing a question does not carry, so it is still
+    // read from the cards. A daily review can span several subjects at once,
+    // so every distinct one among the test's cards is kept, not just the first.
     // Scoped to the caller, like every other read of the flashcards: cards that
     // are not theirs answer nothing, so a test cannot be built over them.
-    const subject_id = await this.flashcardService.getSubject(
+    const subject_id = await this.flashcardService.getSubjects(
       userId,
       test.questions.map((q) => q.flashcard_id),
     );
@@ -301,10 +321,10 @@ export class TestService {
     }
 
     // Both are stored on the test itself, so no join is needed to filter by
-    // them. topic_id holds every topic of the test, and Mongo compares a value
-    // against each element of an array: a filter by topic returns every test
-    // that touches it, a single-topic one and a test built from the whole
-    // subject alike.
+    // them. Each holds every subject/topic the test touches, and Mongo compares
+    // a value against each element of an array: a filter by either returns
+    // every test that touches it, one built on a single subject/topic and a
+    // daily review spanning several alike.
     if (filter.subject_id) {
       pipeline.push({
         $match: { subject_id: new Types.ObjectId(filter.subject_id) },
@@ -328,7 +348,7 @@ export class TestService {
   }
 
   /**
-   * Turns the subject and topic stored on a test into their names. Shared by
+   * Turns the subjects and topics stored on a test into their names. Shared by
    * the paginated list and by the single test, so both describe a test the
    * same way; the list pushes it after $skip/$limit, so it only touches the
    * tests of the page being returned.
@@ -345,10 +365,23 @@ export class TestService {
       {
         $lookup: {
           from: 'subject',
-          let: { subjectId: '$subject_id' },
+          // subject_id is an array on every test created since a test could
+          // span more than one subject, but a test created before that holds
+          // a single id, not wrapped in one - normalized to an array here so
+          // both read the same way.
+          let: {
+            subjectIds: {
+              $cond: [
+                { $isArray: '$subject_id' },
+                '$subject_id',
+                { $cond: [{ $ifNull: ['$subject_id', false] }, ['$subject_id'], []] },
+              ],
+            },
+          },
           pipeline: [
-            { $match: { $expr: { $eq: ['$_id', '$$subjectId'] } } },
+            { $match: { $expr: { $in: ['$_id', '$$subjectIds'] } } },
             { $project: { name: 1 } },
+            { $sort: { name: 1 } },
           ],
           as: 'testSubjects',
         },
@@ -367,11 +400,11 @@ export class TestService {
       },
       {
         $addFields: {
-          subject_name: { $arrayElemAt: ['$testSubjects.name', 0] },
           // Every name, in order, and the reader decides what to make of them:
-          // one is stated, several are counted. A deleted topic drops out here
-          // rather than being carried as a blank, so a test says as many topics
-          // as it can still name.
+          // one is stated, several are counted. A deleted subject or topic
+          // drops out here rather than being carried as a blank, so a test
+          // says as many as it can still name.
+          subject_names: '$testSubjects.name',
           topic_names: '$testTopics.name',
         },
       },

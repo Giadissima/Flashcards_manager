@@ -28,7 +28,7 @@ import { toSubjectOptions, toTopicOptions } from '../../shared/select-options.ut
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
 import { TestService } from '../test.service';
-import { getTestScore, getTestSubjectLabel } from '../test-view.util';
+import { getTestScore, getTestSubjectLabel, getTestSubjectTooltip } from '../test-view.util';
 import { ToastService } from '../../shared/toast/toast.service';
 import { Topic } from '../../models/topic.dto';
 import { TopicService } from '../../topic/topic.service';
@@ -363,6 +363,11 @@ export class TestHistory extends PaginatedList implements OnInit, OnDestroy {
   /** "Subject · Topic", the line the result page puts in its own subtitle. */
   getSubjectLabel(test: Test): string {
     return getTestSubjectLabel(test, this.transloco);
+  }
+
+  /** The subjects behind a "N materie" label, for its hover tooltip. */
+  getSubjectTooltip(test: Test): string | undefined {
+    return getTestSubjectTooltip(test);
   }
 
   openTest(test: Test): void {

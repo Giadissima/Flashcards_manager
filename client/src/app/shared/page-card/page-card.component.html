@@ -11,7 +11,7 @@
       <div class="page-card-heading">
         <h2 class="card-title">{{ title }}</h2>
         @if (subtitle) {
-        <h6 class="card-subtitle mb-0 text-body-secondary">{{ subtitle }}</h6>
+        <h6 class="card-subtitle mb-0 text-body-secondary" [attr.title]="subtitleTooltip">{{ subtitle }}</h6>
         }
       </div>
     </div>

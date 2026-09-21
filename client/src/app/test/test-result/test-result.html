@@ -5,7 +5,8 @@
   <!-- A result is read to find out what went wrong, and the next thing wanted
        is a run on exactly those questions - or on the whole test again, the
        action beside it. -->
-  <app-page-card icon="fact_check" [title]="t('test.result.title')" [subtitle]="subtitle" bodyClass="p-4"
+  <app-page-card icon="fact_check" [title]="t('test.result.title')" [subtitle]="subtitle"
+    [subtitleTooltip]="subtitleTooltip" bodyClass="p-4"
     [actions]="headerActions" (action)="onHeaderAction($event)">
 
     <!-- The score is what the page is opened for, so it leads the body: the
@@ -64,6 +65,15 @@
            the same way and both fold their controls away on a phone. -->
       <app-filter-bar [activeCount]="activeFilterCount" appearance="inset" [caption]="t('common.filters')">
         <div class="review-filters">
+          <!-- Only on a test that spans more than one subject (a daily review
+               can draw cards from several at once): on any other, the single
+               choice it would offer is already in the subtitle. -->
+          @if (showSubjectFilter) {
+          <app-searchable-select [options]="subjectOptions" [value]="selectedSubjectId"
+            [allOptionLabel]="t('common.allSubjects')" [placeholder]="t('common.allSubjects')"
+            (valueChange)="onSubjectSelected($event)"></app-searchable-select>
+          }
+
           <!-- Only on a test that spans more than one topic: on any other, the
                single choice it would offer is already in the subtitle. -->
           @if (showTopicFilter) {

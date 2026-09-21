@@ -44,7 +44,7 @@ export class TestStatsFilterDto extends DateRangeRequest {
   @IsOptional()
   @IsMongoId()
   @ApiProperty({
-    description: 'Filter by subject ID (stored on the test when it is created)',
+    description: 'Filter by subject ID, matching any test that touches it',
     required: false,
   })
   subject_id?: string;
@@ -98,9 +98,11 @@ export interface TestStats {
   averageScorePercent: number;
 }
 
-/** One of the topics the questions of a test are on. */
+/** One of the topics the questions of a test are on, with the subject it belongs to. */
 export interface TestTopic {
   _id: Types.ObjectId;
   name: string;
   color?: string;
+  subject_id?: Types.ObjectId;
+  subject_name?: string;
 }
