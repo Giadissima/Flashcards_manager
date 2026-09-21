@@ -73,6 +73,12 @@ export class AuthService {
     await this.restClient.post(this.baseUrl + '/verify-email/resend', {});
   }
 
+  /** Marks the Community rules modal as shown, for whoever is logged in. */
+  async markCommunityRulesSeen(): Promise<void> {
+    const user: AuthUser = await this.restClient.patch(this.baseUrl + '/me/community-rules-seen', {});
+    this.storeUser(user);
+  }
+
   /**
    * The user as the server has them now. The copy in storage is only there to
    * show a name without waiting for a round trip, so a page that edits the

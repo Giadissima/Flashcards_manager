@@ -103,6 +103,16 @@ export class User {
   @Prop({ required: false })
   avatarColor?: string;
 
+  /**
+   * Whether the Community rules modal has already been shown to this account.
+   *
+   * Per account and not per browser: the modal is meant to greet a reader once,
+   * the first time they ever open the Community, not once per device they log
+   * in from.
+   */
+  @Prop({ required: true, default: false })
+  communityRulesSeen: boolean;
+
   // ------------------------------------------------------------- moderation
 
   /**

@@ -15,6 +15,8 @@ export interface AuthUser {
   /** Id of the uploaded picture; absent means the default drawing. */
   avatar?: string;
   avatarColor?: string;
+  /** Whether the Community rules modal has already been shown to this account. */
+  communityRulesSeen: boolean;
   /** Present only while reporting is blocked. `until` is null for good. */
   reportBlocked?: { until: string | null };
 }

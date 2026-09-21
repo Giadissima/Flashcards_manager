@@ -185,6 +185,8 @@ export interface PublicUser {
   /** Id of the uploaded picture; absent means the default drawing. */
   avatar?: string;
   avatarColor?: string;
+  /** Whether the Community rules modal has already been shown to this account. */
+  communityRulesSeen: boolean;
   /**
    * Present only while reporting is blocked, so the client can refuse to open
    * the report dialog in the first place rather than open it and fail on

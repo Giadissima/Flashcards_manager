@@ -116,6 +116,20 @@ export class AuthService {
     await this.verification.resend(payload.sub, lang);
   }
 
+  /**
+   * Marks the Community rules modal as shown, for the account that just saw it.
+   * Idempotent: called again it just saves the same value.
+   */
+  async markCommunityRulesSeen(payload: JwtPayload): Promise<PublicUser> {
+    const user = await this.userModel.findById(payload.sub).exec();
+    if (!user) throw new UnauthorizedException('User no longer exists');
+
+    user.communityRulesSeen = true;
+    await user.save();
+
+    return this.toPublicUser(user);
+  }
+
   async login(dto: LoginDto): Promise<AuthResponse> {
     const user = await this.userModel
       .findOne({ username: dto.username.toLowerCase() })
@@ -247,6 +261,7 @@ export class AuthService {
       courseKind: user.courseKind,
       avatar: user.avatar,
       avatarColor: user.avatarColor,
+      communityRulesSeen: user.communityRulesSeen,
       email: user.email,
       // An account from before the field existed has nothing to confirm, so it
       // counts as confirmed: the alternative is locking out everybody who

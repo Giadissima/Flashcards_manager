@@ -109,6 +109,15 @@ export class AuthController {
   }
 
   @ApiOperation({
+    description: 'mark the Community rules modal as shown for the logged user',
+  })
+  @Patch('me/community-rules-seen')
+  @HttpCode(HttpStatus.OK)
+  markCommunityRulesSeen(@CurrentUser() user: JwtPayload): Promise<PublicUser> {
+    return this.authService.markCommunityRulesSeen(user);
+  }
+
+  @ApiOperation({
     description:
       'replace the study fields of the logged user; a field left out is cleared',
   })
