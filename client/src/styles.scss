@@ -997,10 +997,109 @@ fieldset:disabled .btn {
   margin-top: auto;
 }
 
-/* A display-mode formula ($$...$$) is a block with its own width and never
-   wraps (KaTeX sets white-space: nowrap on .base): inside a narrow card it has
-   to scroll horizontally instead of breaking the grid. The padding leaves room
-   for descenders, which the overflow would otherwise clip. */
+/* Generic themed scrollbar: thumb/track colors follow --border-color and
+   --component-background, which already change with [data-theme], so only the
+   webkit arrow icons need a separate dark variant (see
+   themed-scrollbar-dark-arrows below). $direction picks which scrollbar
+   dimension gets styled and which way its arrows point. Shared by the KaTeX
+   display-formula overflow (.flashcard-text/.question-text/.answer/.tiptap)
+   and by .dropdown-content.
+   On Chromium/Opera, setting scrollbar-color on the same element makes the
+   ::-webkit-scrollbar-* rules (hover included) be ignored entirely: so
+   scrollbar-width/-color are reserved for the browsers that do NOT support the
+   webkit pseudo-element (that is, Firefox). */
+@mixin themed-scrollbar($direction: vertical) {
+  @supports not selector(::-webkit-scrollbar) {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) var(--component-background);
+  }
+
+  @if $direction == horizontal {
+    &::-webkit-scrollbar {
+      height: 8px;
+    }
+  } @else {
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: var(--component-background);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--border-color);
+    border-radius: var(--border-radius-sm);
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: var(--primary-color);
+  }
+
+  /* The arrows at both ends: scrollbar pseudo-elements do not support
+     clip-path/transform (they are drawn by the browser internally, outside the
+     normal CSS pipeline), so the arrow has to be a background-image SVG - the
+     same trick already used for the .form-switch knob above: black by
+     default, white in dark mode (see themed-scrollbar-dark-arrows). */
+  &::-webkit-scrollbar-button {
+    background-color: transparent;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 8px 8px;
+
+    @if $direction == horizontal {
+      width: 12px;
+      height: 8px;
+    } @else {
+      width: 8px;
+      height: 12px;
+    }
+  }
+
+  @if $direction == horizontal {
+    &::-webkit-scrollbar-button:horizontal:decrement {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3e%3cpath d='M2 5L8 1.5V8.5Z' fill='%23000'/%3e%3c/svg%3e");
+    }
+
+    &::-webkit-scrollbar-button:horizontal:increment {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3e%3cpath d='M8 5L2 1.5V8.5Z' fill='%23000'/%3e%3c/svg%3e");
+    }
+  } @else {
+    &::-webkit-scrollbar-button:vertical:decrement {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3e%3cpath d='M5 2L8.5 8H1.5Z' fill='%23000'/%3e%3c/svg%3e");
+    }
+
+    &::-webkit-scrollbar-button:vertical:increment {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3e%3cpath d='M5 8L1.5 2H8.5Z' fill='%23000'/%3e%3c/svg%3e");
+    }
+  }
+}
+
+/* Dark-mode recolor for the arrow icons drawn by themed-scrollbar above. A
+   separate mixin because it has to be emitted under a [data-theme='dark']
+   ANCESTOR selector, which nesting inside the element's own themed-scrollbar
+   rule can't produce. */
+@mixin themed-scrollbar-dark-arrows($direction: vertical) {
+  @if $direction == horizontal {
+    &::-webkit-scrollbar-button:horizontal:decrement {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3e%3cpath d='M2 5L8 1.5V8.5Z' fill='%23fff'/%3e%3c/svg%3e");
+    }
+
+    &::-webkit-scrollbar-button:horizontal:increment {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3e%3cpath d='M8 5L2 1.5V8.5Z' fill='%23fff'/%3e%3c/svg%3e");
+    }
+  } @else {
+    &::-webkit-scrollbar-button:vertical:decrement {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3e%3cpath d='M5 2L8.5 8H1.5Z' fill='%23fff'/%3e%3c/svg%3e");
+    }
+
+    &::-webkit-scrollbar-button:vertical:increment {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3e%3cpath d='M5 8L1.5 2H8.5Z' fill='%23fff'/%3e%3c/svg%3e");
+    }
+  }
+}
+
 .flashcard-text,
 .question-text,
 .answer,
@@ -1135,78 +1234,30 @@ ngx-colors-overlay[data-ngx-colors-theme='dark'] .bg-white {
   cursor: zoom-in;
 }
 
+/* A display-mode formula ($$...$$) is a block with its own width and never
+   wraps (KaTeX sets white-space: nowrap on .base): inside a narrow card, or
+   inside the editor (.tiptap) on a narrow/mobile viewport, it has to scroll
+   horizontally instead of overflowing the layout. The padding leaves room for
+   descenders, which the overflow would otherwise clip. */
 .flashcard-text,
 .question-text,
-.answer {
+.answer,
+.tiptap {
   .katex-display {
     overflow-x: auto;
     overflow-y: hidden;
     padding: 2px 0;
     margin: calc(var(--spacing-unit) * 1.5) 0;
 
-    /* Same themed scrollbar as .dropdown-content: --border-color and
-       --component-background already change with [data-theme], so no separate
-       dark-mode rule is needed.
-       On Chromium/Opera, setting scrollbar-color on the same element makes the
-       ::-webkit-scrollbar-* rules (hover included) be ignored entirely: so
-       scrollbar-width/-color are reserved for the browsers that do NOT support
-       the webkit pseudo-element (that is, Firefox). */
-    @supports not selector(::-webkit-scrollbar) {
-      scrollbar-width: thin;
-      scrollbar-color: var(--border-color) var(--component-background);
-    }
-
-    &::-webkit-scrollbar {
-      height: 8px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background-color: var(--component-background);
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background-color: var(--border-color);
-      border-radius: var(--border-radius-sm);
-    }
-
-    &::-webkit-scrollbar-thumb:hover {
-      background-color: var(--primary-color);
-    }
-
-    /* The arrows at both ends: scrollbar pseudo-elements do not support
-       clip-path/transform (they are drawn by the browser internally, outside the
-       normal CSS pipeline), so the arrow has to be a background-image SVG - the
-       same trick already used for the .form-switch knob above: black by default,
-       white in dark mode. */
-    &::-webkit-scrollbar-button {
-      background-color: transparent;
-      background-repeat: no-repeat;
-      background-position: center;
-      background-size: 8px 8px;
-      width: 12px;
-      height: 8px;
-    }
-
-    &::-webkit-scrollbar-button:horizontal:decrement {
-      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3e%3cpath d='M2 5L8 1.5V8.5Z' fill='%23000'/%3e%3c/svg%3e");
-    }
-
-    &::-webkit-scrollbar-button:horizontal:increment {
-      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3e%3cpath d='M8 5L2 1.5V8.5Z' fill='%23000'/%3e%3c/svg%3e");
-    }
+    @include themed-scrollbar(horizontal);
   }
 }
 
-[data-theme='dark'] .flashcard-text .katex-display::-webkit-scrollbar-button:horizontal:decrement,
-[data-theme='dark'] .question-text .katex-display::-webkit-scrollbar-button:horizontal:decrement,
-[data-theme='dark'] .answer .katex-display::-webkit-scrollbar-button:horizontal:decrement {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3e%3cpath d='M2 5L8 1.5V8.5Z' fill='%23fff'/%3e%3c/svg%3e");
-}
-
-[data-theme='dark'] .flashcard-text .katex-display::-webkit-scrollbar-button:horizontal:increment,
-[data-theme='dark'] .question-text .katex-display::-webkit-scrollbar-button:horizontal:increment,
-[data-theme='dark'] .answer .katex-display::-webkit-scrollbar-button:horizontal:increment {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3e%3cpath d='M8 5L2 1.5V8.5Z' fill='%23fff'/%3e%3c/svg%3e");
+[data-theme='dark'] .flashcard-text .katex-display,
+[data-theme='dark'] .question-text .katex-display,
+[data-theme='dark'] .answer .katex-display,
+[data-theme='dark'] .tiptap .katex-display {
+  @include themed-scrollbar-dark-arrows(horizontal);
 }
 
 /* Home image lightbox: the classes passed as [dialogClass]/[contentClass] land
@@ -1413,63 +1464,11 @@ $image-modal-height: calc(
   max-height: 320px;
   overflow-y: auto;
 
-  /* --component-background/--border-color already change with the theme, so the
-     scrollbar adapts on its own without a separate dark-mode rule.
-     On Chromium/Opera, setting scrollbar-color on the same element makes the
-     ::-webkit-scrollbar-* rules (hover included) be ignored entirely: so
-     scrollbar-width/-color are reserved for the browsers that do NOT support
-     the webkit pseudo-element (that is, Firefox). */
-  @supports not selector(::-webkit-scrollbar) {
-    scrollbar-width: thin;
-    scrollbar-color: var(--border-color) var(--component-background);
-  }
+  @include themed-scrollbar(vertical);
 }
 
-.dropdown-content::-webkit-scrollbar {
-  width: 8px;
-}
-
-.dropdown-content::-webkit-scrollbar-track {
-  background-color: var(--component-background);
-}
-
-.dropdown-content::-webkit-scrollbar-thumb {
-  background-color: var(--border-color);
-  border-radius: var(--border-radius-sm);
-}
-
-.dropdown-content::-webkit-scrollbar-thumb:hover {
-  background-color: var(--primary-color);
-}
-
-/* The arrows at both ends: scrollbar pseudo-elements do not support
-   clip-path/transform (they are drawn by the browser internally, outside the
-   normal CSS pipeline), so the arrow has to be a background-image SVG - the
-   same trick already used for the .form-switch knob above: black by default,
-   white in dark mode. */
-.dropdown-content::-webkit-scrollbar-button {
-  background-color: transparent;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 8px 8px;
-  width: 8px;
-  height: 12px;
-}
-
-.dropdown-content::-webkit-scrollbar-button:vertical:decrement {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3e%3cpath d='M5 2L8.5 8H1.5Z' fill='%23000'/%3e%3c/svg%3e");
-}
-
-.dropdown-content::-webkit-scrollbar-button:vertical:increment {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3e%3cpath d='M5 8L1.5 2H8.5Z' fill='%23000'/%3e%3c/svg%3e");
-}
-
-[data-theme='dark'] .dropdown-content::-webkit-scrollbar-button:vertical:decrement {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3e%3cpath d='M5 2L8.5 8H1.5Z' fill='%23fff'/%3e%3c/svg%3e");
-}
-
-[data-theme='dark'] .dropdown-content::-webkit-scrollbar-button:vertical:increment {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3e%3cpath d='M5 8L1.5 2H8.5Z' fill='%23fff'/%3e%3c/svg%3e");
+[data-theme='dark'] .dropdown-content {
+  @include themed-scrollbar-dark-arrows(vertical);
 }
 
 .dropdown-content a {
@@ -1550,4 +1549,40 @@ html:not(.fonts-loaded) .material-symbols-outlined {
 
 .search-clear-btn .material-symbols-outlined {
   font-size: 18px;
+}
+
+/* appPendingButton (pending-button.directive.ts): overlays a spinning icon on
+   a button while its request is in flight, hiding the original content in
+   place so the button doesn't change width. Targets the .pending-button-host
+   class the directive adds itself - not an [appPendingButton] attribute
+   selector, since Angular never renders that binding as a DOM attribute. */
+.pending-button-host {
+  position: relative;
+}
+
+.pending-button-spinner {
+  display: none;
+}
+
+.pending-button-host.is-pending {
+  pointer-events: none;
+
+  .pending-button-content {
+    visibility: hidden;
+  }
+
+  .pending-button-spinner {
+    display: inline-flex;
+    position: absolute;
+    inset: 0;
+    align-items: center;
+    justify-content: center;
+    animation: pending-button-spin 0.8s linear infinite;
+  }
+}
+
+@keyframes pending-button-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
