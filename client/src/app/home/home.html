@@ -81,6 +81,14 @@
     </div>
   </app-filter-bar>
 
+  @if (emptyState) {
+  <div class="empty-state">
+    <p>
+      {{ emptyState.textKey | transloco }}
+      <a class="link-action" [routerLink]="emptyState.route">{{ emptyState.linkKey | transloco }}</a>
+    </p>
+  </div>
+  } @else {
   <div class="flashcard-grid-wrapper">
     @if (isReloading) {
     <div class="flashcard-grid-overlay">
@@ -146,6 +154,7 @@
   <app-pagination [currentPage]="currentPage" [totalPages]="totalPages"
     [disabled]="isReloading"
     (previous)="previousPage()" (next)="nextPage()"></app-pagination>
+  }
 </div>
 </app-load-state>
 

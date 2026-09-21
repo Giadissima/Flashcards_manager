@@ -105,14 +105,21 @@
         "title": "Benvenuta/o su Flashcards Manager!",
         "text": "Una breve guida per orientarti tra le funzioni principali. Puoi rivederla in qualsiasi momento dalle impostazioni."
       },
+      "whatIsFlashcard": {
+        "title": "Cos'è una flashcard?",
+        "text": "Una carta a due facce: da un lato la domanda, dall'altro la risposta. Perfetta per ripassare in modo rapido ed efficace."
+      },
       "subject": {
-        "title": "Crea la tua prima materia"
+        "title": "Crea la tua prima materia",
+        "text": "È il contenitore principale, ad esempio 'Analisi Matematica 1'."
       },
       "topic": {
-        "title": "Suddividila in argomenti"
+        "title": "Suddividila in argomenti",
+        "text": "Ogni materia si divide in argomenti, per tenere tutto più ordinato."
       },
       "flashcards": {
-        "title": "Riempila di flashcard"
+        "title": "Riempila di flashcard",
+        "text": "Ogni argomento raccoglie le sue flashcard, con domanda e risposta."
       },
       "test": {
         "title": "Mettiti alla prova",
@@ -194,6 +201,20 @@
     "seeQuestion": "Vedi domanda",
     "expand": "Espandi",
     "collapse": "Riduci",
+    "emptyState": {
+      "noSubject": {
+        "text": "Non hai ancora creato una materia.",
+        "link": "Clicca qui per crearne una."
+      },
+      "noTopic": {
+        "text": "Non hai ancora creato un topic.",
+        "link": "Clicca qui per crearne uno."
+      },
+      "noFlashcards": {
+        "text": "Non hai ancora creato una flashcard.",
+        "link": "Clicca qui per crearne una."
+      }
+    },
     "toast": {
       "cardDeleted": "Flashcard eliminata con successo",
       "deleteError": "Errore durante l'eliminazione",

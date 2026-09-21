@@ -14,7 +14,7 @@ import { Flashcard } from '../models/flashcard.dto';
 import { FlashcardService } from '../flashcard/flashcard.service';
 import { KatexRendererPipe } from '../pipes/katex-renderer.pipe';
 import { LoadStateComponent } from '../shared/load-state/load-state.component';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { PaginatedList } from '../shared/paginated-list';
 import { toSubjectOptions, toTopicOptions } from '../shared/select-options.util';
 import * as cardView from '../shared/flashcard-view.util';
@@ -35,7 +35,7 @@ import {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, KatexRendererPipe, SearchableSelectComponent, SearchInputComponent, TranslocoModule, ImageLightboxComponent, ZoomableImagesDirective, ContentOverflowDirective, LoadStateComponent, PaginationComponent, FilterBarComponent, VisibilityButtonComponent, ImportedBadgeComponent, DateRangeFilterComponent],
+  imports: [CommonModule, KatexRendererPipe, SearchableSelectComponent, SearchInputComponent, TranslocoModule, RouterLink, ImageLightboxComponent, ZoomableImagesDirective, ContentOverflowDirective, LoadStateComponent, PaginationComponent, FilterBarComponent, VisibilityButtonComponent, ImportedBadgeComponent, DateRangeFilterComponent],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
@@ -64,6 +64,20 @@ export class Home extends PaginatedList implements OnInit, OnDestroy {
       { value: 'imported', label: this.transloco.translate('home.importFilter.imported') },
       { value: 'personal', label: this.transloco.translate('home.importFilter.personal') },
     ];
+  }
+
+  // Only meaningful for a genuinely empty account, not a filtered-down view:
+  // shown solely when nothing is filtered and no flashcard matched anyway, so
+  // it never overrides an actual "no results for this filter" situation.
+  get emptyState(): { textKey: string; linkKey: string; route: string } | null {
+    if (this.activeFilterCount > 0 || this.totalCount > 0) return null;
+    if (this.subjects.length === 0) {
+      return { textKey: 'home.emptyState.noSubject.text', linkKey: 'home.emptyState.noSubject.link', route: '/create-subject' };
+    }
+    if (this.topics.length === 0) {
+      return { textKey: 'home.emptyState.noTopic.text', linkKey: 'home.emptyState.noTopic.link', route: '/create-topic' };
+    }
+    return { textKey: 'home.emptyState.noFlashcards.text', linkKey: 'home.emptyState.noFlashcards.link', route: '/create-card' };
   }
 
   get activeFilterCount(): number {

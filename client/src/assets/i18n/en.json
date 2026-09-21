@@ -105,14 +105,21 @@
         "title": "Welcome to Flashcards Manager!",
         "text": "A quick tour of the main features. You can revisit it anytime from the settings."
       },
+      "whatIsFlashcard": {
+        "title": "What is a flashcard?",
+        "text": "A two-sided card: the question on one side, the answer on the other. Perfect for quick, effective review."
+      },
       "subject": {
-        "title": "Create your first subject"
+        "title": "Create your first subject",
+        "text": "The top-level container, e.g. 'Calculus 1'."
       },
       "topic": {
-        "title": "Break it down into topics"
+        "title": "Break it down into topics",
+        "text": "Each subject splits into topics, to keep things organized."
       },
       "flashcards": {
-        "title": "Fill it with flashcards"
+        "title": "Fill it with flashcards",
+        "text": "Each topic holds its own flashcards, question and answer."
       },
       "test": {
         "title": "Put yourself to the test",
@@ -194,6 +201,20 @@
     "seeQuestion": "See question",
     "expand": "Expand",
     "collapse": "Collapse",
+    "emptyState": {
+      "noSubject": {
+        "text": "You haven't created a subject yet.",
+        "link": "Click here to create one."
+      },
+      "noTopic": {
+        "text": "You haven't created a topic yet.",
+        "link": "Click here to create one."
+      },
+      "noFlashcards": {
+        "text": "You haven't created a flashcard yet.",
+        "link": "Click here to create one."
+      }
+    },
     "toast": {
       "cardDeleted": "Flashcard successfully deleted",
       "deleteError": "Error deleting Flashcard",

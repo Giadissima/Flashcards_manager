@@ -29,6 +29,19 @@
   position: relative;
 }
 
+/* Shown instead of the (otherwise silently empty) grid, only for a genuinely
+   empty account - see Home.emptyState. */
+.empty-state {
+  text-align: center;
+  padding: calc(var(--spacing-unit) * 6) var(--spacing-unit);
+  color: var(--text-color);
+
+  p {
+    margin: 0;
+    font-size: 1.05rem;
+  }
+}
+
 .flashcard-grid-overlay {
   position: absolute;
   inset: 0;
