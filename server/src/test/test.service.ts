@@ -549,7 +549,17 @@ export class TestService {
     pipeline.push(
       {
         $addFields: {
-          totalQuestions: { $size: '$questions' },
+          // Blank questions (no is_correct) are left out: the average only
+          // weighs right answers against wrong ones.
+          totalQuestions: {
+            $size: {
+              $filter: {
+                input: '$questions',
+                as: 'q',
+                cond: { $in: ['$$q.is_correct', [true, false]] },
+              },
+            },
+          },
           correctQuestions: {
             $size: {
               $filter: {

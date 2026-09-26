@@ -458,6 +458,7 @@
       "statsTestsDone": "Tests taken",
       "statsCompleted": "Completed",
       "statsAvgScore": "Average correct answers",
+      "statsAvgScoreHint": "average = correct/(correct+wrong)",
       "statsTotalTime": "Total study time",
       "noTests": "No tests taken yet.",
       "repeatOf": "Retry of the wrong ones",

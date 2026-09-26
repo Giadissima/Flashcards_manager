@@ -58,7 +58,7 @@
         <span class="stat-value">{{ stats.completedTests }}</span>
         <span class="stat-label">{{ 'test.history.statsCompleted' | transloco }}</span>
       </div>
-      <div class="stat-item">
+      <div class="stat-item" [title]="'test.history.statsAvgScoreHint' | transloco">
         <span class="stat-value">{{ stats.averageScorePercent }}%</span>
         <span class="stat-label">{{ 'test.history.statsAvgScore' | transloco }}</span>
       </div>
