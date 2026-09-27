@@ -1600,8 +1600,14 @@ $image-modal-height: calc(
    Bootstrap Icons shipped its own correction (vertical-align: -.125em on the
    ::before), the font does not. `middle` brings every one of them to within a
    pixel, and has no effect where the icon is already a flex item. */
+/* Without this, a long press on the ligature glyph (mobile touch's stand-in
+   for a mouse hover-then-select) highlights it like selectable text and pops
+   up the copy/share callout, since it renders as a single character. */
 .material-symbols-outlined {
   vertical-align: middle;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 /* Hidden until the font itself has loaded (html.fonts-loaded, set in
