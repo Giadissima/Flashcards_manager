@@ -41,6 +41,13 @@
       </div>
     </app-filter-bar>
 
+    @if (showVerifyBanner) {
+    <div class="alert alert-warning d-flex align-items-center justify-content-between" role="alert">
+      <span>{{ 'auth.verify.pending' | transloco }}</span>
+      <button type="button" class="btn-close" [attr.aria-label]="'common.close' | transloco"
+        (click)="dismissVerifyBanner()"></button>
+    </div>
+    }
 
     <app-load-state errorMessageKey="community.loadError">
       @if (!scopeChosen) {

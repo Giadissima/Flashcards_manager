@@ -83,6 +83,9 @@ export class CommunityComponent implements OnInit, OnDestroy {
   // in app-load-state. Later ones (filter, sort, page) reload in place - swapping
   // the whole page for a spinner on every filter click would be bad UX.
   private isInitialLoad = true;
+  // Set when the reload under way was caused by paging, so it can end at the top
+  // of the new page. See the queryParamMap subscription below.
+  private scrollToTopAfterReload = false;
 
   get activeFilterCount(): number {
     return [
@@ -106,6 +109,11 @@ export class CommunityComponent implements OnInit, OnDestroy {
   scopeChosen = false;
 
   rulesModalOpen = false;
+
+  // Closed by the reader for this visit only: leaving Community and coming
+  // back - the component is recreated - shows it again, since the account is
+  // still unverified either way.
+  verifyBannerDismissed = false;
 
   constructor(
     private communityService: CommunityService,
@@ -152,7 +160,15 @@ export class CommunityComponent implements OnInit, OnDestroy {
         this.isInitialLoad = false;
         this.loadState.run(() => this.loadFeed());
       } else {
-        void this.loadFeed();
+        void this.loadFeed().then(() => {
+          // After the new posts are in, not when the button was clicked:
+          // paging reloads the feed in place, so jumping first would scroll
+          // over the posts of the previous page.
+          if (this.scrollToTopAfterReload) {
+            this.scrollToTopAfterReload = false;
+            window.scrollTo(0, 0);
+          }
+        });
       }
     });
   }
@@ -240,6 +256,16 @@ export class CommunityComponent implements OnInit, OnDestroy {
     this.rulesModalOpen = true;
   }
 
+  /** An address without an email counts as confirmed - see AuthUser. */
+  get showVerifyBanner(): boolean {
+    const user = this.authService.user;
+    return !!user?.email && !user.emailVerified && !this.verifyBannerDismissed;
+  }
+
+  dismissVerifyBanner(): void {
+    this.verifyBannerDismissed = true;
+  }
+
   onStudyChange(study: StudyFields): void {
     this.study = study;
     this.onFilterChange();
@@ -285,18 +311,21 @@ export class CommunityComponent implements OnInit, OnDestroy {
   previousPage(): void {
     if (this.page === 0) return;
     this.page--;
+    this.scrollToTopAfterReload = true;
     this.updateQueryParams();
   }
 
   nextPage(): void {
     if (this.currentPage >= this.totalPages) return;
     this.page++;
+    this.scrollToTopAfterReload = true;
     this.updateQueryParams();
   }
 
   goToPage(target: number): void {
     if (target === this.currentPage || target < 1 || target > this.totalPages) return;
     this.page = target - 1;
+    this.scrollToTopAfterReload = true;
     this.updateQueryParams();
   }
 
