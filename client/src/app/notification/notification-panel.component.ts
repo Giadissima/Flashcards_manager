@@ -167,6 +167,7 @@ export class NotificationPanelComponent extends PaginatedList implements OnInit,
 
   protected async onPageChange(): Promise<void> {
     await this.load();
+    window.scrollTo(0, 0);
   }
 
   async onKindFilterChange(value: string | null | undefined): Promise<void> {

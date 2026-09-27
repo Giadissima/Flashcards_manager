@@ -84,8 +84,15 @@ export class ManageSubjectsComponent extends PaginatedList implements OnInit {
     this.onFilterChange();
   }
 
+  // After the new rows are in, not when the button was clicked: paging
+  // reloads the table in place, so jumping first would scroll over the rows
+  // of the previous page.
   protected override onPageChange(): void {
-    this.reloadSubjects();
+    this.loadSubjects()
+      .then(() => window.scrollTo(0, 0))
+      .catch(() => {
+        this.toastService.show(this.transloco.translate('subject.toast.loadError'), 'error');
+      });
   }
 
   getIconUrl(subject: Subject): string {

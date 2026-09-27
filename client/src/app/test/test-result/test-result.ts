@@ -259,8 +259,11 @@ export class TestResult extends PaginatedList {
     }
   }
 
+  // After the new page's questions are in, not when the button was clicked:
+  // paging reloads the review in place, so jumping first would scroll over
+  // the cards of the previous page.
   protected override onPageChange(): void {
-    this.loadPage();
+    this.loadPage().then(() => window.scrollTo(0, 0));
   }
 
   /**

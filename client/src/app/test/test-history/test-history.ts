@@ -264,8 +264,8 @@ export class TestHistory extends PaginatedList implements OnInit, OnDestroy {
     }
   }
 
-  loadTests(): void {
-    this.testService
+  loadTests(): Promise<void> {
+    return this.testService
       .getAll({
         // A root's own updatedAt would bury a chain still being worked on
         // (fresh "repeat the wrong ones" only) at the bottom of the list -
@@ -288,8 +288,11 @@ export class TestHistory extends PaginatedList implements OnInit, OnDestroy {
       });
   }
 
+  // After the new rows are in, not when the button was clicked: paging
+  // reloads the list in place, so jumping first would scroll over the rows
+  // of the previous page.
   protected override onPageChange(): void {
-    this.loadTests();
+    this.loadTests().then(() => window.scrollTo(0, 0));
   }
 
   /* Children fetched from the server, by parent id, the first time a node is

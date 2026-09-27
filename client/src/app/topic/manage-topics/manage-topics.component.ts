@@ -108,8 +108,15 @@ export class ManageTopicsComponent extends PaginatedList implements OnInit {
     });
   }
 
+  // After the new rows are in, not when the button was clicked: paging
+  // reloads the table in place, so jumping first would scroll over the rows
+  // of the previous page.
   protected override onPageChange(): void {
-    this.reloadTopics();
+    this.loadTopics()
+      .then(() => window.scrollTo(0, 0))
+      .catch(() => {
+        this.toastService.show(this.transloco.translate('topic.toast.topicsLoadError'), 'error');
+      });
   }
 
   getSubjectName(subjectId: any): string {

@@ -186,8 +186,11 @@ export class TestRunner extends PaginatedList implements OnInit {
     this.pageFlashcards = loaded.filter((card): card is Flashcard => card !== null);
   }
 
+  // After the new page's questions are in, not when the button was clicked:
+  // paging reloads the run in place, so jumping first would scroll over the
+  // cards of the previous page.
   protected override onPageChange(): void {
-    this.loadPage();
+    this.loadPage().then(() => window.scrollTo(0, 0));
   }
 
   isCorrectAnswer(card: Flashcard): boolean | undefined {
