@@ -9,6 +9,7 @@ import { CreateTopicComponent } from './topic/create-topic/create-topic.componen
 import { EditFlashcard } from './flashcard/edit-flashcard/edit-flashcard';
 import { EditSubjectComponent } from './subject/edit-subject/edit-subject.component';
 import { EditTopicComponent } from './topic/edit-topic/edit-topic.component';
+import { ForgotPasswordComponent } from './auth/forgot-password/forgot-password.component';
 import { Home } from './home/home';
 import { LandingComponent } from './landing/landing.component';
 import { LoginComponent } from './auth/login/login.component';
@@ -18,6 +19,7 @@ import { NotFoundComponent } from './shared/not-found/not-found.component';
 import { PrivacyPolicyComponent } from './privacy-policy/privacy-policy.component';
 import { ProfileComponent } from './profile/profile.component';
 import { RegisterComponent } from './auth/register/register.component';
+import { ResetPasswordComponent } from './auth/reset-password/reset-password.component';
 import { Routes } from '@angular/router';
 import { SetupTest } from './test/setup-test/setup-test';
 import { VerifyEmailComponent } from './auth/verify-email/verify-email.component';
@@ -36,9 +38,11 @@ export const routes: Routes = [
   { path: 'admin/:id', component: AdminComponent },
   { path: 'login', component: LoginComponent, canActivate: [guestGuard] },
   { path: 'register', component: RegisterComponent, canActivate: [guestGuard] },
+  { path: 'forgot-password', component: ForgotPasswordComponent, canActivate: [guestGuard] },
   // No guard of any kind: the link is opened from a mail, so the reader can be
   // logged in, logged out, or in a browser that has never seen this site.
   { path: 'verify-email', component: VerifyEmailComponent },
+  { path: 'reset-password', component: ResetPasswordComponent },
   // Linked from the landing page footer, and open to anyone, logged in or not.
   { path: 'privacy-policy', component: PrivacyPolicyComponent },
   // Every page of the app hangs off this one, so a new route is behind the

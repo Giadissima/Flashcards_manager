@@ -73,6 +73,22 @@ export class AuthService {
     await this.restClient.post(this.baseUrl + '/verify-email/resend', {});
   }
 
+  /** Replaces the password of whoever is logged in, proving the old one first. */
+  async changePassword(currentPassword: string, newPassword: string): Promise<void> {
+    await this.restClient.patch(this.baseUrl + '/me/password', { currentPassword, newPassword });
+  }
+
+  /** Asks for a reset mail, if that address has an account - the server gives
+      the same answer either way, so the response says nothing on its own. */
+  async forgotPassword(email: string): Promise<void> {
+    await this.restClient.post(this.baseUrl + '/forgot-password', { email });
+  }
+
+  /** Spends the token out of a reset mail, setting a new password. */
+  async resetPassword(token: string, newPassword: string): Promise<void> {
+    await this.restClient.post(this.baseUrl + '/reset-password', { token, newPassword });
+  }
+
   /** Marks the Community rules modal as shown, for whoever is logged in. */
   async markCommunityRulesSeen(): Promise<void> {
     const user: AuthUser = await this.restClient.patch(this.baseUrl + '/me/community-rules-seen', {});

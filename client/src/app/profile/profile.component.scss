@@ -1,0 +1,9 @@
+/* Two stacked cards - profile and change-password - need the block layout a
+   component host does not get by default, plus a gap between them. */
+app-page-card {
+  display: block;
+}
+
+app-page-card + app-page-card {
+  margin-top: calc(var(--spacing-unit) * 3);
+}

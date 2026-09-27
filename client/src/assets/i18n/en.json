@@ -22,18 +22,42 @@
     "email": "Email",
     "emailHint": "We send you a confirmation link. You need it to post in the Community",
     "emailError": "Enter a valid email address",
-    "usernameRequiredError": "Enter your username",
+    "usernameRequiredError": "Enter your username or email",
     "usernameLengthError": "The username must be between {{min}} and {{max}} characters",
     "usernamePatternError": "The username can only contain letters, digits, dots, dashes and underscores",
     "passwordMinError": "The password must be at least {{min}} characters long",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
     "logout": "Log out",
     "loggedInAs": "Logged in as {{username}}",
     "login": {
       "title": "Sign in",
       "subtitle": "Enter your credentials to reach your flashcards",
+      "usernameOrEmail": "Username or email",
       "submit": "Sign in",
+      "forgotPassword": "Forgot your password?",
       "noAccount": "Don't have an account yet?",
       "registerLink": "Create one"
+    },
+    "forgotPassword": {
+      "title": "Forgot password",
+      "subtitle": "Enter your email: if it matches an account, we'll send you a link to reset your password",
+      "submit": "Send the link",
+      "backToLogin": "Back to sign in",
+      "sentTitle": "Check your mail",
+      "sentSubtitle": "If that address matches an account, we sent you a link to reset your password. Check the spam folder too."
+    },
+    "resetPassword": {
+      "title": "Reset password",
+      "subtitle": "Choose the new password for your account",
+      "newPassword": "New password",
+      "submit": "Reset password",
+      "toastSuccess": "Password reset",
+      "doneTitle": "Password reset",
+      "doneSubtitle": "You can now sign in with the new password.",
+      "invalidTitle": "This link is no longer valid",
+      "invalidSubtitle": "Reset links last one hour. Ask for another one.",
+      "retry": "Ask for a new link"
     },
     "register": {
       "title": "Create account",
@@ -143,6 +167,7 @@
     "pageOf": "Page {{current}} of {{total}}",
     "goToPage": "Go to page {{page}}",
     "cancel": "Cancel",
+    "close": "Close",
     "icon": "Icon",
     "yes": "Yes",
     "name": "Name",
@@ -581,6 +606,19 @@
     "toast": {
       "saved": "Profile updated",
       "saveError": "The profile could not be saved"
+    },
+    "changePassword": {
+      "title": "Change password",
+      "subtitle": "Choose a new password for your account",
+      "currentPassword": "Current password",
+      "currentRequired": "Enter your current password",
+      "newPassword": "New password",
+      "submit": "Change password",
+      "wrongCurrent": "The current password is not correct",
+      "toast": {
+        "saved": "Password updated",
+        "saveError": "The password could not be changed"
+      }
     }
   },
   "spacedRepetition": {

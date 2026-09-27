@@ -14,7 +14,7 @@
       }
 
       <div class="form-group">
-        <label for="username" class="form-label">{{ 'auth.username' | transloco }}</label>
+        <label for="username" class="form-label">{{ 'auth.login.usernameOrEmail' | transloco }}</label>
         <input type="text" id="username" formControlName="username" class="form-control" autocomplete="username"
           autofocus>
         @if (loginForm.get('username')?.touched && loginForm.get('username')?.invalid) {
@@ -24,11 +24,13 @@
 
       <div class="form-group">
         <label for="password" class="form-label">{{ 'auth.password' | transloco }}</label>
-        <input type="password" id="password" formControlName="password" class="form-control"
-          autocomplete="current-password">
+        <app-password-field id="password" formControlName="password" autocomplete="current-password">
+        </app-password-field>
         @if (loginForm.get('password')?.touched && loginForm.get('password')?.invalid) {
         <div class="invalid-feedback d-block">{{ 'auth.passwordMinError' | transloco:{ min: passwordMinLength } }}</div>
         }
+        <a routerLink="/forgot-password" class="link-action forgot-password-link">{{ 'auth.login.forgotPassword' |
+          transloco }}</a>
       </div>
 
       <div class="form-actions">

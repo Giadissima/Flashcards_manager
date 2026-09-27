@@ -22,18 +22,42 @@
     "email": "Email",
     "emailHint": "Ti mandiamo un link di conferma. Serve per pubblicare in Community",
     "emailError": "Inserisci un indirizzo email valido",
-    "usernameRequiredError": "Inserisci il tuo nome utente",
+    "usernameRequiredError": "Inserisci il tuo nome utente o la tua email",
     "usernameLengthError": "Il nome utente deve avere tra {{min}} e {{max}} caratteri",
     "usernamePatternError": "Il nome utente può contenere solo lettere, numeri, punti, trattini e trattini bassi",
     "passwordMinError": "La password deve avere almeno {{min}} caratteri",
+    "showPassword": "Mostra password",
+    "hidePassword": "Nascondi password",
     "logout": "Logout",
     "loggedInAs": "Accesso come {{username}}",
     "login": {
       "title": "Accedi",
       "subtitle": "Inserisci le tue credenziali per raggiungere le tue flashcard",
+      "usernameOrEmail": "Nome utente o email",
       "submit": "Accedi",
+      "forgotPassword": "Password dimenticata?",
       "noAccount": "Non hai ancora un account?",
       "registerLink": "Creane uno"
+    },
+    "forgotPassword": {
+      "title": "Password dimenticata",
+      "subtitle": "Inserisci la tua email: se corrisponde a un account, ti mandiamo un link per reimpostare la password",
+      "submit": "Invia il link",
+      "backToLogin": "Torna al login",
+      "sentTitle": "Controlla la tua posta",
+      "sentSubtitle": "Se l'indirizzo corrisponde a un account, ti abbiamo mandato un link per reimpostare la password. Controlla anche lo spam."
+    },
+    "resetPassword": {
+      "title": "Reimposta password",
+      "subtitle": "Scegli la nuova password per il tuo account",
+      "newPassword": "Nuova password",
+      "submit": "Reimposta password",
+      "toastSuccess": "Password reimpostata",
+      "doneTitle": "Password reimpostata",
+      "doneSubtitle": "Ora puoi accedere con la nuova password.",
+      "invalidTitle": "Questo link non vale più",
+      "invalidSubtitle": "I link di reimpostazione durano un'ora. Richiedine un altro.",
+      "retry": "Richiedi un nuovo link"
     },
     "register": {
       "title": "Crea account",
@@ -143,6 +167,7 @@
     "pageOf": "Pagina {{current}} di {{total}}",
     "goToPage": "Vai alla pagina {{page}}",
     "cancel": "Annulla",
+    "close": "Chiudi",
     "icon": "Icona",
     "yes": "Sì",
     "name": "Nome",
@@ -581,6 +606,19 @@
     "toast": {
       "saved": "Profilo aggiornato",
       "saveError": "Non è stato possibile salvare il profilo"
+    },
+    "changePassword": {
+      "title": "Cambia password",
+      "subtitle": "Scegli una nuova password per il tuo account",
+      "currentPassword": "Password attuale",
+      "currentRequired": "Inserisci la password attuale",
+      "newPassword": "Nuova password",
+      "submit": "Cambia password",
+      "wrongCurrent": "La password attuale non è corretta",
+      "toast": {
+        "saved": "Password aggiornata",
+        "saveError": "Non è stato possibile cambiare la password"
+      }
     }
   },
   "spacedRepetition": {

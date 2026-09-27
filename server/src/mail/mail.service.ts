@@ -55,6 +55,37 @@ const verificationCopy: Record<
   },
 };
 
+const passwordResetCopy: Record<
+  MailLang,
+  {
+    subject: string;
+    /** Comes before the username, e.g. "Ciao" for "Ciao Giada,". */
+    greeting: string;
+    intro: string;
+    button: string;
+    footer: string;
+  }
+> = {
+  it: {
+    subject: 'Reimposta la tua password — Flashcards Manager',
+    greeting: 'Ciao',
+    intro: 'per scegliere una nuova password apri il link qui sotto:',
+    button: 'Reimposta password',
+    footer:
+      'Il link vale un’ora. Se non sei stata/o tu a chiederlo, ignora ' +
+      'questo messaggio: la tua password resta quella di sempre.',
+  },
+  en: {
+    subject: 'Reset your password — Flashcards Manager',
+    greeting: 'Hi',
+    intro: 'to choose a new password, open the link below:',
+    button: 'Reset password',
+    footer:
+      "The link is valid for one hour. If you didn't ask for this, ignore " +
+      'this message: your password stays the same.',
+  },
+};
+
 @Injectable()
 export class MailService {
   private readonly logger = new Logger(MailService.name);
@@ -124,6 +155,49 @@ export class MailService {
     if (!this.transport) return;
 
     const copy = verificationCopy[lang];
+    const safeUser = escape(username);
+    const safeLink = escape(link);
+
+    await this.transport.sendMail({
+      from: this.from,
+      to,
+      subject: copy.subject,
+      text: [
+        `${copy.greeting} ${username},`,
+        '',
+        copy.intro,
+        link,
+        '',
+        copy.footer,
+      ].join('\n'),
+      html: [
+        `<p>${copy.greeting} <strong>${safeUser}</strong>,</p>`,
+        `<p>${copy.intro}</p>`,
+        `<p><a href="${safeLink}" style="display:inline-block;padding:10px 18px;`,
+        'border-radius:8px;background:#a294f9;color:#fff;text-decoration:none">',
+        `${copy.button}</a></p>`,
+        `<p style="font-size:13px;color:#666">${safeLink}</p>`,
+        `<p style="font-size:13px;color:#666">${copy.footer}</p>`,
+      ].join(''),
+    });
+  }
+
+  /**
+   * Asks somebody to choose a new password.
+   *
+   * Same shape as sendVerification, including the link repeated as plain text:
+   * a mail that grants access to the account is exactly the one that should
+   * still work in a client that won't draw the button.
+   */
+  async sendPasswordReset(
+    to: string,
+    username: string,
+    link: string,
+    lang: MailLang = 'it',
+  ): Promise<void> {
+    if (!this.transport) return;
+
+    const copy = passwordResetCopy[lang];
     const safeUser = escape(username);
     const safeLink = escape(link);
 

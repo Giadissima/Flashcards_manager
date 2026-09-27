@@ -27,6 +27,15 @@ export const emailMaxLength = 254;
  */
 export const verificationTokenHours = 24;
 
+/**
+ * How long a password reset link stays good for.
+ *
+ * Much shorter than a confirmation link: this one grants access to the
+ * account rather than just to posting, so a copy sitting in an inbox for a
+ * day is a bigger risk than the inconvenience of asking again.
+ */
+export const passwordResetTokenHours = 1;
+
 // ------------------------------------------------------------- moderation
 
 /**
@@ -110,6 +119,15 @@ export const rateLimits = {
   resendVerification: { ttl: 60 * 60_000, limit: 5 },
   /** Anything that puts words in front of other people. */
   write: { ttl: 60_000, limit: 20 },
+  /**
+   * Asking for a password reset mail. Low, and per address: every one of
+   * these is a mail somebody's server has to deliver, and the endpoint has to
+   * answer the same way whether or not the address exists - which is exactly
+   * what makes it worth rate limiting on its own.
+   */
+  forgotPassword: { ttl: 60 * 60_000, limit: 5 },
+  /** Trying the current password before setting a new one. */
+  changePassword: { ttl: 10 * 60_000, limit: 10 },
 } as const;
 
 export const Filters = {

@@ -23,6 +23,11 @@
   }
 }
 
+.forgot-password-link {
+  display: inline-block;
+  margin-top: calc(var(--spacing-unit) * 0.75);
+}
+
 .auth-switch {
   margin-top: calc(var(--spacing-unit) * 2);
   text-align: center;

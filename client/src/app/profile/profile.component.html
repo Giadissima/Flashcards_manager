@@ -63,5 +63,52 @@
         </div>
       </form>
     </app-page-card>
+
+    <app-page-card icon="password" [title]="'profile.changePassword.title' | transloco"
+      [subtitle]="'profile.changePassword.subtitle' | transloco">
+      <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" novalidate>
+
+        @if (passwordErrorKey) {
+        <div class="alert alert-danger" role="alert">{{ passwordErrorKey | transloco }}</div>
+        }
+
+        <div class="form-group">
+          <label for="currentPassword" class="form-label">{{ 'profile.changePassword.currentPassword' | transloco
+            }}</label>
+          <app-password-field id="currentPassword" formControlName="currentPassword" autocomplete="current-password">
+          </app-password-field>
+          @if (passwordForm.get('currentPassword')?.touched && passwordForm.get('currentPassword')?.invalid) {
+          <div class="invalid-feedback d-block">{{ 'profile.changePassword.currentRequired' | transloco }}</div>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="newPassword" class="form-label">{{ 'profile.changePassword.newPassword' | transloco }}</label>
+          <app-password-field id="newPassword" formControlName="newPassword" autocomplete="new-password">
+          </app-password-field>
+          @if (passwordForm.get('newPassword')?.touched && passwordForm.get('newPassword')?.invalid) {
+          <div class="invalid-feedback d-block">{{ 'auth.passwordMinError' | transloco:{ min: passwordMinLength }
+            }}</div>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="confirmNewPassword" class="form-label">{{ 'auth.register.confirmPassword' | transloco
+            }}</label>
+          <app-password-field id="confirmNewPassword" formControlName="confirmNewPassword"
+            autocomplete="new-password"></app-password-field>
+          @if (passwordForm.get('confirmNewPassword')?.touched && passwordForm.hasError('passwordMismatch')) {
+          <div class="invalid-feedback d-block">{{ 'auth.register.mismatchError' | transloco }}</div>
+          }
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" [disabled]="passwordForm.invalid || changingPassword"
+            [appPendingButton]="changingPassword">
+            <span class="material-symbols-outlined">password</span>{{ 'profile.changePassword.submit' | transloco }}
+          </button>
+        </div>
+      </form>
+    </app-page-card>
   </app-load-state>
 </div>

@@ -22,10 +22,13 @@ import { ToBoolean, Trim } from 'src/common/transform.decorators';
 
 /** The Dto file contains the description of the client requests and the server's responses*/
 export class LoginDto {
+  // Named username for compatibility with existing clients and tokens, but
+  // AuthService looks it up against both username and email: the field only
+  // has to be long enough for the longer of the two.
   @IsString()
-  @Length(charMinLength, usernameMaxLength)
+  @Length(charMinLength, emailMaxLength)
   @ApiProperty({
-    description: 'Username',
+    description: 'Username or email address',
     example: 'giada',
   })
   @Trim()
@@ -162,6 +165,43 @@ export class UpdateProfileDto extends StudyFieldsDto {
     required: false,
   })
   removeAvatar?: boolean;
+}
+
+/** Changing the password of the logged user: the current one has to be given
+    again, so a stolen but still-open session cannot lock the owner out. */
+export class ChangePasswordDto {
+  @IsString()
+  @Length(passwordMinLength, passwordMaxLength)
+  @ApiProperty({ description: 'Current password' })
+  currentPassword: string;
+
+  @IsString()
+  @Length(passwordMinLength, passwordMaxLength)
+  @ApiProperty({ description: 'New password' })
+  newPassword: string;
+}
+
+/** Where the reset mail is asked to go. */
+export class ForgotPasswordDto {
+  @IsEmail({}, { message: 'email must be a valid address' })
+  @Length(charMinLength, emailMaxLength)
+  @ApiProperty({ description: 'Address the reset link is sent to' })
+  @Trim()
+  email: string;
+}
+
+/** The token out of the reset link, together with the password it unlocks. */
+export class ResetPasswordDto {
+  @IsString()
+  @Length(16, 200)
+  @ApiProperty({ description: 'Token from the ?token= of the reset link' })
+  @Trim()
+  token: string;
+
+  @IsString()
+  @Length(passwordMinLength, passwordMaxLength)
+  @ApiProperty({ description: 'New password' })
+  newPassword: string;
 }
 
 export interface AuthResponse {

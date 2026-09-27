@@ -1,5 +1,6 @@
 import {
   AuthResponse,
+  ChangePasswordDto,
   JwtPayload,
   LoginDto,
   PublicUser,
@@ -130,18 +131,40 @@ export class AuthService {
     return this.toPublicUser(user);
   }
 
+  /** The field doubles as username or email, so either one signs in. */
   async login(dto: LoginDto): Promise<AuthResponse> {
+    const identifier = dto.username.toLowerCase();
     const user = await this.userModel
-      .findOne({ username: dto.username.toLowerCase() })
+      .findOne({ $or: [{ username: identifier }, { email: identifier }] })
       .exec();
 
     // The same message either way, so the answer never says whether the
-    // username exists.
+    // account exists.
     const invalid = new UnauthorizedException('Wrong username or password');
     if (!user) throw invalid;
     if (!(await bcrypt.compare(dto.password, user.password))) throw invalid;
 
     return this.buildResponse(user);
+  }
+
+  /**
+   * Replaces the password, once the current one is proven. Never trusts the
+   * bearer token alone for this: a session left open on a shared computer
+   * must not be enough on its own to lock the real owner out for good.
+   */
+  async changePassword(
+    payload: JwtPayload,
+    dto: ChangePasswordDto,
+  ): Promise<void> {
+    const user = await this.userModel.findById(payload.sub).exec();
+    if (!user) throw new UnauthorizedException('User no longer exists');
+
+    if (!(await bcrypt.compare(dto.currentPassword, user.password))) {
+      throw new UnauthorizedException('Wrong current password');
+    }
+
+    user.password = await bcrypt.hash(dto.newPassword, bcryptSaltRounds);
+    await user.save();
   }
 
   /**

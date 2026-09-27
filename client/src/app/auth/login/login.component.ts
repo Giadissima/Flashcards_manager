@@ -1,13 +1,14 @@
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { waitErrorOf } from '../../shared/wait-error';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { charMinLength, passwordMaxLength, passwordMinLength, usernameMaxLength } from '../../../config/config';
+import { charMinLength, emailMaxLength, passwordMaxLength, passwordMinLength } from '../../../config/config';
 
 import { AuthService } from '../auth.service';
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { PageCardComponent } from '../../shared/page-card/page-card.component';
+import { PasswordFieldComponent } from '../../shared/password-field/password-field.component';
 import { PendingButtonDirective } from '../../shared/pending-button.directive';
 import { ToastService } from '../../shared/toast/toast.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
@@ -15,7 +16,15 @@ import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, TranslocoModule, RouterLink, PageCardComponent, PendingButtonDirective],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    TranslocoModule,
+    RouterLink,
+    PageCardComponent,
+    PasswordFieldComponent,
+    PendingButtonDirective,
+  ],
   templateUrl: './login.component.html',
   styleUrl: '../auth-page.scss',
 })
@@ -28,7 +37,9 @@ export class LoginComponent {
   errorParams: Record<string, unknown> = {};
 
   readonly charMinLength = charMinLength;
-  readonly usernameMaxLength = usernameMaxLength;
+  // The field takes either a username or an email, so it has to fit the
+  // longer of the two - the server checks it against both anyway.
+  readonly identifierMaxLength = emailMaxLength;
   readonly passwordMinLength = passwordMinLength;
   readonly passwordMaxLength = passwordMaxLength;
 
@@ -41,7 +52,9 @@ export class LoginComponent {
     private transloco: TranslocoService,
   ) {
     this.loginForm = this.fb.group({
-      username: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(usernameMaxLength)]],
+      // Still called "username" on the wire: the server looks it up against
+      // both fields, so the DTO does not need a name change to match.
+      username: ['', [Validators.required, Validators.minLength(charMinLength), Validators.maxLength(emailMaxLength)]],
       password: ['', [Validators.required, Validators.minLength(passwordMinLength), Validators.maxLength(passwordMaxLength)]],
     });
   }

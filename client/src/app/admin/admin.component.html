@@ -5,8 +5,8 @@
 <div class="admin-gate">
   <form class="admin-gate-box" (ngSubmit)="login()">
     <h1 class="admin-title">Moderazione</h1>
-    <input type="password" class="form-control" [(ngModel)]="password" name="password"
-      placeholder="Password" autocomplete="current-password" autofocus>
+    <app-password-field [(ngModel)]="password" name="password" autocomplete="current-password"
+      placeholder="Password" [autofocus]="true"></app-password-field>
     @if (loginError) {
     <p class="admin-error">{{ loginError }}</p>
     }

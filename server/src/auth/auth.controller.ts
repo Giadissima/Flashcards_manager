@@ -1,9 +1,12 @@
 import {
   AuthResponse,
+  ChangePasswordDto,
+  ForgotPasswordDto,
   JwtPayload,
   LoginDto,
   PublicUser,
   RegisterDto,
+  ResetPasswordDto,
   UpdateProfileDto,
   VerifyEmailDto,
 } from './auth.dto';
@@ -28,6 +31,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { MailLang } from 'src/mail/mail.service';
 import { AuthService } from './auth.service';
 import { CurrentUser } from './current-user.decorator';
+import { PasswordResetService } from './password-reset.service';
 import { Public } from './public.decorator';
 import { VerificationService } from './verification.service';
 
@@ -45,6 +49,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly verification: VerificationService,
+    private readonly passwordReset: PasswordResetService,
   ) {}
 
   @ApiOperation({ description: 'create a new user and return its access token' })
@@ -97,6 +102,51 @@ export class AuthController {
   ): Promise<{ sent: true }> {
     await this.authService.resendVerification(user, mailLangOf(lang));
     return { sent: true };
+  }
+
+  @ApiOperation({
+    description: 'change the password of the logged user',
+  })
+  @Throttle({ all: rateLimits.changePassword })
+  @Patch('me/password')
+  @HttpCode(HttpStatus.OK)
+  async changePassword(
+    @CurrentUser() user: JwtPayload,
+    @Body() dto: ChangePasswordDto,
+  ): Promise<{ changed: true }> {
+    await this.authService.changePassword(user, dto);
+    return { changed: true };
+  }
+
+  @ApiOperation({
+    description: 'send a password reset mail, if that address has an account',
+  })
+  // Public: nobody is logged in yet when they have forgotten their password.
+  @Public()
+  @Throttle({ all: rateLimits.forgotPassword })
+  @Post('forgot-password')
+  @HttpCode(HttpStatus.ACCEPTED)
+  async forgotPassword(
+    @Body() dto: ForgotPasswordDto,
+    @Headers('accept-language') lang?: string,
+  ): Promise<{ sent: true }> {
+    // Same answer whether or not the address is registered, on purpose: see
+    // PasswordResetService.send.
+    await this.passwordReset.send(dto.email, mailLangOf(lang));
+    return { sent: true };
+  }
+
+  @ApiOperation({
+    description: 'spend a password reset token and set a new password',
+  })
+  // Public because it is opened from a mail, same reasoning as verify-email.
+  @Public()
+  @Throttle({ all: rateLimits.forgotPassword })
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  async resetPassword(@Body() dto: ResetPasswordDto): Promise<{ reset: true }> {
+    await this.passwordReset.reset(dto.token, dto.newPassword);
+    return { reset: true };
   }
 
   @ApiOperation({

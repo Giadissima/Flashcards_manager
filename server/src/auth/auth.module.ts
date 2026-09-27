@@ -11,6 +11,7 @@ import { ModerationModule } from 'src/moderation/moderation.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { RestrictionsModule } from 'src/common/restrictions.module';
 import { UniversityModule } from 'src/university/university.module';
+import { PasswordResetService } from './password-reset.service';
 import { VerificationService } from './verification.service';
 
 @Module({
@@ -36,6 +37,6 @@ import { VerificationService } from './verification.service';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, VerificationService],
+  providers: [AuthService, VerificationService, PasswordResetService],
 })
 export class AuthModule {}

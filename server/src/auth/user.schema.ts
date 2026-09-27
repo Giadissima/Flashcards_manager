@@ -75,6 +75,18 @@ export class User {
   emailTokenExpiresAt?: Date;
 
   /**
+   * sha-256 of the password reset token, never the token itself, for the same
+   * reason as emailTokenHash: a database leak must not hand over a way into
+   * every account with a reset outstanding. Cleared once it has been used.
+   */
+  @Prop({ required: false })
+  passwordResetTokenHash?: string;
+
+  /** When that token stops working, so an old mail cannot reset anything. */
+  @Prop({ required: false })
+  passwordResetTokenExpiresAt?: Date;
+
+  /**
    * Ministry code of the university the user belongs to, e.g. "00101". Both
    * study fields are optional: they describe the user, they do not gate
    * anything, and the registration form lets them be skipped.

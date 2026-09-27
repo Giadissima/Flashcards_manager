@@ -40,8 +40,8 @@
 
       <div class="form-group">
         <label for="password" class="form-label">{{ 'auth.password' | transloco }}</label>
-        <input type="password" id="password" formControlName="password" class="form-control"
-          autocomplete="new-password">
+        <app-password-field id="password" formControlName="password" autocomplete="new-password">
+        </app-password-field>
         @if (registerForm.get('password')?.touched && registerForm.get('password')?.invalid) {
         <div class="invalid-feedback d-block">{{ 'auth.passwordMinError' | transloco:{ min: passwordMinLength } }}</div>
         }
@@ -49,8 +49,8 @@
 
       <div class="form-group">
         <label for="confirmPassword" class="form-label">{{ 'auth.register.confirmPassword' | transloco }}</label>
-        <input type="password" id="confirmPassword" formControlName="confirmPassword" class="form-control"
-          autocomplete="new-password">
+        <app-password-field id="confirmPassword" formControlName="confirmPassword" autocomplete="new-password">
+        </app-password-field>
         @if (registerForm.get('confirmPassword')?.touched && registerForm.hasError('passwordMismatch')) {
         <div class="invalid-feedback d-block">{{ 'auth.register.mismatchError' | transloco }}</div>
         }

@@ -1,5 +1,5 @@
+import { AbstractControl, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { StudyFields, StudyFieldsComponent, emptyStudyFields } from '../university/study-fields/study-fields.component';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { charMinLength, usernameMaxLength } from '../../config/config';
@@ -13,9 +13,11 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { IconPreviewComponent } from '../shared/icon-preview/icon-preview.component';
 import { LoadStateComponent } from '../shared/load-state/load-state.component';
 import { PageCardComponent } from '../shared/page-card/page-card.component';
+import { PasswordFieldComponent } from '../shared/password-field/password-field.component';
 import { PendingButtonDirective } from '../shared/pending-button.directive';
 import { Router } from '@angular/router';
 import { ToastService } from '../shared/toast/toast.service';
+import { passwordMaxLength, passwordMinLength } from '../../config/config';
 
 /** Same rule as the server DTO: what is refused there is caught here first. */
 const usernamePattern = /^[A-Za-z0-9._-]+$/;
@@ -37,9 +39,11 @@ const usernamePattern = /^[A-Za-z0-9._-]+$/;
     StudyFieldsComponent,
     IconPreviewComponent,
     AvatarSvgComponent,
+    PasswordFieldComponent,
     PendingButtonDirective,
   ],
   templateUrl: './profile.component.html',
+  styleUrl: './profile.component.scss',
 })
 export class ProfileComponent implements OnInit, OnDestroy {
   @ViewChild(LoadStateComponent, { static: true }) loadState!: LoadStateComponent;
@@ -77,6 +81,24 @@ export class ProfileComponent implements OnInit, OnDestroy {
     return this.profileForm.get('avatarColor') as FormControl<string>;
   }
 
+  // ------------------------------------------------------------- password
+
+  passwordForm: FormGroup;
+  changingPassword = false;
+  /** Translation key of the failure shown above the password form. */
+  passwordErrorKey: string | null = null;
+
+  readonly passwordMinLength = passwordMinLength;
+  readonly passwordMaxLength = passwordMaxLength;
+
+  private static passwordsMatch(group: AbstractControl): ValidationErrors | null {
+    const newPassword = group.get('newPassword')?.value;
+    const confirmNewPassword = group.get('confirmNewPassword')?.value;
+    return newPassword && confirmNewPassword && newPassword !== confirmNewPassword
+      ? { passwordMismatch: true }
+      : null;
+  }
+
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
@@ -93,6 +115,16 @@ export class ProfileComponent implements OnInit, OnDestroy {
       ]],
       avatarColor: [defaultAvatarColor, Validators.required],
     });
+
+    this.passwordForm = this.fb.group({
+      currentPassword: ['', Validators.required],
+      newPassword: ['', [
+        Validators.required,
+        Validators.minLength(passwordMinLength),
+        Validators.maxLength(passwordMaxLength),
+      ]],
+      confirmNewPassword: ['', Validators.required],
+    }, { validators: ProfileComponent.passwordsMatch });
   }
 
   ngOnInit(): void {
@@ -224,5 +256,28 @@ export class ProfileComponent implements OnInit, OnDestroy {
   logout(): void {
     this.authService.logout();
     this.toastService.show(this.transloco.translate('auth.toast.loggedOut'), 'info');
+  }
+
+  async changePassword(): Promise<void> {
+    if (this.passwordForm.invalid || this.changingPassword) {
+      this.passwordForm.markAllAsTouched();
+      return;
+    }
+
+    this.changingPassword = true;
+    this.passwordErrorKey = null;
+    const { currentPassword, newPassword } = this.passwordForm.getRawValue();
+
+    try {
+      await this.authService.changePassword(currentPassword, newPassword);
+      this.passwordForm.reset();
+      this.toastService.show(this.transloco.translate('profile.changePassword.toast.saved'), 'success');
+    } catch (error) {
+      this.passwordErrorKey = error instanceof HttpErrorResponse && error.status === 401
+        ? 'profile.changePassword.wrongCurrent'
+        : 'profile.changePassword.toast.saveError';
+    } finally {
+      this.changingPassword = false;
+    }
   }
 }
