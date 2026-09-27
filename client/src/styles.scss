@@ -322,6 +322,7 @@ a:focus {
    never sharing a line with the others. */
 .filter-col--full {
   flex: 1 1 100%;
+  min-width: 0; // same as .filter-col: lets content shrink instead of overflowing the row
 }
 
 /* Paired with .filter-col on a control - the search bar - that wants more
@@ -335,6 +336,15 @@ a:focus {
    room to read without truncating immediately. */
 .filter-col--xwide {
   flex-basis: 320px;
+}
+
+/* Stacks several .filter-row lines with the same gap as inside a line, for a
+   filter bar whose controls are split into fixed lines by hand (each line
+   still wraps on its own when the screen is too narrow). */
+.filter-rows {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--spacing-unit) * 1.5);
 }
 
 /* Bootstrap's default .btn padding is shorter than .form-control's own, which

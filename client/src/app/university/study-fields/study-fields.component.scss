@@ -7,6 +7,7 @@
 
   .form-group {
     flex: 1 1 220px;
+    min-width: 0; // lets the select inside shrink and truncate instead of overflowing the row
     margin-bottom: 0;
   }
 }

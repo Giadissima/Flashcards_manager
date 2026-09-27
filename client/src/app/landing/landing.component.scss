@@ -40,6 +40,31 @@
   cursor: pointer;
 }
 
+/* Below this width the title wraps onto two lines and its centred text runs
+   under the switcher, which stays put in its top-right corner: stacked above
+   the brand instead, out of the way, with the title shrunk so a long
+   translation still fits without wrapping into the logo. */
+@media (max-width: 950px) {
+  .landing-header {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: calc(var(--spacing-unit) * 2);
+  }
+
+  .language-switcher {
+    position: static;
+  }
+
+  .brand {
+    width: 100%;
+  }
+
+  .brand-title {
+    font-size: 1.75rem;
+  }
+}
+
 .language-switcher-menu {
   position: absolute;
   right: 0;
