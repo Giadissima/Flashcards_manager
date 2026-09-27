@@ -259,8 +259,21 @@ export class FlashcardsService {
   ): Promise<RandomFlashcard[]> {
     const query = this.buildObjectIdQuery(userId, filter);
     query.review_count = { $gt: 0 };
+    // $match evaluates every clause of the same stage against every document,
+    // review_count filter included: a card with review_count 0 still reaches
+    // $divide here and MongoDB throws on dividing by zero, so the ratio is
+    // guarded with $cond instead of relying on the other clause to skip it.
     query.$expr = {
-      $gte: [{ $divide: ['$wrong_count', '$review_count'] }, weakWrongRatio],
+      $gte: [
+        {
+          $cond: [
+            { $eq: ['$review_count', 0] },
+            0,
+            { $divide: ['$wrong_count', '$review_count'] },
+          ],
+        },
+        weakWrongRatio,
+      ],
     };
 
     return this.flashcardModel
