@@ -134,7 +134,7 @@
         </a>
         }
         <div class="flashcard-actions">
-          <button class="btn btn-primary" (click)="seeAnswer(card)">
+          <button class="btn btn-primary" (click)="seeAnswer(card, $event)">
             <span class="material-symbols-outlined">visibility</span>
             {{ getCardButtonText(card) }}
           </button>

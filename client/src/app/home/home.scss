@@ -15,6 +15,9 @@
   .flashcard {
     /* The anchor for the lock in the corner, see .card-visibility. */
     position: relative;
+    /* Keeps the card's top clear of the sticky navbar when it is scrolled
+       into view after switching between question and answer. */
+    scroll-margin-top: 5rem;
     height: auto;
     /* A floor, not a fixed height: cards holding a one-line question would
        otherwise come out as thin strips next to their neighbours. Everything

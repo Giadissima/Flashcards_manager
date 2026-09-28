@@ -346,9 +346,17 @@ export class Home extends PaginatedList implements OnInit, OnDestroy {
     this.expandedMap[card._id] = !this.expandedMap[card._id];
   }
 
-  seeAnswer(card: Flashcard): void {
+  seeAnswer(card: Flashcard, event: Event): void {
     if (!card._id) return;
     this.showAnswerMap[card._id] = !this.showAnswerMap[card._id];
+
+    // A long question or answer leaves the reader at the bottom of the card,
+    // so once the new face is rendered, bring the card back to its top.
+    const cardEl = (event.currentTarget as HTMLElement).closest('.flashcard');
+    setTimeout(() => {
+      if (!cardEl || cardEl.getBoundingClientRect().top >= 0) return;
+      cardEl.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    });
   }
 
   ngOnDestroy(): void {
