@@ -1,4 +1,4 @@
-import { ActivatedRoute, ParamMap, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs';
 import {
@@ -12,14 +12,10 @@ import {
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../auth/auth.service';
 import { CommunityService } from './community.service';
+import { ProfileType } from '../models/auth.dto';
 import { CommunityRulesModalComponent } from './community-rules-modal/community-rules-modal.component';
 import { FilterBarComponent } from '../shared/filter-bar/filter-bar.component';
 import { SearchInputComponent } from '../shared/search-input/search-input.component';
-import {
-  StudyFields,
-  StudyFieldsComponent,
-  emptyStudyFields,
-} from '../university/study-fields/study-fields.component';
 import {
   DateRange,
   DateRangeFilterComponent,
@@ -28,10 +24,21 @@ import { LoadStateComponent } from '../shared/load-state/load-state.component';
 import { PageCardAction, PageCardComponent } from '../shared/page-card/page-card.component';
 import { PaginationComponent } from '../shared/pagination/pagination.component';
 import { PostCardComponent } from './post-card/post-card.component';
-import { SegmentedFilterComponent } from '../shared/segmented-filter/segmented-filter.component';
+import {
+  SegmentedFilterComponent,
+  SegmentedOption,
+} from '../shared/segmented-filter/segmented-filter.component';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 
 const pageSize = 5;
+
+/**
+ * The whole Community, or just the reader's own corner of it. "own" is the
+ * default: a brand-new account opens on the posts closest to it rather than
+ * everyone's at once.
+ */
+export const feedScopes = ['own', 'global'] as const;
+export type FeedScope = (typeof feedScopes)[number];
 
 /**
  * The Community feed: what other people have chosen to share, newest first.
@@ -54,7 +61,6 @@ const pageSize = 5;
     DateRangeFilterComponent,
     FilterBarComponent,
     SearchInputComponent,
-    StudyFieldsComponent,
     RouterLink,
     CommunityRulesModalComponent,
   ],
@@ -74,8 +80,12 @@ export class CommunityComponent implements OnInit, OnDestroy {
   /** Which of the two dates that range reads. */
   dateField: FeedDateField = 'created';
 
-  /** Which university and course the feed is being read from. */
-  study: StudyFields = emptyStudyFields();
+  /**
+   * Which slice of the Community the feed reads: every space at once, or only
+   * the reader's own - their university, their school, or their flat "other"
+   * space, depending on profileType.
+   */
+  scope: FeedScope = 'own';
   searchTerm = '';
 
   private queryParamsSubscription?: Subscription;
@@ -92,21 +102,62 @@ export class CommunityComponent implements OnInit, OnDestroy {
       this.searchTerm,
       // One filter and not two: an open end is still the same range
       this.dateFrom || this.dateTo,
-      this.study.universityCode,
-      this.study.course,
     ].filter(Boolean).length;
   }
   readonly pageSize = pageSize;
 
   /**
-   * False only until the reader's university scope is settled - by their own
-   * profile having one, or by an explicit filter choice (including choosing
-   * "all universities" on purpose). Until then the feed asks for nothing:
-   * showing everyone's posts to someone who never chose to see them would mean
-   * a brand-new account with no university sees random Engineering, Nursing
-   * and Computer Science posts mixed together on the very first visit.
+   * Which corner of the Community this account reads: "other" and high
+   * schoolers each have one flat space of their own, with no university/course
+   * filter to narrow it further - only a university student's is split that
+   * way.
+   *
+   * Undefined for the moment between a logout (or a 401 forcing one) and the
+   * router actually leaving this page: `authService.user` goes to null right
+   * away, but this component can still be checked for one more cycle. Every
+   * comparison against it below is a `===`/`!==`, which undefined simply fails,
+   * so that moment reads as "no scope" rather than throwing.
    */
-  scopeChosen = false;
+  get space(): ProfileType | undefined {
+    return this.authService.user?.profileType;
+  }
+
+  get subtitleKey(): string {
+    if (this.space === 'other') return 'community.subtitleOther';
+    if (this.space === 'highschool') return 'community.subtitleHighschool';
+    return 'community.subtitle';
+  }
+
+  /** The label naming the reader's own space, which depends on profileType. */
+  private get ownScopeLabelKey(): string {
+    if (this.space === 'highschool') return 'community.scopeOwnHighschool';
+    if (this.space === 'other') return 'community.scopeOwnOther';
+    return 'community.scopeOwnUniversity';
+  }
+
+  get scopeOptions(): SegmentedOption[] {
+    return [
+      {
+        value: 'own',
+        label: this.transloco.translate(this.ownScopeLabelKey),
+      },
+      { value: 'global', label: this.transloco.translate('community.scopeGlobal') },
+    ];
+  }
+
+  /**
+   * False only when the reader picked "own" but their university scope is
+   * not settled - a university student with none on their profile. Showing
+   * everyone's posts there instead would mean a brand-new account with no
+   * university sees random Engineering, Nursing and Computer Science posts
+   * mixed together on the very first visit, so the feed asks for nothing
+   * until they pick a scope that resolves to something, or set a university.
+   */
+  get scopeChosen(): boolean {
+    if (this.scope === 'global') return true;
+    if (this.space !== 'university') return true;
+    return !!this.authService.user?.universityCode;
+  }
 
   rulesModalOpen = false;
 
@@ -154,7 +205,7 @@ export class CommunityComponent implements OnInit, OnDestroy {
       this.dateField = this.readOption(qp.get('dateField'), feedDateFields, 'created');
       this.searchTerm = qp.get('search') || '';
       this.page = Math.max(0, (Number(qp.get('page')) || 1) - 1);
-      this.study = this.readStudy(qp);
+      this.scope = this.readOption(qp.get('scope'), feedScopes, 'own');
 
       if (this.isInitialLoad) {
         this.isInitialLoad = false;
@@ -187,34 +238,6 @@ export class CommunityComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Where the reader studies is the corner of the Community their own course is
-   * in: the one place worth opening on, so an address carrying no filters at all
-   * starts there. Once the filters have been written to the address - and `sort`
-   * always is - an absent university means the reader cleared it, not that they
-   * never chose, and the feed stays as they left it.
-   */
-  private readStudy(qp: ParamMap): StudyFields {
-    const universityCode = qp.get('university');
-    if (!universityCode && !qp.has('sort')) {
-      const user = this.authService.user;
-      // No filter has ever been touched: a university on the profile settles
-      // the scope, but its absence does not - that is not yet a choice.
-      this.scopeChosen = !!user?.universityCode;
-      return {
-        universityCode: user?.universityCode ?? null,
-        course: user?.course ?? null,
-        courseKind: user?.courseKind ?? null,
-      };
-    }
-    this.scopeChosen = true;
-    return {
-      universityCode: universityCode || null,
-      course: qp.get('course') || null,
-      courseKind: qp.get('courseKind') || null,
-    };
-  }
-
-  /**
    * The filters live in the address, and the feed reloads through the
    * queryParamMap subscription: a read can then be sent to somebody else, or
    * reopened later exactly as it was left.
@@ -228,9 +251,7 @@ export class CommunityComponent implements OnInit, OnDestroy {
         to: this.dateTo,
         dateField: this.dateField,
         search: this.searchTerm.trim() || null,
-        university: this.study.universityCode,
-        course: this.study.course,
-        courseKind: this.study.courseKind,
+        scope: this.scope,
         page: this.currentPage,
       },
       queryParamsHandling: 'merge',
@@ -266,8 +287,8 @@ export class CommunityComponent implements OnInit, OnDestroy {
     this.verifyBannerDismissed = true;
   }
 
-  onStudyChange(study: StudyFields): void {
-    this.study = study;
+  onScopeChange(scope: string): void {
+    this.scope = scope as FeedScope;
     this.onFilterChange();
   }
 
@@ -344,9 +365,19 @@ export class CommunityComponent implements OnInit, OnDestroy {
         from: this.dateFrom ?? undefined,
         to: this.dateTo ?? undefined,
         dateField: this.dateField,
-        universityCode: this.study.universityCode ?? undefined,
-        course: this.study.course ?? undefined,
-        courseKind: this.study.courseKind ?? undefined,
+        // Left out entirely for the global scope: an empty profileType is
+        // what asks the server for every corner of the Community at once,
+        // whatever kind of account is reading. Scoped to "own", it is sent
+        // together with the reader's own university, so a university
+        // student's own feed does not spill into every other university's.
+        ...(this.scope === 'own'
+          ? {
+              profileType: this.space,
+              ...(this.space === 'university'
+                ? { universityCode: this.authService.user?.universityCode ?? undefined }
+                : {}),
+            }
+          : {}),
         search: this.searchTerm.trim() || undefined,
       },
     );

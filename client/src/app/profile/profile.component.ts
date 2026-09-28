@@ -7,6 +7,7 @@ import { defaultAvatarColor, getAvatarUrl } from '../shared/avatar/avatar.util';
 import { waitErrorOf } from '../shared/wait-error';
 
 import { AuthService } from '../auth/auth.service';
+import { ProfileType } from '../models/auth.dto';
 import { AvatarSvgComponent } from '../shared/avatar/avatar-svg.component';
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -49,6 +50,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
   @ViewChild(LoadStateComponent, { static: true }) loadState!: LoadStateComponent;
 
   profileForm: FormGroup;
+  /** Placeholder until loadProfile overwrites it with the account's real value. */
+  profileType: ProfileType = 'university';
   studyFields: StudyFields = emptyStudyFields();
   saving = false;
   /** Translation key of the failure shown above the form, cleared on each save. */
@@ -143,6 +146,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       username: user.username,
       avatarColor: user.avatarColor ?? defaultAvatarColor,
     });
+    this.profileType = user.profileType;
     this.studyFields = {
       universityCode: user.universityCode ?? null,
       course: user.course ?? null,
@@ -151,6 +155,15 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.previewUrl = user.avatar ? getAvatarUrl(user) : null;
     this.email = user.email ?? null;
     this.emailVerified = user.emailVerified;
+  }
+
+  selectProfileType(type: ProfileType): void {
+    this.profileType = type;
+    // Study fields belong to a university student alone: switching away from
+    // it drops whatever was picked, so it cannot ride along in the save.
+    if (type !== 'university') {
+      this.studyFields = emptyStudyFields();
+    }
   }
 
   /**
@@ -219,12 +232,15 @@ export class ProfileComponent implements OnInit, OnDestroy {
     const formData = new FormData();
     formData.append('username', this.profileForm.get('username')?.value);
     formData.append('avatarColor', this.profileForm.get('avatarColor')?.value);
+    formData.append('profileType', this.profileType);
 
-    const { universityCode, course, courseKind } = this.studyFields;
-    if (universityCode) formData.append('universityCode', universityCode);
-    if (course && courseKind) {
-      formData.append('course', course);
-      formData.append('courseKind', courseKind);
+    if (this.profileType === 'university') {
+      const { universityCode, course, courseKind } = this.studyFields;
+      if (universityCode) formData.append('universityCode', universityCode);
+      if (course && courseKind) {
+        formData.append('course', course);
+        formData.append('courseKind', courseKind);
+      }
     }
 
     if (this.selectedAvatar) {

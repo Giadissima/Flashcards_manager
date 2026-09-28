@@ -1,3 +1,10 @@
+/**
+ * What kind of account this is. Only "university" carries the study fields -
+ * "other" or a high schooler has nothing further to place them in - and each
+ * of the three is its own flat corner of the Community.
+ */
+export type ProfileType = 'other' | 'university' | 'highschool';
+
 /** The user as the server hands it back: never anything password related. */
 export interface AuthUser {
   _id: string;
@@ -8,6 +15,7 @@ export interface AuthUser {
   /** False only while a confirmation link is still unopened - and only that
       stands between the account and the Community section. */
   emailVerified: boolean;
+  profileType: ProfileType;
   /** Ministry code of the university, absent when the user skipped it. */
   universityCode?: string;
   course?: string;
@@ -44,4 +52,5 @@ export interface StudyFieldsPayload {
 /** What the registration form sends: only the study fields are optional. */
 export interface RegistrationPayload extends Credentials, StudyFieldsPayload {
   email: string;
+  profileType: ProfileType;
 }

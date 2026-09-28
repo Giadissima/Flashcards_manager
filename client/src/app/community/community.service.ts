@@ -14,6 +14,7 @@ import { Feedback, PostComment } from '../models/social.dto';
 import { Flashcard } from '../models/flashcard.dto';
 import { Injectable } from '@angular/core';
 import { PaginatedResponse } from '../models/http.dto';
+import { ProfileType } from '../models/auth.dto';
 import { RestClientService } from '../api/rest-api.service';
 
 /** Everything the feed can be narrowed by, beside its order and its page. */
@@ -22,6 +23,14 @@ export interface FeedFilters {
   to?: string;
   /** Which date the range reads; the server defaults to when it was shared. */
   dateField?: FeedDateField;
+  /**
+   * Which corner of the Community this reads. Always sent by the caller: for
+   * "university" it is further narrowed by universityCode/course/courseKind
+   * below, other and highschool have nothing further to narrow it by. Left
+   * out, the server treats the request as scoped to nothing at all - so this
+   * is what keeps the three corners from bleeding into one another.
+   */
+  profileType?: ProfileType;
   universityCode?: string;
   course?: string;
   courseKind?: string;
@@ -51,6 +60,7 @@ export class CommunityService {
       ...(filters.from ? { from: filters.from } : {}),
       ...(filters.to ? { to: filters.to } : {}),
       ...(filters.dateField ? { dateField: filters.dateField } : {}),
+      ...(filters.profileType ? { profileType: filters.profileType } : {}),
       ...(filters.universityCode ? { universityCode: filters.universityCode } : {}),
       ...(filters.course ? { course: filters.course } : {}),
       ...(filters.courseKind ? { courseKind: filters.courseKind } : {}),

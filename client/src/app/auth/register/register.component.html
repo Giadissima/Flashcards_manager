@@ -5,14 +5,18 @@
     <span>Flashcards Manager</span>
   </div>
 
+  @if (step < 3) {
   <app-page-card icon="person_add" [title]="'auth.register.title' | transloco"
-    [subtitle]="'auth.register.subtitle' | transloco">
+    [subtitle]="(step === 1 ? 'auth.register.subtitle' : 'auth.register.step2Subtitle') | transloco">
+    <p class="step-indicator">{{ 'auth.register.step' | transloco:{ current: step, total: 2 } }}</p>
+
     <form [formGroup]="registerForm" (ngSubmit)="register()" novalidate>
 
       @if (errorKey) {
       <div class="alert alert-danger" role="alert">{{ errorKey | transloco:errorParams }}</div>
       }
 
+      @if (step === 1) {
       <div class="form-group">
         <label for="username" class="form-label">{{ 'auth.username' | transloco }}</label>
         <input type="text" id="username" formControlName="username" class="form-control" autocomplete="username"
@@ -56,19 +60,65 @@
         }
       </div>
 
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">
+          <span class="material-symbols-outlined">arrow_forward</span>{{ 'auth.register.next' | transloco }}
+        </button>
+      </div>
+      }
+
+      @if (step === 2) {
+      <div class="mode-tiles mb-3">
+        <button type="button" class="mode-tile" [class.is-selected]="registerForm.get('profileType')?.value === 'other'"
+          (click)="selectProfileType('other')">
+          <span class="material-symbols-outlined">category</span>
+          <span class="mode-tile-title">{{ 'profileType.other' | transloco }}</span>
+        </button>
+        <button type="button" class="mode-tile" [class.is-selected]="registerForm.get('profileType')?.value === 'university'"
+          (click)="selectProfileType('university')">
+          <span class="material-symbols-outlined">school</span>
+          <span class="mode-tile-title">{{ 'profileType.university' | transloco }}</span>
+        </button>
+        <button type="button" class="mode-tile" [class.is-selected]="registerForm.get('profileType')?.value === 'highschool'"
+          (click)="selectProfileType('highschool')">
+          <span class="material-symbols-outlined">backpack</span>
+          <span class="mode-tile-title">{{ 'profileType.highschool' | transloco }}</span>
+        </button>
+      </div>
+      @if (registerForm.get('profileType')?.touched && registerForm.get('profileType')?.invalid) {
+      <div class="invalid-feedback d-block mb-3">{{ 'profileType.required' | transloco }}</div>
+      }
+
+      @if (registerForm.get('profileType')?.value === 'university') {
       <app-study-fields [value]="studyFields" (valueChange)="studyFields = $event"></app-study-fields>
+      }
 
       <div class="form-actions">
-        <button type="submit" class="btn btn-primary" [disabled]="registerForm.invalid || submitting"
-          [appPendingButton]="submitting">
+        <button type="button" class="btn btn-outline-primary" (click)="goToStep1()">
+          <span class="material-symbols-outlined">arrow_back</span>{{ 'auth.register.back' | transloco }}
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="submitting" [appPendingButton]="submitting">
           <span class="material-symbols-outlined">person_add</span>{{ 'auth.register.submit' | transloco }}
         </button>
       </div>
+      }
     </form>
 
+    @if (step === 1) {
     <div class="auth-switch">
       {{ 'auth.register.haveAccount' | transloco }}
       <a routerLink="/login" class="link-action">{{ 'auth.register.loginLink' | transloco }}</a>
     </div>
+    }
   </app-page-card>
+  } @else {
+  <app-page-card icon="mark_email_unread" [title]="'auth.register.step3.title' | transloco"
+    [subtitle]="'auth.register.step3.subtitle' | transloco">
+    <div class="form-actions">
+      <button type="button" class="btn btn-primary" (click)="goHome()">
+        <span class="material-symbols-outlined">arrow_forward</span>{{ 'auth.verify.goHome' | transloco }}
+      </button>
+    </div>
+  </app-page-card>
+  }
 </div>

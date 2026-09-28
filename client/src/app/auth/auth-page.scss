@@ -33,3 +33,12 @@
   text-align: center;
   color: var(--text-color);
 }
+
+/* "Passo 1 di 2": placed above the form rather than in the card subtitle, so
+   the subtitle stays free to explain what the step is actually asking. */
+.step-indicator {
+  margin: 0 0 calc(var(--spacing-unit) * 1.5);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-color);
+}

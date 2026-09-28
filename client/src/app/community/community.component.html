@@ -5,7 +5,7 @@
      the card, so the pipe is what keeps the header on screen while loading. -->
 <div class="container-md">
   <app-page-card icon="diversity_3" [title]="'community.title' | transloco"
-    [subtitle]="'community.subtitle' | transloco" [actions]="pageActions" (action)="openRulesModal()">
+    [subtitle]="subtitleKey | transloco" [actions]="pageActions" (action)="openRulesModal()">
     <app-filter-bar [activeCount]="activeFilterCount" appearance="inset"
       [caption]="'common.filters' | transloco">
       <div class="filter-row">
@@ -25,12 +25,10 @@
             ]" (rangeChange)="onDateRangeChange($event)"
             (fieldChange)="onDateFieldChange($event)"></app-date-range-filter>
         </div>
-        <!-- Set to the reader's own university and course to begin with: the
-             feed is worth most where they study, and the whole of it is one
-             choice away in the same two dropdowns. -->
-        <div class="filter-col--full">
-          <app-study-fields variant="filter" [value]="study"
-            (valueChange)="onStudyChange($event)"></app-study-fields>
+        <div class="filter-col--auto">
+          <app-segmented-filter [options]="scopeOptions" [value]="scope"
+            [label]="'community.scopeLabel' | transloco" (valueChange)="onScopeChange($event)">
+          </app-segmented-filter>
         </div>
         <app-segmented-filter [options]="[
             { value: 'created', label: ('community.sortCreated' | transloco) },

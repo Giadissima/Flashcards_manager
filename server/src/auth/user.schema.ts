@@ -7,6 +7,14 @@ import { Privilege, privileges } from 'src/common/privileges';
 export type UserDocument = User & Document;
 
 /**
+ * What kind of account this is. Only "university" carries the study fields
+ * below it - "other" and a high schooler have nothing further to place them
+ * in, and each of the three is its own flat corner of the Community.
+ */
+export const profileTypes = ['other', 'university', 'highschool'] as const;
+export type ProfileType = (typeof profileTypes)[number];
+
+/**
  * One thing this account may not do, and until when.
  *
  * Stored as a list rather than three flags because that is how it is read:
@@ -85,6 +93,15 @@ export class User {
   /** When that token stops working, so an old mail cannot reset anything. */
   @Prop({ required: false })
   passwordResetTokenExpiresAt?: Date;
+
+  /**
+   * Decides which corner of the Community the account belongs to, and (for
+   * "university" alone) whether the study fields below mean anything.
+   * Indexed: the feed looks every account of one profileType up on every
+   * request to that corner of the Community (see PostService.authorsStudying).
+   */
+  @Prop({ required: true, enum: profileTypes, index: true })
+  profileType: ProfileType;
 
   /**
    * Ministry code of the university the user belongs to, e.g. "00101". Both

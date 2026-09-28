@@ -31,15 +31,20 @@ export class VisibilityToggleComponent {
   constructor(private authService: AuthService) {}
 
   /**
-   * Nothing is shared until the profile says where its author studies: the
-   * feed is read university by university, and a post belonging to none would
-   * be everywhere, which would make filling the field in the losing move.
+   * A university student's profile has to say where they study before
+   * anything can go public: the university feed is read university by
+   * university, and a post belonging to none would be everywhere, which
+   * would make filling the field in the losing move. "Other" or a high
+   * schooler has no such field to fill in - their flat feed asks for nothing
+   * more than the account already being one or the other.
    *
    * Taking something back is always allowed, whatever the profile says - a
    * subject shared before the rule cannot be left stuck out in the open.
    */
   get canPublish(): boolean {
-    return !!this.authService.user?.universityCode || this.isPublic;
+    const user = this.authService.user;
+    if (user && user.profileType !== 'university') return true;
+    return !!user?.universityCode || this.isPublic;
   }
 
   /**

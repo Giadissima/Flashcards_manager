@@ -48,7 +48,30 @@
         </div>
         }
 
+        <div class="form-group">
+          <label class="form-label">{{ t('profile.profileTypeLabel') }}</label>
+          <div class="mode-tiles">
+            <button type="button" class="mode-tile" [class.is-selected]="profileType === 'other'"
+              (click)="selectProfileType('other')">
+              <span class="material-symbols-outlined">category</span>
+              <span class="mode-tile-title">{{ t('profileType.other') }}</span>
+            </button>
+            <button type="button" class="mode-tile" [class.is-selected]="profileType === 'university'"
+              (click)="selectProfileType('university')">
+              <span class="material-symbols-outlined">school</span>
+              <span class="mode-tile-title">{{ t('profileType.university') }}</span>
+            </button>
+            <button type="button" class="mode-tile" [class.is-selected]="profileType === 'highschool'"
+              (click)="selectProfileType('highschool')">
+              <span class="material-symbols-outlined">backpack</span>
+              <span class="mode-tile-title">{{ t('profileType.highschool') }}</span>
+            </button>
+          </div>
+        </div>
+
+        @if (profileType === 'university') {
         <app-study-fields [value]="studyFields" (valueChange)="studyFields = $event"></app-study-fields>
+        }
 
         <!-- Saving is what the page is for, so it sits on the right, where the
              eye ends up after reading the form. -->

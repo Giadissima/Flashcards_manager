@@ -1,6 +1,7 @@
 import {
   IsBoolean,
   IsEmail,
+  IsIn,
   IsOptional,
   IsString,
   Length,
@@ -18,6 +19,7 @@ import {
 
 import { ApiProperty } from '@nestjs/swagger';
 import { IntersectionType } from '@nestjs/mapped-types';
+import { ProfileType, profileTypes } from './user.schema';
 import { ToBoolean, Trim } from 'src/common/transform.decorators';
 
 /** The Dto file contains the description of the client requests and the server's responses*/
@@ -110,6 +112,17 @@ export class RegisterDto extends IntersectionType(LoginDto, StudyFieldsDto) {
   })
   @Trim()
   email: string;
+
+  // Only "university" carries the study fields above it: "other" or a high
+  // schooler has nothing further to place them in, and the three sort every
+  // account into its own flat corner of the Community.
+  @IsIn(profileTypes)
+  @ApiProperty({
+    description: "What kind of account this is; only 'university' also accepts the study fields",
+    enum: profileTypes,
+    example: 'university',
+  })
+  profileType: ProfileType;
 }
 
 /** The token out of the confirmation link, as the page sends it back. */
@@ -129,6 +142,19 @@ export class VerifyEmailDto {
  * replacement and not a merge: a field left out is a field cleared.
  */
 export class UpdateProfileDto extends StudyFieldsDto {
+  // Optional here, unlike at registration: an account editing its avatar or
+  // its username is not necessarily also changing what kind of account it is.
+  // Left out, the existing value stands; sent, it decides whether the study
+  // fields below are kept or dropped (see AuthService.updateProfile).
+  @IsOptional()
+  @IsIn(profileTypes)
+  @ApiProperty({
+    description: "What kind of account this is; only 'university' also accepts the study fields",
+    enum: profileTypes,
+    required: false,
+  })
+  profileType?: ProfileType;
+
   // Free to change: the user is keyed by its id everywhere, and the token is
   // signed with it, so a new username costs nothing and invalidates nothing.
   @IsOptional()
@@ -219,6 +245,7 @@ export interface PublicUser {
   /** Whether the address was confirmed. True for an account without one, so
       that nothing the old accounts could do is taken away from them. */
   emailVerified: boolean;
+  profileType: ProfileType;
   universityCode?: string;
   course?: string;
   courseKind?: string;

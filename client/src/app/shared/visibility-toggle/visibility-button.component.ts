@@ -50,11 +50,15 @@ export class VisibilityButtonComponent {
   constructor(private authService: AuthService) {}
 
   /**
-   * Sharing waits for the profile to say where its author studies; taking
-   * something back never does. See VisibilityToggleComponent for why.
+   * A university student's sharing waits for the profile to say where they
+   * study; "other" or a high schooler has no such field to wait on. Taking
+   * something back never waits on anything. See VisibilityToggleComponent for
+   * why.
    */
   get canPublish(): boolean {
-    return !!this.authService.user?.universityCode || this.isPublic;
+    const user = this.authService.user;
+    if (user && user.profileType !== 'university') return true;
+    return !!user?.universityCode || this.isPublic;
   }
   /** Set while the change is in flight, so it cannot be asked for twice. */
   @Input() busy = false;

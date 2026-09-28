@@ -13,6 +13,7 @@ import { charMinLength, nameMaxLength } from 'src/config';
 
 import { ApiProperty, IntersectionType } from '@nestjs/swagger';
 import { BasicFilterRequest, DateRangeRequest } from 'src/common.dto';
+import { ProfileType, profileTypes } from 'src/auth/user.schema';
 import { Trim } from 'src/common/transform.decorators';
 
 /**
@@ -37,6 +38,22 @@ export class FeedFilterRequest extends IntersectionType(
   BasicFilterRequest,
   DateRangeRequest,
 ) {
+  // Which corner of the Community this request reads. Always sent by the
+  // client, for all three: the university one is further narrowed by
+  // universityCode/course/courseKind below, other and highschool have
+  // nothing further to narrow it by. Required in practice (not required here)
+  // so an old client that never sends it still gets an answer rather than a
+  // 400 - see authorsStudying, which then falls back to no scoping at all.
+  @IsOptional()
+  @IsString()
+  @IsIn(profileTypes)
+  @ApiProperty({
+    description: 'Which corner of the Community this feed reads; "university" is further narrowed by universityCode/course/courseKind',
+    enum: profileTypes,
+    required: false,
+  })
+  profileType?: ProfileType;
+
   @IsOptional()
   @IsString()
   @ApiProperty({

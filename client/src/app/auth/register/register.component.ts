@@ -10,10 +10,9 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { PageCardComponent } from '../../shared/page-card/page-card.component';
 import { PasswordFieldComponent } from '../../shared/password-field/password-field.component';
 import { PendingButtonDirective } from '../../shared/pending-button.directive';
-import { RegistrationPayload } from '../../models/auth.dto';
+import { ProfileType, RegistrationPayload } from '../../models/auth.dto';
 import { Router, RouterLink } from '@angular/router';
-import { ToastService } from '../../shared/toast/toast.service';
-import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
+import { TranslocoModule } from '@jsverse/transloco';
 import { TutorialService } from '../../shared/tutorial/tutorial.service';
 
 /** Same rule as the server DTO: what is refused there is caught here first. */
@@ -43,6 +42,14 @@ export class RegisterComponent {
   /** What the message needs, when it needs anything: the wait, in minutes. */
   errorParams: Record<string, unknown> = {};
 
+  /**
+   * 1: account basics. 2: profile type, and study fields for a university
+   * student. 3: the confirmation mail is on its way - shown in place of the
+   * form rather than navigating straight off, so the "check your inbox"
+   * message is not just a toast that can be missed.
+   */
+  step: 1 | 2 | 3 = 1;
+
   studyFields: StudyFields = emptyStudyFields();
 
   readonly charMinLength = charMinLength;
@@ -55,8 +62,6 @@ export class RegisterComponent {
     private fb: FormBuilder,
     private router: Router,
     private authService: AuthService,
-    private toastService: ToastService,
-    private transloco: TranslocoService,
     private tutorialService: TutorialService,
   ) {
     this.registerForm = this.fb.group({
@@ -71,6 +76,7 @@ export class RegisterComponent {
       email: ['', [Validators.required, Validators.email, Validators.maxLength(emailMaxLength)]],
       password: ['', [Validators.required, Validators.minLength(passwordMinLength), Validators.maxLength(passwordMaxLength)]],
       confirmPassword: ['', Validators.required],
+      profileType: [null as ProfileType | null, Validators.required],
     }, { validators: RegisterComponent.passwordsMatch });
   }
 
@@ -81,7 +87,46 @@ export class RegisterComponent {
     return password && confirmPassword && password !== confirmPassword ? { passwordMismatch: true } : null;
   }
 
+  /** Only the fields step 1 actually shows - profileType belongs to step 2,
+      and checking the whole form here would refuse "Avanti" before it is even asked. */
+  get step1Invalid(): boolean {
+    const form = this.registerForm;
+    return (
+      form.get('username')!.invalid ||
+      form.get('email')!.invalid ||
+      form.get('password')!.invalid ||
+      form.get('confirmPassword')!.invalid ||
+      form.hasError('passwordMismatch')
+    );
+  }
+
+  goToStep2(): void {
+    if (this.step1Invalid) {
+      ['username', 'email', 'password', 'confirmPassword'].forEach((name) => this.registerForm.get(name)?.markAsTouched());
+      return;
+    }
+    this.step = 2;
+  }
+
+  goToStep1(): void {
+    this.step = 1;
+  }
+
+  selectProfileType(type: ProfileType): void {
+    this.registerForm.get('profileType')?.setValue(type);
+    // Study fields belong to a university student alone: switching away from
+    // it drops whatever was picked, so it cannot ride along in the payload.
+    if (type !== 'university') {
+      this.studyFields = emptyStudyFields();
+    }
+  }
+
   async register(): Promise<void> {
+    if (this.step === 1) {
+      this.goToStep2();
+      return;
+    }
+
     if (this.registerForm.invalid || this.submitting) {
       this.registerForm.markAllAsTouched();
       return;
@@ -89,24 +134,23 @@ export class RegisterComponent {
 
     this.submitting = true;
     this.errorKey = null;
-    const { username, email, password } = this.registerForm.getRawValue();
-    const { universityCode, course, courseKind } = this.studyFields;
+    const { username, email, password, profileType } = this.registerForm.getRawValue();
 
-    const payload: RegistrationPayload = { username, email: email.trim(), password };
-    if (universityCode) payload.universityCode = universityCode;
-    if (course && courseKind) {
-      payload.course = course;
-      payload.courseKind = courseKind;
+    const payload: RegistrationPayload = { username, email: email.trim(), password, profileType };
+    if (profileType === 'university') {
+      const { universityCode, course, courseKind } = this.studyFields;
+      if (universityCode) payload.universityCode = universityCode;
+      if (course && courseKind) {
+        payload.course = course;
+        payload.courseKind = courseKind;
+      }
     }
 
     try {
       await this.authService.register(payload);
-      // The account is ready; the mail is the one thing still outstanding, so
-      // the welcome says where to look for it.
-      this.toastService.show(this.transloco.translate('auth.toast.registered'), 'success');
-      this.router.navigate(['/home']);
-      // First thing a brand new account sees on /home: a quick tour of the app.
-      this.tutorialService.open();
+      // The account exists, but there is still the mail to confirm - said as
+      // its own step rather than a toast that can be missed and never seen again.
+      this.step = 3;
     } catch (error) {
       // An address that has asked too often is told how long to wait, not that
       // something went wrong: waiting is the whole of what it has to do.
@@ -131,5 +175,12 @@ export class RegisterComponent {
     } finally {
       this.submitting = false;
     }
+  }
+
+  /** Leaves step 3 for the app itself, once the confirmation mail has been read about. */
+  goHome(): void {
+    this.router.navigate(['/home']);
+    // First thing a brand new account sees on /home: a quick tour of the app.
+    this.tutorialService.open();
   }
 }

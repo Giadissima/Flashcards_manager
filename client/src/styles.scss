@@ -1501,6 +1501,64 @@ $image-modal-height: calc(
   color: var(--text-color);
 }
 
+/* A handful of options as equal tiles rather than a select or radio list -
+   naming each one plainly earns its screen space when there are only a few.
+   Used for the test setup's mode picker, and for the profile-type choice at
+   registration and on the profile page. */
+.mode-tiles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-unit);
+}
+
+.mode-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--spacing-unit) * 0.5);
+  padding: calc(var(--spacing-unit) * 2);
+  text-align: center;
+  background-color: var(--component-background);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+
+  .material-symbols-outlined {
+    font-size: 28px;
+    color: var(--text-color);
+  }
+
+  &:hover {
+    border-color: var(--primary-color);
+  }
+
+  &.is-selected {
+    background-color: var(--primary-tint-soft);
+    border-color: var(--primary-color);
+
+    .material-symbols-outlined {
+      color: var(--primary-color);
+    }
+  }
+}
+
+.mode-tile-title {
+  font-weight: 600;
+  color: var(--header-color);
+}
+
+.mode-tile-desc {
+  font-size: 0.85rem;
+  color: var(--text-color);
+}
+
+@media (max-width: 575.98px) {
+  .mode-tiles {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Wrapper for the round icon in a card header */
 .header-icon-container {
   background-color: var(--background-color);

@@ -250,8 +250,12 @@ export class PostService {
   }
 
   /**
-   * The people a feed filtered by university and course is about, or null when
-   * it was not filtered by either.
+   * The people a feed scoped to one corner of the Community is about, or null
+   * when it was sent no scope at all (an old client that predates
+   * profileType). `profileType` picks which of the three it is; university
+   * and course only ever narrow it further *inside* the university one - they
+   * are ignored otherwise, so an empty one can never widen a request out into
+   * the other two corners.
    *
    * Looked up as a list of ids rather than joined onto the posts: the feed
    * reads them with populate, and turning it into an aggregation to reach one
@@ -262,9 +266,14 @@ export class PostService {
     filter: FeedFilterRequest,
   ): Promise<Types.ObjectId[] | null> {
     const query: FilterQuery<User> = {};
-    if (filter.universityCode) query.universityCode = filter.universityCode;
-    if (filter.course) query.course = filter.course;
-    if (filter.courseKind) query.courseKind = filter.courseKind;
+    if (filter.profileType) {
+      query.profileType = filter.profileType;
+      if (filter.profileType === 'university') {
+        if (filter.universityCode) query.universityCode = filter.universityCode;
+        if (filter.course) query.course = filter.course;
+        if (filter.courseKind) query.courseKind = filter.courseKind;
+      }
+    }
 
     if (!Object.keys(query).length) return null;
 

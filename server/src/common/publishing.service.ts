@@ -7,12 +7,16 @@ import { User } from 'src/auth/user.schema';
 import { Visibility } from './visibility';
 
 /**
- * The one condition on sharing: the author has to have said where they study.
+ * The one condition on sharing: a university student has to have said where
+ * they study. "Other" or a high schooler has no such further field to fill
+ * in - their profileType alone already places them in their own corner of
+ * the Community.
  *
- * Not a formality. The feed opens on the reader's own university, so a post
- * with no university behind it belongs to no corner of the Community, and
- * leaving the field empty would be the way to be seen everywhere - which would
- * make filling it in the losing move for everybody who does.
+ * Not a formality, for a university student. The feed opens on the reader's
+ * own university, so a post with no university behind it belongs to no
+ * corner of the Community, and leaving the field empty would be the way to
+ * be seen everywhere - which would make filling it in the losing move for
+ * everybody who does.
  *
  * Checked here rather than in each of the three services, so a new way of
  * publishing something cannot quietly skip it.
@@ -36,11 +40,11 @@ export class PublishingService {
     await this.restrictions.assertMay(userId, 'publish');
 
     const user = await this.userModel
-      .findById(userId, { universityCode: 1 })
+      .findById(userId, { universityCode: 1, profileType: 1 })
       .lean()
       .exec();
 
-    if (!user?.universityCode) {
+    if (user?.profileType === 'university' && !user.universityCode) {
       throw new ForbiddenException(
         'Add your university to your profile before sharing anything',
       );

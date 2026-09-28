@@ -62,11 +62,19 @@
     "register": {
       "title": "Create account",
       "subtitle": "Choose a username and a password to get started",
+      "step2Subtitle": "Tell us where you study or work",
+      "step": "Step {{current}} of {{total}}",
       "confirmPassword": "Confirm password",
       "mismatchError": "The two passwords do not match",
+      "back": "Back",
+      "next": "Next",
       "submit": "Create account",
       "haveAccount": "Already have an account?",
-      "loginLink": "Sign in"
+      "loginLink": "Sign in",
+      "step3": {
+        "title": "Check your mail",
+        "subtitle": "We sent you a mail to confirm your address: confirming it matters to take part in the Community."
+      }
     },
     "verify": {
       "pending": "You have not confirmed this address yet. Until you do you can study and import as always, but not post, comment or send feedback in the Community.",
@@ -578,6 +586,12 @@
       "invalidFile": "Invalid file: select a valid JSON or ZIP export"
     }
   },
+  "profileType": {
+    "other": "Other",
+    "university": "University student",
+    "highschool": "High school student",
+    "required": "Pick one of the options"
+  },
   "studyFields": {
     "why": "Why we ask for your university",
     "whyText": "In the Community section the shared flashcards are grouped by degree course: tell us yours and you go straight to the ones made by people sitting your same exams.",
@@ -597,6 +611,7 @@
   },
   "profile": {
     "title": "Profile",
+    "profileTypeLabel": "University student, high school student, or other",
     "subtitle": "Your account and where you study",
     "avatar": "Profile picture",
     "avatarColor": "Picture colour",
@@ -655,11 +670,18 @@
   "community": {
     "title": "Community",
     "subtitle": "What other people have chosen to share",
+    "subtitleOther": "What other people in this space have chosen to share",
+    "subtitleHighschool": "What other high school students have chosen to share",
     "sortLabel": "Order",
     "sortCreated": "Newest",
     "sortUpdated": "Recently updated",
     "empty": "Nothing has been shared yet.",
-    "noUniversityHint": "Choose a university to see its posts, or set yours on your profile to start there.",
+    "scopeLabel": "Scope",
+    "scopeGlobal": "Global search",
+    "scopeOwnUniversity": "In your university",
+    "scopeOwnHighschool": "In your school",
+    "scopeOwnOther": "In your community",
+    "noUniversityHint": "Set your university on your profile to see its posts, or switch to global search.",
     "loadError": "The feed could not be loaded",
     "noFlashcards": "No flashcards to show",
     "cardCount": "{{count}} flashcards",

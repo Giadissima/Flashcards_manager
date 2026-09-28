@@ -62,11 +62,19 @@
     "register": {
       "title": "Crea account",
       "subtitle": "Scegli un nome utente e una password per iniziare",
+      "step2Subtitle": "Raccontaci dove studi o lavori",
+      "step": "Passo {{current}} di {{total}}",
       "confirmPassword": "Conferma password",
       "mismatchError": "Le due password non coincidono",
+      "back": "Indietro",
+      "next": "Avanti",
       "submit": "Crea account",
       "haveAccount": "Hai già un account?",
-      "loginLink": "Accedi"
+      "loginLink": "Accedi",
+      "step3": {
+        "title": "Controlla la tua posta",
+        "subtitle": "Ti abbiamo mandato un'email per confermare il tuo indirizzo: verificarla è importante per poter partecipare alla Community."
+      }
     },
     "verify": {
       "pending": "Non hai ancora confermato questo indirizzo. Finché non lo fai puoi studiare e importare come sempre, ma non pubblicare, commentare o mandare feedback in Community.",
@@ -578,6 +586,12 @@
       "invalidFile": "File non valido: seleziona un export JSON o ZIP valido"
     }
   },
+  "profileType": {
+    "other": "Altro",
+    "university": "Studente universitario",
+    "highschool": "Studente delle superiori",
+    "required": "Scegli una delle opzioni"
+  },
   "studyFields": {
     "why": "Perché ti chiediamo l'università",
     "whyText": "Nella sezione Community le flashcard condivise sono raggruppate per corso di laurea: indicando il tuo, arrivi subito a quelle di chi prepara i tuoi stessi esami.",
@@ -598,6 +612,7 @@
   "profile": {
     "title": "Profilo",
     "subtitle": "Il tuo account e dove studi",
+    "profileTypeLabel": "Studente universitario, delle superiori, o altro",
     "avatar": "Immagine del profilo",
     "avatarColor": "Colore dell'immagine",
     "replaceAvatar": "Carica un'immagine",
@@ -655,11 +670,18 @@
   "community": {
     "title": "Community",
     "subtitle": "Quello che gli altri hanno scelto di condividere",
+    "subtitleOther": "Quello che gli altri hanno scelto di condividere in questo spazio",
+    "subtitleHighschool": "Quello che gli altri studenti delle superiori hanno scelto di condividere",
     "sortLabel": "Ordine",
     "sortCreated": "Più recenti",
     "sortUpdated": "Aggiornati di recente",
     "empty": "Non è ancora stato condiviso nulla.",
-    "noUniversityHint": "Scegli un'università per visualizzarne i post, o indica la tua nel profilo per partire da lì.",
+    "scopeLabel": "Ambito",
+    "scopeGlobal": "Ricerca globale",
+    "scopeOwnUniversity": "Nella tua università",
+    "scopeOwnHighschool": "Nella tua scuola",
+    "scopeOwnOther": "Nella tua community",
+    "noUniversityHint": "Indica la tua università nel profilo per vedere i post di chi la frequenta, oppure passa alla ricerca globale.",
     "loadError": "Non è stato possibile caricare il feed",
     "noFlashcards": "Nessuna flashcard da mostrare",
     "cardCount": "{{count}} flashcard",

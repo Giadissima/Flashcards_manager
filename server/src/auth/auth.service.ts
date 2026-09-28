@@ -83,9 +83,16 @@ export class AuthService {
         username,
         email,
         password,
-        universityCode: dto.universityCode,
-        course: dto.course,
-        courseKind: dto.courseKind,
+        profileType: dto.profileType,
+        // "Other" or a high schooler has nothing to place in these: whatever
+        // the client sent along with them is dropped rather than trusted.
+        ...(dto.profileType === 'university'
+          ? {
+              universityCode: dto.universityCode,
+              course: dto.course,
+              courseKind: dto.courseKind,
+            }
+          : {}),
         signupIp: ip,
       });
     } catch (error) {
@@ -209,9 +216,22 @@ export class AuthService {
 
     if (dto.username) await this.renameTo(user, dto.username);
 
-    user.universityCode = dto.universityCode;
-    user.course = dto.course;
-    user.courseKind = dto.courseKind;
+    // Read after the write and not before: dto.profileType left out means
+    // "unchanged", so the account's existing value is what decides the branch
+    // below whenever the caller isn't also changing it.
+    if (dto.profileType) user.profileType = dto.profileType;
+    const profileType = user.profileType;
+    if (profileType === 'university') {
+      user.universityCode = dto.universityCode;
+      user.course = dto.course;
+      user.courseKind = dto.courseKind;
+    } else {
+      // Switched away from university, or never was one: nothing here belongs
+      // to "other" or a high schooler's account.
+      user.universityCode = undefined;
+      user.course = undefined;
+      user.courseKind = undefined;
+    }
     user.avatarColor = dto.avatarColor;
 
     // Read before the change, dropped only once the save went through
@@ -279,6 +299,7 @@ export class AuthService {
     return {
       _id: String(user._id),
       username: user.username,
+      profileType: user.profileType,
       universityCode: user.universityCode,
       course: user.course,
       courseKind: user.courseKind,
