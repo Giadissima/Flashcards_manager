@@ -127,7 +127,9 @@ export class ManageTopicsComponent extends PaginatedList implements OnInit {
   }
 
   createTopic(): void {
-    this.router.navigate(['/create-topic']);
+    this.router.navigate(['/create-topic'], {
+      queryParams: this.selectedSubjectId ? { subject_id: this.selectedSubjectId } : {},
+    });
   }
 
   editTopic(id?: string): void {

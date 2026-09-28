@@ -12,7 +12,7 @@ import { answerMaxLength, charMinLength, questionMaxLength, titleMaxLength } fro
 import { CommonModule } from '@angular/common';
 import { ModalComponent } from '../../shared/modal/modal.component';
 import { PendingButtonDirective } from '../../shared/pending-button.directive';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { VisibilityToggleComponent } from '../../shared/visibility-toggle/visibility-toggle.component';
 import { Visibility } from '../../models/visibility.dto';
 import {
@@ -107,6 +107,7 @@ export class CreateFlashcard implements OnInit, OnDestroy {
     private subjectService: SubjectService,
     private transloco: TranslocoService,
     private router: Router,
+    private route: ActivatedRoute,
     private tutorialService: TutorialService
   ) {
     this.questionEditor = createRichTextEditor({
@@ -134,9 +135,24 @@ export class CreateFlashcard implements OnInit, OnDestroy {
       subject_id: ['']
     });
 
-    Promise.all([this.loadSubjects(), this.loadTopicsBySubject(undefined)]).then(() =>
-      this.updateEmptyState()
-    );
+    Promise.all([this.loadSubjects(), this.loadTopicsBySubject(undefined)]).then(() => {
+      this.updateEmptyState();
+      this.applyQueryPreselection();
+    });
+  }
+
+  // Arriving from the home filters: preselect the subject/topic they had set.
+  // A topic wins (it also implies its subject); a stale id is simply ignored.
+  private applyQueryPreselection(): void {
+    const qp = this.route.snapshot.queryParamMap;
+    const topicId = qp.get('topic_id');
+    const subjectId = qp.get('subject_id');
+
+    if (topicId && this.topics.some((t) => t._id === topicId)) {
+      this.onTopicSelected(topicId);
+    } else if (subjectId && this.subjects.some((s) => s._id === subjectId)) {
+      this.onSubjectSelected(subjectId);
+    }
   }
 
   // Called after subjects/topics load: no subject at all takes priority over

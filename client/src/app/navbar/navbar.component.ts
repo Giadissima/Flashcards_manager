@@ -1,12 +1,13 @@
 import { AuthService } from '../auth/auth.service';
-import { Observable, map } from 'rxjs';
+import { Observable, filter, map } from 'rxjs';
 import { getAvatarUrl } from '../shared/avatar/avatar.util';
 import { ClickOutsideDirective } from '../shared/click-outside.directive';
 import { CommonModule } from '@angular/common';
 import { Component, HostListener } from '@angular/core';
 import { ImportExportModalComponent } from '../import-export-modal/import-export-modal.component';
 import { NotificationPanelComponent } from '../notification/notification-panel.component';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { NavigationEnd, Params, Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SettingsModalComponent } from '../settings-modal/settings-modal.component';
 import { ToastService } from '../shared/toast/toast.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
@@ -43,8 +44,31 @@ export class NavbarComponent {
     protected authService: AuthService,
     private toastService: ToastService,
     private transloco: TranslocoService,
+    private router: Router,
   ) {
     this.avatarUrl$ = this.authService.user$.pipe(map((user) => getAvatarUrl(user)));
+
+    this.router.events
+      .pipe(
+        filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+        takeUntilDestroyed(),
+      )
+      .subscribe(() => this.updateCreateCardParams());
+    this.updateCreateCardParams();
+  }
+
+  /**
+   * Query params carried by the "new flashcard" links: while on the home feed,
+   * its subject/topic filters become the defaults of the create form. A property
+   * and not a getter, so the binding keeps a stable reference between checks.
+   */
+  createCardParams: Params = {};
+
+  private updateCreateCardParams(): void {
+    const tree = this.router.parseUrl(this.router.url);
+    const onHome = tree.root.children['primary']?.segments[0]?.path === 'home';
+    const { subject_id, topic_id } = tree.queryParams;
+    this.createCardParams = onHome ? { subject_id: subject_id || null, topic_id: topic_id || null } : {};
   }
 
   @HostListener('window:resize')

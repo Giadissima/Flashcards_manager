@@ -16,7 +16,7 @@ import { NgxColorsComponent, NgxColorsTriggerDirective } from 'ngx-colors';
 import { PageCardComponent } from '../../shared/page-card/page-card.component';
 import { PendingButtonDirective } from '../../shared/pending-button.directive';
 import { TopicService } from '../topic.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from '../../models/subject.dto';
 import { SubjectService } from '../../subject/subject.service';
 import { ToastService } from '../../shared/toast/toast.service';
@@ -83,6 +83,7 @@ export class CreateTopicComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private router: Router,
+    private route: ActivatedRoute,
     private topicService: TopicService,
     private toastService: ToastService,
     private subjectService: SubjectService,
@@ -179,6 +180,12 @@ export class CreateTopicComponent implements OnInit {
     try {
       this.subjects = await this.subjectService.getSelectableSubjects();
       this.showEmptyStateModal = this.subjects.length === 0;
+
+      // Arriving from "manage topics" filtered by a subject: preselect it.
+      const preselected = this.route.snapshot.queryParamMap.get('subject_id');
+      if (preselected && this.subjects.some((s) => s._id === preselected)) {
+        this.onSubjectChange(preselected);
+      }
     } catch (err) {
       console.error('Error loading subjects', err);
       this.toastService.show(
