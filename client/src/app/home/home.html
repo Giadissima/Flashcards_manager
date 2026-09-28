@@ -1,6 +1,7 @@
 <app-load-state errorMessageKey="home.toast.flashcardsLoadError">
 <div class="container mt-4" *transloco="let t">
   <app-filter-bar [activeCount]="activeFilterCount" [caption]="t('common.filters')">
+    <div class="filter-rows">
     <div class="filter-row">
       <div class="filter-col">
         <label class="visually-hidden">{{ 'common.subject' | transloco }}</label>
@@ -24,10 +25,9 @@
           (valueChange)="onTopicSelected($event)"
         ></app-searchable-select>
       </div>
-      <!-- Sort sits with the two selects rather than after search/date range:
-           subject, topic and sort are the three that stay compact, so they
-           are what a narrower row keeps together on its own line, wrapping
-           search and date range - the two widest controls - onto the next. -->
+      <!-- Two fixed lines of three: each ends with a control that keeps its own
+           width (sort buttons, date range) while the other two stretch to fill
+           the line. Each line still wraps on its own on narrow screens. -->
       <div class="filter-col--auto">
         <div class="btn-group" role="group">
           <button type="button" class="btn" (click)="setSortBy('title')"
@@ -56,7 +56,9 @@
           </button>
         </div>
       </div>
-      <div class="filter-col filter-col--wide">
+    </div>
+    <div class="filter-row">
+      <div class="filter-col">
         <app-search-input
           [value]="searchTerm"
           [placeholder]="t('home.searchPlaceholder')"
@@ -64,10 +66,6 @@
           (valueChange)="onSearchTermChange($event)"
           (search)="onSearch($event)"
         ></app-search-input>
-      </div>
-      <div class="filter-col--auto">
-        <app-date-range-filter [from]="dateFrom" [to]="dateTo" [disabled]="isReloading"
-          (rangeChange)="onDateRangeChange($event)"></app-date-range-filter>
       </div>
       <div class="filter-col">
         <label class="visually-hidden">{{ 'home.importFilter.label' | transloco }}</label>
@@ -78,6 +76,11 @@
           (valueChange)="onImportFilterChange($event)"
         ></app-searchable-select>
       </div>
+      <div class="filter-col--auto">
+        <app-date-range-filter [from]="dateFrom" [to]="dateTo" [disabled]="isReloading"
+          (rangeChange)="onDateRangeChange($event)"></app-date-range-filter>
+      </div>
+    </div>
     </div>
   </app-filter-bar>
 
