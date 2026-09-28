@@ -91,6 +91,7 @@ export class RichTextEditorComponent implements OnInit, OnDestroy {
   private mathInputEl?: HTMLInputElement;
 
   constructor(
+    private host: ElementRef<HTMLElement>,
     private fileService: FileService,
     private toastService: ToastService,
     private transloco: TranslocoService
@@ -120,9 +121,14 @@ export class RichTextEditorComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.editor.on('selectionUpdate', this.onSelectionUpdate);
+    // Capturing, so this runs before ProseMirror's own paste handling, which
+    // would otherwise also insert the HTML that comes with an image copied
+    // from a web page and leave the picture in twice.
+    this.host.nativeElement.addEventListener('paste', this.onPaste, true);
   }
 
   ngOnDestroy(): void {
+    this.host.nativeElement.removeEventListener('paste', this.onPaste, true);
     this.editor.off('selectionUpdate', this.onSelectionUpdate);
   }
 
@@ -312,16 +318,27 @@ export class RichTextEditorComponent implements OnInit, OnDestroy {
   async onImageSelected(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
+    if (file) await this.uploadImage(file);
+    input.value = '';
+  }
+
+  /** Ctrl+V with an image on the clipboard uploads it, like the image button. */
+  private readonly onPaste = (event: ClipboardEvent): void => {
+    const file = Array.from(event.clipboardData?.files ?? []).find((f) => f.type.startsWith('image/'));
     if (!file) return;
 
+    event.preventDefault();
+    event.stopPropagation();
+    void this.uploadImage(file);
+  };
+
+  private async uploadImage(file: File): Promise<void> {
     if (!file.type.startsWith('image/')) {
       this.toastService.show(this.transloco.translate('flashcard.toast.invalidImageType'), 'error');
-      input.value = '';
       return;
     }
     if (file.size > maxImageSize) {
       this.toastService.show(this.transloco.translate('flashcard.toast.imageTooLarge'), 'error');
-      input.value = '';
       return;
     }
 
@@ -331,8 +348,6 @@ export class RichTextEditorComponent implements OnInit, OnDestroy {
     } catch (err) {
       console.error('Error uploading image', err);
       this.toastService.show(this.transloco.translate('flashcard.toast.imageUploadError'), 'error');
-    } finally {
-      input.value = '';
     }
   }
 
