@@ -621,6 +621,7 @@
     "universityPlaceholder": "Choose your university",
     "chooseUniversity": "Choose a university",
     "cityFilterPlaceholder": "Filter by city",
+    "courseFilterPlaceholder": "Filter by course",
     "course": "Degree course",
     "coursePlaceholder": "Choose your course",
     "coursePlaceholderLocked": "Choose a university first",

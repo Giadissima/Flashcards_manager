@@ -85,6 +85,9 @@ export class StudyFieldsComponent implements OnInit, OnChanges {
 
   universityOptions: SelectOption[] = [];
   courseOptions: SelectOption[] = [];
+  /** Full list of the picked university; courseOptions is its filtered view. */
+  private allCourseOptions: SelectOption[] = [];
+  courseFilter = '';
   loadingUniversities = true;
   loadingCourses = false;
   /**
@@ -139,7 +142,7 @@ export class StudyFieldsComponent implements OnInit, OnChanges {
     this.applyCityFilter();
 
     if (universityChanged) {
-      this.courseOptions = [];
+      this.setCourseOptions([]);
       this.universityHasNoCourses = false;
       if (universityCode) {
         this.loadingCourses = true;
@@ -175,11 +178,37 @@ export class StudyFieldsComponent implements OnInit, OnChanges {
     this.universityOptions = toUniversityOptions(filtered);
   }
 
+  onCourseFilterChange(courseFilter: string): void {
+    this.courseFilter = courseFilter;
+    this.applyCourseFilter();
+  }
+
+  private setCourseOptions(options: SelectOption[]): void {
+    this.allCourseOptions = options;
+    this.applyCourseFilter();
+  }
+
+  // Same idea as the city filter: a university can offer hundreds of courses.
+  private applyCourseFilter(): void {
+    const filter = normalize(this.courseFilter.trim());
+    let filtered = filter
+      ? this.allCourseOptions.filter((o) => normalize(o.label).includes(filter))
+      : this.allCourseOptions;
+
+    // Keep the picked course visible even if it does not match the filter
+    if (this.courseValue && !filtered.some((o) => o.value === this.courseValue)) {
+      const selected = this.allCourseOptions.find((o) => o.value === this.courseValue);
+      if (selected) filtered = [selected, ...filtered];
+    }
+
+    this.courseOptions = filtered;
+  }
+
   async onUniversityChange(code: string | null | undefined): Promise<void> {
     this.universityCode = code ?? null;
     // The course belonged to the previous university: it cannot survive the change
     this.courseValue = null;
-    this.courseOptions = [];
+    this.setCourseOptions([]);
     this.universityHasNoCourses = false;
 
     if (this.universityCode) await this.loadCourses(this.universityCode);
@@ -195,12 +224,13 @@ export class StudyFieldsComponent implements OnInit, OnChanges {
     this.loadingCourses = true;
     try {
       const courses = await this.universityService.getCourses(universityCode);
-      this.courseOptions = toCourseOptions(courses);
+      this.setCourseOptions(toCourseOptions(courses));
       this.universityHasNoCourses = courses.length === 0;
       // A course that is no longer offered would otherwise sit in the control
       // showing nothing but its raw value
       if (this.courseValue && !courses.some((c) => courseOptionValue(c) === this.courseValue)) {
         this.courseValue = null;
+        this.applyCourseFilter();
       }
     } catch {
       this.toastService.show(this.transloco.translate('studyFields.coursesError'), 'warning');

@@ -25,6 +25,10 @@
 
   <div class="form-group">
     <label class="form-label">{{ 'studyFields.course' | transloco }}</label>
+    <app-search-input [inputId]="'courseFilter'" [value]="courseFilter"
+      [disabled]="!universityCode || loadingCourses || universityHasNoCourses"
+      [placeholder]="'studyFields.courseFilterPlaceholder' | transloco"
+      (valueChange)="courseFilter = $event" (search)="onCourseFilterChange($event)"></app-search-input>
     <app-searchable-select [options]="courseOptions" [value]="courseValue"
       [disabled]="!universityCode || loadingCourses || universityHasNoCourses" [loading]="loadingCourses"
       [placeholder]="(!universityCode ? 'studyFields.coursePlaceholderLocked'
