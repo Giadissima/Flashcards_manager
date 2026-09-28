@@ -581,9 +581,31 @@
       "exportSuccess": "Esportazione completata!",
       "exportFailed": "Esportazione fallita",
       "importSuccess": "Importazione completata! {{count}} flashcard aggiunte.",
-      "importCompleted": "Importazione completata: {{imported}} aggiunte, {{skipped}} duplicati saltati.",
+      "importCompleted": "Importazione completata: {{imported}} aggiunte, {{skipped}} saltate (già presenti o escluse).",
       "importFailed": "Importazione fallita",
-      "invalidFile": "File non valido: seleziona un export JSON o ZIP valido"
+      "invalidFile": "File non valido: seleziona un export JSON o ZIP valido",
+      "nameTaken": "Uno dei nuovi nomi è già in uso: scegline un altro"
+    },
+    "conflicts": {
+      "title": "Alcuni elementi esistono già",
+      "hint": "Queste materie hanno lo stesso nome di quelle che hai già. Stesso nome non significa per forza la stessa cosa: scegli cosa farne.",
+      "applyToAll": "Applica a tutti:",
+      "merge": "Unisci",
+      "rename": "Rinomina",
+      "skip": "Salta",
+      "subjectInfo": "{{cards}} flashcard nel file, {{duplicates}} già presenti identiche.",
+      "topicInfo": "{{cards}} flashcard",
+      "subjectChoice": "Cosa fare con la materia {{name}}",
+      "topicChoice": "Cosa fare con l'argomento {{name}}",
+      "mergeSubject": "Metti le flashcard nella mia materia",
+      "renameSubject": "Crea una nuova materia con un altro nome",
+      "skipSubject": "Salta tutta la materia",
+      "mergeTopic": "Metti le flashcard nel mio argomento",
+      "renameTopic": "Crea un nuovo argomento con un altro nome",
+      "skipTopic": "Salta questo argomento",
+      "newName": "Nuovo nome",
+      "nameInvalid": "Scegli un nome diverso da quello attuale, tra 2 e 30 caratteri.",
+      "back": "Indietro"
     }
   },
   "profileType": {

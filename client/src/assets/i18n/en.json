@@ -581,9 +581,31 @@
       "exportSuccess": "Export successful!",
       "exportFailed": "Export failed",
       "importSuccess": "Import successful! {{count}} flashcards added.",
-      "importCompleted": "Import completed: {{imported}} added, {{skipped}} duplicates skipped.",
+      "importCompleted": "Import completed: {{imported}} added, {{skipped}} skipped (already there or left out).",
       "importFailed": "Import failed",
-      "invalidFile": "Invalid file: select a valid JSON or ZIP export"
+      "invalidFile": "Invalid file: select a valid JSON or ZIP export",
+      "nameTaken": "One of the new names is already in use: pick another one"
+    },
+    "conflicts": {
+      "title": "Some items already exist",
+      "hint": "These subjects have the same name as ones you already have. Same name, not necessarily the same thing: choose what to do with them.",
+      "applyToAll": "Apply to all:",
+      "merge": "Merge",
+      "rename": "Rename",
+      "skip": "Skip",
+      "subjectInfo": "{{cards}} flashcards in the file, {{duplicates}} already there as identical copies.",
+      "topicInfo": "{{cards}} flashcards",
+      "subjectChoice": "What to do with the subject {{name}}",
+      "topicChoice": "What to do with the topic {{name}}",
+      "mergeSubject": "Put the flashcards in my subject",
+      "renameSubject": "Create a new subject under another name",
+      "skipSubject": "Skip the whole subject",
+      "mergeTopic": "Put the flashcards in my topic",
+      "renameTopic": "Create a new topic under another name",
+      "skipTopic": "Skip this topic",
+      "newName": "New name",
+      "nameInvalid": "Pick a name different from the current one, between 2 and 30 characters.",
+      "back": "Back"
     }
   },
   "profileType": {
