@@ -36,9 +36,16 @@ export const routes: Routes = [
   // opened from the address in the chat, with the server's own password.
   { path: 'admin', component: AdminComponent },
   { path: 'admin/:id', component: AdminComponent },
-  { path: 'login', component: LoginComponent, canActivate: [guestGuard] },
-  { path: 'register', component: RegisterComponent, canActivate: [guestGuard] },
-  { path: 'forgot-password', component: ForgotPasswordComponent, canActivate: [guestGuard] },
+  // The sign-in pages are only forms, with nothing a search result could show:
+  // noindex keeps them out of the results (see App, which turns it into a meta tag).
+  { path: 'login', component: LoginComponent, canActivate: [guestGuard], data: { noindex: true } },
+  { path: 'register', component: RegisterComponent, canActivate: [guestGuard], data: { noindex: true } },
+  {
+    path: 'forgot-password',
+    component: ForgotPasswordComponent,
+    canActivate: [guestGuard],
+    data: { noindex: true },
+  },
   // No guard of any kind: the link is opened from a mail, so the reader can be
   // logged in, logged out, or in a browser that has never seen this site.
   { path: 'verify-email', component: VerifyEmailComponent },

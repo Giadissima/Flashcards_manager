@@ -1,5 +1,9 @@
 User-agent: *
 Allow: /$
+# Crawlable on purpose: their noindex tag can only be read if the page is fetched.
+Allow: /login
+Allow: /register
+Allow: /forgot-password
 Disallow: /
 
-Sitemap: https://flashcardsmanager.example/sitemap.xml
+Sitemap: https://flashcardsmanager.it/sitemap.xml
