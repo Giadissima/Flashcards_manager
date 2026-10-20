@@ -55,6 +55,7 @@ export class TestRunner extends PaginatedList implements OnInit {
   subjectName = '';
   subjectIconUrl = '';
   testStartDate?: Date;
+  isDaily = false;
   answeredCount = 0;
 
   /** Set when this test was started from a community post rather than the
@@ -154,8 +155,12 @@ export class TestRunner extends PaginatedList implements OnInit {
     this.sourcePostId = test.source_post_id;
     this.answeredCount = test.questions.filter(q => q.is_correct !== undefined).length;
 
+    this.isDaily = !!test.is_daily;
+
     await this.loadPage();
-    if (this.pageFlashcards.length > 0) {
+    // A daily review has no single subject to name: it gets its own title and
+    // a static icon (the template) instead.
+    if (!this.isDaily && this.pageFlashcards.length > 0) {
       this.subjectName = this.getCardSubjectName(this.pageFlashcards[0]);
       this.subjectIconUrl = this.getCardSubjectIconUrl(this.pageFlashcards[0]);
     }

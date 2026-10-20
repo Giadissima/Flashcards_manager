@@ -543,6 +543,7 @@
       "answerNotAvailable": "Answer not available"
     },
     "runner": {
+      "dailyTitle": "Daily review",
       "seeAnswer": "See answer",
       "seeQuestion": "See question",
       "pause": "Pause",

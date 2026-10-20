@@ -31,6 +31,10 @@ export interface Test {
   // tester's own library: the runner reads it to send "exit" back to the
   // Community, and to ask first whether such a run is worth keeping.
   source_post_id?: string;
+
+  // Set when the test is a daily review: the runner titles it as such, since
+  // its cards usually span several subjects.
+  is_daily?: boolean;
 }
 
 /**
@@ -44,6 +48,7 @@ export interface TestCreateRequest {
   parent_test_id?: string;
   only_wrong?: boolean;
   source_post_id?: string;
+  is_daily?: boolean;
 }
 
 export type Question = {

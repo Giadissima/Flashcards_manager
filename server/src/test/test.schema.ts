@@ -118,6 +118,12 @@ export class Test {
   // run is worth keeping there at all.
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Post', required: false })
   source_post_id?: Types.ObjectId;
+
+  // Set when the test is a daily review: its cards are the ones due, drawn
+  // across subjects, so the runner titles it as such instead of naming the
+  // subject of its first card.
+  @Prop({ type: Boolean, required: false })
+  is_daily?: boolean;
 }
 
 export const TestSchema = SchemaFactory.createForClass(Test);

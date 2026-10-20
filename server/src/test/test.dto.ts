@@ -34,6 +34,10 @@ export class TestCreateRequest {
   @IsOptional()
   @IsMongoId()
   source_post_id?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  is_daily?: boolean;
 }
 
 // Filters shared between the test list (TestFilterDto) and the aggregate stats

@@ -313,7 +313,7 @@ export class SetupTest implements OnInit {
         flashcard_id: fc._id,
         topic_id: fc.topic_id,
       }));
-      const test = await this.testService.create({questions});
+      const test = await this.testService.create({ questions, is_daily: this.mode === 'daily' || undefined });
       this.router.navigate(['/test', test!._id]);
 
     } catch (err: any) {

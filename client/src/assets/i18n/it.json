@@ -543,6 +543,7 @@
       "answerNotAvailable": "Risposta non disponibile"
     },
     "runner": {
+      "dailyTitle": "Ripasso del giorno",
       "seeAnswer": "Vedi risposta",
       "seeQuestion": "Vedi domanda",
       "pause": "Pausa",
