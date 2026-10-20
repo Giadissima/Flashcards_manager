@@ -1,5 +1,6 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { restrictionOf } from '../../shared/restriction';
+import { ListStateMemory } from '../../shared/list-state-memory.service';
 import { PaginationComponent } from '../../shared/pagination/pagination.component';
 
 import { CommonModule } from '@angular/common';
@@ -27,7 +28,7 @@ import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
   templateUrl: './manage-topics.component.html',
   styleUrls: ['./manage-topics.component.scss']
 })
-export class ManageTopicsComponent extends PaginatedList implements OnInit {
+export class ManageTopicsComponent extends PaginatedList implements OnInit, OnDestroy {
   @ViewChild(LoadStateComponent, { static: true }) loadState!: LoadStateComponent;
 
   topics: Topic[] = [];
@@ -44,7 +45,8 @@ export class ManageTopicsComponent extends PaginatedList implements OnInit {
     private activatedRoute: ActivatedRoute,
     private toastService: ToastService,
     private subjectService: SubjectService,
-    private transloco: TranslocoService
+    private transloco: TranslocoService,
+    private listState: ListStateMemory
   ) {
     super();
   }
@@ -52,9 +54,26 @@ export class ManageTopicsComponent extends PaginatedList implements OnInit {
   ngOnInit(): void {
     // Arriving from "manage subjects" with a subject clicked lands here with
     // its id in the query string, pre-filtering the list to that subject.
-    this.selectedSubjectId = this.activatedRoute.snapshot.queryParamMap.get('subject_id') || null;
+    const subjectFromQuery = this.activatedRoute.snapshot.queryParamMap.get('subject_id') || null;
+    // Coming back from create/edit: the filters the list was left with.
+    const saved = this.listState.take<{ subjectId: string | null; searchTerm: string; page: number }>('topics');
+    if (subjectFromQuery || !saved) {
+      this.selectedSubjectId = subjectFromQuery;
+    } else {
+      this.selectedSubjectId = saved.subjectId;
+      this.searchTerm = saved.searchTerm;
+      this.currentPage = saved.page;
+    }
     this.loadState.run(() => this.loadTopics());
     this.loadSubjects();
+  }
+
+  ngOnDestroy(): void {
+    this.listState.save('topics', {
+      subjectId: this.selectedSubjectId,
+      searchTerm: this.searchTerm,
+      page: this.currentPage,
+    });
   }
 
   async loadSubjects() {
@@ -136,10 +155,14 @@ export class ManageTopicsComponent extends PaginatedList implements OnInit {
     this.router.navigate(['/edit-topic', id]);
   }
 
-  /** Clicking a topic row jumps to the home feed pre-filtered to that topic. */
-  filterByTopic(id?: string): void {
-    if (!id) return;
-    this.router.navigate(['/home'], { queryParams: { topic_id: id } });
+  /** Clicking a topic row jumps to the home feed pre-filtered to that topic and its subject. */
+  filterByTopic(topic: Topic): void {
+    if (!topic._id) return;
+    const subject = topic.subject_id as any;
+    const subjectId = typeof subject === 'object' && subject !== null ? subject._id : subject;
+    this.router.navigate(['/home'], {
+      queryParams: { topic_id: topic._id, ...(subjectId ? { subject_id: subjectId } : {}) },
+    });
   }
 
   /** Which topic the confirmation dialog is currently asking about. */

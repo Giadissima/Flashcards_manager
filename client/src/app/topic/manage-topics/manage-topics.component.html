@@ -40,7 +40,7 @@
       </thead>
       <tbody>
         @for (topic of topics; track topic._id) {
-        <tr class="clickable-row" (click)="filterByTopic(topic._id)" [attr.title]="t('topic.manage.filterByTitle')">
+        <tr class="clickable-row" (click)="filterByTopic(topic)" [attr.title]="t('topic.manage.filterByTitle')">
           <td class="cell-title">{{ topic.name }}</td>
           <td class="topic-color">
             <span [style.backgroundColor]="topic.color" class="color-preview"></span>

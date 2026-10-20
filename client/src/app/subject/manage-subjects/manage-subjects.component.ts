@@ -1,5 +1,6 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { restrictionOf } from '../../shared/restriction';
+import { ListStateMemory } from '../../shared/list-state-memory.service';
 import { PaginationComponent } from '../../shared/pagination/pagination.component';
 
 import { CommonModule } from '@angular/common';
@@ -27,7 +28,7 @@ import { hasHtmlContent } from '../../shared/html.util';
   templateUrl: './manage-subjects.component.html',
   styleUrls: ['./manage-subjects.component.scss']
 })
-export class ManageSubjectsComponent extends PaginatedList implements OnInit {
+export class ManageSubjectsComponent extends PaginatedList implements OnInit, OnDestroy {
   @ViewChild(LoadStateComponent, { static: true }) loadState!: LoadStateComponent;
 
   subjects: Subject[] = [];
@@ -38,13 +39,24 @@ export class ManageSubjectsComponent extends PaginatedList implements OnInit {
     private subjectService: SubjectService,
     private router: Router,
     private toastService: ToastService,
-    private transloco: TranslocoService
+    private transloco: TranslocoService,
+    private listState: ListStateMemory
   ) {
     super();
   }
 
   ngOnInit(): void {
+    // Coming back from create/edit: the filters the list was left with.
+    const saved = this.listState.take<{ searchTerm: string; page: number }>('subjects');
+    if (saved) {
+      this.searchTerm = saved.searchTerm;
+      this.currentPage = saved.page;
+    }
     this.loadState.run(() => this.loadSubjects());
+  }
+
+  ngOnDestroy(): void {
+    this.listState.save('subjects', { searchTerm: this.searchTerm, page: this.currentPage });
   }
 
   // Left to throw: the initial call goes through app-load-state (see
