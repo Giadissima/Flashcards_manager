@@ -353,10 +353,20 @@ export class Home extends PaginatedList implements OnInit, OnDestroy {
     // A long question or answer leaves the reader at the bottom of the card,
     // so once the new face is rendered, bring the card back to its top.
     const cardEl = (event.currentTarget as HTMLElement).closest('.flashcard');
-    setTimeout(() => {
-      if (!cardEl || cardEl.getBoundingClientRect().top >= 0) return;
-      cardEl.scrollIntoView({ block: 'start', behavior: 'smooth' });
-    });
+    // Two frames: the content swap, the overflow measurement and the resulting
+    // reflow have to settle first, and the scroll must not be smooth - a
+    // layout shift mid-animation cancels it and leaves the card where it was.
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        if (!cardEl) return;
+        // A card that is fully in view needs no move; one cut off by the sticky
+        // navbar above or by the fold below does, since the page may have been
+        // clamped by the shorter face and left it half off screen.
+        const { top, bottom } = cardEl.getBoundingClientRect();
+        if (top >= 80 && bottom <= window.innerHeight) return;
+        cardEl.scrollIntoView({ block: 'start', behavior: 'instant' });
+      }),
+    );
   }
 
   ngOnDestroy(): void {
