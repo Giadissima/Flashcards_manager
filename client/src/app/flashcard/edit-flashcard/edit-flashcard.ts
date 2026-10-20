@@ -9,6 +9,7 @@ import { VisibilityToggleComponent } from '../../shared/visibility-toggle/visibi
 import { Visibility, defaultVisibility } from '../../models/visibility.dto';
 import { Editor } from '@tiptap/core';
 import { createRichTextEditor } from '../../shared/rich-text-editor/editor.factory';
+import { HomeFiltersMemory } from '../../home/home-filters-memory.service';
 import { Flashcard } from '../../models/flashcard.dto';
 import { FlashcardService } from '../flashcard.service';
 import { LoadStateComponent } from '../../shared/load-state/load-state.component';
@@ -68,7 +69,8 @@ export class EditFlashcard implements OnInit, OnDestroy {
     private toastService: ToastService,
     private topicService: TopicService,
     private subjectService: SubjectService,
-    private transloco: TranslocoService
+    private transloco: TranslocoService,
+    private homeFilters: HomeFiltersMemory
   ) {
     this.questionEditor = createRichTextEditor({
       placeholder: () => this.transloco.translate('flashcard.create.questionPlaceholder'),
@@ -148,7 +150,7 @@ export class EditFlashcard implements OnInit, OnDestroy {
 
   /** Leaves without saving: whatever was typed is thrown away. */
   cancel(): void {
-    this.router.navigate(['/home']);
+    this.router.navigate(['/home'], { queryParams: this.homeFilters.homeParams });
   }
 
   async updateCard(): Promise<void> {
@@ -172,7 +174,7 @@ export class EditFlashcard implements OnInit, OnDestroy {
     try {
       await this.flashcardService.update(this.cardId, card);
       this.toastService.show(this.transloco.translate('flashcard.toast.cardUpdated'), 'success');
-      this.router.navigate(['/home']);
+      this.router.navigate(['/home'], { queryParams: this.homeFilters.homeParams });
     } catch (error) {
       console.error('Error updating card', error);
       this.toastService.show(this.transloco.translate('flashcard.toast.updateError'), 'error');

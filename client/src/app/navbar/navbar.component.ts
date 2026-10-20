@@ -4,6 +4,7 @@ import { getAvatarUrl } from '../shared/avatar/avatar.util';
 import { ClickOutsideDirective } from '../shared/click-outside.directive';
 import { CommonModule } from '@angular/common';
 import { Component, HostListener } from '@angular/core';
+import { HomeFiltersMemory } from '../home/home-filters-memory.service';
 import { ImportExportModalComponent } from '../import-export-modal/import-export-modal.component';
 import { NotificationPanelComponent } from '../notification/notification-panel.component';
 import { NavigationEnd, Params, Router, RouterLink, RouterLinkActive } from '@angular/router';
@@ -45,6 +46,7 @@ export class NavbarComponent {
     private toastService: ToastService,
     private transloco: TranslocoService,
     private router: Router,
+    protected homeFilters: HomeFiltersMemory,
   ) {
     this.avatarUrl$ = this.authService.user$.pipe(map((user) => getAvatarUrl(user)));
 

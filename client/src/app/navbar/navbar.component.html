@@ -56,7 +56,7 @@
       </span>
       <div class="dropdown-content" [class.show]="openDropdown === 'flashcards'">
         <a routerLink="/create-card" [queryParams]="createCardParams" (click)="onNavigate('flashcards')">{{ 'navbar.createCard' | transloco }}</a>
-        <a routerLink="/home" (click)="onNavigate('flashcards')">{{ 'navbar.manageFlashcards' | transloco }}</a>
+        <a routerLink="/home" [queryParams]="homeFilters.homeParams" (click)="onNavigate('flashcards')">{{ 'navbar.manageFlashcards' | transloco }}</a>
       </div>
     </div>
     <div class="dropdown" routerLinkActive="is-active" (appClickOutside)="closeDropdown('topics')">
