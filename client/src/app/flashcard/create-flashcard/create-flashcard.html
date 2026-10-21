@@ -1,17 +1,26 @@
 <div class="container-md" *transloco="let t">
   <app-page-card icon="add_box" [title]="'flashcard.create.title' | transloco"
     [subtitle]="'flashcard.create.subtitle' | transloco"
-    [actions]="[{ label: t('flashcard.create.importButton'), icon: 'content_paste', variant: 'outline' }]"
-    (action)="toggleImport()">
+    [actions]="[{ label: t('flashcard.create.importButton'), icon: 'content_paste', variant: 'outline', disabled: showImport }]"
+    (action)="openImport()">
     @if (showImport) {
     <div class="form-group">
       <label for="import-text" class="form-label">{{ 'flashcard.create.importLabel' | transloco }}</label>
       <textarea id="import-text" class="form-control" rows="4" [(ngModel)]="importText"
         [ngModelOptions]="{ standalone: true }"
-        [placeholder]="t('flashcard.create.importPlaceholder')"></textarea>
+        [placeholder]="t('flashcard.create.importPlaceholder')"
+        (keydown.enter)="onImportTextareaEnter($event)"></textarea>
       <div class="form-actions">
-        <button type="button" class="btn btn-outline-secondary" (click)="toggleImport()">{{ 'common.cancel' | transloco }}</button>
-        <button type="button" class="btn btn-primary" [disabled]="!importText.trim()" (click)="applyImport()">{{ 'flashcard.create.importApply' | transloco }}</button>
+        <button type="button" class="btn" [class.btn-primary]="!importText.trim()"
+          [class.btn-outline-secondary]="importText.trim()" (click)="pasteFromClipboard()">
+          <span class="material-symbols-outlined">content_paste</span>{{ 'flashcard.create.importPasteButton' | transloco }}
+        </button>
+        <button type="button" class="btn btn-outline-secondary" (click)="cancelImport()">
+          <span class="material-symbols-outlined">close</span>{{ 'common.cancel' | transloco }}
+        </button>
+        <button type="button" class="btn btn-primary" [disabled]="!importText.trim()" (click)="applyImport()">
+          <span class="material-symbols-outlined">check</span>{{ 'flashcard.create.importApply' | transloco }}
+        </button>
       </div>
     </div>
     }

@@ -268,9 +268,32 @@ export class CreateFlashcard implements OnInit, OnDestroy {
     }
   }
 
-  toggleImport(): void {
-    this.showImport = !this.showImport;
-    if (!this.showImport) this.importText = '';
+  // Opens the import panel; the header button that triggers this is disabled
+  // while it's open (see the template) until "annulla" or "importa" closes it.
+  openImport(): void {
+    this.showImport = true;
+  }
+
+  async pasteFromClipboard(): Promise<void> {
+    try {
+      this.importText = await navigator.clipboard.readText();
+    } catch (err) {
+      console.error('Clipboard read failed', err);
+      this.toastService.show(this.transloco.translate('flashcard.create.importClipboardError'), 'error');
+    }
+  }
+
+  cancelImport(): void {
+    this.showImport = false;
+    this.importText = '';
+  }
+
+  // Enter applies the import as a shortcut; Shift+Enter still inserts a
+  // newline in case the pasted text needs manual tweaking first.
+  onImportTextareaEnter(event: Event): void {
+    if ((event as KeyboardEvent).shiftKey || !this.importText.trim()) return;
+    event.preventDefault();
+    this.applyImport();
   }
 
   // Fills the form from the text "copia card" produces, so a card copied from
