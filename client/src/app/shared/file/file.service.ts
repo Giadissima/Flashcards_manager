@@ -9,9 +9,10 @@ export class FileService {
 
   constructor(private restClient: RestClientService) {}
 
-  upload(file: File): Promise<{ _id: string }> {
+  /** Uploads one or more image files at once; ids come back in the same order. */
+  upload(files: File[]): Promise<{ ids: string[] }> {
     const formData = new FormData();
-    formData.append('file', file, file.name);
+    files.forEach((file) => formData.append('files', file, file.name));
     return this.restClient.post(this.baseUrl, formData);
   }
 }

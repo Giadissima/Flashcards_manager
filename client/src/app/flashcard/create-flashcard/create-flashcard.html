@@ -37,7 +37,7 @@
 
       <div class="form-group">
         <label for="question-editor" class="form-label">{{ 'flashcard.create.questionLabel' | transloco }}</label>
-        <app-rich-text-editor [editor]="questionEditor"></app-rich-text-editor>
+        <app-rich-text-editor #questionRichEditor [editor]="questionEditor"></app-rich-text-editor>
         @if(cardForm.get('question')?.touched && cardForm.get('question')?.hasError('minlength')){
         <div class="invalid-feedback d-block">
           {{ 'flashcard.create.questionMinError' | transloco }}
@@ -54,7 +54,7 @@
 
       <div class="form-group">
         <label for="answer-editor" class="form-label">{{ 'flashcard.create.answerLabel' | transloco }}</label>
-        <app-rich-text-editor [editor]="answerEditor"></app-rich-text-editor>
+        <app-rich-text-editor #answerRichEditor [editor]="answerEditor"></app-rich-text-editor>
         @if(cardForm.get('answer')?.touched && cardForm.get('answer')?.hasError('minlength')){
         <div class="invalid-feedback d-block">
           {{ 'flashcard.create.answerMinError' | transloco }}

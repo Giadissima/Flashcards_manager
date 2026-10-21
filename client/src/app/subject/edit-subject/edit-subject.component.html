@@ -20,7 +20,7 @@
 
         <div class="form-group">
           <label for="desc-editor" class="form-label">{{ 'common.description' | transloco }}</label>
-          <app-rich-text-editor [editor]="descEditor"></app-rich-text-editor>
+          <app-rich-text-editor #descRichEditor [editor]="descEditor"></app-rich-text-editor>
           @if (descLength > descMaxLength) {
           <div class="invalid-feedback d-block">{{ 'subject.create.descMaxError' | transloco:{ max: descMaxLength,
             current: descLength } }}</div>

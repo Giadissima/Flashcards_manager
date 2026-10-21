@@ -11,12 +11,26 @@ export class FileService {
   ) {}
   // Takes a reduced shape, not the whole Express.Multer.File, because only these
   // two fields are used: this way it can also be called for files rebuilt from a
-  // zip during an import, not just from a real multipart upload
-  create(file: { buffer: Buffer; mimetype: string }[]): Promise<FileDocument> {
+  // zip during an import, not just from a real multipart upload. ownerId only
+  // for an inline image of a flashcard or subject description, see
+  // FileMongo.user_id.
+  create(
+    file: { buffer: Buffer; mimetype: string }[],
+    ownerId?: string,
+  ): Promise<FileDocument> {
     return new this.fileModel({
       content: file[0].buffer,
       mimetype: file[0].mimetype,
+      user_id: ownerId,
     }).save();
+  }
+
+  /** create(), for several files at once - the editor resolves every image a draft is still holding in one request instead of one per image. */
+  createMany(
+    files: { buffer: Buffer; mimetype: string }[],
+    ownerId?: string,
+  ): Promise<FileDocument[]> {
+    return Promise.all(files.map((file) => this.create([file], ownerId)));
   }
 
   /**
@@ -26,19 +40,40 @@ export class FileService {
    * file, so deleting a flashcard can drop its images without first asking who
    * else might still be pointing at them.
    */
-  async duplicate(id: string): Promise<string | null> {
+  async duplicate(id: string, ownerId: string): Promise<string | null> {
     const source = await this.findOne(id);
     if (!source) return null;
 
-    const copy = await this.create([
-      // Buffer.from copies: convertBuffer can hand back a view over the stored
-      // bytes, and the copy must not stay tied to the original document
-      {
-        buffer: Buffer.from(this.convertBuffer(source.content)),
-        mimetype: source.mimetype,
-      },
-    ]);
+    const copy = await this.create(
+      [
+        // Buffer.from copies: convertBuffer can hand back a view over the stored
+        // bytes, and the copy must not stay tied to the original document
+        {
+          buffer: Buffer.from(this.convertBuffer(source.content)),
+          mimetype: source.mimetype,
+        },
+      ],
+      ownerId,
+    );
     return String(copy._id);
+  }
+
+  /** Which of these files the user owns as content images. */
+  async ownedBy(ids: string[], userId: string): Promise<Set<string>> {
+    if (!ids.length) return new Set();
+    const owned = await this.fileModel
+      .find({ _id: { $in: ids }, user_id: userId }, { _id: 1 })
+      .lean()
+      .exec();
+    return new Set(owned.map((file) => String(file._id)));
+  }
+
+  /** Deletes those of these files the user owns as content images, and nothing else. */
+  async deleteOwned(ids: string[], userId: string): Promise<void> {
+    if (!ids.length) return;
+    await this.fileModel
+      .deleteMany({ _id: { $in: ids }, user_id: userId })
+      .exec();
   }
 
   // TODO take a res parameter to serve the file as a download

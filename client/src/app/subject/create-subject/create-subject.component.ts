@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { charMinLength, descMaxLength, nameMaxLength } from '../../../config/config';
@@ -35,6 +35,8 @@ import { RichTextEditorComponent } from '../../shared/rich-text-editor/rich-text
   templateUrl: './create-subject.component.html',
 })
 export class CreateSubjectComponent implements OnInit, OnDestroy {
+  @ViewChild('descRichEditor') descRichEditor!: RichTextEditorComponent;
+
   subjectForm!: FormGroup;
   selectedFile: File | null = null;
   descEditor: Editor;
@@ -106,6 +108,19 @@ export class CreateSubjectComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.submitting = true;
+
+    // Only now does any picture still held as a local draft actually reach the
+    // server - see RichTextEditorComponent.resolvePendingImages().
+    try {
+      await this.descRichEditor.resolvePendingImages();
+    } catch (err) {
+      console.error('Error uploading image', err);
+      this.toastService.show(this.transloco.translate('flashcard.toast.imageUploadError'), 'error');
+      this.submitting = false;
+      return;
+    }
+
     const formData = new FormData();
     formData.append('name', this.subjectForm.get('name')?.value);
     formData.append('desc', this.descEditor.getHTML());
@@ -115,7 +130,6 @@ export class CreateSubjectComponent implements OnInit, OnDestroy {
       formData.append('icon', this.selectedFile, this.selectedFile.name);
     }
 
-    this.submitting = true;
     try {
       await this.subjectService.createSubject(formData);
       this.toastService.show(this.transloco.translate('subject.toast.created'), 'success');

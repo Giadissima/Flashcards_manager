@@ -33,6 +33,8 @@ import { SearchableSelectComponent, SelectOption } from '../../shared/searchable
 })
 export class EditFlashcard implements OnInit, OnDestroy {
   @ViewChild(LoadStateComponent, { static: true }) loadState!: LoadStateComponent;
+  @ViewChild('questionRichEditor') questionRichEditor!: RichTextEditorComponent;
+  @ViewChild('answerRichEditor') answerRichEditor!: RichTextEditorComponent;
 
   editForm!: FormGroup;
   cardId?: string;
@@ -159,6 +161,24 @@ export class EditFlashcard implements OnInit, OnDestroy {
       return;
     }
 
+    this.submitting = true;
+
+    // Only now does any picture still held as a local draft actually reach the
+    // server - see RichTextEditorComponent.resolvePendingImages(). Kept apart
+    // from the try below so a failure here is told apart from one saving the
+    // card itself.
+    // One field after the other rather than both at once, so a poor
+    // connection is not asked to carry every picture at the same time.
+    try {
+      await this.questionRichEditor.resolvePendingImages();
+      await this.answerRichEditor.resolvePendingImages();
+    } catch (err) {
+      console.error('Error uploading image', err);
+      this.toastService.show(this.transloco.translate('flashcard.toast.imageUploadError'), 'error');
+      this.submitting = false;
+      return;
+    }
+
     const { title, topic_id, subject_id, visibility } = this.editForm.value;
 
     const card: Omit<Flashcard, '_id'> = {
@@ -170,7 +190,6 @@ export class EditFlashcard implements OnInit, OnDestroy {
       answer: this.answerEditor.getHTML(),
     };
 
-    this.submitting = true;
     try {
       await this.flashcardService.update(this.cardId, card);
       this.toastService.show(this.transloco.translate('flashcard.toast.cardUpdated'), 'success');

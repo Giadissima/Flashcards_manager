@@ -19,7 +19,7 @@ import {
   updateOwnedOrThrow,
 } from 'src/common/mongo.util';
 import { extractImageFileIds, replaceImageFileIds } from 'src/common/html.util';
-import { FileService } from 'src/file/file.service';
+import { ContentImageService } from 'src/file/content-image.service';
 import { PostService } from 'src/post/post.service';
 import { Subject } from 'src/subject/subject.schema';
 import { Topic } from 'src/topic/topic.schema';
@@ -55,7 +55,7 @@ export class FlashcardsService {
   constructor(
     @InjectModel(Flashcard.name)
     private flashcardModel: Model<Flashcard>,
-    private readonly fileService: FileService,
+    private readonly contentImages: ContentImageService,
     @InjectModel(Subject.name) private subjectModel: Model<Subject>,
     @InjectModel(Topic.name) private topicModel: Model<Topic>,
     private readonly postService: PostService,
@@ -481,9 +481,10 @@ export class FlashcardsService {
       throw new NotFoundException(`${ENTITY} with id ${id} not found`);
     }
 
-    // Unconditionally, with no check on who else might point at them: a file
-    // belongs to one flashcard only, which is what claimImages() guarantees.
-    await this.deleteImagesOf(existing.question, existing.answer);
+    await this.contentImages.release(
+      userId,
+      this.imageIdsOf(existing.question, existing.answer),
+    );
 
     if (existing.subject_id) {
       await this.postService.refresh(userId, existing.subject_id);
@@ -508,8 +509,13 @@ export class FlashcardsService {
       .exec();
     if (!cards.length) return;
 
-    await Promise.all(cards.map((c) => this.deleteImagesOf(c.question, c.answer)));
+    // Cards first, images after: two cards of the same batch sharing an image
+    // would otherwise each find the other still showing it, and keep it.
     await this.flashcardModel.deleteMany(query).exec();
+    await this.contentImages.release(
+      userId,
+      cards.flatMap((c) => this.imageIdsOf(c.question, c.answer)),
+    );
   }
 
   async update(
@@ -530,14 +536,17 @@ export class FlashcardsService {
       throw new NotFoundException(`${ENTITY} with id ${id} not found`);
     }
 
-    const owned = await this.claimImages(userId, updateObj, id);
+    const owned = await this.claimImages(userId, updateObj, existing, id);
     await updateOwnedOrThrow(this.flashcardModel, id, userId, owned, ENTITY);
 
-    // Images the edit took out of the content have nothing left pointing at
-    // them, so they go with it. Done after the update succeeded.
+    // Images the edit took out of the content go with it, if they are the
+    // user's own to drop. Done after the update succeeded.
     const before = this.imageIdsOf(existing.question, existing.answer);
     const after = this.imageIdsOf(owned.question, owned.answer);
-    await this.deleteFiles(before.filter((fileId) => !after.includes(fileId)));
+    await this.contentImages.release(
+      userId,
+      before.filter((fileId) => !after.includes(fileId)),
+    );
 
     await this.refreshPostOf(userId, id);
   }
@@ -546,58 +555,19 @@ export class FlashcardsService {
     return [...new Set([...extractImageFileIds(question), ...extractImageFileIds(answer)])];
   }
 
-  private deleteImagesOf(question?: string, answer?: string): Promise<void> {
-    return this.deleteFiles(this.imageIdsOf(question, answer));
-  }
-
-  private async deleteFiles(ids: string[]): Promise<void> {
-    await Promise.all(ids.map((fileId) => this.fileService.delete(fileId)));
-  }
-
-  /**
-   * Gives the flashcard images of its own, so that deleting it can drop them
-   * without asking anyone's permission.
-   *
-   * The editor uploads a new file for every picture inserted, so normally there
-   * is nothing to do. What this catches is content copied from another
-   * flashcard, which carries the very same <img src> along: that file is copied
-   * and the markup repointed at the copy, rather than being shared - a shared
-   * file would turn one deletion into a broken image somewhere else.
-   */
+  /** Gives the flashcard image files of its own - see ContentImageService.claim. */
   private async claimImages(
     userId: string,
     dto: ModifyFlashcardDto,
+    previous?: Pick<Flashcard, 'question' | 'answer'>,
     selfId?: string,
   ): Promise<ModifyFlashcardDto> {
-    const ids = this.imageIdsOf(dto.question, dto.answer);
-    if (!ids.length) return dto;
-
-    const pattern = ids.join('|');
-    // Only the cards of the same user can hold the same picture: content is
-    // copied between flashcards one can see, and nobody sees another's.
-    const query: FilterQuery<Flashcard> = {
-      user_id: userId,
-      $or: [{ question: { $regex: pattern } }, { answer: { $regex: pattern } }],
-    };
-    if (selfId) query._id = { $ne: new Types.ObjectId(selfId) };
-
-    const others = await this.flashcardModel
-      .find(query, { question: 1, answer: 1 })
-      .lean()
-      .exec();
-
-    const alreadyTaken = new Set(
-      others.flatMap((other) => this.imageIdsOf(other.question, other.answer)),
+    const idMap = await this.contentImages.claim(
+      userId,
+      [dto.question, dto.answer],
+      [previous?.question, previous?.answer],
+      { cardId: selfId },
     );
-
-    const idMap = new Map<string, string>();
-    for (const fileId of ids) {
-      if (!alreadyTaken.has(fileId)) continue;
-      const copyId = await this.fileService.duplicate(fileId);
-      // A missing file means the reference was already broken: left as it is,
-      // since copying nothing would not mend it
-      if (copyId) idMap.set(fileId, copyId);
-    }
     if (!idMap.size) return dto;
 
     return {

@@ -370,7 +370,7 @@ export class ImportExportService {
       let finalAnswer = answer;
 
       if (zip && item.images) {
-        await this.restoreFlashcardImages(zip, item.images, restoredImageIdsByOldId);
+        await this.restoreFlashcardImages(userId, zip, item.images, restoredImageIdsByOldId);
         finalQuestion = replaceImageFileIds(question, restoredImageIdsByOldId);
         finalAnswer = replaceImageFileIds(answer, restoredImageIdsByOldId);
       }
@@ -489,6 +489,7 @@ export class ImportExportService {
   // references keep pointing at the original ids (possibly broken on the new
   // db), exactly as happens for a subject icon.
   private async restoreFlashcardImages(
+    userId: string,
     zip: JSZip,
     images: Record<string, FlashcardImageMeta>,
     restoredImageIdsByOldId: Map<string, string>,
@@ -500,9 +501,10 @@ export class ImportExportService {
       if (!entry) continue;
 
       const buffer = await entry.async('nodebuffer');
-      const savedFile = await this.fileService.create([
-        { buffer, mimetype: meta.mimetype },
-      ]);
+      const savedFile = await this.fileService.create(
+        [{ buffer, mimetype: meta.mimetype }],
+        userId,
+      );
       restoredImageIdsByOldId.set(oldId, String(savedFile._id));
     }
   }

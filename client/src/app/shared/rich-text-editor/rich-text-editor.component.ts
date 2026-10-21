@@ -9,6 +9,7 @@ import { ToastService } from '../toast/toast.service';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { getFileUrl } from '../file/file-url.util';
 import { mathNodeName } from './math.extension';
+import { retryOnConnectivityError } from '../retry.util';
 
 const maxImageSize = 5 * 1024 * 1024;
 
@@ -90,6 +91,17 @@ export class RichTextEditorComponent implements OnInit, OnDestroy {
   private closingMath = false;
   private mathInputEl?: HTMLInputElement;
 
+  /**
+   * Images inserted into this editor that have not been uploaded yet: a
+   * picture is only ever shown from a local blob: URL (keyed here by that
+   * same URL) while it is still just part of a draft, and only turned into a
+   * real server upload by resolvePendingImages(), called right before the
+   * form around this editor is actually submitted. A draft abandoned before
+   * that point never reaches the server at all - there is nothing to clean up
+   * there, only the blob URLs themselves, released in ngOnDestroy.
+   */
+  private readonly pendingImages = new Map<string, File>();
+
   constructor(
     private host: ElementRef<HTMLElement>,
     private fileService: FileService,
@@ -130,6 +142,51 @@ export class RichTextEditorComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.host.nativeElement.removeEventListener('paste', this.onPaste, true);
     this.editor.off('selectionUpdate', this.onSelectionUpdate);
+    this.releasePendingImages();
+  }
+
+  /**
+   * Uploads every image this editor is still only holding as a local blob:
+   * URL and repoints the document at the real, now-permanent files. Called by
+   * the form around this editor right before it reads the final HTML to send
+   * to the server - never on every keystroke, since an image dropped again
+   * before that point should simply never have been uploaded at all.
+   *
+   * A dropped connection is retried a few times before giving up. Past that
+   * the error is left to throw: the caller is expected to stop the save and
+   * stay on the page, rather than send a card with a picture missing. The
+   * pending images are kept as they are, so saving again simply retries.
+   */
+  async resolvePendingImages(): Promise<void> {
+    if (this.pendingImages.size === 0) return;
+
+    // A blob: URL dropped from the content before ever being saved - undone,
+    // replaced, or simply deleted - is never uploaded in the first place.
+    const html = this.editor.getHTML();
+    const urls = [...this.pendingImages.keys()].filter((url) => html.includes(url));
+    if (!urls.length) {
+      this.releasePendingImages();
+      return;
+    }
+
+    const files = urls.map((url) => this.pendingImages.get(url)!);
+    const { ids } = await retryOnConnectivityError(() => this.fileService.upload(files));
+
+    // One dispatch for every image, so the document only re-renders once.
+    const tr = this.editor.state.tr;
+    this.editor.state.doc.descendants((node, pos) => {
+      const index = urls.indexOf(node.attrs['src']);
+      if (index !== -1) tr.setNodeAttribute(pos, 'src', getFileUrl(ids[index]));
+    });
+    this.editor.view.dispatch(tr);
+
+    this.releasePendingImages();
+  }
+
+  /** Frees every blob: URL still pending - nothing here was ever sent to the server, so there is nothing to ask it to delete. */
+  private releasePendingImages(): void {
+    for (const url of this.pendingImages.keys()) URL.revokeObjectURL(url);
+    this.pendingImages.clear();
   }
 
   /**
@@ -315,24 +372,30 @@ export class RichTextEditorComponent implements OnInit, OnDestroy {
     this.editor.chain().focus().setTextSelection(pos).run();
   }
 
-  async onImageSelected(event: Event): Promise<void> {
+  onImageSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
-    if (file) await this.uploadImage(file);
+    if (file) this.insertImage(file);
     input.value = '';
   }
 
-  /** Ctrl+V with an image on the clipboard uploads it, like the image button. */
+  /** Ctrl+V with an image on the clipboard inserts it, like the image button. */
   private readonly onPaste = (event: ClipboardEvent): void => {
     const file = Array.from(event.clipboardData?.files ?? []).find((f) => f.type.startsWith('image/'));
     if (!file) return;
 
     event.preventDefault();
     event.stopPropagation();
-    void this.uploadImage(file);
+    this.insertImage(file);
   };
 
-  private async uploadImage(file: File): Promise<void> {
+  /**
+   * Shows the picture right away from a local blob: URL, without touching the
+   * server: it only becomes a real upload if and when resolvePendingImages()
+   * is called, which is what lets a draft be abandoned - or this very image
+   * swapped for another one - without ever leaving a file behind.
+   */
+  private insertImage(file: File): void {
     if (!file.type.startsWith('image/')) {
       this.toastService.show(this.transloco.translate('flashcard.toast.invalidImageType'), 'error');
       return;
@@ -342,13 +405,9 @@ export class RichTextEditorComponent implements OnInit, OnDestroy {
       return;
     }
 
-    try {
-      const { _id } = await this.fileService.upload(file);
-      this.editor.chain().focus().setImage({ src: getFileUrl(_id) }).run();
-    } catch (err) {
-      console.error('Error uploading image', err);
-      this.toastService.show(this.transloco.translate('flashcard.toast.imageUploadError'), 'error');
-    }
+    const url = URL.createObjectURL(file);
+    this.pendingImages.set(url, file);
+    this.editor.chain().focus().setImage({ src: url }).run();
   }
 
   /**

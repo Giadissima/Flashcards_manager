@@ -17,6 +17,8 @@ import { PostService } from 'src/post/post.service';
 import { Flashcard } from 'src/flashcards/flashcards.schema';
 import { FlashcardsService } from 'src/flashcards/flashcards.service';
 import { Topic } from 'src/topic/topic.schema';
+import { extractImageFileIds, replaceImageFileIds } from 'src/common/html.util';
+import { ContentImageService } from 'src/file/content-image.service';
 
 const ENTITY = 'Subject';
 
@@ -25,6 +27,7 @@ export class SubjectService {
   constructor(
     @InjectModel(Subject.name) private subjectModel: Model<Subject>,
     private readonly fileService: FileService,
+    private readonly contentImages: ContentImageService,
     private readonly postService: PostService,
     @InjectModel(Topic.name) private topicModel: Model<Topic>,
     @InjectModel(Flashcard.name) private flashcardModel: Model<Flashcard>,
@@ -44,6 +47,7 @@ export class SubjectService {
       : undefined;
     const created = await new this.subjectModel({
       ...createSubjectDto,
+      desc: await this.claimDescImages(userId, createSubjectDto.desc),
       icon: icon_id,
       user_id: userId,
     }).save();
@@ -94,6 +98,8 @@ export class SubjectService {
     await this.flashcardsService.deleteMany(userId, { subject_id: id });
     await this.topicModel.deleteMany({ user_id: userId, subject_id: id }).exec();
 
+    await this.contentImages.release(userId, extractImageFileIds(existing.desc));
+
     // The subject is gone, so its post has nothing left to hang off
     await this.postService.refresh(userId, id);
   }
@@ -121,11 +127,20 @@ export class SubjectService {
       ? (await this.fileService.create([icon]))._id
       : undefined;
     const previousIconId = existing.icon;
+    // Left alone when the description was not sent at all
+    const desc =
+      updateObj.desc === undefined
+        ? undefined
+        : await this.claimDescImages(userId, updateObj.desc, existing.desc, id);
 
     const result = await this.subjectModel
       .findOneAndUpdate(
         { _id: id, user_id: userId },
-        { ...updateObj, ...(newIconId ? { icon: newIconId } : {}) },
+        {
+          ...updateObj,
+          ...(desc !== undefined ? { desc } : {}),
+          ...(newIconId ? { icon: newIconId } : {}),
+        },
         { new: true },
       )
       .exec();
@@ -137,6 +152,17 @@ export class SubjectService {
     // Drop the previous icon only once the update actually succeeded.
     if (newIconId && previousIconId) {
       await this.fileService.delete(previousIconId.toString());
+    }
+
+    // Same for the images the edit took out of the description, if they are
+    // the user's own to drop.
+    if (desc !== undefined) {
+      const after = extractImageFileIds(desc);
+      await this.contentImages.release(
+        userId,
+        extractImageFileIds(existing.desc).filter((fileId) => !after.includes(fileId)),
+        { subjectId: id },
+      );
     }
 
     // The form promises it too, not just the quick toggle in the list: it says
@@ -222,6 +248,20 @@ export class SubjectService {
     await Promise.all(
       subjects.map((subject) => this.postService.refresh(userId, String(subject._id))),
     );
+  }
+
+  /** Gives the description image files of its own - see ContentImageService.claim. */
+  private async claimDescImages(
+    userId: string,
+    desc: string | undefined,
+    previousDesc?: string,
+    selfId?: string,
+  ): Promise<string | undefined> {
+    if (!desc) return desc;
+    const idMap = await this.contentImages.claim(userId, [desc], [previousDesc], {
+      subjectId: selfId,
+    });
+    return idMap.size ? replaceImageFileIds(desc, idMap) : desc;
   }
 
   /**

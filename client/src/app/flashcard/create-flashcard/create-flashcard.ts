@@ -1,5 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { HttpErrorResponse } from '@angular/common/http';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder,
   FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
@@ -33,23 +32,7 @@ import { Topic } from '../../models/topic.dto';
 import { TopicService } from '../../topic/topic.service';
 import { TutorialService } from '../../shared/tutorial/tutorial.service';
 import { toSubjectOptions, toTopicOptions } from '../../shared/select-options.util';
-
-// How many times to retry fetching subjects/topics before giving up, and how
-// long to wait between attempts - covers a connection that drops briefly
-// while the (otherwise fine) create-flashcard page is already loaded.
-const MAX_LOAD_ATTEMPTS = 4;
-const LOAD_RETRY_DELAY_MS = 2000;
-
-function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-// status === 0 means the request never reached the server (offline, DNS
-// failure, timeout, CORS...) - a real response from the server, even an
-// error one, means the connection is fine and retrying would not help.
-function isConnectivityError(err: unknown): boolean {
-  return err instanceof HttpErrorResponse && err.status === 0;
-}
+import { retryOnConnectivityError } from '../../shared/retry.util';
 
 @Component({
   selector: 'app-create-card',
@@ -69,6 +52,9 @@ function isConnectivityError(err: unknown): boolean {
   templateUrl: './create-flashcard.html',
 })
 export class CreateFlashcard implements OnInit, OnDestroy {
+  @ViewChild('questionRichEditor') questionRichEditor!: RichTextEditorComponent;
+  @ViewChild('answerRichEditor') answerRichEditor!: RichTextEditorComponent;
+
   cardForm!: FormGroup;
   submitting = false;
   topics: Topic[] = [];
@@ -187,25 +173,12 @@ export class CreateFlashcard implements OnInit, OnDestroy {
     this.answerEditor.destroy();
   }
 
-  // Retries the given loader up to MAX_LOAD_ATTEMPTS times, waiting between
-  // attempts, so a flaky connection gets a chance to recover instead of
-  // leaving the select stuck empty after a single failed request.
-  private async loadWithRetry<T>(loader: () => Promise<T>): Promise<T> {
-    for (let attempt = 1; attempt <= MAX_LOAD_ATTEMPTS; attempt++) {
-      try {
-        return await loader();
-      } catch (err) {
-        if (attempt === MAX_LOAD_ATTEMPTS || !isConnectivityError(err)) throw err;
-        await delay(LOAD_RETRY_DELAY_MS);
-      }
-    }
-    throw new Error('unreachable');
-  }
-
+  // Retried on a dropped connection, so a flaky network does not leave the
+  // select stuck empty after a single failed request.
   async loadTopicsBySubject(subjectId: string | undefined) {
     this.topicsLoading = true;
     try {
-      this.topics = await this.loadWithRetry(() => this.topicService.getSelectableTopics(subjectId));
+      this.topics = await retryOnConnectivityError(() => this.topicService.getSelectableTopics(subjectId));
     } catch (err) {
       console.error('Error loading topics for subject ' + subjectId, err);
       this.toastService.show(this.transloco.translate('flashcard.toast.topicsLoadError'), 'error');
@@ -217,7 +190,7 @@ export class CreateFlashcard implements OnInit, OnDestroy {
   async loadSubjects() {
     this.subjectsLoading = true;
     try {
-      this.subjects = await this.loadWithRetry(() => this.subjectService.getSelectableSubjects());
+      this.subjects = await retryOnConnectivityError(() => this.subjectService.getSelectableSubjects());
     } catch (err) {
       console.error('Error loading subjects', err);
       this.toastService.show(this.transloco.translate('flashcard.toast.subjectsLoadError'), 'error');
@@ -240,20 +213,37 @@ export class CreateFlashcard implements OnInit, OnDestroy {
       return;
     }
 
-    // Untouched "inherit" is left unset rather than sent as whatever the
-    // toggle happened to show before a topic/subject was chosen: the server
-    // then resolves it itself - see create-topic.component.ts for the same idea.
-    const stillInheriting =
-      this.visibilityDefaultMode === 'inherit' && !this.visibilityControl.dirty;
-    const newCard = {
-      ...this.cardForm.value,
-      visibility: stillInheriting ? undefined : this.cardForm.value.visibility,
-      question: this.questionEditor.getHTML(),
-      answer: this.answerEditor.getHTML()
-    };
-
     this.submitting = true;
+
+    // Only now does any picture still held as a local draft actually reach the
+    // server - see RichTextEditorComponent.resolvePendingImages(). Kept apart
+    // from the try below so a failure here is told apart from one saving the
+    // card itself.
+    // One field after the other rather than both at once, so a poor
+    // connection is not asked to carry every picture at the same time.
     try {
+      await this.questionRichEditor.resolvePendingImages();
+      await this.answerRichEditor.resolvePendingImages();
+    } catch (err) {
+      console.error('Error uploading image', err);
+      this.toastService.show(this.transloco.translate('flashcard.toast.imageUploadError'), 'error');
+      this.submitting = false;
+      return;
+    }
+
+    try {
+      // Untouched "inherit" is left unset rather than sent as whatever the
+      // toggle happened to show before a topic/subject was chosen: the server
+      // then resolves it itself - see create-topic.component.ts for the same idea.
+      const stillInheriting =
+        this.visibilityDefaultMode === 'inherit' && !this.visibilityControl.dirty;
+      const newCard = {
+        ...this.cardForm.value,
+        visibility: stillInheriting ? undefined : this.cardForm.value.visibility,
+        question: this.questionEditor.getHTML(),
+        answer: this.answerEditor.getHTML()
+      };
+
       await this.flashcardService.create(newCard);
       this.toastService.show(this.transloco.translate('flashcard.toast.cardAdded'), 'success')
 

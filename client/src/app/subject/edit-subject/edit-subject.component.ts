@@ -40,6 +40,7 @@ import { SubjectIconSvgComponent } from '../subject-icon-svg/subject-icon-svg.co
 })
 export class EditSubjectComponent implements OnInit, OnDestroy {
   @ViewChild(LoadStateComponent, { static: true }) loadState!: LoadStateComponent;
+  @ViewChild('descRichEditor') descRichEditor!: RichTextEditorComponent;
 
   editForm!: FormGroup;
   subjectId?: string;
@@ -189,6 +190,19 @@ export class EditSubjectComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.submitting = true;
+
+    // Only now does any picture still held as a local draft actually reach the
+    // server - see RichTextEditorComponent.resolvePendingImages().
+    try {
+      await this.descRichEditor.resolvePendingImages();
+    } catch (err) {
+      console.error('Error uploading image', err);
+      this.toastService.show(this.transloco.translate('flashcard.toast.imageUploadError'), 'error');
+      this.submitting = false;
+      return;
+    }
+
     const formData = new FormData();
     formData.append('name', this.editForm.get('name')?.value);
     formData.append('desc', this.descEditor.getHTML());
@@ -206,7 +220,6 @@ export class EditSubjectComponent implements OnInit, OnDestroy {
       formData.append('icon', fileToUpload, fileToUpload.name);
     }
 
-    this.submitting = true;
     try {
       await this.subjectService.updateSubject(this.subjectId, formData);
       this.toastService.show(this.transloco.translate('subject.toast.updated'), 'success');

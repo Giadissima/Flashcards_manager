@@ -726,7 +726,7 @@ export class PostService {
      // questions, the one about a topic name already in use included.
     const subject_id = await this.importTarget(owner, source.subject_id?._id, dto);
     const topicOf = await this.importTopics(owner, subject_id, [source], dto);
-    const { question, answer } = await this.copyImages(source);
+    const { question, answer } = await this.copyImages(source, owner);
 
     await this.flashcardModel.create({
       title: source.title,
@@ -864,7 +864,7 @@ export class PostService {
 
     const copies: Record<string, unknown>[] = [];
     for (const source of fresh) {
-      const { question, answer } = await this.copyImages(source);
+      const { question, answer } = await this.copyImages(source, owner);
       copies.push({
         title: source.title,
         question,
@@ -1059,6 +1059,7 @@ export class PostService {
    */
   private async copyImages(
     source: SourceCard,
+    owner: Types.ObjectId,
   ): Promise<{ question: string; answer: string }> {
     const ids = [
       ...new Set([
@@ -1070,7 +1071,7 @@ export class PostService {
 
     const idMap = new Map<string, string>();
     for (const fileId of ids) {
-      const copyId = await this.fileService.duplicate(fileId);
+      const copyId = await this.fileService.duplicate(fileId, String(owner));
       if (copyId) idMap.set(fileId, copyId);
     }
 
